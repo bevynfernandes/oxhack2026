@@ -29,6 +29,7 @@ must treat nested mappings as immutable and hash serialized published artifacts.
 | Forecast bundle | `ForecastManifest` | No outcome artifact reference required |
 | Pre-reveal rows | `ForecastResult` | No actual outcome or outcome maturity fields |
 | Reveal rows | `MatureOutcome` | Separate mature label and outcome vintage |
+| Reveal diagnostics | `OutcomeDiagnostics` | Separate per-tool growth and count/log errors |
 | Evaluation | `EvaluationReport` | Counts, periods, metric definitions, limitations |
 | Evidence | `EvidenceItem` | Measured observations and cautious interpretations |
 | Numerical API | `RankedCandidate`, `ShortlistScore` | Shared ranking/scoring output types |

@@ -147,3 +147,17 @@ class ShortlistScore(Contract):
     recall_at_5: float | None
     regret: float | None
     reason_codes: tuple[str, ...] = ()
+
+
+class OutcomeDiagnostics(Contract):
+    """Separately revealed truth and model-owned per-tool numerical diagnostics."""
+
+    forecast_id: str
+    outcome_vintage: str
+    actual_downloads: int = Field(ge=0)
+    realized_growth_pct: float | None
+    model_absolute_error: float | None = Field(default=None, ge=0)
+    baseline_absolute_error: float | None = Field(default=None, ge=0)
+    model_log_absolute_error: float | None = Field(default=None, ge=0)
+    baseline_log_absolute_error: float | None = Field(default=None, ge=0)
+    reason_codes: tuple[str, ...] = ()

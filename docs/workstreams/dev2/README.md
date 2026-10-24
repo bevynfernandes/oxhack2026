@@ -46,3 +46,9 @@ Ivan now owns Dev 1; this stream remains the authority for numerical policy.
 D2-04a adds `origin_availability` and `calendar_protocol` for exact backwards
 calendar membership. This independent infrastructure does not replace the C1
 feature/label integration gate or establish a successful empirical experiment.
+
+Per-tool reveal: `evaluation.metrics.outcome_diagnostics(forecast, outcome, as_of)`
+returns the additive `OutcomeDiagnostics` contract. Dev 3 can use its realized
+growth, model/baseline absolute count errors, and nullable unavailable states.
+The helper enforces matching frozen identity/windows and the truth's collection
+availability boundary before returning any actuals.

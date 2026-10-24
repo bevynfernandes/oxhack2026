@@ -7,6 +7,7 @@ import orjson
 from oxhack2026.evaluation.contracts import (
     EvaluationReport,
     EvidenceItem,
+    OutcomeDiagnostics,
     RankedCandidate,
     ShortlistScore,
 )
@@ -31,6 +32,7 @@ if __name__ == "__main__":
         MatureOutcome,
         EvaluationReport,
         EvidenceItem,
+        OutcomeDiagnostics,
         RankedCandidate,
         ShortlistScore,
     ):

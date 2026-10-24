@@ -14,6 +14,7 @@ from oxhack2026.evaluation.contracts import (
     CohortCounts,
     EvaluationReport,
     EvidenceItem,
+    OutcomeDiagnostics,
     RankedCandidate,
     ShortlistScore,
 )
@@ -76,6 +77,7 @@ def test_forecast_fixtures(name: str) -> None:
         MatureOutcome,
         EvaluationReport,
         EvidenceItem,
+        OutcomeDiagnostics,
         RankedCandidate,
         ShortlistScore,
     ],
