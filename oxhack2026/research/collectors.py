@@ -22,6 +22,7 @@ from oxhack2026.api.research_v2_schemas import (
     SourceState,
 )
 from oxhack2026.api.schemas import Window
+from oxhack2026.research.documents import page_family
 from oxhack2026.research.extraction import Page, company_links, evidence, parse_page
 from oxhack2026.research.network import CollectionError, Fetcher, public_url
 
@@ -125,11 +126,20 @@ class Collector:
         domain = self.identity.canonical_domain
         queue = deque([(f"https://{domain}/", 0), (f"https://{domain}/sitemap.xml", 1)])
         seen: set[str] = set()
+        families: dict[str, int] = {}
         while queue and len(seen) < 20:
+            index = min(
+                enumerate(queue),
+                key=lambda item: families.get(page_family(item[1][0]), 0),
+            )[0]
+            queue.rotate(-index)
             url, depth = queue.popleft()
+            queue.rotate(index)
             if url in seen:
                 continue
             seen.add(url)
+            family = page_family(url)
+            families[family] = families.get(family, 0) + 1
             try:
                 capture, content = self.fetcher.fetch(url)
                 destination = (urlsplit(capture.final_url).hostname or "").removeprefix(
@@ -150,6 +160,9 @@ class Collector:
                         for link in company_links(page.links, domain)
                         if link not in seen
                     )
+                    if len(queue) > 120:
+                        queue = deque(list(queue)[:120])
+                        self.reasons.append("website_frontier_limit")
             except CollectionError as error:
                 logger.error("Website page collection failed: %s", str(error))  # noqa: TRY400
                 self.reasons.append(str(error))

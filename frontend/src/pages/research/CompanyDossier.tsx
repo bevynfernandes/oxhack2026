@@ -1,3 +1,4 @@
+import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
 import {
   MotionSelection,
   MotionIndicator,
@@ -283,6 +284,7 @@ export default function CompanyDossier({
       0,
     ) ?? 0;
   const partial =
+    standalone?.mapping?.state === "partial" ||
     standalone?.sources.some((source) =>
       ["partial", "failed"].includes(source.state),
     ) ||
@@ -463,7 +465,7 @@ export default function CompanyDossier({
           {partial && (
             <p className="notice warning" role="note">
               {standalone
-                ? "Partial source results: inspect provider coverage and limits."
+                ? "Partial source results: inspect collection and mapping limits."
                 : "Partial source results: attention count unavailable."}{" "}
               <MotionButton onClick={() => open({ kind: "sources", index: 0 })}>
                 View limitations
@@ -539,6 +541,14 @@ export default function CompanyDossier({
               {measurements.size} measurements ·{" "}
               {standalone || report ? "Research report" : "Saved analysis"}
             </p>
+            {standalone && (
+              <MotionButton
+                className="dossier-inline-action"
+                onClick={() => open({ kind: "sources", index: 3 })}
+              >
+                Evidence mapping
+              </MotionButton>
+            )}
           </div>
           <span className="stat-icon">
             <Icon name="file" />
@@ -588,6 +598,9 @@ export default function CompanyDossier({
           const row = sections.get(group.id);
           const model = modelSections.get(group.id);
           const ids = row?.metric_observation_ids ?? [];
+          const coverage = standalone?.mapping?.dimensions.find(
+            (item) => item.group_id === group.id,
+          );
           return (
             <article
               key={group.id}
@@ -621,6 +634,12 @@ export default function CompanyDossier({
                 role="region"
                 aria-label={`${group.name} measurements`}
               >
+                {coverage && (
+                  <small className="more-metrics">
+                    {coverage.status} evidence · {coverage.claim_ids.length}{" "}
+                    claims · {coverage.event_ids.length} events
+                  </small>
+                )}
                 {ids.length ? (
                   <dl>
                     {ids.slice(0, 3).map((id) => {
@@ -643,8 +662,15 @@ export default function CompanyDossier({
                       <Icon name={group.icon} />
                     </span>
                     <p>
-                      {standalone ? (
-                        "Dimension mapping is pending. Inspect fresh evidence in the source inventory."
+                      {coverage ? (
+                        coverage.claim_ids.length ||
+                        coverage.event_ids.length ? (
+                          `${coverage.claim_ids.length} attributed claims · ${coverage.event_ids.length} dated events`
+                        ) : (
+                          "No supported evidence mapped to this dimension."
+                        )
+                      ) : standalone ? (
+                        "Dimension mapping is unavailable for this report. Inspect the source inventory."
                       ) : (
                         <>
                           No verified measurements
@@ -653,7 +679,11 @@ export default function CompanyDossier({
                         </>
                       )}
                     </p>
-                    <span>Evidence gap</span>
+                    <span>
+                      {coverage?.status === "reported"
+                        ? "Reported evidence"
+                        : "Evidence gap"}
+                    </span>
                   </div>
                 )}
                 {ids.length > 3 && (
@@ -806,6 +836,11 @@ export default function CompanyDossier({
           tabIndex={0}
           aria-labelledby={`drawer-tab-${panel.index}`}
         >
+          {standalone && (
+            <div hidden={panel.kind !== "sources" || panel.index !== 3}>
+              <MappingControls key={standalone.report_id} report={standalone} />
+            </div>
+          )}
           {panel.kind === "driver" ? (
             <>
               <div className="drawer-model-state">
@@ -852,9 +887,9 @@ export default function CompanyDossier({
                   ) ?? ["no_published_group_mapping", "model_not_trained"]
                 }
               />
-              {standalone && (
+              {standalone && !standalone.mapping && (
                 <p>
-                  Fresh evidence is not yet mapped to model dimensions.{" "}
+                  This report has no published dimension evidence mapping.{" "}
                   <MotionButton
                     className="secondary"
                     onClick={() => setPanel({ kind: "sources", index: 1 })}
@@ -867,6 +902,12 @@ export default function CompanyDossier({
               {renderMeasurements(
                 section?.metric_observation_ids ?? [],
                 section?.usable_metric_observation_ids ?? [],
+              )}
+              {standalone?.mapping && (
+                <MappedDimensionEvidence
+                  report={standalone}
+                  group={currentGroup.id}
+                />
               )}
             </>
           ) : panel.index === 0 ? (
@@ -988,6 +1029,7 @@ export default function CompanyDossier({
           ) : (
             <>
               <h3>Versions and provenance</h3>
+
               {profile && (
                 <PublicationNotice publication={profile.publication} />
               )}

@@ -12,6 +12,12 @@ from uuid import uuid4
 import httpx
 
 from oxhack2026.api.company_repository import CompanyRepository
+from oxhack2026.api.evidence_mapping_schemas import (
+    MappingCapability,
+    MappingJob,
+    MappingJobRequest,
+    MappingProgress,
+)
 from oxhack2026.api.repository import RepositoryUnavailable
 from oxhack2026.api.research_v2_schemas import (
     PROVIDERS,
@@ -21,6 +27,7 @@ from oxhack2026.api.research_v2_schemas import (
     Job,
     JobRequest,
     ProviderCapability,
+    Report,
     ResearchEvidence,
     SourceState,
 )
@@ -73,6 +80,8 @@ class V2Service:
     transport: httpx.BaseTransport = field(default_factory=PinnedTransport)
     quotas: Quotas = field(default_factory=Quotas)
     dimension_models: DimensionModelRegistry | None = None
+    collection_enabled: bool = True
+    mapping_enabled: bool = True
     _lock: Lock = field(default_factory=Lock)
 
     def capabilities(self) -> Capabilities:
@@ -107,10 +116,37 @@ class V2Service:
         )
         return Capabilities(
             storage_available=self.store.root.is_dir(),
-            collection_enabled=self.executor is not None,
+            collection_enabled=self.executor is not None and self.collection_enabled,
             worker_available=self.executor is not None,
             browser_available=browser,
             providers=providers,
+            mapping=self.mapping_capability(),
+        )
+
+    def mapping_capability(self) -> MappingCapability:
+        """Read mapping configuration and optional SDK presence without API calls."""
+        from oxhack2026.explanations.config import (
+            DEFAULT_MODEL,
+            gemini_api_key,
+            mapping_mode,
+        )
+
+        model = os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL
+        if "-live" in model:
+            installed = importlib.util.find_spec("websockets") is not None
+        else:
+            installed = importlib.util.find_spec("google") is not None
+            installed = (
+                installed and importlib.util.find_spec("google.genai") is not None
+            )
+        available = bool(gemini_api_key()) and installed
+        return MappingCapability(
+            enabled=self.executor is not None and self.mapping_enabled,
+            mode=mapping_mode(),
+            gemini_available=available,
+            reason=None
+            if available
+            else "Gemini credentials or optional SDK unavailable",
         )
 
     def _capacity(self) -> None:
@@ -120,6 +156,10 @@ class V2Service:
         active += sum(
             identity.state in {"queued", "running"}
             for identity in self.store.identities()
+        )
+        active += sum(
+            job.progress.state in {"pending", "running"}
+            for job in self.store.mapping_jobs()
         )
         if active >= 10:
             raise QueueFull
@@ -132,6 +172,8 @@ class V2Service:
             QueueFull: Ten tasks already occupy active/queued capacity.
             RepositoryUnavailable: Worker or optional saved context unavailable.
         """
+        if not self.collection_enabled:
+            raise RepositoryUnavailable
         domain = normalize_domain(request.domain)
         saved = None
         if request.company_id and request.assessment_publication_id:
@@ -280,6 +322,8 @@ class V2Service:
             QueueFull: Worker queue is full.
             RepositoryUnavailable: Collection is disabled.
         """
+        if not self.collection_enabled:
+            raise RepositoryUnavailable
         identity = self.store.identity(request.identity_id)
         if identity.state != "ready":
             raise ConfirmationRequired
@@ -301,6 +345,7 @@ class V2Service:
                     SourceState(provider=provider, name=_NAMES[provider])
                     for provider in PROVIDERS
                 ),
+                mapping=MappingProgress() if self.mapping_enabled else None,
             )
             self.store.save_job(job)
             if self.executor is None:
@@ -341,23 +386,175 @@ class V2Service:
         state = "failed"
         if useful:
             report = compose(job, identity, self.dimension_models)
+            if self.mapping_enabled:
+                report = self._map_report(job.job_id, report)
             self.store.publish(report)
             report_id = report.report_id
             state = (
                 "partial"
                 if any(source.state in {"partial", "failed"} for source in job.sources)
+                or (report.mapping and report.mapping.state == "partial")
                 else "completed"
             )
         self.store.save_job(
             Job.model_validate(
                 {
                     **job.model_dump(),
+                    "mapping": self.store.job(job.job_id).mapping,
                     "state": state,
                     "report_id": report_id,
                     "finished_at": datetime.now(UTC),
                 }
             )
         )
+
+    def _map_report(self, job_id: str, report: Report) -> Report:
+        from oxhack2026.research.evidence_mapping import MappingEngine
+
+        def checkpoint(progress: MappingProgress) -> None:
+            current = self.store.job(job_id)
+            if current.mapping:
+                progress = progress.model_copy(
+                    update={
+                        "started_at": current.mapping.started_at or progress.started_at,
+                        "completed_batches": max(
+                            current.mapping.completed_batches,
+                            progress.completed_batches,
+                        ),
+                    }
+                )
+            self.store.save_job(current.model_copy(update={"mapping": progress}))
+
+        result = MappingEngine(self.store.root, checkpoint).map(report)
+        current = self.store.job(job_id)
+        checkpoint(
+            MappingProgress(
+                state=result.mapping.state if result.mapping else "failed",
+                started_at=current.mapping.started_at if current.mapping else None,
+                finished_at=datetime.now(UTC),
+                completed_batches=current.mapping.completed_batches
+                if current.mapping
+                else 0,
+                reason_codes=result.mapping.reason_codes
+                if result.mapping
+                else ("mapping_unavailable",),
+            )
+        )
+        return result
+
+    def create_mapping(self, request: MappingJobRequest) -> MappingJob:
+        """Queue retained-capture interpretation; coalesce equivalent active work.
+
+        Raises:
+            RepositoryUnavailable: Mapping worker is disabled.
+            QueueFull: Shared research queue has no free slots.
+            KeyError: Source report does not exist.
+            ValueError: Report or captures fail integrity verification.
+        """
+        if self.executor is None or not self.mapping_enabled:
+            raise RepositoryUnavailable
+        self.store.report(request.source_report_id)
+        with self._lock:
+            for previous in self.store.mapping_jobs():
+                if (
+                    previous.source_report_id == request.source_report_id
+                    and previous.progress.state in {"pending", "running"}
+                ):
+                    return previous
+            self._capacity()
+            job = MappingJob(
+                job_id=uuid4().hex,
+                source_report_id=request.source_report_id,
+                requested_at=datetime.now(UTC),
+            )
+            self.store.save_mapping_job(job)
+            try:
+                self.executor.submit(self.run_mapping, job.job_id)
+            except RuntimeError as error:
+                self.store.save_mapping_job(
+                    job.model_copy(
+                        update={
+                            "progress": MappingProgress(
+                                state="failed",
+                                finished_at=datetime.now(UTC),
+                                reason_codes=("worker_unavailable",),
+                            )
+                        }
+                    )
+                )
+                raise RepositoryUnavailable from error
+            return job
+
+    def run_mapping(self, job_id: str) -> None:
+        """Publish a new report from retained captures only; preserve source dates."""
+        from oxhack2026.research.evidence_mapping import MappingEngine
+
+        job = self.store.mapping_job(job_id)
+        if job.progress.state not in {"pending", "running"}:
+            return
+        started = job.progress.started_at or datetime.now(UTC)
+
+        def checkpoint(progress: MappingProgress) -> None:
+            current = self.store.mapping_job(job_id)
+            progress = progress.model_copy(
+                update={
+                    "started_at": current.progress.started_at or progress.started_at,
+                    "completed_batches": max(
+                        current.progress.completed_batches, progress.completed_batches
+                    ),
+                }
+            )
+            self.store.save_mapping_job(
+                current.model_copy(update={"progress": progress})
+            )
+
+        checkpoint(
+            MappingProgress(
+                state="running",
+                started_at=started,
+                completed_batches=job.progress.completed_batches,
+            )
+        )
+        try:
+            source = self.store.report(job.source_report_id)
+            report_id = uuid4().hex
+            source = source.model_copy(
+                update={
+                    "report_id": report_id,
+                    "outlook": source.outlook.model_copy(
+                        update={"source_snapshot_id": report_id}
+                    ),
+                }
+            )
+            report = MappingEngine(self.store.root, checkpoint).map(
+                source, job.source_report_id
+            )
+            self.store.publish(report)
+            current = self.store.mapping_job(job_id)
+            progress = MappingProgress(
+                state=report.mapping.state if report.mapping else "failed",
+                started_at=started,
+                finished_at=datetime.now(UTC),
+                completed_batches=current.progress.completed_batches,
+                reason_codes=report.mapping.reason_codes if report.mapping else (),
+            )
+            self.store.save_mapping_job(
+                current.model_copy(
+                    update={"progress": progress, "report_id": report_id}
+                )
+            )
+        except (OSError, ValueError, RuntimeError) as error:
+            logger.error(  # noqa: TRY400
+                "Retained evidence mapping failed: %s", type(error).__name__
+            )
+            checkpoint(
+                MappingProgress(
+                    state="failed",
+                    started_at=started,
+                    finished_at=datetime.now(UTC),
+                    reason_codes=("mapping_storage_or_integrity_failure",),
+                )
+            )
 
     def run(self, job_id: str) -> None:
         """Checkpoint every collector transition; independent failures preserve
@@ -446,6 +643,56 @@ class V2Service:
                 )
         for job in self.store.jobs():
             if job.state == "queued":
-                self.executor.submit(self.run, job.job_id)
+                if self.collection_enabled:
+                    self.executor.submit(self.run, job.job_id)
+                else:
+                    self._cancel_queued_collection(job)
             elif job.state == "running":
                 self._interrupt(job, "worker_interrupted")
+        self._recover_mappings(self.executor)
+
+    def _recover_mappings(self, executor: Executor) -> None:
+        for mapping_job in self.store.mapping_jobs():
+            if mapping_job.progress.state in {"pending", "running"}:
+                if self.mapping_enabled:
+                    executor.submit(self.run_mapping, mapping_job.job_id)
+                else:
+                    self.store.save_mapping_job(
+                        mapping_job.model_copy(
+                            update={
+                                "progress": mapping_job.progress.model_copy(
+                                    update={
+                                        "state": "failed",
+                                        "finished_at": datetime.now(UTC),
+                                        "reason_codes": (
+                                            "mapping_disabled_during_recovery",
+                                        ),
+                                    }
+                                ),
+                            }
+                        )
+                    )
+
+    def _cancel_queued_collection(self, job: Job) -> None:
+        finished = datetime.now(UTC)
+        self.store.save_job(
+            job.model_copy(
+                update={
+                    "state": "failed",
+                    "finished_at": finished,
+                    "reason_codes": ("collection_disabled_during_recovery",),
+                    "sources": tuple(
+                        source.model_copy(
+                            update={
+                                "state": "failed",
+                                "finished_at": finished,
+                                "reason_codes": (
+                                    "collection_disabled_during_recovery",
+                                ),
+                            }
+                        )
+                        for source in job.sources
+                    ),
+                }
+            )
+        )

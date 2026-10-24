@@ -225,6 +225,15 @@ function StandaloneJobPage() {
           </p>
           <Reasons reasons={job.reason_codes} />
           <SourceProgress sources={job.sources} />
+          {job.mapping && (
+            <section aria-label="Evidence mapping progress">
+              <h3>Evidence mapping: {job.mapping.state}</h3>
+              <p>
+                {job.mapping.completed_batches} interpretation batches processed
+              </p>
+              <Reasons reasons={job.mapping.reason_codes} />
+            </section>
+          )}
           <div className="research-actions">
             {job.report_id && (
               <Link

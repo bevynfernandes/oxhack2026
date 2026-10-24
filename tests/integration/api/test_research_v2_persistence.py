@@ -58,6 +58,7 @@ def test_refresh_immutable_capture_integrity_and_disabled_reads(
 ) -> None:
     """A refresh publishes new bytes while the previous report and captures stay
     exact."""
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
     service = _service(tmp_path)
     request = _confirmed(service)
     first = service.create(request)
@@ -98,11 +99,14 @@ def test_refresh_immutable_capture_integrity_and_disabled_reads(
         service.store.report(report_id)
 
 
-def test_recovery_preserves_completed_collectors(tmp_path: Path) -> None:
+def test_recovery_preserves_completed_collectors(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Recovery interrupts unfinished work while retaining useful completed
     checkpoints."""
     from oxhack2026.research.collectors import Collector
 
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
     service = _service(tmp_path)
     job = service.create(_confirmed(service))
     started = job.model_copy(

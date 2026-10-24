@@ -284,3 +284,32 @@ pixel identity.
   verification limits and native-control/non-Latin fallback differences apply.
   This follows the reference's visual language, using an OFL font substitute and
   original artwork rather than claiming identical branded pixels.
+
+### Integration with the new evidence-mapping UI
+
+- Main advanced during delivery to `f1b7e65` (mapped evidence presentation and
+  immutable re-mapping). Integrated that UI into the theme branch while retaining the other
+  developer's work.
+- The only conflict was the measurement wrapper: retain both the theme's labelled
+  keyboard-scroll region and the new backend-provided coverage/claim/event counts.
+  New mapping controls, attributed quotes, links, polling and explicit writes are
+  unchanged from main. Backend/API/generated-type files have no PR diff.
+- Integrated formatting, generated types, TypeScript, build and 63 unit tests pass.
+  The two additional units are the other developer's mapping tests.
+- The optional live re-mapping browser case requires a retained mapped report and
+  configured mapping worker; no report ID was supplied, so it remains explicitly
+  skipped. Existing publication/dimension/immutable-report replay remains enabled.
+- Integrated application size is CSS 17.23 KB gzip, entry JS 172.05 KB and chart
+  JS 172.07 KB. The extra JavaScript comes from the newly integrated mapping UI;
+  the theme revision itself added no application JavaScript.
+- A new mapping link increased the summary row height. Compact mapping-action
+  typography and model-note spacing keep the original standalone report geometry
+  checks passing. Inline-control hover remains transparent.
+- Final integrated browser artifacts and logs use `hermes-delivery` and
+  `hermes-delivery-real`. The initial integrated run and focused spacing regression
+  remain in `hermes-integrated` and `hermes-mapping-fit`; earlier captures are kept.
+- Final integrated result: 63 unit tests, all 52 default browser tests, three real
+  replay cases, formatting, generated types, TypeScript and production build pass.
+  One optional live re-mapping case is explicitly skipped for the missing report
+  fixture described above. No known visual or interaction regression remains in
+  the audited Chromium flows.

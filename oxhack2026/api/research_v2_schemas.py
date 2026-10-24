@@ -7,6 +7,11 @@ from urllib.parse import urlsplit
 from pydantic import AfterValidator, Field, TypeAdapter, model_validator
 
 from oxhack2026.api.company_schemas import CompanyDetail
+from oxhack2026.api.evidence_mapping_schemas import (
+    MappingBundle,
+    MappingCapability,
+    MappingProgress,
+)
 from oxhack2026.api.research_schemas import Domain, JobState, ResearchRequest
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime, Window
 from oxhack2026.models.dimension_serving import CompanyDimensionModels
@@ -203,6 +208,9 @@ class Job(DTO):
     report_id: Identifier | None = None
     sources: tuple[SourceState, ...]
     reason_codes: tuple[str, ...] = ()
+    mapping: MappingProgress | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @model_validator(mode="after")
     def _consistent(self) -> Self:
@@ -249,6 +257,9 @@ class Report(DTO):
         default=None, exclude_if=lambda value: value is None
     )
     limitations: tuple[str, ...]
+    mapping: MappingBundle | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @model_validator(mode="after")
     def _references(self) -> Self:
@@ -274,6 +285,29 @@ class Report(DTO):
         ):
             message = "Observation identifiers must be unique"
             raise ValueError(message)
+        if self.mapping:
+            support = {item.evidence_id: item for item in self.evidence}
+            records = {
+                "observation": {item.observation_id for item in self.observations},
+                "claim": {item.claim_id for item in self.claims},
+                "event": {item.event_id for item in self.events},
+            }
+            for mapped in self.mapping.records:
+                if (
+                    mapped.record_id not in records[mapped.record_type]
+                    or not set(mapped.evidence_ids) <= evidence
+                ):
+                    message = "Mapping references an absent record or evidence"
+                    raise ValueError(message)
+                if any(
+                    quote.evidence_id not in mapped.evidence_ids
+                    or quote.capture_id not in captures
+                    or support[quote.evidence_id].capture_id != quote.capture_id
+                    or support[quote.evidence_id].excerpt != quote.exact
+                    for quote in mapped.quotes
+                ):
+                    message = "Mapping quote references absent support"
+                    raise ValueError(message)
         return self
 
 
@@ -301,3 +335,6 @@ class Capabilities(DTO):
     request_budget: int = 120
     response_bytes: int = 4194304
     capture_bytes: int = 33554432
+    mapping: MappingCapability | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )

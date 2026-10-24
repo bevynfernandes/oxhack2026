@@ -1625,3 +1625,19 @@ button.secondary:hover {
 .terminal-view > main:has(.research-start) {
   overflow: auto;
 }
+
+.evidence-mapping-controls {
+  display: grid;
+  gap: 10px;
+  margin-block: 16px;
+  overflow-wrap: anywhere;
+}
+.evidence-mapping-controls p {
+  margin: 0;
+}
+[aria-label="Mapped claims and events"] blockquote {
+  margin: 12px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--terminal-line);
+  overflow-wrap: anywhere;
+}

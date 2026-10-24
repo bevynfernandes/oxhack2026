@@ -58,3 +58,21 @@ export async function confirmIdentity(identityId: string) {
     }),
   );
 }
+
+/** Explicitly interpret retained captures without fetching company sources again. */
+export async function createMappingJob(reportId: string) {
+  return researchResult(
+    await api.POST("/api/v2/research-mapping-jobs", {
+      body: { source_report_id: reportId },
+    }),
+  );
+}
+
+/** Poll a durable mapping job; this read never submits another write. */
+export async function fetchMappingJob(jobId: string) {
+  return researchResult(
+    await api.GET("/api/v2/research-mapping-jobs/{job_id}", {
+      params: { path: { job_id: jobId } },
+    }),
+  );
+}

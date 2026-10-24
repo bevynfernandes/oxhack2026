@@ -1052,3 +1052,23 @@
     min-height: 650px;
   }
 }
+
+/* Leave room for explicit mapping actions without crowding dimension evidence. */
+.theme-techno-classical .dossier-stat > div > .dossier-inline-action {
+  font: 600 11px/1.4 var(--theme-display);
+}
+.theme-techno-classical .pillar-model-note {
+  padding-block: 10px;
+}
+.theme-techno-classical
+  :is(
+    .pillar-expand:hover,
+    .dossier-inline-action:hover,
+    .pillar-card footer button:hover,
+    .dossier-ledger button:hover,
+    .dossier-banners button:hover,
+    button.motion-disclosure-trigger:hover
+  ) {
+  background-color: transparent;
+  border-color: transparent;
+}
