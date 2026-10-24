@@ -16,9 +16,13 @@ Company checkpoints:
 - Calendar horizons and separate maturity/unknown-label contracts: #24.
 - Three-section evidence-only assessment contracts and schema: #26.
 - Outcome-specific chronological label selection and family exclusions: #29.
-- The deterministic builder consumes actual C1 classes and has been run against
-  the real two-company source publication. See
+- Deterministic real-company assessments: #33, published through Dev 1's exact
+  source/assessment store and verified in the real API. See
   `docs/tasks/dev2/company-evidence-builder.md` for policy and handoff details.
+- Outcome-specific proper scores, discrimination and calibration diagnostics: #37.
+- Multi-family numerical feature projection with shared evidence usability: #40.
+- Training-only prevalence comparator: #42; explicit exclusions and no invented
+  prior when mature labels are absent.
 
 Earlier traction checkpoints:
 
@@ -46,9 +50,9 @@ Catalogue resolution and callable baseline batch generation now consume C1
 identities. Contemporary historical cohorts require explicit opt-in and retain
 their retrospective/survivorship limitations.
 
-Pending: company assessment publication/application integration, representative
-historical cohort and mature labels, learned outcome experiments, calibrated
-evaluation and the probability-serving gate. Dev 1 has published real npm and
+Pending: company browser acceptance, historically justified features/families and
+mature labels, learned outcome experiments, calibrated evaluation and the
+probability-serving gate. Dev 1 has published real npm and
 company source bundles; these are evidence inputs, not success-label cohorts.
 Synthetic fixtures establish software behavior only; no empirical performance,
 validated interval, real-data product completion, or cloud deployment is claimed.
