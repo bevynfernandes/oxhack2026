@@ -21,11 +21,20 @@ published source/assessment graphs, not collector checkpoints or credentials.
   `39ad67f0a0aaecb1f9d42bc082e76387261f20477d77d9bc23e8aebea2b9d41a`
 
 Restore with `python -m oxhack2026 data company-restore ZIP NEW_ROOT SHA256`.
-Compose Dev 3's PublishedCompanyRepository with `LocalCompanyStore(NEW_ROOT)`
-and `SourceScopedAssessmentReader(LocalCompanyAssessmentStore(NEW_ROOT),
-("company-assessments-vector-20261024-v1",))`. No latest-policy inference occurs.
-Source/assessment publication and real API acceptance are complete. Readiness,
-list, both profiles, three outcome sections, missing financials, privacy and 404
-checks pass in the API-only environment. Restarting the actual server reproduces
-identical response bytes. The final browser comparison gate remains Dev 3
-integration work.
+Set `SIGNALSHIFT_COMPANY_ROOT=NEW_ROOT` and
+`SIGNALSHIFT_COMPANY_PUBLICATIONS=company-assessments-vector-20261024-v1`, then
+serve `oxhack2026.api.company_runtime:create_company_app` with Uvicorn's factory
+mode. API routes select the exact assessment publication ID, retaining the source
+snapshot separately; retired selections fail rather than resolving another policy.
+
+- Source/assessment publication, real API and real browser acceptance are complete.
+- Readiness, list, both profiles, three outcome sections, missing financials,
+  privacy and 404 checks pass in the API-only environment. Restarting the actual
+  server reproduces identical response bytes.
+- #44/#45 browser integration at `6cf7f66` passes real company search, list,
+  profile, source inspection and comparison, including mobile/keyboard and axe
+  checks. Commercial measurements remain unknown and probabilities remain null.
+- Retained browser evidence: `tests/outputs/company-first-ui-real/`; details are
+  in the [Dev 1 acceptance audit](../../workstreams/dev1/STATUS.md).
+- Fresh research and the broader prediction proposal in #46 are separate gates;
+  this verifies the existing saved-assessment application only.
