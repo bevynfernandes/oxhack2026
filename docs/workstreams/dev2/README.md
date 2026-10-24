@@ -29,5 +29,12 @@ No real dataset, model performance, or product acceptance is claimed. Synthetic
 artifact references use placeholder hashes and do not identify retrievable files.
 Real baseline evaluation waits for a frozen, verified C1 npm bundle.
 
-Next: D2-02 temporal builders and ranking policy, followed by D2-03 baselines.
-Contracts remain a checkpoint draft until cross-stream compatibility is checked.
+Merged: C2 PR #3, corrected author/sign-off `daniyalrai364@gmail.com`. Integration
+with C3 passes 102 local tests; GitHub Python/frontend checks pass. Dev 3's merged
+bootstrap enabled the existing declared extras in integration CI.
+
+The overlapping shared policy implementation is coordinated through PR #4;
+use that implementation rather than the retained local policy prototype.
+D2-03a on `dev/models-baselines-v1` supplies aggregate baseline formulas and
+tie-averaged comparator expectations. Its numerical tests pass on synthetic
+counts. Real feature/label building and baseline artifacts still require C1.
