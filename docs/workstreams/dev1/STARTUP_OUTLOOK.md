@@ -126,3 +126,15 @@ claims; adding selected famous shutdowns does not solve survivorship bias.
 - Integration of separately published Dev 2 assessments with Dev 3 company views.
 - Separate accounting for evidence-product completion, label coverage and model
   validation. Older download progress is not revised-product completion.
+
+## Concrete first profile candidate
+
+LangChain already has a verified npm/repository mapping in the current catalogue.
+Combine its dated SDK download windows, public `langchain-ai/langchainjs` release
+records (labelled SDK execution activity), and the company's
+[20 October 2025 financing announcement](https://www.langchain.com/blog/series-b).
+That primary announcement reports a $125 million raise; record it as a dated
+company-reported financing event, without asserting that it is the latest round
+or that funding establishes runway or profitability. Cash flow, retention and
+comparable paying-customer histories remain unknown without further evidence.
+This is a proposed real-source profile, not a normalized/published company bundle.
