@@ -38,3 +38,11 @@ use that implementation rather than the retained local policy prototype.
 D2-03a on `dev/models-baselines-v1` supplies aggregate baseline formulas and
 tie-averaged comparator expectations. Its numerical tests pass on synthetic
 counts. Real feature/label building and baseline artifacts still require C1.
+
+Merged baseline formulas/comparators: PR #5. Shared policy: PR #4, reviewed
+against the plan and checked together with baseline code (150 passing tests).
+Ivan now owns Dev 1; this stream remains the authority for numerical policy.
+
+D2-04a adds `origin_availability` and `calendar_protocol` for exact backwards
+calendar membership. This independent infrastructure does not replace the C1
+feature/label integration gate or establish a successful empirical experiment.
