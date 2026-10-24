@@ -1,5 +1,12 @@
 # C2 numerical artifacts
 
+Research reports can embed `StartupOutlook` from `models/startup_outlook.py`.
+This additive `startup-outlook-placeholder-v1` payload has five metric groups,
+independent data/model status, source references and null predictions/overall
+outlook. `available` describes usable observations, not training readiness.
+`build_untrained_outlook` requires an explicit versioned metric-to-group mapping;
+unmapped observations remain visible. No model runs or weights are implied.
+
 Company evidence profiles use `company-assessments-v1` in
 `models/company_assessments.py`. `CompanyAssessment` contains all three outlook
 sections, source-linked statements and explicit unavailable evidence. Probabilities
