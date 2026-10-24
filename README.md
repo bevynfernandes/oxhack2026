@@ -3,10 +3,11 @@
 Project template for the developer-tool scouting application described in
 [PLAN.md](PLAN.md). The implementation plan remains the source of truth.
 
-**Status: scaffold only.** Python modules reserve implementation boundaries;
-the frontend renders a static template notice. There are no source connectors,
-API endpoints, database models, forecasts, evaluation algorithms, CLI commands,
-or cloud integrations yet.
+**Status: contracts and API foundation.** C1 data types, C2 model types and C3
+read-only API routes are implemented with synthetic contract tests. Source
+ingestion, persistent repositories and real forecast datasets are not yet
+available. An unconfigured API reports unavailable data rather than invented
+results. See the workstream handoffs under `docs/workstreams/`.
 
 ## Development setup
 
@@ -18,8 +19,8 @@ make notebooks
 make frontend-install
 ```
 
-The default Python installation includes development tools. Planned application
-dependencies are opt-in extras, for example:
+The development installation includes all locked extras for shared checks.
+Individual runtime environments can use narrower profiles, for example:
 
 ```bash
 uv sync --frozen --inexact --extra api --extra data --group docs
@@ -40,7 +41,8 @@ npm --prefix frontend run dev
 ```
 
 See [frontend/README.md](frontend/README.md) for the frontend structure.
-There is no backend server or `signalshift` CLI entry point at this stage.
+See [the API handoff](docs/workstreams/dev3/README.md) for backend startup and
+repository wiring. There is no `signalshift` CLI entry point at this stage.
 
 ## Verification
 
@@ -48,8 +50,10 @@ There is no backend server or `signalshift` CLI entry point at this stage.
 make check test build docs-test frontend-check
 ```
 
-The Python tests check namespace imports only. Passing scaffold checks does not
-validate any forecasting or product behavior. CI runs the same checks.
+Python checks cover contracts, API behavior and saved synthetic fixtures.
+Passing them does not establish real-data forecasting performance. Service
+integration tests are opt-in with `make test-integration`; default tests require
+no external services. CI installs all declared extras and runs shared checks.
 
 ## Layout
 
