@@ -1,5 +1,14 @@
 # SignalShift: startup outlook
 
+Approved UI alignment (2026-10-24): **Startup Outlook → Growth (24 months),
+Survival (24 months), Financial Health (12 months) → five fundamental driver
+groups → sources and limitations**. See the
+[current decision and API boundary](docs/tasks/dev2/prediction-workspace-alignment.md)
+and [canonical design reference](design/prediction-workspace/README.md).
+Ivan retains the frontend assignment. This supersedes the older page hierarchy
+below; saved v1 outcomes keep their exact meanings. Numerical predictions remain
+unavailable pending label/data review and validated local models.
+
 Latest direction: [startup prediction plan #46](https://github.com/bevynfernandes/oxhack2026/issues/46)
 and its [data-readiness and delivery plan](docs/tasks/dev2/startup-prediction-reset.md)
 update the scope below to Software/SaaS, single-company research and local backend

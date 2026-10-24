@@ -1398,6 +1398,55 @@ export interface components {
             tool_id: string;
         };
         /**
+         * OutcomeForecast
+         * @description An agreed product horizon without an approved label policy or model.
+         *
+         *     Attributes:
+         *         outcome_id: Product outcome, separate from specialist groups/v1 targets.
+         *         horizon_months: Approved calendar-month horizon from the report cutoff.
+         *         definition_status: Detailed labels/thresholds still require a data review.
+         *         model_status: No training or inference has run for this outcome.
+         *         prediction: Always null; no probability or score is permitted.
+         *         reason_codes: Both label-policy and model limitations, in display order.
+         *
+         *     Raises:
+         *         ValueError: Horizon disagrees with the outcome or a prediction is injected.
+         */
+        OutcomeForecast: {
+            /**
+             * Definition Status
+             * @default pending_label_policy
+             * @constant
+             */
+            definition_status: "pending_label_policy";
+            /** Horizon Months */
+            horizon_months: number;
+            /**
+             * Model Status
+             * @default model_not_trained
+             * @constant
+             */
+            model_status: "model_not_trained";
+            /**
+             * Outcome Id
+             * @enum {string}
+             */
+            outcome_id: "growth" | "survival" | "financial_health";
+            /** Prediction */
+            prediction?: null;
+            /**
+             * Reason Codes
+             * @default [
+             *       "target_definition_pending",
+             *       "model_not_trained"
+             *     ]
+             */
+            reason_codes: [
+                "target_definition_pending",
+                "model_not_trained"
+            ];
+        };
+        /**
          * Provenance
          * @description Public immutable version references, never storage locations or secrets.
          */
@@ -1788,6 +1837,8 @@ export interface components {
          *         inference_runtime: Intended execution location; no inference has run.
          *         overall_outlook: Null; this contract cannot fabricate an outlook index.
          *         overall_reason_codes: Why a combined prediction cannot be served.
+         *         forecasts: Three outcome placeholders for new reports. Absent in older
+         *             reports; omitted on serialization to preserve their original bytes.
          *
          *     Raises:
          *         ValueError: Groups or observation assignments repeat or are incomplete.
@@ -1800,6 +1851,8 @@ export interface components {
             as_of: string;
             /** Company Id */
             company_id: string;
+            /** Forecasts */
+            forecasts?: components["schemas"]["OutcomeForecast"][] | null;
             /** Grouping Policy Version */
             grouping_policy_version: string;
             /**

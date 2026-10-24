@@ -5,6 +5,16 @@ Bevyn owns research jobs/report storage and embeds `StartupOutlook` from
 `oxhack2026.models.startup_outlook`. Ivan renders the backend payload. Existing
 company source/assessment v1 contracts are unchanged.
 
+The user-approved [prediction workspace](prediction-workspace-alignment.md) adds
+three `forecasts` above the five driver groups: Growth/Survival at 24 calendar
+months and Financial Health at 12. New builders include all three with null
+predictions, `pending_label_policy` and `model_not_trained`. Their ordered reasons
+are `target_definition_pending` and `model_not_trained`. These are product outcomes,
+not aliases for existing v1 targets or approved labels. Detailed endpoint criteria
+and trained serving remain gated. Older reports omit `forecasts`; validation and
+serialization preserve that absence and their original bytes. The generated API
+field is optional for compatibility, not permission to drop a new report's lanes.
+
 Call `build_untrained_outlook(snapshot, company_id, metric_groups, policy_version)`
 with a validated source snapshot and an explicit mapping from metric-definition ID
 to group ID. Financing must not be guessed to mean industry outlook. Unmapped

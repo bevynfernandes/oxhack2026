@@ -215,12 +215,31 @@ def test_report_preserves_saved_bytes_and_resolves_new_inventory(
     assert report.outlook.overall_outlook is None
     assert len(report.outlook.specialists) == 5
     assert all(row.prediction is None for row in report.outlook.specialists)
+    assert report.outlook.forecasts is not None
+    assert [row.horizon_months for row in report.outlook.forecasts] == [24, 24, 12]
+    assert all(row.prediction is None for row in report.outlook.forecasts)
     attention = report.outlook.specialists[1]
     assert attention.data_status == "available"
     assert attention.metric_observation_ids == (captured.observation.observation_id,)
     assert report.inventory.capture_sha256 == captured.evidence.raw_artifact.sha256
     assert ResearchReport.model_validate_json(report.model_dump_json()) == report
     assert "raw_artifact" not in report.model_dump_json()
+
+
+def test_legacy_report_round_trip_preserves_original_payload(
+    context: tuple[CompanySourceSnapshot, CompanyDetail],
+) -> None:
+    """An immutable pre-forecast report remains byte-identical after validation."""
+    source, saved = context
+    report = build_report(
+        _job(), saved, source, _capture({"hits": [], "nbHits": 0, "nbPages": 0})
+    )
+    original_bytes = report.model_dump_json(exclude={"outlook": {"forecasts"}})
+
+    loaded = ResearchReport.model_validate_json(original_bytes)
+
+    assert loaded.outlook.forecasts is None
+    assert loaded.model_dump_json() == original_bytes
 
 
 @pytest.mark.parametrize("company", ["observation", "evidence"])

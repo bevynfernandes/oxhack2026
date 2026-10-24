@@ -8,6 +8,7 @@ import pytest
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.startup_outlook import (
     SPECIALIST_GROUP_IDS,
+    OutcomeForecast,
     SpecialistGroupId,
     SpecialistOutlook,
     StartupOutlook,
@@ -209,3 +210,74 @@ def test_group_inventory_and_assignment_are_unambiguous() -> None:
         )
     with pytest.raises(ValueError, match="requires a reason"):
         StartupOutlook.model_validate(payload | {"overall_reason_codes": ()})
+
+
+def test_outcome_horizons_are_separate_from_five_driver_groups() -> None:
+    """New reports expose the three agreed targets without claiming predictions."""
+    outlook = _outlook()
+
+    assert outlook.forecasts is not None
+    assert [(row.outcome_id, row.horizon_months) for row in outlook.forecasts] == [
+        ("growth", 24),
+        ("survival", 24),
+        ("financial_health", 12),
+    ]
+    assert len(outlook.specialists) == 5
+    for forecast in outlook.forecasts:
+        assert forecast.definition_status == "pending_label_policy"
+        assert forecast.model_status == "model_not_trained"
+        assert forecast.prediction is None
+        assert forecast.reason_codes == (
+            "target_definition_pending",
+            "model_not_trained",
+        )
+
+
+@pytest.mark.parametrize(
+    "patch",
+    [
+        {"outcome_id": "financing_or_acquisition_24m_v1"},
+        {"horizon_months": 12},
+        {"horizon_months": "24"},
+        {"prediction": 0.8},
+        {"definition_status": "approved"},
+        {"model_status": "validated"},
+        {"reason_codes": ("model_not_trained",)},
+        {"confidence": 0.99},
+    ],
+)
+def test_outcome_placeholder_rejects_unapproved_claims(
+    patch: dict[str, object],
+) -> None:
+    """Old target IDs, wrong periods and numerical claims cannot leak into UI."""
+    payload = OutcomeForecast(outcome_id="growth", horizon_months=24).model_dump()
+
+    with pytest.raises(ValueError):
+        OutcomeForecast.model_validate(payload | patch)
+
+
+@pytest.mark.parametrize("indices", [(0, 1), (0, 1, 1), (2, 1, 0), ()])
+def test_forecast_inventory_cannot_drop_duplicate_or_reorder_outcomes(
+    indices: tuple[int, ...],
+) -> None:
+    """Every new report must retain all three distinct ordered outcomes."""
+    outlook = _outlook()
+    assert outlook.forecasts is not None
+    forecasts = tuple(outlook.forecasts[index] for index in indices)
+
+    with pytest.raises(ValueError, match="Forecasts require"):
+        StartupOutlook.model_validate(outlook.model_dump() | {"forecasts": forecasts})
+
+
+def test_legacy_outlook_serialization_does_not_add_forecast_fields() -> None:
+    """Reading a previously published report must not change its serialized bytes."""
+    legacy_payload = _outlook().model_dump(exclude={"forecasts"})
+    legacy_bytes = _outlook().model_dump_json(exclude={"forecasts"})
+
+    loaded = StartupOutlook.model_validate(legacy_payload)
+    reloaded = StartupOutlook.model_validate_json(legacy_bytes)
+
+    assert loaded.forecasts is None
+    assert reloaded == loaded
+    assert loaded.model_dump_json() == legacy_bytes
+    assert loaded.model_dump() == legacy_payload
