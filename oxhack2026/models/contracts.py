@@ -1,10 +1,17 @@
 """Versioned numerical artifacts; importing these types starts no services."""
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import PurePosixPath
 from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from oxhack2026.features.definitions import (
+    HISTORY_DAYS,
+    MIN_REFERENCE_COUNT,
+    require_utc,
+    target_windows,
+)
 
 SCHEMA_VERSION: Literal["models-v1"] = "models-v1"
 Ecosystem = Literal["npm", "pypi"]
@@ -70,10 +77,7 @@ class TimeWindow(Contract):
         Raises:
             ValueError: If the boundary lacks a timezone or has a nonzero offset.
         """
-        if value.utcoffset() != timedelta(0):
-            message = "Timestamps must be timezone-aware UTC"
-            raise ValueError(message)
-        return value.astimezone(UTC)
+        return require_utc(value).astimezone(UTC)
 
     @model_validator(mode="after")
     def validate_order(self) -> Self:
@@ -97,20 +101,14 @@ class TargetWindows(Contract):
     @model_validator(mode="after")
     def validate_boundaries(self) -> Self:
         """Return valid plan windows; raise ValueError for inconsistent boundaries."""
-        decision = TimeWindow.validate_utc(self.decision_at)
-        anchor = decision - timedelta(hours=48)
-        if decision.weekday() != 0 or decision.time() != datetime.min.time():
-            message = "Decision origins must be Monday 00:00 UTC"
-            raise ValueError(message)
-        reference_days, offset_days, horizon_days = (
-            (30, 0, 30) if self.target_id == "downloads_next_30d_v1" else (28, 63, 91)
-        )
+        expected = target_windows(self.decision_at, self.target_id)
+        require_utc(self.observation_window_end)
         if (
-            self.observation_window_end != anchor
-            or self.reference.start != anchor - timedelta(days=reference_days)
-            or self.reference.end != anchor
-            or self.target.start != decision + timedelta(days=offset_days)
-            or self.target.end != decision + timedelta(days=horizon_days)
+            self.observation_window_end != expected.observation_end
+            or self.reference.start != expected.reference_start
+            or self.reference.end != expected.reference_end
+            or self.target.start != expected.target_start
+            or self.target.end != expected.target_end
         ):
             message = "Windows must match the versioned target and 48-hour lag"
             raise ValueError(message)
@@ -145,7 +143,7 @@ class FeatureRow(Contract):
     @model_validator(mode="after")
     def validate_history(self) -> Self:
         """Return this row; raise ValueError for eligibility below 84 complete days."""
-        if self.forecast_eligible and self.complete_history_days < 84:
+        if self.forecast_eligible and self.complete_history_days < HISTORY_DAYS:
             message = "Learned forecast eligibility requires 84 complete history days"
             raise ValueError(message)
         return self
@@ -252,7 +250,7 @@ class ForecastResult(Contract):
         can_rank = (
             ready
             and self.reference_downloads is not None
-            and self.reference_downloads >= 1000
+            and self.reference_downloads >= MIN_REFERENCE_COUNT
         )
         if self.ranking_eligible and not can_rank:
             message = "Ranking requires a ready forecast and reference >= 1000"
@@ -343,7 +341,7 @@ class ForecastManifest(Contract):
             raise ValueError(message)
         if (
             self.mode == "prospective"
-            and self.first_recorded_at > self.windows.decision_at
+            and self.first_recorded_at >= self.windows.decision_at
         ):
             message = "Late recordings cannot be called prospective"
             raise ValueError(message)
