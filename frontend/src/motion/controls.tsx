@@ -145,7 +145,12 @@ export function MotionNavLink({
     <NavLink
       {...props}
       ref={element}
-      style={{ backgroundImage: stateLayer, ...props.style }}
+      style={(state) => ({
+        backgroundImage: stateLayer,
+        ...(typeof props.style === "function"
+          ? props.style(state)
+          : props.style),
+      })}
       data-motion-control=""
     />
   );

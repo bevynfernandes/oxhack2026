@@ -23,6 +23,7 @@ from oxhack2026.models.company_assessments import (
     CompanyAssessment,
     CompanyOutcomeAssessment,
 )
+from oxhack2026.models.dimension_serving import CompanyDimensionModels
 from oxhack2026.models.startup_outlook import StartupOutlook
 from oxhack2026.storage.company_assessments import CompanyAssessmentPublication
 
@@ -151,5 +152,8 @@ class CompanyDetail(DTO):
     coverage: tuple[PublicCompanyCoverage, ...]
     evidence: tuple[CompanySource, ...]
     outlook: StartupOutlook | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    dimension_models: CompanyDimensionModels | None = Field(
         default=None, exclude_if=lambda value: value is None
     )

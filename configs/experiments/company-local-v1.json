@@ -1,0 +1,14 @@
+{
+  "adoption_retention": [
+    "npm_downloads_30d_v1",
+    "npm_downloads_previous_30d_v1",
+    "active_paying_customers_v1"
+  ],
+  "attention_sentiment": [],
+  "financial_health": [
+    "revenue_12m_usd_v1",
+    "operating_cashflow_12m_usd_v1"
+  ],
+  "industry_competition": [],
+  "team_execution": ["github_stable_releases_90d_v1"]
+}

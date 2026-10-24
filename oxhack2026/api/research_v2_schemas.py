@@ -9,6 +9,7 @@ from pydantic import AfterValidator, Field, TypeAdapter, model_validator
 from oxhack2026.api.company_schemas import CompanyDetail
 from oxhack2026.api.research_schemas import Domain, JobState, ResearchRequest
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime, Window
+from oxhack2026.models.dimension_serving import CompanyDimensionModels
 from oxhack2026.models.startup_outlook import StartupOutlook
 from oxhack2026.storage.contracts import ArtifactReference
 
@@ -244,6 +245,9 @@ class Report(DTO):
     evidence: tuple[ResearchEvidence, ...]
     captures: tuple[Capture, ...]
     outlook: StartupOutlook
+    dimension_models: CompanyDimensionModels | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     limitations: tuple[str, ...]
 
     @model_validator(mode="after")
