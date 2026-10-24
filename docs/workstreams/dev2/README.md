@@ -12,6 +12,8 @@ Merged checkpoints:
 - Whole-origin chronological evaluation protocol: #6.
 - Separate per-tool reveal diagnostics: #8.
 - Frozen-pair CQR calculations and empirical interval gates: #10.
+- C1 daily vintage selection is implemented in `features.snapshots`; feature
+  aggregation and label materialization follow separately.
 
 C1 is merged. The artifact-alignment checkpoint adopts C1's canonical reference
 class with required size/media type: `models-v2` feature/forecast manifests and
