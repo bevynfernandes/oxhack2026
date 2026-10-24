@@ -298,6 +298,66 @@
         "title": "CompanyAssessment",
         "type": "object"
       },
+      "CompanyAssessmentPublication": {
+        "additionalProperties": false,
+        "description": "Public-safe batch metadata; recorded_at is the latest model recording time.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "company_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Company Ids",
+            "type": "array"
+          },
+          "policy_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "publication_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Publication Id",
+            "type": "string"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "company-assessment-publication-v1",
+            "default": "company-assessment-publication-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_snapshot_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Source Snapshot Id",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "publication_id",
+          "source_snapshot_id",
+          "as_of",
+          "recorded_at",
+          "policy_version",
+          "synthetic",
+          "company_ids"
+        ],
+        "title": "CompanyAssessmentPublication",
+        "type": "object"
+      },
       "CompanyDetail": {
         "additionalProperties": false,
         "description": "Pre-outcome profile; raw source paths and future labels are absent.",
@@ -781,6 +841,9 @@
         "additionalProperties": false,
         "description": "An exact source snapshot with a complete published assessment set.",
         "properties": {
+          "assessment": {
+            "$ref": "#/components/schemas/CompanyAssessmentPublication"
+          },
           "company_count": {
             "title": "Company Count",
             "type": "integer"
@@ -797,6 +860,7 @@
         },
         "required": [
           "source",
+          "assessment",
           "company_count"
         ],
         "title": "CompanyPublication",
@@ -3124,7 +3188,7 @@
     },
     "/api/v1/company-snapshots/{snapshot_id}/companies": {
       "get": {
-        "description": "Read the full name-ordered company table for an exact publication.",
+        "description": "Read an exact assessment publication ID, never a source-only alias.",
         "operationId": "companies",
         "parameters": [
           {

@@ -16,25 +16,13 @@ from oxhack2026.api.schemas import Health
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.company_assessments import CompanyAssessment
 from oxhack2026.storage.company import CompanySourceReader, metadata, resolve_family
-from oxhack2026.storage.company_assessments import validate_company_assessments
+from oxhack2026.storage.company_assessments import (
+    CompanyAssessmentPublication,
+    CompanyAssessmentReader,
+    validate_company_assessments,
+)
 
 logger = logging.getLogger(__name__)
-
-
-class CompanyAssessmentReader(Protocol):
-    """Published C2 reads; unknown publications raise KeyError, corruption ValueError.
-
-    Implementations may raise OSError. Enumeration includes only source IDs with
-    published assessments, without inventing an assessment from source activity.
-    """
-
-    def snapshot_ids(self) -> tuple[str, ...]:
-        """Return exact source snapshot IDs with published assessment sets."""
-        ...
-
-    def assessments(self, snapshot_id: str) -> tuple[CompanyAssessment, ...]:
-        """Return the complete immutable assessment set for an exact source ID."""
-        ...
 
 
 class CompanyRepository(Protocol):
@@ -60,12 +48,15 @@ class CompanyRepository(Protocol):
 @dataclass(frozen=True)
 class _Publication:
     source: CompanySourceSnapshot
+    assessment: CompanyAssessmentPublication
     assessments: dict[str, CompanyAssessment]
 
     @property
     def public(self) -> s.CompanyPublication:
         return s.CompanyPublication(
-            source=metadata(self.source), company_count=len(self.source.companies)
+            source=metadata(self.source),
+            assessment=self.assessment,
+            company_count=len(self.source.companies),
         )
 
 
@@ -99,6 +90,7 @@ class PublishedCompanyRepository:
     Args:
         sources: Lifecycle-managed C1 exact-version reader.
         assessments: Lifecycle-managed published C2 reader.
+        publication_ids: Explicit canonical assessment publication selection.
 
     Construction performs no I/O. Each read verifies the selected immutable bytes
     through the owners' readers; no vendor collection or process cache is used.
@@ -106,13 +98,26 @@ class PublishedCompanyRepository:
 
     sources: CompanySourceReader
     assessments: CompanyAssessmentReader
+    publication_ids: tuple[str, ...]
 
     def _load(self, snapshot_id: str) -> _Publication:
         try:
-            if snapshot_id not in self.assessments.snapshot_ids():
+            if len(self.publication_ids) != len(set(self.publication_ids)):
+                raise RepositoryUnavailable
+            if snapshot_id not in self.publication_ids:
                 raise ResourceNotFound
-            source = self.sources.snapshot(snapshot_id)
-            if source.snapshot_id != snapshot_id:
+            manifest = self.assessments.manifest(snapshot_id)
+            publication = CompanyAssessmentPublication.model_validate(
+                {
+                    key: getattr(manifest, key)
+                    for key in CompanyAssessmentPublication.model_fields
+                }
+            )
+            source = self.sources.snapshot(publication.source_snapshot_id)
+            if (
+                publication.publication_id != snapshot_id
+                or source.snapshot_id != publication.source_snapshot_id
+            ):
                 raise RepositoryUnavailable
             source = CompanySourceSnapshot.model_validate_json(source.model_dump_json())
             assessments = tuple(
@@ -120,8 +125,22 @@ class PublishedCompanyRepository:
                 for row in self.assessments.assessments(snapshot_id)
             )
             validate_company_assessments(source, assessments)
+            if (
+                publication.as_of != source.as_of
+                or publication.synthetic != source.synthetic
+                or set(publication.company_ids)
+                != {row.company_id for row in assessments}
+                or len(publication.company_ids) != len(assessments)
+                or {row.policy_version for row in assessments}
+                != {publication.policy_version}
+                or publication.recorded_at
+                != max(row.first_recorded_at for row in assessments)
+            ):
+                raise RepositoryUnavailable
             _require_public_claims(source, assessments)
-            return _Publication(source, {row.company_id: row for row in assessments})
+            return _Publication(
+                source, publication, {row.company_id: row for row in assessments}
+            )
         except (KeyError, OSError, ValueError) as error:
             logger.error(  # noqa: TRY400 - upstream error details may contain secrets
                 "Company publication failed integrity or storage checks"
@@ -131,7 +150,7 @@ class PublishedCompanyRepository:
     def publications(self) -> s.CompanyPublications:
         """Return verified publications; raise RepositoryUnavailable on broken data."""
         try:
-            ids = self.assessments.snapshot_ids()
+            ids = self.publication_ids
             if len(ids) != len(set(ids)):
                 raise RepositoryUnavailable
             return s.CompanyPublications(

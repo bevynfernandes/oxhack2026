@@ -20,7 +20,7 @@ def test_real_company_api_reads_all_outcomes_and_multiple_metric_families() -> N
         assert choices
         for choice in choices:
             assert choice["source"]["synthetic"] is False
-            snapshot_id = choice["source"]["snapshot_id"]
+            snapshot_id = choice["assessment"]["publication_id"]
             prefix = f"/api/v1/company-snapshots/{snapshot_id}/companies"
             rows = client.get(prefix).json()["items"]
             assert len(rows) >= 2

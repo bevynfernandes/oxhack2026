@@ -35,9 +35,6 @@ def test_runtime_composes_only_explicit_publications(
         patch("oxhack2026.api.company_runtime.LocalCompanyStore") as sources,
         patch("oxhack2026.api.company_runtime.LocalCompanyAssessmentStore") as models,
         patch(
-            "oxhack2026.api.company_runtime.SourceScopedAssessmentReader"
-        ) as selected,
-        patch(
             "oxhack2026.api.company_runtime.PublishedCompanyRepository"
         ) as repository,
     ):
@@ -46,5 +43,6 @@ def test_runtime_composes_only_explicit_publications(
             assert client.get("/api/v1/health/ready").status_code == 200
         sources.assert_called_once_with(Path("/mock/company-root"))
         models.assert_called_once_with(Path("/mock/company-root"))
-        selected.assert_called_once_with(models.return_value, ("first-v1", "second-v2"))
-        repository.assert_called_once_with(sources.return_value, selected.return_value)
+        repository.assert_called_once_with(
+            sources.return_value, models.return_value, ("first-v1", "second-v2")
+        )
