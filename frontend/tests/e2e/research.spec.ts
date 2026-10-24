@@ -418,6 +418,54 @@ const standaloneReport = {
   limitations: ["Bounded collection; no trained prediction."],
 };
 
+test("directory research previews v2 with exact saved context before confirmation", async ({
+  page,
+}) => {
+  let discoveries = 0;
+  const jobPosts: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      request.url().includes("research-jobs")
+    ) {
+      jobPosts.push(request.url());
+    }
+  });
+  await page.route("**/api/v2/research-capabilities", (route) =>
+    route.fulfill({ json: capabilities }),
+  );
+  await page.route("**/api/v2/research-identities", (route) => {
+    discoveries++;
+    expect(route.request().postDataJSON()).toEqual({
+      domain: "alpha.example",
+      company_id: "alpha",
+      assessment_publication_id: "synthetic-assessments-v1",
+    });
+    return route.fulfill({ status: 202, json: standaloneIdentity });
+  });
+  await page.route("**/api/v2/research-identities/*", (route) =>
+    route.fulfill({ json: standaloneIdentity }),
+  );
+  await page.goto("/");
+  const research = page.getByRole("link", {
+    name: "Research company Synthetic alpha",
+  });
+  await expect(research).toHaveAttribute(
+    "href",
+    "/research/new?domain=alpha.example&company=alpha&publication=synthetic-assessments-v1",
+  );
+  await research.click();
+  await expect(page.getByLabel("Company domain")).toHaveValue("alpha.example");
+  expect(discoveries).toBe(0);
+  await page.getByRole("button", { name: "Preview company" }).click();
+  await expect(page.getByRole("status")).toHaveText("Identity preview ready");
+  await expect(
+    page.getByRole("button", { name: "Confirm and start research" }),
+  ).toBeDisabled();
+  expect(discoveries).toBe(1);
+  expect(jobPosts).toEqual([]);
+});
+
 test("standalone discovery confirms redirected identity, retains partial results and explicitly refreshes", async ({
   page,
 }) => {

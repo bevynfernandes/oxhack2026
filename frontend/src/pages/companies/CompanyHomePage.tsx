@@ -143,10 +143,12 @@ export default function CompanyHomePage() {
                         </Link>
                         <Link
                           to={
-                            "/research/new/" +
-                            encodeURIComponent(snapshot) +
-                            "/" +
-                            encodeURIComponent(company.company_id)
+                            "/research/new?" +
+                            new URLSearchParams({
+                              domain: companyDomain(company.website_url) ?? "",
+                              company: company.company_id,
+                              publication: snapshot,
+                            }).toString()
                           }
                           aria-label={
                             "Research company " + company.display_name
