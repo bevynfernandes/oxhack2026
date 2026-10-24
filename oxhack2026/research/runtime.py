@@ -14,6 +14,7 @@ from fastapi import FastAPI
 from oxhack2026.api.company_repository import CompanyRepository
 from oxhack2026.api.routes.research import get_research_service
 from oxhack2026.api.routes.research_v2 import get_v2_service
+from oxhack2026.models.dimension_serving import DimensionModelRegistry
 from oxhack2026.research.service import ResearchService
 from oxhack2026.research.store import LocalResearchStore
 from oxhack2026.research.v2_service import V2Service
@@ -40,13 +41,16 @@ class ReadOnlyExecutor(Executor):
 
 
 def configure_research(
-    app: FastAPI, repository: CompanyRepository | None = None
+    app: FastAPI,
+    repository: CompanyRepository | None = None,
+    dimension_models: DimensionModelRegistry | None = None,
 ) -> FastAPI:
     """Attach persistent reads and an opt-in worker, independent of saved publications.
 
     Args:
         app: Company or standalone API to configure.
         repository: Optional reviewed saved-company publication reader.
+        dimension_models: Verified experimental proxies for newly composed reports.
     Returns:
         The same application with configured research dependencies and lifecycle.
     Raises:
@@ -59,7 +63,9 @@ def configure_research(
     if not selection:
         return app
     directory = Path(selection).expanduser()
-    read_service = V2Service(V2Store(directory), repository=repository)
+    read_service = V2Service(
+        V2Store(directory), repository=repository, dimension_models=dimension_models
+    )
     app.dependency_overrides[get_v2_service] = lambda: read_service
     # Legacy stored reports remain readable even when new collection is disabled.
     if repository is not None:
@@ -85,7 +91,12 @@ def configure_research(
             with ThreadPoolExecutor(
                 max_workers=2, thread_name_prefix="research"
             ) as executor:
-                service = V2Service(V2Store(directory), executor, repository)
+                service = V2Service(
+                    V2Store(directory),
+                    executor,
+                    repository,
+                    dimension_models=dimension_models,
+                )
                 _app.dependency_overrides[get_v2_service] = lambda: service
                 service.recover()
                 if repository is not None:

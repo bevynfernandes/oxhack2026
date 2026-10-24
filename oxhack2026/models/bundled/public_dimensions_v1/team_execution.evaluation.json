@@ -1,0 +1,220 @@
+{
+  "mode": "reconstructed",
+  "point_in_time_validated": false,
+  "counts": {
+    "train": 221,
+    "validation": 27,
+    "test": 15
+  },
+  "subjects": {
+    "train": [
+      "algolia",
+      "appwrite",
+      "clickhouse",
+      "courier",
+      "datastax",
+      "drizzle",
+      "flagsmith",
+      "influxdata",
+      "knock",
+      "neon",
+      "pinecone",
+      "qdrant",
+      "statsig",
+      "supertokens",
+      "surrealdb",
+      "unleash",
+      "weaviate"
+    ],
+    "validation": [
+      "firebase",
+      "mixpanel",
+      "turso"
+    ],
+    "test": [
+      "resend"
+    ]
+  },
+  "validation_mae_by_alpha": {
+    "0.1": 0.46991511088283794,
+    "1.0": 0.47087197613706605,
+    "10.0": 0.48003054357039227,
+    "100.0": 0.5433701688102182
+  },
+  "limitations": [
+    "Current commercial SDK cohort has survivor and developer-tool selection bias.",
+    "Reconstructed current API captures do not prove historical availability.",
+    "SDK activity is not paying-customer retention, revenue or company survival.",
+    "Public SDK projects; historical legal ownership families are unverified.",
+    "Public release cadence measures delivery, not team capability.",
+    "Complete pagination required; drafts/prereleases are excluded."
+  ],
+  "recommended_predictor": "persistence",
+  "validation": {
+    "ridge": {
+      "mae": 0.46991511088283794,
+      "rmse": 0.4948338583967463,
+      "r2": -1.2803739760847508
+    },
+    "persistence": {
+      "mae": 0.20973927704207204,
+      "rmse": 0.4223463117893661,
+      "r2": -0.6612105173755327
+    },
+    "training_mean": {
+      "mae": 0.7239310760711967,
+      "rmse": 0.756504236702807,
+      "r2": -4.329788669207055
+    },
+    "constant_zero": {
+      "mae": 0.13272292364652258,
+      "rmse": 0.35354312165412993,
+      "r2": -0.1640510973467606
+    },
+    "beats_persistence_mae": false
+  },
+  "test": {
+    "ridge": {
+      "mae": 0.5829562126335891,
+      "rmse": 0.6518822779322928,
+      "r2": 0.1187516463566628
+    },
+    "persistence": {
+      "mae": 0.5148132876332175,
+      "rmse": 0.5571367681349635,
+      "r2": 0.3562998491962943
+    },
+    "training_mean": {
+      "mae": 0.8971215776526745,
+      "rmse": 1.096472791309005,
+      "r2": -1.4931917904460974
+    },
+    "constant_zero": {
+      "mae": 1.6631250282515913,
+      "rmse": 1.8022760883574473,
+      "r2": -5.736008262513917
+    },
+    "beats_persistence_mae": false
+  },
+  "dataset": {
+    "declared_subjects": 53,
+    "complete_npm_subjects": [
+      "adyen",
+      "algolia",
+      "appwrite",
+      "chargebee",
+      "chroma",
+      "clickhouse",
+      "convex",
+      "courier",
+      "datastax",
+      "drizzle",
+      "elastic",
+      "firebase",
+      "flagsmith",
+      "influxdata",
+      "knock",
+      "launchdarkly",
+      "meilisearch",
+      "milvus",
+      "mixpanel",
+      "mongodb",
+      "neo4j",
+      "neon",
+      "pinecone",
+      "posthog",
+      "qdrant",
+      "recurly",
+      "resend",
+      "sendgrid",
+      "sentry",
+      "statsig",
+      "supabase",
+      "supertokens",
+      "surrealdb",
+      "turso",
+      "twilio",
+      "unleash",
+      "weaviate"
+    ],
+    "complete_release_subjects": [
+      "qdrant",
+      "weaviate",
+      "pinecone",
+      "appwrite",
+      "firebase",
+      "neon",
+      "turso",
+      "drizzle",
+      "datastax",
+      "surrealdb",
+      "influxdata",
+      "clickhouse",
+      "algolia",
+      "mixpanel",
+      "flagsmith",
+      "unleash",
+      "statsig",
+      "resend",
+      "knock",
+      "courier",
+      "supertokens"
+    ],
+    "fixed_available_peer_membership": {
+      "data": [
+        "qdrant",
+        "weaviate",
+        "pinecone",
+        "chroma",
+        "milvus",
+        "mongodb",
+        "elastic",
+        "supabase",
+        "appwrite",
+        "firebase",
+        "neon",
+        "turso",
+        "drizzle",
+        "convex",
+        "datastax",
+        "surrealdb",
+        "neo4j",
+        "influxdata",
+        "clickhouse",
+        "meilisearch",
+        "algolia"
+      ],
+      "analytics": [
+        "sentry",
+        "posthog",
+        "mixpanel"
+      ],
+      "feature_management": [
+        "launchdarkly",
+        "flagsmith",
+        "unleash",
+        "statsig"
+      ],
+      "communications": [
+        "resend",
+        "knock",
+        "courier",
+        "twilio",
+        "sendgrid"
+      ],
+      "identity": [
+        "supertokens"
+      ],
+      "payments": [
+        "adyen",
+        "recurly",
+        "chargebee"
+      ]
+    },
+    "exclusions": {
+      "sdk_origin_below_1000_downloads": 160,
+      "missing_or_incomplete_release_history": 32,
+      "peer_segment_fewer_than_three_sdks": 45
+    }
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schema_version": "public-dimension-training-v1",
+  "status": "experimental_models_trained",
+  "public_serving_approved": false,
+  "source_manifest_sha256": "e43521cf492f5d52fc8ab54270994f3f362ccc1958b672bb702238d4bbd0c47c",
+  "libraries": {
+    "numpy": "2.5.4",
+    "scikit-learn": "1.9.1",
+    "polars": "1.44.2"
+  },
+  "code_sha256": {
+    "public_training.py": "f969a1aedcb92f615f976e1cf7d8e09a514ae88da815bf8c2ce103dd5fec28e2",
+    "public_dimensions.py": "4f11373cf76f9ff693901ee703e01e3093474e1ac0c90a547b56feccbce8351c",
+    "dimension_datasets.py": "9f5c9a02aee2714b653cc19ff15621e3b2860077f808eba1f349f789dfe5eb05"
+  },
+  "artifacts": {
+    "adoption_retention": {
+      "model_path": "adoption_retention.model.json",
+      "model_sha256": "17136f1c4cf54e3a9e87bc9d1250047c4ddfe6c87a558ce12e0a07565f62c9a0",
+      "evaluation_path": "adoption_retention.evaluation.json",
+      "evaluation_sha256": "c3c6fff96a04cda86ff5403aadb65ded045ee1900662d8d026476fc5b1b81a25"
+    },
+    "industry_competition": {
+      "model_path": "industry_competition.model.json",
+      "model_sha256": "2b3e3bfb9c7f675ca3487569c940fa3c72a633e45338283220d36cb5c1036d81",
+      "evaluation_path": "industry_competition.evaluation.json",
+      "evaluation_sha256": "c50def1a3b5dbb03ad2e27dfe2e35c28476029b454a7216f744ce1f9c1963408"
+    },
+    "team_execution": {
+      "model_path": "team_execution.model.json",
+      "model_sha256": "147778f4e764d92c3aabff35ab57315bb4dd518d5bfdef62183e6a3a0863dabf",
+      "evaluation_path": "team_execution.evaluation.json",
+      "evaluation_sha256": "b537f7cfa9061abe8b7966f70d3db1c24778466a76390e687c3613f2ca20f0dd"
+    },
+    "financial_health": {
+      "model_path": "financial_health.model.json",
+      "model_sha256": "ab474a79e75ecd8e97546422e255e82237e667d1a702e022fd0d93610dc8fdda",
+      "evaluation_path": "financial_health.evaluation.json",
+      "evaluation_sha256": "3e1cd61fd78dba1d279901d8406eb50b73b12aa11f1141e254ceee91aebb69f2"
+    },
+    "attention_sentiment": {
+      "model_path": "attention_sentiment.model.json",
+      "model_sha256": "368b7635377b18483abc047320af79474a0e60ad6309149bfe8c558db8e0a6d9",
+      "evaluation_path": "attention_sentiment.evaluation.json",
+      "evaluation_sha256": "46b90807e284f4c7275db93f7d0f79ec9003e3a6bf295e4480bb0d798a0804cc"
+    }
+  },
+  "ascore": {
+    "schema_version": "ascore-dimension-index-v1",
+    "weights": {
+      "adoption_retention": 0.2,
+      "attention_sentiment": 0.2,
+      "financial_health": 0.2,
+      "industry_competition": 0.2,
+      "team_execution": 0.2
+    },
+    "numeric_scaling": "Midrank percentile of predicted proxy in training outcomes",
+    "sentiment_scaling": "50 * (1 + P(Positive) - P(Negative))",
+    "missingness": "Abstain unless all five eligible dimension scores exist",
+    "interpretation": "Descriptive index, not company-success probability",
+    "validation": "Overall index is not validated against company-health outcomes"
+  },
+  "original_training_run_sha256": "bc649483d240279d8f658ae8f3711865bd766fd420fdfbbdfa9c1719dafc6750"
+}

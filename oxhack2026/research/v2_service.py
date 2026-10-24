@@ -24,6 +24,7 @@ from oxhack2026.api.research_v2_schemas import (
     ResearchEvidence,
     SourceState,
 )
+from oxhack2026.models.dimension_serving import DimensionModelRegistry
 from oxhack2026.research.network import (
     CollectionError,
     Fetcher,
@@ -71,6 +72,7 @@ class V2Service:
     repository: CompanyRepository | None = None
     transport: httpx.BaseTransport = field(default_factory=PinnedTransport)
     quotas: Quotas = field(default_factory=Quotas)
+    dimension_models: DimensionModelRegistry | None = None
     _lock: Lock = field(default_factory=Lock)
 
     def capabilities(self) -> Capabilities:
@@ -338,7 +340,7 @@ class V2Service:
         report_id = None
         state = "failed"
         if useful:
-            report = compose(job, identity)
+            report = compose(job, identity, self.dimension_models)
             self.store.publish(report)
             report_id = report.report_id
             state = (

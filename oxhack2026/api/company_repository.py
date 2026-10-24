@@ -15,6 +15,7 @@ from oxhack2026.api.repository import RepositoryUnavailable, ResourceNotFound
 from oxhack2026.api.schemas import Health
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.company_assessments import CompanyAssessment
+from oxhack2026.models.dimension_serving import DimensionModelRegistry
 from oxhack2026.models.startup_outlook import build_company_outlook
 from oxhack2026.storage.company import CompanySourceReader, metadata, resolve_family
 from oxhack2026.storage.company_assessments import (
@@ -100,6 +101,7 @@ class PublishedCompanyRepository:
     sources: CompanySourceReader
     assessments: CompanyAssessmentReader
     publication_ids: tuple[str, ...]
+    dimension_models: DimensionModelRegistry | None = None
 
     def _load(self, snapshot_id: str) -> _Publication:
         try:
@@ -231,6 +233,11 @@ class PublishedCompanyRepository:
             ),
             coverage=public_coverage(source, company_id),
             outlook=build_company_outlook(source, company_id),
+            dimension_models=(
+                self.dimension_models.evaluate(source, company_id)
+                if self.dimension_models is not None
+                else None
+            ),
             evidence=tuple(
                 s.public_source(row)
                 for row in source.evidence
