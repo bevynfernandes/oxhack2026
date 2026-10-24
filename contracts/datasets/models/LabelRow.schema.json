@@ -1,0 +1,122 @@
+{
+  "$defs": {
+    "TargetWindows": {
+      "additionalProperties": false,
+      "description": "One decision's target definition, fixed observation anchor, and windows.",
+      "properties": {
+        "target_id": {
+          "enum": [
+            "downloads_next_30d_v1",
+            "downloads_trailing_28d_at_91d_v1"
+          ],
+          "title": "Target Id",
+          "type": "string"
+        },
+        "decision_at": {
+          "format": "date-time",
+          "title": "Decision At",
+          "type": "string"
+        },
+        "observation_window_end": {
+          "format": "date-time",
+          "title": "Observation Window End",
+          "type": "string"
+        },
+        "reference": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "target": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "definition_version": {
+          "const": "targets-v1",
+          "default": "targets-v1",
+          "title": "Definition Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_id",
+        "decision_at",
+        "observation_window_end",
+        "reference",
+        "target"
+      ],
+      "title": "TargetWindows",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "Nonempty half-open measurement interval with timezone-aware UTC bounds.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Separate label row; an unavailable outcome remains null, including its time.",
+  "properties": {
+    "feature_row_id": {
+      "title": "Feature Row Id",
+      "type": "string"
+    },
+    "windows": {
+      "$ref": "#/$defs/TargetWindows"
+    },
+    "actual_downloads": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Actual Downloads"
+    },
+    "available_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Available At"
+    },
+    "outcome_revision_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Outcome Revision Ids",
+      "type": "array"
+    }
+  },
+  "required": [
+    "feature_row_id",
+    "windows"
+  ],
+  "title": "LabelRow",
+  "type": "object"
+}

@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Relative bundle path and SHA-256 digest; paths cannot escape the bundle.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "ModelReference": {
+      "additionalProperties": false,
+      "description": "Frozen model and optional paired calibrator, scoped to ecosystem/target.",
+      "properties": {
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "experiment_id": {
+          "title": "Experiment Id",
+          "type": "string"
+        },
+        "ecosystem": {
+          "enum": [
+            "npm",
+            "pypi"
+          ],
+          "title": "Ecosystem",
+          "type": "string"
+        },
+        "target_id": {
+          "enum": [
+            "downloads_next_30d_v1",
+            "downloads_trailing_28d_at_91d_v1"
+          ],
+          "title": "Target Id",
+          "type": "string"
+        },
+        "model_artifact": {
+          "$ref": "#/$defs/ArtifactReference"
+        },
+        "calibration_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Calibration Id"
+        },
+        "calibration_artifact": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ArtifactReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "model_id",
+        "experiment_id",
+        "ecosystem",
+        "target_id",
+        "model_artifact"
+      ],
+      "title": "ModelReference",
+      "type": "object"
+    },
+    "TargetWindows": {
+      "additionalProperties": false,
+      "description": "One decision's target definition, fixed observation anchor, and windows.",
+      "properties": {
+        "target_id": {
+          "enum": [
+            "downloads_next_30d_v1",
+            "downloads_trailing_28d_at_91d_v1"
+          ],
+          "title": "Target Id",
+          "type": "string"
+        },
+        "decision_at": {
+          "format": "date-time",
+          "title": "Decision At",
+          "type": "string"
+        },
+        "observation_window_end": {
+          "format": "date-time",
+          "title": "Observation Window End",
+          "type": "string"
+        },
+        "reference": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "target": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "definition_version": {
+          "const": "targets-v1",
+          "default": "targets-v1",
+          "title": "Definition Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_id",
+        "decision_at",
+        "observation_window_end",
+        "reference",
+        "target"
+      ],
+      "title": "TargetWindows",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "Nonempty half-open measurement interval with timezone-aware UTC bounds.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Published batch with outcomes stored as separate versioned artifacts.",
+  "properties": {
+    "schema_version": {
+      "const": "models-v1",
+      "default": "models-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "batch_id": {
+      "title": "Batch Id",
+      "type": "string"
+    },
+    "windows": {
+      "$ref": "#/$defs/TargetWindows"
+    },
+    "ecosystem": {
+      "enum": [
+        "npm",
+        "pypi"
+      ],
+      "title": "Ecosystem",
+      "type": "string"
+    },
+    "dataset_version": {
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "mapping_version": {
+      "title": "Mapping Version",
+      "type": "string"
+    },
+    "feature_schema_version": {
+      "title": "Feature Schema Version",
+      "type": "string"
+    },
+    "model": {
+      "$ref": "#/$defs/ModelReference"
+    },
+    "mode": {
+      "enum": [
+        "reconstructed",
+        "prospective"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "first_recorded_at": {
+      "format": "date-time",
+      "title": "First Recorded At",
+      "type": "string"
+    },
+    "forecasts": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "evidence": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "limitations": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "batch_id",
+    "windows",
+    "ecosystem",
+    "dataset_version",
+    "mapping_version",
+    "feature_schema_version",
+    "model",
+    "mode",
+    "first_recorded_at",
+    "forecasts",
+    "evidence",
+    "synthetic"
+  ],
+  "title": "ForecastManifest",
+  "type": "object"
+}

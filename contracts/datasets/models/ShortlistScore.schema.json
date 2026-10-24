@@ -1,0 +1,102 @@
+{
+  "additionalProperties": false,
+  "description": "Frozen manual selection score; missing truth yields missing metrics.",
+  "properties": {
+    "forecast_ids": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Forecast Ids",
+      "type": "array"
+    },
+    "candidate_universe_id": {
+      "title": "Candidate Universe Id",
+      "type": "string"
+    },
+    "selection_count": {
+      "maximum": 5,
+      "minimum": 0,
+      "title": "Selection Count",
+      "type": "integer"
+    },
+    "eligible_organization_count": {
+      "minimum": 0,
+      "title": "Eligible Organization Count",
+      "type": "integer"
+    },
+    "headline_eligible": {
+      "title": "Headline Eligible",
+      "type": "boolean"
+    },
+    "complete_outcomes": {
+      "title": "Complete Outcomes",
+      "type": "boolean"
+    },
+    "mean_realized_log_growth": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Mean Realized Log Growth"
+    },
+    "precision_at_5": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Precision At 5"
+    },
+    "recall_at_5": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Recall At 5"
+    },
+    "regret": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Regret"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "forecast_ids",
+    "candidate_universe_id",
+    "selection_count",
+    "eligible_organization_count",
+    "headline_eligible",
+    "complete_outcomes",
+    "mean_realized_log_growth",
+    "precision_at_5",
+    "recall_at_5",
+    "regret"
+  ],
+  "title": "ShortlistScore",
+  "type": "object"
+}

@@ -1,0 +1,49 @@
+{
+  "forecast_id": "synthetic-missing-source",
+  "batch_id": "synthetic-c2-v1",
+  "identity": {
+    "tool_id": "synthetic-tool",
+    "organization_id": "synthetic-org",
+    "package_id": "synthetic-package",
+    "ecosystem": "npm",
+    "dataset_version": "synthetic-dataset-v1",
+    "mapping_version": "synthetic-mapping-v1"
+  },
+  "windows": {
+    "target_id": "downloads_next_30d_v1",
+    "decision_at": "2025-01-06T00:00:00Z",
+    "observation_window_end": "2025-01-04T00:00:00Z",
+    "reference": {
+      "start": "2024-12-05T00:00:00Z",
+      "end": "2025-01-04T00:00:00Z"
+    },
+    "target": {
+      "start": "2025-01-06T00:00:00Z",
+      "end": "2025-02-05T00:00:00Z"
+    },
+    "definition_version": "targets-v1"
+  },
+  "feature_row_id": "synthetic-feature-v1",
+  "feature_schema_version": "features-v1",
+  "model_id": "synthetic-model",
+  "experiment_id": "synthetic-experiment",
+  "mode": "reconstructed",
+  "evidence_status": "exploratory",
+  "reference_downloads": 3000,
+  "predicted_downloads": null,
+  "predicted_growth_pct": null,
+  "estimate_kind": "log_space_point",
+  "interval": null,
+  "baseline_model_id": "persistence-v1",
+  "baseline_predicted_downloads": 3000.0,
+  "forecast_status": "unavailable",
+  "ranking_eligible": false,
+  "reason_codes": [
+    "missing_source"
+  ],
+  "evidence_ids": [
+    "synthetic-evidence-v1"
+  ],
+  "data_age_hours": 48.0,
+  "stale": false
+}

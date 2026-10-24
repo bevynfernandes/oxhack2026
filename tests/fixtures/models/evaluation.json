@@ -1,0 +1,37 @@
+{
+  "schema_version": "evaluation-v1",
+  "evaluation_id": "synthetic-evaluation-v1",
+  "experiment_id": "synthetic-experiment",
+  "ecosystem": "npm",
+  "target_id": "downloads_next_30d_v1",
+  "dataset_version": "synthetic-dataset-v1",
+  "mapping_version": "synthetic-mapping-v1",
+  "evidence_status": "inconclusive",
+  "serving_model_id": "persistence-v1",
+  "fallback_model_id": "persistence-v1",
+  "period": {
+    "start": "2025-01-06T00:00:00Z",
+    "end": "2025-02-05T00:00:00Z"
+  },
+  "counts": {
+    "candidate_count": 1,
+    "eligible_count": 1,
+    "organization_count": 1,
+    "origin_count": 1,
+    "headline_origin_count": 0,
+    "exclusions": {
+      "undersized_candidate_universe": 1
+    }
+  },
+  "metrics": [],
+  "metric_definitions": [],
+  "experiment_manifest": {
+    "path": "synthetic/fixture.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "effective_block_count": 0,
+  "statistical_superiority": false,
+  "limitations": [
+    "Synthetic fixture; no measured model performance."
+  ]
+}

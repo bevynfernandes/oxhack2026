@@ -1,0 +1,27 @@
+{
+  "forecast_id": "synthetic-ready",
+  "label": {
+    "feature_row_id": "synthetic-feature-v1",
+    "windows": {
+      "target_id": "downloads_next_30d_v1",
+      "decision_at": "2025-01-06T00:00:00Z",
+      "observation_window_end": "2025-01-04T00:00:00Z",
+      "reference": {
+        "start": "2024-12-05T00:00:00Z",
+        "end": "2025-01-04T00:00:00Z"
+      },
+      "target": {
+        "start": "2025-01-06T00:00:00Z",
+        "end": "2025-02-05T00:00:00Z"
+      },
+      "definition_version": "targets-v1"
+    },
+    "actual_downloads": 3900,
+    "available_at": "2025-02-07T00:00:00Z",
+    "outcome_revision_ids": [
+      "synthetic-outcome-revision-v1"
+    ]
+  },
+  "outcome_vintage": "synthetic-vintage-v1",
+  "first_complete_vintage": true
+}

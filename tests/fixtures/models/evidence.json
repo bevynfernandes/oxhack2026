@@ -1,0 +1,20 @@
+{
+  "evidence_id": "synthetic-evidence-v1",
+  "tool_id": "synthetic-tool",
+  "source": "synthetic-downloads",
+  "source_revision_ids": [
+    "synthetic-revision-v1"
+  ],
+  "window": {
+    "start": "2024-12-05T00:00:00Z",
+    "end": "2025-01-04T00:00:00Z"
+  },
+  "available_at": "2025-01-06T00:00:00Z",
+  "availability_basis": "assumed-48h-lag",
+  "source_url": null,
+  "measured_change": "Synthetic reference window contains 3000 downloads.",
+  "predictive_interpretation": "Download activity alone does not establish company growth.",
+  "limitations": [
+    "Synthetic fixture; no vendor observations."
+  ]
+}
