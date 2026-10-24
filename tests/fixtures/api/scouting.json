@@ -1,0 +1,907 @@
+{
+  "catalog": {
+    "catalog_version": "synthetic-catalog-v1",
+    "mapping_version": "synthetic-mapping-v1",
+    "synthetic": true,
+    "tools": [
+      {
+        "tool_id": "tool-1",
+        "tool_name": "Fixture Tool 1",
+        "organization_id": "org-1",
+        "organization_name": "Fixture Company 1",
+        "package_id": "package-1",
+        "package_name": "@fixture/tool-1",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-1",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-2",
+        "tool_name": "Fixture Tool 2",
+        "organization_id": "org-2",
+        "organization_name": "Fixture Company 2",
+        "package_id": "package-2",
+        "package_name": "@fixture/tool-2",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-2",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-3",
+        "tool_name": "Fixture Tool 3",
+        "organization_id": "org-3",
+        "organization_name": "Fixture Company 3",
+        "package_id": "package-3",
+        "package_name": "@fixture/tool-3",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-3",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-4",
+        "tool_name": "Fixture Tool 4",
+        "organization_id": "org-4",
+        "organization_name": "Fixture Company 4",
+        "package_id": "package-4",
+        "package_name": "@fixture/tool-4",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-4",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-5",
+        "tool_name": "Fixture Tool 5",
+        "organization_id": "org-5",
+        "organization_name": "Fixture Company 5",
+        "package_id": "package-5",
+        "package_name": "@fixture/tool-5",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-5",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-6",
+        "tool_name": "Fixture Tool 6",
+        "organization_id": "org-6",
+        "organization_name": "Fixture Company 6",
+        "package_id": "package-6",
+        "package_name": "@fixture/tool-6",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-6",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-7",
+        "tool_name": "Fixture Tool 7",
+        "organization_id": "org-7",
+        "organization_name": "Fixture Company 7",
+        "package_id": "package-7",
+        "package_name": "@fixture/tool-7",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-7",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      },
+      {
+        "tool_id": "tool-8",
+        "tool_name": "Fixture Tool 8",
+        "organization_id": "org-8",
+        "organization_name": "Fixture Company 8",
+        "package_id": "package-8",
+        "package_name": "@fixture/tool-8",
+        "ecosystem": "npm",
+        "category": "Synthetic AI tooling",
+        "representative": true,
+        "mapping_evidence": [
+          {
+            "evidence_id": "evidence-8",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "mapping",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          }
+        ]
+      }
+    ]
+  },
+  "cutoffs": {
+    "items": [
+      {
+        "batch_id": "synthetic-npm-2025-01-06",
+        "ecosystem": "npm",
+        "target_id": "downloads_next_30d_v1",
+        "decision_at": "2025-01-06T00:00:00Z",
+        "mode": "reconstructed",
+        "evaluation_id": "synthetic-evaluation-v1",
+        "synthetic": true
+      }
+    ]
+  },
+  "forecast": {
+    "contract_version": "0.1.0",
+    "batch_id": "synthetic-npm-2025-01-06",
+    "ecosystem": "npm",
+    "target_id": "downloads_next_30d_v1",
+    "target_definition_version": "v1",
+    "decision_at": "2025-01-06T00:00:00Z",
+    "observation_window_end": "2025-01-04T00:00:00Z",
+    "reference_window": {
+      "start": "2024-12-05T00:00:00Z",
+      "end": "2025-01-04T00:00:00Z"
+    },
+    "target_window": {
+      "start": "2025-01-06T00:00:00Z",
+      "end": "2025-02-05T00:00:00Z"
+    },
+    "mode": "reconstructed",
+    "provenance": {
+      "dataset_version": "synthetic-data-v1",
+      "catalog_version": "synthetic-catalog-v1",
+      "mapping_version": "synthetic-mapping-v1",
+      "feature_schema_version": "synthetic-features-v1",
+      "evidence_version": "synthetic-evidence-v1",
+      "experiment_id": "synthetic-experiment-v1",
+      "synthetic": true,
+      "limitations": [
+        "Synthetic contract fixtures. No real research conclusions."
+      ]
+    },
+    "results": [
+      {
+        "forecast_id": "forecast-1",
+        "tool_id": "tool-1",
+        "organization_id": "org-1",
+        "package_id": "package-1",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 2000,
+        "predicted_downloads": 3800,
+        "predicted_growth_pct": 90,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": true,
+        "reasons": [],
+        "interval": null,
+        "baseline": {
+          "model_id": "synthetic-persistence-v1",
+          "predicted_downloads": 2000
+        },
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-1",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-1",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-2",
+        "tool_id": "tool-2",
+        "organization_id": "org-2",
+        "package_id": "package-2",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 2000,
+        "predicted_downloads": 3600,
+        "predicted_growth_pct": 80,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": true,
+        "reasons": [],
+        "interval": null,
+        "baseline": {
+          "model_id": "synthetic-persistence-v1",
+          "predicted_downloads": 2000
+        },
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-2",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-2",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-3",
+        "tool_id": "tool-3",
+        "organization_id": "org-3",
+        "package_id": "package-3",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 2000,
+        "predicted_downloads": 3400,
+        "predicted_growth_pct": 70,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": true,
+        "reasons": [],
+        "interval": null,
+        "baseline": {
+          "model_id": "synthetic-persistence-v1",
+          "predicted_downloads": 2000
+        },
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-3",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-3",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-4",
+        "tool_id": "tool-4",
+        "organization_id": "org-4",
+        "package_id": "package-4",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 2000,
+        "predicted_downloads": 3200,
+        "predicted_growth_pct": 60,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": true,
+        "reasons": [],
+        "interval": null,
+        "baseline": {
+          "model_id": "synthetic-persistence-v1",
+          "predicted_downloads": 2000
+        },
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-4",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-4",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-5",
+        "tool_id": "tool-5",
+        "organization_id": "org-5",
+        "package_id": "package-5",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 2000,
+        "predicted_downloads": 3000,
+        "predicted_growth_pct": 50,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": true,
+        "reasons": [],
+        "interval": null,
+        "baseline": {
+          "model_id": "synthetic-persistence-v1",
+          "predicted_downloads": 2000
+        },
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-5",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-5",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-6",
+        "tool_id": "tool-6",
+        "organization_id": "org-6",
+        "package_id": "package-6",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 2000,
+        "predicted_downloads": 2800,
+        "predicted_growth_pct": 40,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": true,
+        "reasons": [],
+        "interval": null,
+        "baseline": {
+          "model_id": "synthetic-persistence-v1",
+          "predicted_downloads": 2000
+        },
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-6",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-6",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-7",
+        "tool_id": "tool-7",
+        "organization_id": "org-7",
+        "package_id": "package-7",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "available",
+        "reference_downloads": 200,
+        "predicted_downloads": 300,
+        "predicted_growth_pct": null,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": false,
+        "reasons": [
+          "low_reference"
+        ],
+        "interval": null,
+        "baseline": null,
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-7",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-7",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      },
+      {
+        "forecast_id": "forecast-8",
+        "tool_id": "tool-8",
+        "organization_id": "org-8",
+        "package_id": "package-8",
+        "model_id": "synthetic-ridge-v1",
+        "availability": "unavailable",
+        "reference_downloads": null,
+        "predicted_downloads": null,
+        "predicted_growth_pct": null,
+        "estimate_kind": "log_space_point",
+        "ranking_eligible": false,
+        "reasons": [
+          "insufficient_history",
+          "missing_observations"
+        ],
+        "interval": null,
+        "baseline": null,
+        "evidence_status": "exploratory",
+        "evidence": [
+          {
+            "evidence_id": "evidence-8",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "measurement",
+            "text": "Synthetic observed package activity. <script>alert(\"unsafe\")</script>",
+            "url": "https://example.com/evidence"
+          },
+          {
+            "evidence_id": "interpretation-8",
+            "source": "Synthetic fixture",
+            "observed_at": "2025-01-03T00:00:00Z",
+            "available_at": "2025-01-04T00:00:00Z",
+            "kind": "interpretation",
+            "text": "The saved forecast is experimental; downloads do not establish adoption.",
+            "url": "https://example.com/evidence"
+          }
+        ],
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        }
+      }
+    ],
+    "evaluation_id": "synthetic-evaluation-v1"
+  },
+  "rankings": {
+    "batch_id": "synthetic-npm-2025-01-06",
+    "policy_version": "synthetic-ranking-v1",
+    "primary": {
+      "name": "Published predicted growth",
+      "tool_ids": [
+        "tool-1",
+        "tool-2",
+        "tool-3",
+        "tool-4",
+        "tool-5",
+        "tool-6"
+      ]
+    },
+    "recommended_tool_ids": [
+      "tool-1",
+      "tool-2",
+      "tool-3",
+      "tool-4",
+      "tool-5"
+    ],
+    "baselines": [
+      {
+        "name": "Current download popularity",
+        "tool_ids": [
+          "tool-6",
+          "tool-5",
+          "tool-4",
+          "tool-3",
+          "tool-2",
+          "tool-1"
+        ]
+      }
+    ],
+    "exclusions": [
+      {
+        "tool_id": "tool-7",
+        "reasons": [
+          "low_reference"
+        ]
+      },
+      {
+        "tool_id": "tool-8",
+        "reasons": [
+          "insufficient_history",
+          "missing_observations"
+        ]
+      }
+    ],
+    "shortfall_reason": null,
+    "reveal_allowed": true
+  },
+  "reveal": {
+    "batch_id": "synthetic-npm-2025-01-06",
+    "outcome_vintage": "synthetic-outcomes-v1",
+    "available_at": "2025-02-07T00:00:00Z",
+    "selected_organization_ids": [
+      "org-1",
+      "org-2",
+      "org-3",
+      "org-4",
+      "org-5"
+    ],
+    "outcomes": [
+      {
+        "tool_id": "tool-1",
+        "actual_downloads": 1800,
+        "realized_growth_pct": -10,
+        "model_absolute_error": 2000,
+        "baseline_absolute_error": 200,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-2",
+        "actual_downloads": 1800,
+        "realized_growth_pct": -10,
+        "model_absolute_error": 1800,
+        "baseline_absolute_error": 200,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-3",
+        "actual_downloads": 1800,
+        "realized_growth_pct": -10,
+        "model_absolute_error": 1600,
+        "baseline_absolute_error": 200,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-4",
+        "actual_downloads": 1800,
+        "realized_growth_pct": -10,
+        "model_absolute_error": 1400,
+        "baseline_absolute_error": 200,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-5",
+        "actual_downloads": 1800,
+        "realized_growth_pct": -10,
+        "model_absolute_error": 1200,
+        "baseline_absolute_error": 200,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-6",
+        "actual_downloads": 1800,
+        "realized_growth_pct": -10,
+        "model_absolute_error": 1000,
+        "baseline_absolute_error": 200,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-7",
+        "actual_downloads": 1800,
+        "realized_growth_pct": null,
+        "model_absolute_error": null,
+        "baseline_absolute_error": null,
+        "reasons": []
+      },
+      {
+        "tool_id": "tool-8",
+        "actual_downloads": null,
+        "realized_growth_pct": null,
+        "model_absolute_error": null,
+        "baseline_absolute_error": null,
+        "reasons": [
+          "incomplete_outcome"
+        ]
+      }
+    ],
+    "selection_score": {
+      "name": "Your selection",
+      "metric": "Mean realized log growth",
+      "value": null,
+      "organization_ids": [
+        "org-1",
+        "org-2",
+        "org-3",
+        "org-4",
+        "org-5"
+      ],
+      "reason": "Synthetic fixture; no research score asserted."
+    },
+    "comparators": [
+      {
+        "name": "Published recommendation",
+        "metric": "Mean realized log growth",
+        "value": null,
+        "organization_ids": [
+          "org-1",
+          "org-2",
+          "org-3",
+          "org-4",
+          "org-5"
+        ],
+        "reason": "Synthetic fixture; no research score asserted."
+      }
+    ],
+    "limitations": [
+      "Synthetic outcomes used only for contract testing."
+    ]
+  },
+  "history": {
+    "batch_id": "synthetic-npm-2025-01-06",
+    "tool_id": "tool-1",
+    "dataset_version": "synthetic-data-v1",
+    "observation_window_end": "2025-01-04T00:00:00Z",
+    "points": [
+      {
+        "window": {
+          "start": "2025-01-01T00:00:00Z",
+          "end": "2025-01-02T00:00:00Z"
+        },
+        "downloads": 0,
+        "available_at": "2025-01-04T00:00:00Z",
+        "completeness": "complete",
+        "revision_id": "synthetic-revision-1"
+      },
+      {
+        "window": {
+          "start": "2025-01-02T00:00:00Z",
+          "end": "2025-01-03T00:00:00Z"
+        },
+        "downloads": null,
+        "available_at": "2025-01-04T00:00:00Z",
+        "completeness": "missing",
+        "revision_id": "synthetic-revision-2"
+      },
+      {
+        "window": {
+          "start": "2025-01-03T00:00:00Z",
+          "end": "2025-01-04T00:00:00Z"
+        },
+        "downloads": 100,
+        "available_at": "2025-01-04T00:00:00Z",
+        "completeness": "complete",
+        "revision_id": "synthetic-revision-3"
+      }
+    ]
+  },
+  "evaluation": {
+    "evaluation_id": "synthetic-evaluation-v1",
+    "ecosystem": "npm",
+    "target_id": "downloads_next_30d_v1",
+    "mode": "reconstructed",
+    "status": "rejected",
+    "test_window": {
+      "start": "2025-01-06T00:00:00Z",
+      "end": "2025-02-05T00:00:00Z"
+    },
+    "origin_count": 1,
+    "organization_count": 6,
+    "sample_count": 6,
+    "exclusions": [
+      "Fewer than ten organizations: excluded from headline top-five evaluation."
+    ],
+    "missingness": [
+      "One unavailable tool."
+    ],
+    "metrics": [
+      {
+        "model_id": "synthetic-ridge-v1",
+        "name": "Macro log-download MAE",
+        "value": 0.42,
+        "unit": "log downloads",
+        "lower_is_better": true,
+        "sample_count": 6,
+        "common_rows_id": "synthetic-common-rows",
+        "limitations": [
+          "Synthetic comparison."
+        ]
+      },
+      {
+        "model_id": "synthetic-persistence-v1",
+        "name": "Macro log-download MAE",
+        "value": 0.12,
+        "unit": "log downloads",
+        "lower_is_better": true,
+        "sample_count": 6,
+        "common_rows_id": "synthetic-common-rows",
+        "limitations": [
+          "Synthetic comparison."
+        ]
+      }
+    ],
+    "interval_findings": [
+      "Coverage gate failed; no validated intervals are served."
+    ],
+    "conclusion": "Baseline wins in this synthetic example. The challenger is rejected.",
+    "limitations": [
+      "Insufficient origins for a superiority claim."
+    ],
+    "provenance": {
+      "dataset_version": "synthetic-data-v1",
+      "catalog_version": "synthetic-catalog-v1",
+      "mapping_version": "synthetic-mapping-v1",
+      "feature_schema_version": "synthetic-features-v1",
+      "evidence_version": "synthetic-evidence-v1",
+      "experiment_id": "synthetic-experiment-v1",
+      "synthetic": true,
+      "limitations": [
+        "Synthetic contract fixtures. No real research conclusions."
+      ]
+    },
+    "reports": [
+      {
+        "label": "Synthetic report reference",
+        "url": "https://example.com/report"
+      }
+    ]
+  },
+  "data_health": {
+    "synthetic": true,
+    "sources": [
+      {
+        "source": "npm",
+        "ecosystem": "npm",
+        "freshness": {
+          "as_of": "2025-01-04T00:00:00Z",
+          "stale": true,
+          "completeness": "complete",
+          "reasons": [
+            "Historical snapshot; not current activity."
+          ]
+        },
+        "missing_partitions": 1,
+        "revisions": 2,
+        "mapping_status": "Synthetic verified mapping",
+        "connector_status": "degraded"
+      }
+    ]
+  }
+}
