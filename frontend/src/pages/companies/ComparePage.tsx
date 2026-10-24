@@ -1,5 +1,6 @@
+import { MotionDisclosure, MotionLink as Link } from "../../motion";
 import { useQueries } from "@tanstack/react-query";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
 import {
@@ -167,12 +168,11 @@ export default function ComparePage() {
                         {definition.scope} · {definition.unit}
                         {definition.currency ? ` · ${definition.currency}` : ""}
                       </small>
-                      <details>
-                        <summary>Definition</summary>
+                      <MotionDisclosure summary={<>Definition</>}>
                         <p>{definition.definition}</p>
                         <p>{definition.applicability}</p>
                         <small>{definition.metric_id}</small>
-                      </details>
+                      </MotionDisclosure>
                     </th>
                     {profiles.map((profile, index) => {
                       const metric = measurements[index].get(

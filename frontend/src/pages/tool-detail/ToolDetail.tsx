@@ -1,6 +1,7 @@
+import { MotionLink as Link } from "../../motion";
 import { lazy, Suspense } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+
 import { api, unwrap, type DTO } from "../../api/client";
 import {
   count,

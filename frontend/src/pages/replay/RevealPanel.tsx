@@ -1,3 +1,4 @@
+import { MotionButton } from "../../motion";
 import { useMutation } from "@tanstack/react-query";
 import { api, unwrap, type DTO } from "../../api/client";
 import { count, metricValue, percent, Reasons } from "../../components/Common";
@@ -44,7 +45,7 @@ export default function RevealPanel({
           Complete outcomes are not yet available for this batch.
         </p>
       )}
-      <button
+      <MotionButton
         disabled={!allowed || mutation.isPending}
         onClick={() => mutation.mutate([...selected])}
       >
@@ -53,7 +54,7 @@ export default function RevealPanel({
           : informed
             ? "Score a new selection"
             : "Reveal outcomes"}
-      </button>
+      </MotionButton>
       {mutation.isError && <p role="alert">{mutation.error.message}</p>}
       {receipts.map((receipt, index) => (
         <article

@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test } from "@playwright/test";
 
 test("methodology remains accessible on mobile while published data is unavailable", async ({
@@ -29,7 +29,7 @@ test("methodology remains accessible on mobile while published data is unavailab
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.screenshot({
     path: testInfo.outputPath("methodology-mobile.png"),
     fullPage: true,

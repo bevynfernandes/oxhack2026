@@ -1,3 +1,4 @@
+import { MotionState, MotionButton, MotionDisclosure } from "../motion";
 import type { ReactNode } from "react";
 import type { DTO } from "../api/client";
 
@@ -65,13 +66,22 @@ export function QueryState({
   error: Error | null;
   retry: () => void;
 }) {
-  if (pending) return <p role="status">Loading published data…</p>;
+  if (pending)
+    return (
+      <MotionState stateKey="pending">
+        <p role="status">Loading published data…</p>
+      </MotionState>
+    );
   if (error)
     return (
-      <div role="alert" className="notice error">
+      <MotionState
+        stateKey={error.message}
+        role="alert"
+        className="notice error"
+      >
         <p>{error.message}</p>
-        <button onClick={retry}>Retry</button>
-      </div>
+        <MotionButton onClick={retry}>Retry</MotionButton>
+      </MotionState>
     );
   return null;
 }
@@ -143,8 +153,7 @@ export function EvidenceList({ evidence }: { evidence: DTO<"Evidence">[] }) {
 
 export function Provenance({ provenance }: { provenance: DTO<"Provenance"> }) {
   return (
-    <details>
-      <summary>Versions and provenance</summary>
+    <MotionDisclosure summary={<>Versions and provenance</>}>
       <dl className="metadata">
         {Object.entries(provenance)
           .filter(([key]) => !["limitations", "synthetic"].includes(key))
@@ -156,6 +165,6 @@ export function Provenance({ provenance }: { provenance: DTO<"Provenance"> }) {
           ))}
       </dl>
       <Reasons reasons={provenance.limitations ?? []} />
-    </details>
+    </MotionDisclosure>
   );
 }

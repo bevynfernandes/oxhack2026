@@ -377,13 +377,13 @@ tbody tr:hover {
   color: #5d6573;
   padding-left: 1.25rem;
 }
-details {
+.motion-disclosure {
   margin: 1rem 0;
   padding: 1rem;
   border: 1px solid #dfe3e8;
   border-radius: 0.25rem;
 }
-summary {
+.motion-disclosure-trigger {
   cursor: pointer;
   font-weight: 600;
 }
@@ -473,15 +473,6 @@ dd {
     padding-top: 1.5rem;
   }
 }
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
-}
 
 /* Company research: restrained surfaces and short, reduced-motion-aware transitions. */
 :root {
@@ -540,13 +531,13 @@ h3 {
 .page-heading h1 {
   font-size: clamp(2rem, 4vw, 3rem);
 }
-details,
+.motion-disclosure,
 .panel {
   border-radius: 10px;
   background: #fff;
   border-color: #e0e6df;
 }
-summary {
+.motion-disclosure-trigger {
   font-size: 0.875rem;
 }
 select,
@@ -645,9 +636,6 @@ input[type="search"] {
   border: 1px solid #dce4dc;
   border-radius: 8px;
   min-height: 44px;
-  transition:
-    background 180ms ease,
-    border-color 180ms ease;
 }
 .company-open:hover {
   background: #edf3ee;
@@ -756,22 +744,6 @@ input[type="search"] {
   border: 0;
   padding: 0;
   background: transparent;
-}
-@keyframes settle-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .home-heading,
-  .company-search-panel {
-    animation: settle-in 220ms ease-out both;
-  }
 }
 @media (max-width: 720px) {
   .home-heading {

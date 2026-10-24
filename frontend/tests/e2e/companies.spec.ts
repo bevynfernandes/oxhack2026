@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test } from "@playwright/test";
 
 const snapshot = "synthetic-assessments-v1";
@@ -54,7 +54,7 @@ test("company research searches, inspects sources and compares the same publishe
     path: testInfo.outputPath("company-compare.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page
     .getByRole("link", { name: "Synthetic alpha", exact: true })
     .click();
@@ -83,7 +83,7 @@ test("company research searches, inspects sources and compares the same publishe
     path: testInfo.outputPath("company-profile.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   expect(requests.every((url) => new URL(url).hostname === "127.0.0.1")).toBe(
     true,
   );
@@ -171,5 +171,5 @@ test("company tables and comparison remain usable on narrow screens with a three
     path: testInfo.outputPath("company-compare-mobile.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
 });

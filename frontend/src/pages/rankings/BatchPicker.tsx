@@ -1,5 +1,6 @@
+import { MotionSelect, MotionLink as Link } from "../../motion";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { api, unwrap } from "../../api/client";
 import { date, modeLabel, QueryState } from "../../components/Common";
 
@@ -38,18 +39,18 @@ export default function BatchPicker() {
         <div className="filters">
           <label>
             Ecosystem
-            <select
+            <MotionSelect
               aria-label="Ecosystem"
               value={ecosystem}
               onChange={(e) => setParams({ ecosystem: e.target.value, target })}
             >
               <option value="npm">npm</option>
               <option value="pypi">PyPI</option>
-            </select>
+            </MotionSelect>
           </label>
           <label>
             Forecast target
-            <select
+            <MotionSelect
               aria-label="Forecast target"
               value={target}
               onChange={(e) => setParams({ ecosystem, target: e.target.value })}
@@ -59,7 +60,7 @@ export default function BatchPicker() {
                   {label}
                 </option>
               ))}
-            </select>
+            </MotionSelect>
           </label>
         </div>
         <QueryState

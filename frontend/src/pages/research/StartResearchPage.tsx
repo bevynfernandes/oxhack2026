@@ -1,11 +1,13 @@
+import {
+  MotionState,
+  MotionButton,
+  MotionInput,
+  MotionDisclosure,
+  MotionLink as Link,
+} from "../../motion";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import {
-  Link,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../../api/client";
 import { QueryState, Reasons, SourceLink } from "../../components/Common";
 import { companyDomain } from "../companies/identity";
@@ -70,7 +72,7 @@ function SavedResearchPage() {
             dates. Models are not trained; predictions remain unavailable.
           </p>
           <label className="identity-confirm">
-            <input
+            <MotionInput
               type="checkbox"
               checked={confirmed}
               onChange={(event) => setConfirmed(event.target.checked)}
@@ -79,19 +81,21 @@ function SavedResearchPage() {
             This is the company and website I want to research.
           </label>
           {start.error && (
-            <p role="alert" className="notice error">
-              {start.error.message}
-            </p>
+            <MotionState stateKey={start.error.message}>
+              <p role="alert" className="notice error">
+                {start.error.message}
+              </p>
+            </MotionState>
           )}
           <div className="research-actions">
-            <button
+            <MotionButton
               type="submit"
               disabled={!confirmed || !domain || start.isPending}
             >
               {start.isPending
                 ? "Submitting research…"
                 : "Confirm and start research"}
-            </button>
+            </MotionButton>
             <Link
               to={
                 "/companies/" +
@@ -187,8 +191,7 @@ function DomainResearchPage() {
         </p>
       )}
       {capabilities.data && (
-        <details>
-          <summary>Research availability</summary>
+        <MotionDisclosure summary={<>Research availability</>}>
           <p>
             Browser rendering:{" "}
             {capabilities.data.browser_available
@@ -203,7 +206,7 @@ function DomainResearchPage() {
               </li>
             ))}
           </ul>
-        </details>
+        </MotionDisclosure>
       )}
       {!identityId ? (
         <form
@@ -216,7 +219,7 @@ function DomainResearchPage() {
         >
           <label>
             Company domain
-            <input
+            <MotionInput
               value={domain}
               onChange={(event) => setDomain(event.target.value)}
               placeholder="posthog.com"
@@ -229,13 +232,17 @@ function DomainResearchPage() {
             starts only after you confirm the discovered identity and
             destination.
           </p>
-          <button disabled={!domain.trim() || !enabled || discovery.isPending}>
+          <MotionButton
+            disabled={!domain.trim() || !enabled || discovery.isPending}
+          >
             {discovery.isPending ? "Requesting preview…" : "Preview company"}
-          </button>
+          </MotionButton>
           {discovery.error && (
-            <p className="notice error" role="alert">
-              {discovery.error.message}
-            </p>
+            <MotionState stateKey={discovery.error.message}>
+              <p className="notice error" role="alert">
+                {discovery.error.message}
+              </p>
+            </MotionState>
           )}
         </form>
       ) : (
@@ -247,15 +254,17 @@ function DomainResearchPage() {
           />
           {preview && (
             <section className="panel">
-              <p role="status">
-                {preview.state === "ready"
-                  ? "Identity preview ready"
-                  : preview.state === "failed"
-                    ? "Identity discovery failed"
-                    : preview.state === "running"
-                      ? "Discovering company identity"
-                      : "Identity discovery queued"}
-              </p>
+              <MotionState stateKey={preview.state}>
+                <p role="status">
+                  {preview.state === "ready"
+                    ? "Identity preview ready"
+                    : preview.state === "failed"
+                      ? "Identity discovery failed"
+                      : preview.state === "running"
+                        ? "Discovering company identity"
+                        : "Identity discovery queued"}
+                </p>
+              </MotionState>
               <h2>{preview.company_name}</h2>
               <dl className="metadata">
                 <div>
@@ -278,8 +287,9 @@ function DomainResearchPage() {
                 </div>
               )}
               <Reasons reasons={preview.limitations} />
-              <details>
-                <summary>Identity evidence ({preview.evidence.length})</summary>
+              <MotionDisclosure
+                summary={<>Identity evidence ({preview.evidence.length})</>}
+              >
                 {preview.evidence.map((row) => (
                   <section key={row.evidence_id}>
                     <p>{row.excerpt}</p>
@@ -287,7 +297,7 @@ function DomainResearchPage() {
                     <p>Collected {row.collected_at}</p>
                   </section>
                 ))}
-              </details>
+              </MotionDisclosure>
               {preview.state === "ready" && (
                 <form
                   onSubmit={(event) => {
@@ -297,7 +307,7 @@ function DomainResearchPage() {
                   }}
                 >
                   <label className="identity-confirm">
-                    <input
+                    <MotionInput
                       type="checkbox"
                       checked={confirmed}
                       onChange={(event) => setConfirmed(event.target.checked)}
@@ -307,15 +317,19 @@ function DomainResearchPage() {
                     {preview.canonical_domain}, and the identity conflicts shown
                     above.
                   </label>
-                  <button disabled={!confirmed || !enabled || start.isPending}>
+                  <MotionButton
+                    disabled={!confirmed || !enabled || start.isPending}
+                  >
                     {start.isPending
                       ? "Submitting research…"
                       : "Confirm and start research"}
-                  </button>
+                  </MotionButton>
                   {start.error && (
-                    <p role="alert" className="notice error">
-                      {start.error.message}
-                    </p>
+                    <MotionState stateKey={start.error.message}>
+                      <p role="alert" className="notice error">
+                        {start.error.message}
+                      </p>
+                    </MotionState>
                   )}
                 </form>
               )}

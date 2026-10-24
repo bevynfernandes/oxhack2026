@@ -1,6 +1,12 @@
+import {
+  MotionButton,
+  MotionInput,
+  MotionSelect,
+  MotionLink as Link,
+} from "../../motion";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
 import { Coverage, PublicationNotice } from "./shared";
@@ -110,7 +116,7 @@ export default function CompanyListPage() {
       {choices.data && (
         <label className="snapshot-picker">
           Assessment snapshot
-          <select
+          <MotionSelect
             value={snapshot}
             onChange={(event) => setFilter("snapshot", event.target.value)}
           >
@@ -130,7 +136,7 @@ export default function CompanyListPage() {
                 {source.synthetic ? " · Synthetic test data" : ""}
               </option>
             ))}
-          </select>
+          </MotionSelect>
         </label>
       )}
       {snapshot && (
@@ -146,7 +152,7 @@ export default function CompanyListPage() {
           <div className="filters company-filters">
             <label>
               Search companies
-              <input
+              <MotionInput
                 type="search"
                 maxLength={120}
                 value={search}
@@ -158,7 +164,7 @@ export default function CompanyListPage() {
             </label>
             <label>
               Segment
-              <select
+              <MotionSelect
                 value={segment}
                 onChange={(event) => setFilter("segment", event.target.value)}
               >
@@ -168,11 +174,11 @@ export default function CompanyListPage() {
                   .map((value) => (
                     <option key={value}>{value}</option>
                   ))}
-              </select>
+              </MotionSelect>
             </label>
             <label>
               Stage
-              <select
+              <MotionSelect
                 value={stage}
                 onChange={(event) => setFilter("stage", event.target.value)}
               >
@@ -189,11 +195,11 @@ export default function CompanyListPage() {
                   .map((value) => (
                     <option key={value}>{value}</option>
                   ))}
-              </select>
+              </MotionSelect>
             </label>
             <label>
               Evidence coverage
-              <select
+              <MotionSelect
                 value={coverage}
                 onChange={(event) => setFilter("coverage", event.target.value)}
               >
@@ -202,7 +208,7 @@ export default function CompanyListPage() {
                   All applicable metrics observed
                 </option>
                 <option value="gaps">Has evidence gaps</option>
-              </select>
+              </MotionSelect>
             </label>
           </div>
           <p role="status">
@@ -218,7 +224,7 @@ export default function CompanyListPage() {
               <span>Select two or three companies to compare.</span>
             )}
             {selected.length > 0 && (
-              <button
+              <MotionButton
                 className="secondary"
                 onClick={() => {
                   const next = new URLSearchParams(params);
@@ -228,7 +234,7 @@ export default function CompanyListPage() {
                 }}
               >
                 Clear selection
-              </button>
+              </MotionButton>
             )}
           </div>
           {visible.length === 0 ? (
@@ -261,7 +267,7 @@ export default function CompanyListPage() {
                   {visible.map((row) => (
                     <tr key={row.company.company_id}>
                       <td>
-                        <input
+                        <MotionInput
                           type="checkbox"
                           aria-label={`Compare ${row.company.display_name}`}
                           checked={selected.includes(row.company.company_id)}

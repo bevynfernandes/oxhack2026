@@ -1,3 +1,4 @@
+import { MotionDisclosure } from "../../motion";
 import { useQuery } from "@tanstack/react-query";
 import { api, unwrap, type DTO } from "../../api/client";
 import { date, Reasons, SyntheticNotice } from "../../components/Common";
@@ -46,8 +47,7 @@ export function PublicationNotice({
         {source.mode === "historical_reconstruction" &&
           " · Historical reconstruction: some evidence was collected later"}
       </p>
-      <details>
-        <summary>Snapshot limitations and versions</summary>
+      <MotionDisclosure summary={<>Snapshot limitations and versions</>}>
         <Reasons reasons={source.limitations} />
         <dl className="metadata">
           <div>
@@ -79,7 +79,7 @@ export function PublicationNotice({
             <dd>{source.configuration_sha256}</dd>
           </div>
         </dl>
-      </details>
+      </MotionDisclosure>
     </>
   );
 }

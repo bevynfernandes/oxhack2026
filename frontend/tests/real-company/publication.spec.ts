@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test } from "@playwright/test";
 
 test("real company publication supports list, source inspection and accessible comparison", async ({
@@ -27,7 +27,7 @@ test("real company publication supports list, source inspection and accessible c
     path: testInfo.outputPath("real-homepage.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page
     .getByRole("link", { name: `Open dossier for ${firstCompany}` })
     .click();
@@ -49,7 +49,7 @@ test("real company publication supports list, source inspection and accessible c
     path: testInfo.outputPath("real-company-list.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.getByRole("link", { name: "Compare selected companies" }).click();
   await expect(
     page.getByRole("heading", { name: "Compare companies" }),
@@ -64,7 +64,7 @@ test("real company publication supports list, source inspection and accessible c
     path: testInfo.outputPath("real-company-comparison.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
 
   await page
     .getByRole("link", { name: rows[0].company.display_name, exact: true })
@@ -95,7 +95,7 @@ test("real company publication supports list, source inspection and accessible c
     path: testInfo.outputPath("real-company-profile.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   const before = await (
     await page.request.get(`${prefix}/${rows[0].company.company_id}`)
   ).text();
@@ -126,7 +126,7 @@ test("real company publication supports list, source inspection and accessible c
     path: testInfo.outputPath("real-company-comparison-mobile.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   expect(requests.every((url) => new URL(url).hostname === "127.0.0.1")).toBe(
     true,
   );

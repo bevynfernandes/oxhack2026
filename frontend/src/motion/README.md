@@ -44,3 +44,29 @@ cards. Animation never delays a backend write or replaces status text.
 
 See NOTICE.md and LICENSE.txt for upstream attribution. Tests compare analytical
 unit-mass spring trajectories, native semantics and interruptible modal behaviour.
+
+## Adoption and validation (2026-10-24)
+
+All existing buttons, native inputs/selects, router links, modal drawers and
+expandable sections use the shared layer across research, company comparison and
+legacy routes. Navigation, source tabs and mobile dimensions share spring
+indicators. Source status changes retain the existing layout and DOM nodes.
+Native external text links and the skip link remain plain navigation.
+
+`motion-boundary.test.ts` enforces imports, JSX motion settings, native widget
+adoption and CSS timing boundaries. Vitest discovers both `.test.ts` and
+`.test.tsx`. Accessibility audits wait for a modal's settled opacity/position;
+interaction tests separately exercise entrance, reversal, exit and reduced motion.
+
+Production entry JS was 118.42 KB gzip before Motion and 169.95 KB after full
+adoption (+51.53 KB). Existing lazy-loaded chart code is unchanged. The six
+presets and adapters use one shared engine; large data collections do not get
+per-row animation controllers. No per-frame React state updates are used.
+
+A local 1440×900 production-build capture of opening the real Qdrant source
+inventory, switching tabs and closing the drawer recorded 150 animation frames
+in each run. Both runs had one interval over 32ms; median intervals were 16.7ms.
+This short smoke measurement is not a cross-device performance guarantee.
+Videos, frames and screenshots are retained in `tests/outputs/motion/before-valid`
+and `tests/outputs/motion/after`; traces and functional browser evidence are in
+`tests/outputs/motion-widgets-v2` and `tests/outputs/motion-real-replay`.

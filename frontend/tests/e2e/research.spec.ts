@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test, type Page } from "@playwright/test";
 import fixture from "../../../tests/fixtures/api/research.json" with { type: "json" };
 
@@ -64,7 +64,7 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
     .getByRole("tab", { name: "Financial Health", exact: true })
     .click();
   await expect(dialog.getByText(/Saved context/).first()).toBeVisible();
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(inspect).toBeFocused();
@@ -96,7 +96,7 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
     path: info.outputPath("workspace-mobile.png"),
     fullPage: true,
   });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page
     .getByRole("group", { name: "Overview dimensions" })
     .getByRole("button", { name: "Attention", exact: true })
@@ -619,10 +619,10 @@ test("standalone queue errors never retry POST and disabled collection stays rea
     page.getByRole("heading", { name: "Synthetic standalone", exact: true }),
   ).toBeVisible();
   await page.setViewportSize({ width: 390, height: 844 });
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page
     .getByRole("button", { name: "Sources & limitations", exact: true })
     .click();
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   expect(writes).toBe(1);
 });
