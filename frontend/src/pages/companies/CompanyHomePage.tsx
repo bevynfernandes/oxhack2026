@@ -1,6 +1,7 @@
+import { MotionButton, MotionInput, MotionLink as Link } from "../../motion";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { companyDomain, matchesCompanySearch } from "./identity";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
@@ -70,7 +71,7 @@ export default function CompanyHomePage() {
           </div>
           <label className="terminal-search">
             Search companies
-            <input
+            <MotionInput
               type="search"
               placeholder="Company name or website domain"
               value={search}
@@ -162,23 +163,23 @@ export default function CompanyHomePage() {
               </ul>
               {rows.length > PAGE_SIZE && (
                 <nav className="directory-pages" aria-label="Company pages">
-                  <button
+                  <MotionButton
                     className="secondary"
                     disabled={page === 0}
                     onClick={() => setPage(page - 1)}
                   >
                     Previous
-                  </button>
+                  </MotionButton>
                   <span>
                     Page {page + 1} of {Math.ceil(rows.length / PAGE_SIZE)}
                   </span>
-                  <button
+                  <MotionButton
                     className="secondary"
                     disabled={(page + 1) * PAGE_SIZE >= rows.length}
                     onClick={() => setPage(page + 1)}
                   >
                     Next
-                  </button>
+                  </MotionButton>
                 </nav>
               )}
             </>

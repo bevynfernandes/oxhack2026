@@ -1,5 +1,11 @@
+import {
+  MotionButton,
+  MotionInput,
+  MotionDisclosure,
+  MotionLink as Link,
+} from "../../motion";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { api, unwrap, type DTO } from "../../api/client";
 import {
   count,
@@ -165,12 +171,12 @@ function RankingsWorkspace({
         {rankings.shortfall_reason && (
           <p className="notice">{rankings.shortfall_reason}</p>
         )}
-        <button
+        <MotionButton
           className="secondary"
           onClick={() => selection.select(defaults)}
         >
           Use published recommendation
-        </button>
+        </MotionButton>
         {selection.storageWarning && (
           <p role="status">
             Browser storage is unavailable. Keep this tab open to retain your
@@ -203,7 +209,7 @@ function RankingsWorkspace({
                 return (
                   <tr key={id}>
                     <td>
-                      <input
+                      <MotionInput
                         aria-label={`Select ${tool?.organization_name ?? result.organization_id}`}
                         type="checkbox"
                         checked={checked}
@@ -254,20 +260,20 @@ function RankingsWorkspace({
           </table>
         </div>
         {rankings.exclusions.length > 0 && (
-          <details>
-            <summary>
-              Excluded from growth ranking ({rankings.exclusions.length})
-            </summary>
+          <MotionDisclosure
+            summary={
+              <>Excluded from growth ranking ({rankings.exclusions.length})</>
+            }
+          >
             {rankings.exclusions.map((item) => (
               <div key={item.tool_id}>
                 <strong>{name(item.tool_id)}</strong>
                 <Reasons reasons={item.reasons} />
               </div>
             ))}
-          </details>
+          </MotionDisclosure>
         )}
-        <details>
-          <summary>Baseline rankings</summary>
+        <MotionDisclosure summary={<>Baseline rankings</>}>
           {rankings.baselines.map((ranking) => (
             <div key={ranking.name}>
               <h3>{ranking.name}</h3>
@@ -278,7 +284,7 @@ function RankingsWorkspace({
               </ol>
             </div>
           ))}
-        </details>
+        </MotionDisclosure>
       </section>
       <RevealPanel
         batchId={batch.batch_id}

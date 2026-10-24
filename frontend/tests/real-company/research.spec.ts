@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test } from "@playwright/test";
 
 const reportId = process.env.SIGNALSHIFT_REAL_REPORT_ID;
@@ -34,7 +34,7 @@ test("real partial research replay preserves immutable legacy report and source 
     dialog.getByRole("link", { name: "Original source (opens new tab)" }),
   ).toHaveAttribute("href", "https://hn.algolia.com/api/v1/search_by_date");
   await page.keyboard.press("Escape");
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.screenshot({
     path: info.outputPath("real-research-desktop.png"),
     fullPage: true,
@@ -107,7 +107,7 @@ test("live standalone domain preview, collection, evidence and immutable refresh
         .getByRole("dialog")
         .getByText("Fresh source coverage", { exact: true }),
     ).toBeVisible();
-    expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+    expect((await auditAccessibility(page)).violations).toEqual([]);
     await page.getByRole("tab", { name: "Measurements", exact: true }).click();
     await expect(
       page

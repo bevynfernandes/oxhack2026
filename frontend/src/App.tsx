@@ -1,4 +1,9 @@
-import { NavLink, Route, Routes, useLocation } from "react-router-dom";
+import {
+  MotionSelection,
+  MotionIndicator,
+  MotionNavLink as NavLink,
+} from "./motion";
+import { Route, Routes, useLocation } from "react-router-dom";
 import Icon from "./components/WorkspaceIcon";
 import BatchPicker from "./pages/rankings/BatchPicker";
 import BatchPage from "./pages/rankings/BatchPage";
@@ -37,11 +42,23 @@ export default function App() {
           Company intelligence <span>/</span> Startup outlook
         </div>
         <nav aria-label="Main navigation">
-          <NavLink to="/" end>
-            Companies
-          </NavLink>
-          <NavLink to="/explore">Compare & explore</NavLink>
-          <NavLink to="/methodology">Methodology</NavLink>
+          <MotionSelection>
+            <NavLink to="/" end>
+              {({ isActive }) => (
+                <>Companies{isActive && <MotionIndicator />}</>
+              )}
+            </NavLink>
+            <NavLink to="/explore">
+              {({ isActive }) => (
+                <>Compare & explore{isActive && <MotionIndicator />}</>
+              )}
+            </NavLink>
+            <NavLink to="/methodology">
+              {({ isActive }) => (
+                <>Methodology{isActive && <MotionIndicator />}</>
+              )}
+            </NavLink>
+          </MotionSelection>
         </nav>
       </header>
       <main id="main" tabIndex={terminal ? -1 : 0}>
@@ -92,7 +109,14 @@ export default function App() {
             element={
               <>
                 <h1>Page not found</h1>
-                <NavLink to="/">Browse company assessments</NavLink>
+                <NavLink to="/">
+                  {({ isActive }) => (
+                    <>
+                      Browse company assessments
+                      {isActive && <MotionIndicator />}
+                    </>
+                  )}
+                </NavLink>
               </>
             }
           />

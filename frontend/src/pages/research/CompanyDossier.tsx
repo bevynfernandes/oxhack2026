@@ -1,4 +1,8 @@
 import {
+  MotionSelection,
+  MotionIndicator,
+  MotionDisclosure,
+  MotionLink as Link,
   MotionButton,
   MotionDialog,
   type MotionDialogHandle,
@@ -10,7 +14,7 @@ import {
   useState,
   type KeyboardEvent,
 } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import type { DTO } from "../../api/client";
 import {
   date,
@@ -110,7 +114,14 @@ function containFocus(event: KeyboardEvent<HTMLDialogElement>) {
     ...event.currentTarget.querySelectorAll<HTMLElement>(
       'button:not([disabled]):not([tabindex="-1"]), a[href], summary, [tabindex="0"]',
     ),
-  ].filter((element) => element.getClientRects().length > 0);
+  ].filter(
+    (element) =>
+      element.tabIndex >= 0 &&
+      !element.matches(":disabled") &&
+      !element.closest("[inert], [hidden]") &&
+      getComputedStyle(element).visibility === "visible" &&
+      element.getClientRects().length > 0,
+  );
   const first = elements[0];
   const last = elements.at(-1);
   if (event.shiftKey && document.activeElement === first) {
@@ -338,8 +349,10 @@ export default function CompanyDossier({
                 {row.evidence.map((sourceId) => {
                   const source = sourceMap.get(sourceId);
                   return source ? (
-                    <details key={sourceId}>
-                      <summary>{source.provider} source</summary>
+                    <MotionDisclosure
+                      key={sourceId}
+                      summary={<>{source.provider} source</>}
+                    >
                       <p>
                         {source.assertion ??
                           "Restricted source. Contents and attachment location are not public."}
@@ -353,7 +366,7 @@ export default function CompanyDossier({
                         Available {date(source.available_at)} · Collected{" "}
                         {date(source.collected_at)}
                       </small>
-                    </details>
+                    </MotionDisclosure>
                   ) : (
                     <small key={sourceId}>Source unavailable</small>
                   );
@@ -547,21 +560,28 @@ export default function CompanyDossier({
         role="group"
         aria-label="Overview dimensions"
       >
-        {groups.map((group, index) => (
-          <MotionButton
-            key={group.id}
-            title={group.name}
-            aria-pressed={mobileGroup === index}
-            aria-controls={`pillar-${group.id}`}
-            id={`overview-tab-${group.id}`}
-            onClick={() => setMobileGroup(index)}
-          >
-            <span aria-hidden="true">0{index + 1}</span>
-            <span>
-              {["Adoption", "Attention", "Finance", "Industry", "Team"][index]}
-            </span>
-          </MotionButton>
-        ))}
+        <MotionSelection>
+          {groups.map((group, index) => (
+            <MotionButton
+              key={group.id}
+              title={group.name}
+              aria-pressed={mobileGroup === index}
+              aria-controls={`pillar-${group.id}`}
+              id={`overview-tab-${group.id}`}
+              onClick={() => setMobileGroup(index)}
+            >
+              <span aria-hidden="true">0{index + 1}</span>
+              <span>
+                {
+                  ["Adoption", "Attention", "Finance", "Industry", "Team"][
+                    index
+                  ]
+                }
+              </span>
+              {mobileGroup === index && <MotionIndicator />}
+            </MotionButton>
+          ))}
+        </MotionSelection>
       </div>
       <section className="dossier-pillars" aria-label="Fundamental drivers">
         {groups.map((group, index) => {
@@ -746,30 +766,33 @@ export default function CompanyDossier({
           className="driver-tabs"
           onKeyDown={switchTab}
         >
-          {(panel.kind === "driver"
-            ? groups.map((group) => group.name)
-            : [
-                "Sources",
-                "Measurements",
-                profile ? "Saved assessment" : "Identity",
-                "Provenance",
-              ]
-          ).map((name, index) => (
-            <MotionButton
-              key={name}
-              ref={(element) => {
-                tabRefs.current[index] = element;
-              }}
-              role="tab"
-              aria-selected={panel.index === index}
-              tabIndex={panel.index === index ? 0 : -1}
-              id={`drawer-tab-${index}`}
-              aria-controls="driver-panel"
-              onClick={() => setPanel({ ...panel, index })}
-            >
-              {name}
-            </MotionButton>
-          ))}
+          <MotionSelection>
+            {(panel.kind === "driver"
+              ? groups.map((group) => group.name)
+              : [
+                  "Sources",
+                  "Measurements",
+                  profile ? "Saved assessment" : "Identity",
+                  "Provenance",
+                ]
+            ).map((name, index) => (
+              <MotionButton
+                key={name}
+                ref={(element) => {
+                  tabRefs.current[index] = element;
+                }}
+                role="tab"
+                aria-selected={panel.index === index}
+                tabIndex={panel.index === index ? 0 : -1}
+                id={`drawer-tab-${index}`}
+                aria-controls="driver-panel"
+                onClick={() => setPanel({ ...panel, index })}
+              >
+                {name}
+                {panel.index === index && <MotionIndicator />}
+              </MotionButton>
+            ))}
+          </MotionSelection>
         </div>
         <div
           className="driver-panel"
@@ -1023,10 +1046,15 @@ function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
       </p>
       {report.claims.length === 0 && <p>No attributed claims collected.</p>}
       {report.claims.map((claim) => (
-        <details key={claim.claim_id}>
-          <summary>
-            {claim.attribution.replaceAll("_", " ")} · {claim.category}
-          </summary>
+        <MotionDisclosure
+          key={claim.claim_id}
+          summary={
+            <>
+              {" "}
+              {claim.attribution.replaceAll("_", " ")} · {claim.category}{" "}
+            </>
+          }
+        >
           <p>{claim.text}</p>
           <p>Published {claim.published_on ?? "Not supplied"}</p>
           {claim.conflicts_with.length > 0 && (
@@ -1046,20 +1074,26 @@ function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
               </p>
             ) : null;
           })}
-        </details>
+        </MotionDisclosure>
       ))}
       <h3>Retrieved events</h3>
       {report.events.map((event) => (
-        <details key={event.event_id}>
-          <summary>
-            {event.kind.replaceAll("_", " ")} · {event.title}
-          </summary>
+        <MotionDisclosure
+          key={event.event_id}
+          summary={
+            <>
+              {" "}
+              {event.kind.replaceAll("_", " ")} · {event.title}{" "}
+            </>
+          }
+        >
           <p>Published {event.published_at ?? "Not supplied"}</p>
           <SourceLink url={event.url}>Event source</SourceLink>
-        </details>
+        </MotionDisclosure>
       ))}
-      <details>
-        <summary>Capture provenance ({report.captures.length})</summary>
+      <MotionDisclosure
+        summary={<>Capture provenance ({report.captures.length})</>}
+      >
         {report.captures.map((capture) => (
           <p key={capture.capture_id}>
             <SourceLink url={capture.final_url}>Captured source</SourceLink> ·
@@ -1067,7 +1101,7 @@ function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
             SHA-256 {capture.artifact.sha256}
           </p>
         ))}
-      </details>
+      </MotionDisclosure>
     </>
   );
 }

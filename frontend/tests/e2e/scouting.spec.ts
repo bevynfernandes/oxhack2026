@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test } from "@playwright/test";
 import raw from "../../../tests/fixtures/api/scouting.json" with { type: "json" };
 
@@ -75,7 +75,7 @@ test("complete scouting replay keeps future truth separate and freezes the submi
   expect(requests.every((url) => new URL(url).hostname === "127.0.0.1")).toBe(
     true,
   );
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
 });
 
 test("detail shows measured zero and missing history, escapes evidence and renders aggregate estimates", async ({
@@ -208,10 +208,10 @@ test("rankings and detail satisfy automated accessibility checks", async ({
   await expect(
     page.getByRole("heading", { name: "Your scouting shortlist" }),
   ).toBeVisible();
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.getByRole("link", { name: "Fixture Tool 1", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "Observed history" }),
   ).toBeVisible();
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
 });

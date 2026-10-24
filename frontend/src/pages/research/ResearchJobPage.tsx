@@ -1,5 +1,10 @@
+import {
+  MotionState,
+  MotionDisclosure,
+  MotionLink as Link,
+} from "../../motion";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams, useLocation } from "react-router-dom";
+import { useParams, useLocation } from "react-router-dom";
 import { api, type DTO } from "../../api/client";
 import { date, QueryState, Reasons } from "../../components/Common";
 import { researchResult } from "./client";
@@ -39,17 +44,19 @@ function LegacyResearchJobPage() {
       {job && (
         <section className="panel" aria-label="Research job">
           <p>{job.request.domain}</p>
-          <h2 role="status">
-            {
+          <MotionState stateKey={job.state}>
+            <h2 role="status">
               {
-                queued: "Queued",
-                running: "Research in progress",
-                partial: "Partial results",
-                completed: "Research complete",
-                failed: "Research failed",
-              }[job.state]
-            }
-          </h2>
+                {
+                  queued: "Queued",
+                  running: "Research in progress",
+                  partial: "Partial results",
+                  completed: "Research complete",
+                  failed: "Research failed",
+                }[job.state]
+              }
+            </h2>
+          </MotionState>
           <p>
             {
               {
@@ -131,17 +138,26 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
       {sources.map((source) => (
         <li key={source.provider}>
           <strong>{source.name}</strong>
-          <span>{source.state}</span>
+          <MotionState
+            className="source-progress-state"
+            stateKey={source.state}
+          >
+            <span>{source.state}</span>
+          </MotionState>
           <Reasons reasons={source.reason_codes} />
           {source.finished_at && (
             <small>Finished {date(source.finished_at)}</small>
           )}
           {(source.evidence.length > 0 || source.observations.length > 0) && (
-            <details>
-              <summary>
-                Collected results · {source.observations.length} measurements ·{" "}
-                {source.evidence.length} excerpts
-              </summary>
+            <MotionDisclosure
+              summary={
+                <>
+                  {" "}
+                  Collected results · {source.observations.length} measurements
+                  · {source.evidence.length} excerpts{" "}
+                </>
+              }
+            >
               {source.observations.map((row) => (
                 <p key={row.observation_id}>
                   {row.metric_id.replaceAll("_", " ")}:{" "}
@@ -154,7 +170,7 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
               {source.evidence.slice(0, 3).map((row) => (
                 <blockquote key={row.evidence_id}>{row.excerpt}</blockquote>
               ))}
-            </details>
+            </MotionDisclosure>
           )}
         </li>
       ))}
@@ -190,17 +206,19 @@ function StandaloneJobPage() {
       />
       {job && (
         <section className="panel">
-          <h2 role="status">
-            {
+          <MotionState stateKey={job.state}>
+            <h2 role="status">
               {
-                queued: "Queued",
-                running: "Research in progress",
-                completed: "Research complete",
-                partial: "Partial results",
-                failed: "Research failed",
-              }[job.state]
-            }
-          </h2>
+                {
+                  queued: "Queued",
+                  running: "Research in progress",
+                  completed: "Research complete",
+                  partial: "Partial results",
+                  failed: "Research failed",
+                }[job.state]
+              }
+            </h2>
+          </MotionState>
           <p>
             Each source reports its own result. A missing or failed source does
             not erase successful results or establish company failure.

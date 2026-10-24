@@ -1,4 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
+import { auditAccessibility } from "../helpers/accessibility";
 import { expect, test } from "@playwright/test";
 
 test("company homepage searches and opens a saved analysis with keyboard", async ({
@@ -18,7 +18,7 @@ test("company homepage searches and opens a saved analysis with keyboard", async
   await expect(
     page.getByRole("link", { name: "Open dossier for Synthetic beta" }),
   ).toHaveCount(0);
-  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.screenshot({
     path: testInfo.outputPath("homepage-desktop.png"),
     fullPage: true,
