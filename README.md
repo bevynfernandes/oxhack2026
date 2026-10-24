@@ -1,69 +1,100 @@
-# oxhack2026
+# SignalShift
 
-[![Release](https://img.shields.io/github/v/release/bevynfernandes/oxhack2026)](https://img.shields.io/github/v/release/bevynfernandes/oxhack2026)
-[![Build status](https://img.shields.io/github/actions/workflow/status/bevynfernandes/oxhack2026/main.yml?branch=main)](https://github.com/bevynfernandes/oxhack2026/actions/workflows/main.yml?query=branch%3Amain)
-[![codecov](https://codecov.io/gh/bevynfernandes/oxhack2026/branch/main/graph/badge.svg)](https://codecov.io/gh/bevynfernandes/oxhack2026)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/bevynfernandes/oxhack2026)](https://img.shields.io/github/commit-activity/m/bevynfernandes/oxhack2026)
-[![License](https://img.shields.io/github/license/bevynfernandes/oxhack2026)](https://img.shields.io/github/license/bevynfernandes/oxhack2026)
+Project template for the developer-tool scouting application described in
+[PLAN.md](PLAN.md). The implementation plan remains the source of truth.
 
-This is a template repository for Python projects that use uv for their dependency management.
+**Status: scaffold only.** Python modules reserve implementation boundaries;
+the frontend renders a static template notice. There are no source connectors,
+API endpoints, database models, forecasts, evaluation algorithms, CLI commands,
+or cloud integrations yet.
 
-- **Github repository**: <https://github.com/bevynfernandes/oxhack2026/>
-- **Documentation** <https://bevynfernandes.github.io/oxhack2026/>
+## Development setup
 
-## Getting started with your project
-
-### 1. Create a New Repository
-
-First, create a repository on GitHub with the same name as this project, and then run the following commands:
-
-```bash
-git init -b main
-git add .
-git commit -m "init commit"
-git remote add origin git@github.com:bevynfernandes/oxhack2026.git
-git push -u origin main
-```
-
-### 2. Set Up Your Development Environment
-
-Then, install the environment and the pre-commit hooks with
+Requirements: Git, uv, Python 3.12 (uv can install it), and Node.js 24 with npm.
 
 ```bash
 make install
+make notebooks
+make frontend-install
 ```
 
-This will also generate your `uv.lock` file
-
-### 3. Run the pre-commit hooks
-
-Initially, the CI/CD pipeline might be failing due to formatting issues. To resolve those run:
+The default Python installation includes development tools. Planned application
+dependencies are opt-in extras, for example:
 
 ```bash
-uv run pre-commit run -a
+uv sync --frozen --inexact --extra api --extra data --group docs
 ```
 
-### 4. Commit the changes
+Extras reserve dependencies only; installing them does not implement features.
+Notebook helpers are installed into the local virtual environment and are not
+project requirements. An exact `uv sync` can remove those helpers; rerun
+`make notebooks` or use `--inexact` when preserving them.
 
-Lastly, commit the changes made by the two steps above to your repository.
+The optional environment template is `.env.example`. Its empty credentials
+and configuration names are placeholders; no service reads them yet.
+
+## Preview the frontend template
 
 ```bash
-git add .
-git commit -m 'Fix formatting issues'
-git push origin main
+npm --prefix frontend run dev
 ```
 
-You are now ready to start development on your project!
-The CI/CD pipeline will be triggered when you open a pull request, merge to main, or when you create a new release.
+See [frontend/README.md](frontend/README.md) for the frontend structure.
+There is no backend server or `signalshift` CLI entry point at this stage.
 
-To finalize the set-up for publishing to PyPI, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/publishing/#set-up-for-pypi).
-For activating the automatic documentation with MkDocs/Zensical, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/docs_tool/#deploying-to-github-pages).
-To enable the code coverage reports, see [here](https://fpgmaas.github.io/cookiecutter-uv/features/codecov/).
+## Verification
 
-## Releasing a new version
+```bash
+make check test build docs-test frontend-check
+```
 
+The Python tests check namespace imports only. Passing scaffold checks does not
+validate any forecasting or product behavior. CI runs the same checks.
 
+## Layout
 
----
+```text
+oxhack2026/
+  catalog/       Identity and mapping templates
+  ingest/        npm, PyPI, GitHub, and HN adapter templates
+  storage/       Database, artifact, and publication templates
+  features/      Feature and label templates
+  models/        Baseline, training, prediction, and calibration templates
+  evaluation/    Split, metric, and experiment templates
+  api/           Future application, schemas, and routes
+  explanations/  Deterministic and Gemini templates
+  cli/           Future command entry points
+frontend/        Static React / TypeScript / Vite starter
+contracts/       Reserved API and dataset contracts
+configs/         Reserved non-secret configuration
+migrations/      Reserved database migrations
+data/            Catalogue documentation and ignored data directories
+artifacts/       Ignored generated model and dataset artifacts
+reports/         Ignored generated evaluation reports
+demo/            Reserved real-data replay exports
+tests/           Smoke checks and reserved unit/integration tests
+deploy/          Local, Tiger, and Vultr deployment notes
+docs/            Scaffold documentation and task handoff template
+```
 
-Repository initiated with [osprey-oss/cookiecutter-uv](https://github.com/osprey-oss/cookiecutter-uv).
+## Container template
+
+`Dockerfile` builds a development shell image. Its default command is Bash;
+it does not start an API, worker, or database, expose ports, or provision cloud
+resources.
+
+```bash
+docker build -t signalshift-scaffold .
+docker run --rm -it signalshift-scaffold
+```
+
+The devcontainer adds Node 24 and installs local development dependencies.
+
+## Contributions
+
+For the three-developer implementation split, start with
+[the team guide](plans/README.md) and the individual workstream plans it links.
+
+Read [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md), and
+[PLAN.md](PLAN.md). Keep generated datasets, credentials, and retained test
+outputs out of version control.

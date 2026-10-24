@@ -1,10 +1,8 @@
-#! /usr/bin/env bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Install uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install Dependencies
-uv sync
-
-# Install pre-commit hooks
-uv run pre-commit install --install-hooks
+python -m pip install --user uv==0.13.0
+export PATH="$HOME/.local/bin:$PATH"
+uv sync --frozen --group docs
+uv pip install --python .venv/bin/python ipykernel ipywidgets
+npm --prefix frontend ci

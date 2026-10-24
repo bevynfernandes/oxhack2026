@@ -1,0 +1,1 @@
+"""PyPI BigQuery extraction template."""

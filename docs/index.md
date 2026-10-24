@@ -1,8 +1,22 @@
-# oxhack2026
+# SignalShift scaffold
 
-[![Release](https://img.shields.io/github/v/release/bevynfernandes/oxhack2026)](https://img.shields.io/github/v/release/bevynfernandes/oxhack2026)
-[![Build status](https://img.shields.io/github/actions/workflow/status/bevynfernandes/oxhack2026/main.yml?branch=main)](https://github.com/bevynfernandes/oxhack2026/actions/workflows/main.yml?query=branch%3Amain)
-[![Commit activity](https://img.shields.io/github/commit-activity/m/bevynfernandes/oxhack2026)](https://img.shields.io/github/commit-activity/m/bevynfernandes/oxhack2026)
-[![License](https://img.shields.io/github/license/bevynfernandes/oxhack2026)](https://img.shields.io/github/license/bevynfernandes/oxhack2026)
+This repository contains the project template for SignalShift. Product behavior
+is not implemented. The repository-root `PLAN.md` defines the intended system;
+`AGENTS.md` defines implementation standards.
 
-This is a template repository for Python projects that use uv for their dependency management.
+## Available now
+
+- Python package namespaces and empty module templates.
+- Static React / TypeScript / Vite frontend.
+- Dependency manifests and lockfiles.
+- Formatting, type-checking, packaging, and scaffold import checks.
+- Development container and CI configuration.
+
+## Development
+
+Run `make install notebooks frontend-install` from the repository root.
+Use `make check test build docs-test frontend-check` to verify the scaffold.
+The only browser preview is `npm --prefix frontend run dev`.
+
+There are no API routes, data ingestion jobs, database migrations, model
+implementations, or deployed services yet.

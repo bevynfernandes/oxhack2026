@@ -209,3 +209,24 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# SignalShift local configuration and generated output
+.env.*
+!.env.example
+*:Zone.Identifier
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+artifacts/*
+!artifacts/.gitkeep
+reports/*
+!reports/.gitkeep
+tests/outputs/*
+!tests/outputs/.gitkeep
+frontend/node_modules/
+frontend/dist/
+frontend/coverage/
+frontend/test-results/
+frontend/playwright-report/
+*.tsbuildinfo

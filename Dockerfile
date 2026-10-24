@@ -1,21 +1,17 @@
-# Install uv
 FROM python:3.12-slim
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.13.0 /uv /bin/uv
 
-# Change the working directory to the `app` directory
 WORKDIR /app
+ENV PATH="/app/.venv/bin:$PATH" \
+    UV_LINK_MODE=copy
 
-# Copy the lockfile and `pyproject.toml` into the image
-COPY uv.lock /app/uv.lock
-COPY pyproject.toml /app/pyproject.toml
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --group docs --no-install-project
 
-# Install dependencies
-RUN uv sync --frozen --no-install-project
+COPY . .
+RUN uv sync --frozen --group docs --no-editable \
+    && useradd --create-home --uid 10001 scaffold \
+    && chown -R scaffold:scaffold /app
 
-# Copy the project into the image
-COPY . /app
-
-# Sync the project
-RUN uv sync --frozen
-
-CMD [ "python", "oxhack2026/foo.py" ]
+USER scaffold
+CMD ["/bin/bash"]

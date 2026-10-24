@@ -1,0 +1,16 @@
+Lock the project to this: a dashboard that predicts which AI developer-tool startups will see the strongest growth in software downloads over the time helping a startup scout choose five companies to investigate.
+We should remove paying-customer predictions from this version because we haven’t secured customer histories. Downloads are an observable adoption signal; they do not measure customers or revenue.
+The exact scope
+DecisionDefinitionUserA startup scout comparing AI developer tools.Companies coveredA manually verified shortlist of approximately 20 startups with an official npm package and sufficient download history.PredictionTotal downloads of each company’s selected package during the nexttime period.RankingPredicted percentage change compared with the previous 30 days.User decisionWhich five companies deserve further investigation.Main dataHistorical npm downloads.Additional signalsHistorical GitHub activity and dated Hacker News mentions, where available.Explicit exclusionsRevenue, company valuation, founder quality, investment returns, market saturation and “which startup will succeed.”
+The finished application has three views:
+
+1. Rankings: company, product description, previous 30-day downloads, predicted next 30-day downloads, predicted growth and data freshness..
+2. Company details: historical download chart, forecast, GitHub/Hacker News signals and links to the underlying sources. Explanation separates measured changes from possible interpretations..
+3. Evaluation: historical predictions versus actual outcomes, compared with a simple baseline that assumes the next will match the previous days..
+A small Python model produces the numerical forecast. An LLM can explain the evidence, but does not invent the forecast or its confidence.
+This is the judge demonstration:
+
+“You can investigate five AI developer tools this week. Here is our shortlist. Open one to see its forecast and evidence. Now move to a historical date: here is what the model predicted using information available then, what actually happened, and how it compared with a simple baseline.”
+That gives HRT a concrete prediction, a concrete decision and a measurable evaluation.
+Make these sponsor decisions now:
+SponsorExact roleDecisionHRTForecasting, ranking and historical evaluation.Core objective.Tiger DataStore timestamped observations and serve weekly/monthly aggregates to the charts.Use as the main database.VultrHost the Python API, collection jobs and application.Use for deployment.GeminiProduce an evidence-linked explanation from supplied metrics and source excerpts.Add after the forecast works.ElevenLabsRead the selected company’s evidence briefing aloud.Optional. No conversational agent in the initial scope. A basic narration feature may qualify, but is a weaker prize entry.SnowflakeNo essential role in this defined product.Cut from the initial build. Reconsider only if there is a distinct, demonstrated feature requiring its API.SolanaWould require a separate public prediction-verification feature.Cut. Don’t build wallets, tokens or blockchain records for this version.PresageNo role in the defined workflow.Cut.DEVArticle explaining the implementation and evaluation.Prepare after the working demo.
