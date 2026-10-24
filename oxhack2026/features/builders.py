@@ -56,7 +56,21 @@ class FeatureRequest(Contract):
         return self
 
 
-def _grid(requests: Sequence[FeatureRequest], as_of: datetime | None) -> pl.LazyFrame:
+def request_grid(
+    requests: Sequence[FeatureRequest], as_of: datetime | None = None
+) -> pl.LazyFrame:
+    """Project exact feature or label windows for the shared daily snapshot join.
+
+    Args:
+        requests: Unique frozen package/origin requests.
+        as_of: Label-vintage UTC cutoff, or None for anchored feature histories.
+    Returns:
+        Typed lazy request grid, including a valid empty-batch schema.
+    Raises:
+        ValueError: IDs repeat or the supplied cutoff is not UTC.
+    """
+    if as_of is not None:
+        require_utc(as_of)
     if len({row.feature_row_id for row in requests}) != len(requests):
         message = "Feature requests require unique row IDs"
         raise ValueError(message)
@@ -77,7 +91,14 @@ def _grid(requests: Sequence[FeatureRequest], as_of: datetime | None) -> pl.Lazy
                 for row in requests
             ],
             "query_at": [as_of or row.windows.decision_at for row in requests],
-        }
+        },
+        schema_overrides={
+            "request_id": pl.String,
+            "series_id": pl.String,
+            "window_start": pl.Datetime("us", "UTC"),
+            "window_end": pl.Datetime("us", "UTC"),
+            "query_at": pl.Datetime("us", "UTC"),
+        },
     ).lazy()
 
 
@@ -169,7 +190,7 @@ def build_features(
     """
     if not requests:
         return ()
-    summaries = _aggregates(daily_snapshot(revisions, _grid(requests, None), mode))
+    summaries = _aggregates(daily_snapshot(revisions, request_grid(requests), mode))
     indexed = {row["request_id"]: row for row in summaries.iter_rows(named=True)}
     results: list[FeatureRow] = []
     for request in requests:
@@ -249,7 +270,7 @@ def build_labels(
     if not requests:
         return ()
     summary = (
-        daily_snapshot(revisions, _grid(requests, as_of), mode)
+        daily_snapshot(revisions, request_grid(requests, as_of), mode)
         .group_by("request_id")
         .agg(
             pl.when(pl.col("downloads").count() == pl.len())
