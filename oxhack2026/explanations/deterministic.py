@@ -2,7 +2,7 @@
 
 from collections import defaultdict
 from collections.abc import Iterator, Mapping
-from datetime import datetime, timedelta
+from datetime import datetime
 from hashlib import sha256
 
 import orjson
@@ -20,6 +20,10 @@ from oxhack2026.features.company_outcomes import (
     COMPANY_OUTCOME_IDS,
     CompanyOutcomeId,
     company_horizon_end,
+)
+from oxhack2026.features.company_policy import (
+    company_metric_state,
+    public_evidence_state,
 )
 from oxhack2026.features.definitions import require_utc
 from oxhack2026.models.company_assessments import (
@@ -126,9 +130,10 @@ def _company_views(snapshot: CompanySourceSnapshot) -> Iterator[CompanySourceSna
 def _source_reason(
     evidence_ids: tuple[str, ...], evidence: Mapping[str, SourceEvidence]
 ) -> str | None:
-    if any(evidence[key].access != "public" for key in evidence_ids):
+    state = public_evidence_state(evidence_ids, evidence)
+    if state == "restricted":
         return "restricted evidence"
-    if any(evidence[key].review_state != "verified" for key in evidence_ids):
+    if state == "unverified":
         return "unverified or disputed evidence"
     return None
 
@@ -139,17 +144,17 @@ def _metric_statement(
     evidence: Mapping[str, SourceEvidence],
     as_of: datetime,
 ) -> AssessmentStatement | None:
-    if row.state == "not_applicable":
+    state = company_metric_state(row, definition, evidence, as_of)
+    if state == "not_applicable":
         return None
-    reason = (
-        row.state
-        if row.state != "observed"
-        else _source_reason(row.evidence_ids, evidence)
-    )
-    if reason is None and as_of - row.measurement_end > timedelta(
-        days=definition.maximum_age_days
-    ):
-        reason = "stale measurement"
+    reason = {
+        "observed": None,
+        "missing": "missing",
+        "conflicting": "conflicting",
+        "restricted": "restricted evidence",
+        "unverified": "unverified or disputed evidence",
+        "stale": "stale measurement",
+    }[state]
     if reason is not None:
         return AssessmentStatement(
             statement_id=f"metric-{row.observation_id}",
