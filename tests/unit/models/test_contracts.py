@@ -18,6 +18,7 @@ from oxhack2026.evaluation.contracts import (
     RankedCandidate,
     ShortlistScore,
 )
+from oxhack2026.models.company_assessments import CompanyAssessment
 from oxhack2026.models.company_contracts import CompanyOutcomeLabel
 from oxhack2026.models.contracts import (
     ArtifactReference,
@@ -83,6 +84,7 @@ def test_forecast_fixtures(name: str) -> None:
         RankedCandidate,
         ShortlistScore,
         CompanyOutcomeLabel,
+        CompanyAssessment,
     ],
 )
 def test_schema_exports_do_not_drift(contract: type[Contract]) -> None:
