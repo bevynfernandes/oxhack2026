@@ -1,5 +1,34 @@
 # Dev 3 checkpoints
 
+## Active company-outlook acceptance
+
+The active scope is [PLAN.md](https://github.com/bevynfernandes/oxhack2026/blob/main/PLAN.md)
+and D3-O1 through D3-O5 in
+[the role plan](https://github.com/bevynfernandes/oxhack2026/blob/main/plans/DEV_3_API_FRONTEND.md). Demo/export/offline serving
+is excluded. The original download checklist below is historical.
+
+| Checkpoint | State | Evidence |
+| --- | --- | --- |
+| D3-O1 visual system | Merged | #21 neutral surfaces, compact navigation/tables; #27 methodology and exact outcome wording |
+| D3-O2 public API/client | Merged | #32 C1/C2 projection, privacy and generated types; #41 canonical assessment publication URLs |
+| D3-O3 list/profile/compare | Implemented and verified | Company landing, URL search/segment/stage/coverage filters, exact profiles and two-to-three-company comparison |
+| D3-O4 real adapter | Merged | #32 storage composition, #39 local runtime; #41 exact policy selection and rollout/retirement regression |
+| D3-O5 real acceptance | Verified locally | Restored Qdrant/Weaviate C1/C2 bundle, real API/browser, all three outcomes, four metric families, mobile/keyboard/axe |
+
+Validation after publication pinning: 540 Python units, 104 API cases, real API
+acceptance, 14 frontend unit tests, 12 browser cases and one separate real-data
+browser flow. Ruff, mypy, generated-contract drift, TypeScript, formatting and
+production frontend build pass. Reports/screenshots are retained under ignored
+`tests/outputs/`; [the runtime handoff](../../workstreams/dev3/README.md) records
+the immutable archive checksum, configuration and reproducible commands.
+
+The real data contains two companies, fourteen metric observations and six
+missing commercial measurements. Unknown stage/business model/family and stale
+financing remain visible. No validated probability, overall success score,
+future label, private attachment contents or private derived measurement is
+served. This proves the evidence-product checkpoint; historical modelling and
+operated cloud deployment remain separate owners' gates.
+
 ## Product scope revision
 
 The user redirected the product to multi-metric startup success/failure assessment
@@ -19,8 +48,9 @@ explains the three calendar-horizon outcomes, cash-flow self-sufficiency,
 evidence-only versus validated assessments, source timing and incomplete
 follow-up. It works without a published repository and makes no claim that a
 company prediction model is available. The company landing/profile/compare
-checkpoint still depends on the concrete C1 source and C2 assessment classes;
-#23 and #25 establish their specification and reader handoff.
+checkpoint now consumes the concrete C1/C2 classes and real storage readers.
+#23 and #25 established their specification; #28, #31/#34 and #33 delivered
+source, storage and assessment generation.
 
 ## Reusable original checkpoints
 

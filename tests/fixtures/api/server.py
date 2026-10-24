@@ -8,7 +8,17 @@ from fastapi import FastAPI
 
 from oxhack2026.api import schemas as s
 from oxhack2026.api.app import create_app as create_api
+from oxhack2026.api.company_repository import (
+    PublishedCompanyRepository,
+)
 from oxhack2026.api.repository import PublishedRepository, ResourceNotFound
+from oxhack2026.catalog.company import CompanySourceSnapshot
+from oxhack2026.models.company_assessments import CompanyAssessment
+from oxhack2026.storage.company import CompanySourceReader
+from oxhack2026.storage.company_assessments import (
+    CompanyAssessmentManifest,
+    CompanyAssessmentReader,
+)
 
 
 def create_app() -> FastAPI:
@@ -93,4 +103,24 @@ def create_app() -> FastAPI:
     repository.data_health.return_value = s.DataHealth.model_validate(
         payload["data_health"]
     )
-    return create_api(repository)
+    company_payload = orjson.loads(
+        Path(__file__).with_name("companies.json").read_bytes()
+    )
+    sources = create_autospec(CompanySourceReader, instance=True)
+    assessments = create_autospec(CompanyAssessmentReader, instance=True)
+    sources.snapshot.return_value = CompanySourceSnapshot.model_validate(
+        company_payload["source"]
+    )
+    publication = CompanyAssessmentManifest.model_validate(
+        company_payload["publication"]
+    )
+    assessments.manifest.return_value = publication
+    assessments.assessments.return_value = tuple(
+        CompanyAssessment.model_validate(row) for row in company_payload["assessments"]
+    )
+    return create_api(
+        repository,
+        company_repository=PublishedCompanyRepository(
+            sources, assessments, (publication.publication_id,)
+        ),
+    )

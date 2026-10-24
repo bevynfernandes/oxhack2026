@@ -15,7 +15,7 @@ export class ApiError extends Error {
         : status === 404
           ? "This published resource was not found."
           : status === 422
-            ? "The request is invalid. Check the selected batch and organizations."
+            ? "The request is invalid. Check the selected identifiers and filters."
             : "Published data is unavailable. Please retry.",
     );
   }

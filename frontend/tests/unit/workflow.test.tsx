@@ -55,7 +55,7 @@ function mount(path: string) {
 }
 
 it("shows only published combinations and an empty second ecosystem", async () => {
-  mount("/");
+  mount("/traction");
   expect(
     await screen.findByRole("link", { name: /Open forecast/ }),
   ).toBeVisible();
@@ -106,7 +106,7 @@ it("renders safe service errors and supports retry", async () => {
   fetchMock.mockResolvedValue(
     new Response('{"code":"repository_unavailable"}', { status: 503 }),
   );
-  mount("/");
+  mount("/traction");
   expect(await screen.findByRole("alert")).toHaveTextContent(
     "Published data is unavailable",
   );

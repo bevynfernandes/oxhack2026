@@ -172,6 +172,114 @@ select {
   color: #20242c;
   max-width: 100%;
 }
+input[type="search"] {
+  padding: 0.6rem;
+  border: 1px solid #aab2bf;
+  border-radius: 0.25rem;
+  background: white;
+  color: #20242c;
+  min-width: 0;
+  max-width: 100%;
+}
+.snapshot-picker {
+  max-width: 680px;
+}
+.company-filters {
+  align-items: end;
+  gap: 1rem;
+}
+.compare-selection {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  border-block: 1px solid #dfe3e8;
+  font-size: 0.85rem;
+}
+.company-table {
+  min-width: 1100px;
+}
+.company-table th[scope="row"] {
+  min-width: 170px;
+}
+.company-table td {
+  min-width: 130px;
+}
+.company-table td:first-child {
+  min-width: auto;
+}
+.coverage-list {
+  list-style: none;
+  padding: 0;
+  font-size: 0.8rem;
+}
+.coverage-list li {
+  margin-block: 0.3rem;
+}
+.company-section {
+  margin-block: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #dfe3e8;
+}
+.outcome-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 2fr;
+  gap: 1.5rem;
+  padding-block: 1rem;
+  border-top: 1px solid #dfe3e8;
+}
+.outcome-row h3,
+.outcome-row p {
+  margin: 0 0 0.4rem;
+}
+.statement-list,
+.source-list,
+.event-list {
+  padding-left: 1.25rem;
+}
+.statement-list li,
+.source-list li,
+.event-list li {
+  padding-block: 0.75rem;
+}
+.statement-list p,
+.source-list p,
+.event-list p {
+  margin-block: 0.4rem;
+}
+.stale-label {
+  display: block;
+  color: #805b10;
+  font-size: 0.8rem;
+}
+.comparison-scroll {
+  max-height: 75vh;
+  overflow: auto;
+}
+.comparison-table {
+  min-width: 760px;
+}
+.comparison-table thead th {
+  position: sticky;
+  top: 0;
+  background: #f7f8fa;
+  z-index: 1;
+}
+.comparison-table th[scope="row"] {
+  width: 200px;
+}
+.comparison-table td {
+  min-width: 240px;
+}
+.comparison-table .outcome-row {
+  display: block;
+  border: none;
+  padding: 0;
+}
+.comparison-table .outcome-row h3 {
+  font-size: 0.85rem;
+}
 .batch-list {
   list-style: none;
   padding: 0;
@@ -335,6 +443,10 @@ dd {
   padding: 1rem;
 }
 @media (max-width: 720px) {
+  .outcome-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
   .site-header {
     align-items: flex-start;
     padding: 1rem;
