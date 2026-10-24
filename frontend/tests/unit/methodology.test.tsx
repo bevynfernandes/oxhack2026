@@ -25,7 +25,7 @@ it("explains company outcomes without a repository, fixture or prediction reques
     "aria-current",
     "page",
   );
-  expect(screen.getByRole("link", { name: "Forecasts" })).not.toHaveAttribute(
+  expect(screen.getByRole("link", { name: "Companies" })).not.toHaveAttribute(
     "aria-current",
   );
   expect(vi.mocked(fetch)).not.toHaveBeenCalled();

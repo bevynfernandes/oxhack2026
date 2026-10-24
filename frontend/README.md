@@ -1,8 +1,9 @@
 # SignalShift frontend
 
-React/TypeScript scouting UI backed by the public API. Select an exact published
-batch, inspect rankings and tool history, construct a shortlist, reveal mature
-outcomes, and read evaluation/evidence/data-health reports.
+React/TypeScript company research UI backed by published assessments. Search
+companies, inspect three separate outcomes and their dated evidence, and compare
+up to three relevant peers. The package forecast/replay workflow remains under
+`/traction`; it is not a company-success prediction.
 
 ## Development
 
@@ -49,11 +50,38 @@ The test servers require distinct valid ports and refuse to reuse existing
 servers. `SIGNALSHIFT_API_ORIGIN` configures Vite's server-side proxy; the browser
 continues using same-origin `/api` requests. It defaults to localhost:8000.
 
+Real company acceptance uses a separate configuration, with no mocked repository:
+
+```bash
+export SIGNALSHIFT_COMPANY_ROOT=/absolute/path/to/verified-restored-root
+export SIGNALSHIFT_COMPANY_PUBLICATIONS=company-assessments-vector-20261024-v1
+SIGNALSHIFT_TEST_API_PORT=8011 SIGNALSHIFT_TEST_WEB_PORT=4184 npm run test:e2e -- --config playwright.company.config.ts
+```
+
+The API factory is `oxhack2026.api.company_runtime:create_company_app`. Restore the
+checksummed bundle using Dev 1's runbook before starting it. Both environment
+variables are server-side; no browser credential or fixture fallback is used.
+
 `npm run generate:types` regenerates TypeScript from `contracts/api/openapi.json`.
 Do not edit `src/api/schema.d.ts` or format it with another generator. Prettier
 ignores that file. The build fails on generated-type drift.
 
 ## Product behavior
+
+- `/` lists explicit assessment snapshots, with name/segment search and
+  segment/stage/evidence filters. URL state survives reload and browser Back.
+- Profiles show three outcome sections, source-linked statements, metrics grouped
+  by family, event stages, source dates/review state and expandable provenance.
+- `/compare` accepts two or three distinct companies from the selected snapshot.
+  It reuses the same profiles and definitions; stage/model unknowns remain visible.
+- Decimal values remain exact strings. Missing, restricted, not-applicable,
+  conflicting, stale and observed-zero evidence retain different meanings.
+- Current assessments are provisional or unavailable, with no numeric success
+  probability. `/methodology` explains requirements for future validated models.
+- Tables scroll within their regions on mobile. Controls have keyboard focus;
+  comparison headers remain visible while scrolling.
+
+## Retained traction research behavior
 
 - Rankings, eligibility, growth, errors and scores come from the API. Local
   filtering only selects supported ecosystem/target combinations.
@@ -80,3 +108,11 @@ ignores that file. The build fails on generated-type drift.
 API errors must remain JSON errors. Cache hashed assets immutably; revalidate
 `index.html`. Dev 1 owns the reverse proxy, TLS, request limits and resource setup.
 No offline export or demo server is included in this workstream.
+
+### Company-first interface
+
+- `/` starts with company search and opens one saved analysis. The default is the latest assessment publication by recorded date (publication ID breaks ties); it does not start a research job.
+- `/explore` retains explicit publication selection, filters and comparison. Older `/?snapshot=...` links redirect there with their selection intact.
+- Profiles retain the three existing outcomes and metric definitions. Publication metadata is expandable; dates and synthetic-data notices stay visible.
+- Visual references and collaborator guidance are in private issue #43: shadcn/ui components, Radix disclosure patterns, Motion accessibility/examples and Lucide icons. This pass uses native controls and CSS with no new dependencies.
+- Short entrance and hover transitions respect reduced-motion settings. No animated scores, implied live research or invented probabilities.

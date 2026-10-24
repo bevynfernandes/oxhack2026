@@ -1,10 +1,80 @@
 # Dev 3 implementation and integration
 
-Scope: API, generated contracts, scouting UI, historical reveal, evaluation,
-evidence/data health and deployment handoff. Demo export and offline serving are
-excluded by the developer's instruction. PLAN.md is unchanged.
+Scope: company API, generated client, company list/profile/compare, evidence
+presentation and deployment handoff. The active company plan supersedes the
+retained download-specific notes below. Demo/export/offline serving is excluded.
 
-## API startup
+## Company runtime
+
+Restore the verified source/assessment archive with Dev 1's `data company-restore`
+command. The current real handoff is documented in
+[D1-O5](../../tasks/dev1/D1-O5-real-assessment-handoff.md). Keep the original archive,
+external checksum and restored root; runtime reads never collect or retrain.
+
+```bash
+export SIGNALSHIFT_COMPANY_ROOT=/absolute/path/to/restored-company-root
+export SIGNALSHIFT_COMPANY_PUBLICATIONS=company-assessments-vector-20261024-v1
+uv run --frozen --no-sync uvicorn oxhack2026.api.company_runtime:create_company_app --factory --host 127.0.0.1 --port 8000
+npm --prefix frontend run dev
+```
+
+The application requires explicit canonical assessment publication IDs. Saved
+list/profile/compare URLs pin that exact policy publication; the source snapshot
+ID remains separate metadata. Multiple policies may use the same source. Retired
+selections return 404 and never select another policy. Missing configuration, corrupt
+bytes or incompatible source/assessment references stay unavailable. No latest
+policy is inferred and no synthetic fixture is loaded. A company-only factory
+uses company readiness; legacy download reads remain unavailable unless a
+separate legacy repository is injected.
+
+`/` offers explicit snapshot selection, company search and segment/stage/evidence
+filters. Filter and up-to-three-company selection state live in the URL. Profiles
+are `/companies/{snapshot_id}/{company_id}`; `/compare` reuses those exact profiles.
+`/methodology` explains outcome meanings; `/traction` retains package research.
+
+All three outcome sections remain present. Cash-flow self-sufficiency, operating
+growth and financing/acquisition are separate targets. The current C2 publication
+is evidence-only/unavailable with null probability. The API/browser performs no
+numerical assessment or success scoring. Unknown company context and commercial
+measurements remain explicit; stale measurements retain their dates.
+
+Public projection removes raw locations, locators, private source assertions and
+restricted derived values/events/relationships. Withheld metric states and
+coverage are separate from missingness and observed zero. Family resolution uses
+public evidence only. External text is escaped and links are navigation only.
+
+## Company verification and handoff
+
+```bash
+uv run --frozen --no-sync pytest tests/unit/api
+npm --prefix frontend run build
+npm --prefix frontend run test
+SIGNALSHIFT_TEST_API_PORT=8011 SIGNALSHIFT_TEST_WEB_PORT=4184 npm --prefix frontend run test:e2e
+uv run --frozen --no-sync pytest -m integration tests/integration/api/test_real_company_api.py
+SIGNALSHIFT_TEST_API_PORT=8011 SIGNALSHIFT_TEST_WEB_PORT=4184 npm --prefix frontend run test:e2e -- --config playwright.company.config.ts
+```
+
+The last two commands require the real-root/publication variables above. The
+default browser suite uses explicitly synthetic mocked readers; the separate
+real configuration launches the actual environment-configured API. Test servers
+refuse occupied ports. Production static assets are `frontend/dist`; route `/api`
+to FastAPI before SPA fallback. `SIGNALSHIFT_API_ORIGIN` changes Vite's server-side
+proxy target without putting credentials into browser configuration.
+
+Real acceptance uses Qdrant and Weaviate with multiple metric families, all three
+sections, six commercial gaps, unresolved families and dated/stale financing.
+The combined archive SHA-256 is
+`ea92fb6167600d182173b08addeef30a3b78615e1678e97162382fd4a84efb4f`.
+Real API reads and list/profile/compare browser tests pass. Screenshots and test
+reports are retained under `tests/outputs/browser-company-real-final-20261024/`; source
+archive, checksum and restored bytes are in `tests/outputs/dev3-company-real-20261024/`.
+These are evidence-product checks, not model calibration or cloud deployment.
+
+Dev 1 owns shared environment/container/CI/deployment wiring. Dev 2 owns labels,
+assessment generation, models/evaluation and probability eligibility. Dev 3's
+completion does not assert those separate research/operational gates are done.
+
+## Historical download API handoff
 
 ```bash
 uv sync --frozen --inexact --all-extras --group docs

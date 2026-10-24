@@ -36,7 +36,7 @@ test("complete scouting replay keeps future truth separate and freezes the submi
 }) => {
   const requests: string[] = [];
   page.on("request", (request) => requests.push(request.url()));
-  await page.goto("/");
+  await page.goto("/traction");
   await page.getByRole("link", { name: /Open forecast/ }).click();
   await expect(
     page.getByRole("heading", { name: "Your scouting shortlist" }),
@@ -150,7 +150,7 @@ test("immature reveal and repository failure are actionable and never turn into 
   await page.route("**/api/v1/cutoffs", (route) =>
     route.fulfill({ status: 503, json: { code: "repository_unavailable" } }),
   );
-  await page.goto("/");
+  await page.goto("/traction");
   await expect(page.getByRole("alert")).toContainText(
     "Published data is unavailable",
   );
@@ -177,7 +177,7 @@ test("narrow screens, keyboard navigation and reduced motion retain the workflow
 }, testInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/");
+  await page.goto("/traction");
   await page.keyboard.press("Tab");
   await expect(
     page.getByRole("link", { name: "Skip to content" }),
