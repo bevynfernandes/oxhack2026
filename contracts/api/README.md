@@ -1,4 +1,4 @@
-# C3 public API contract (0.1.0, provisional mapping)
+# C3 public API contract (0.2.0)
 
 `oxhack2026/api/schemas.py` is the source of truth. `openapi.json` and
 `frontend/src/api/schema.d.ts` are generated, not independently edited.
@@ -30,7 +30,9 @@ links are HTTPS without credentials, query parameters or fragments. Storage
 locations and signed links must be converted into public report references by the
 publisher; never pass them through. Source text is untrusted plain text.
 
-C1/C2 are not merged at this checkpoint. `PublishedRepository` is the proposed
+C2 is merged and `api/model_mapping.py` provides tested forecast/evidence mapping.
+C3 0.2.0 aligns evidence status to C2 (`validated`, not a superiority claim)
+and adds the required feature-row reference. C1 is not merged at this checkpoint. `PublishedRepository` is the proposed
 read/scoring boundary for Dev 1's adapter, not a second persistence system.
 Cross-owner mapping approval and real artifact acceptance remain tracked in
 https://github.com/bevynfernandes/oxhack2026/issues/1.

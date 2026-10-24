@@ -196,7 +196,7 @@
     ]
   },
   "forecast": {
-    "contract_version": "0.1.0",
+    "contract_version": "0.2.0",
     "batch_id": "synthetic-npm-2025-01-06",
     "ecosystem": "npm",
     "target_id": "downloads_next_30d_v1",
@@ -271,7 +271,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-1-features"
       },
       {
         "forecast_id": "forecast-2",
@@ -319,7 +320,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-2-features"
       },
       {
         "forecast_id": "forecast-3",
@@ -367,7 +369,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-3-features"
       },
       {
         "forecast_id": "forecast-4",
@@ -415,7 +418,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-4-features"
       },
       {
         "forecast_id": "forecast-5",
@@ -463,7 +467,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-5-features"
       },
       {
         "forecast_id": "forecast-6",
@@ -511,7 +516,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-6-features"
       },
       {
         "forecast_id": "forecast-7",
@@ -558,7 +564,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-7-features"
       },
       {
         "forecast_id": "forecast-8",
@@ -606,7 +613,8 @@
           "reasons": [
             "Historical snapshot; not current activity."
           ]
-        }
+        },
+        "feature_row_id": "forecast-8-features"
       }
     ],
     "evaluation_id": "synthetic-evaluation-v1"

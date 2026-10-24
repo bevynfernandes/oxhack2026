@@ -13,11 +13,11 @@ from pydantic import (
     model_validator,
 )
 
-CONTRACT_VERSION = "0.1.0"
+CONTRACT_VERSION = "0.2.0"
 Identifier = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")]
 Ecosystem = Literal["npm", "pypi"]
 Target = Literal["downloads_next_30d_v1", "downloads_trailing_28d_at_91d_v1"]
-EvidenceStatus = Literal["exploratory", "inconclusive", "rejected", "confirmed"]
+EvidenceStatus = Literal["exploratory", "inconclusive", "rejected", "validated"]
 Count = Annotated[int, Field(ge=0, strict=True)]
 Number = Annotated[float, Field(allow_inf_nan=False)]
 Estimate = Annotated[float, Field(ge=0, allow_inf_nan=False)]
@@ -52,7 +52,9 @@ PublicURL = Annotated[str, Field(max_length=2048), AfterValidator(_public_url)]
 class DTO(BaseModel):
     """Immutable public fields; undeclared upstream data fails validation."""
 
-    model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
+    model_config = ConfigDict(
+        extra="forbid", frozen=True, allow_inf_nan=False, revalidate_instances="always"
+    )
 
 
 class Window(DTO):
@@ -176,6 +178,8 @@ class Forecast(DTO):
     """One tool's saved aggregate prediction or explicit unavailable result."""
 
     forecast_id: Identifier
+    feature_row_id: Identifier
+    data_age_hours: Estimate | None = None
     tool_id: Identifier
     organization_id: Identifier
     package_id: Identifier
@@ -215,7 +219,7 @@ class Forecast(DTO):
 class ForecastBatch(DTO):
     """Frozen prediction payload; shared identity/time apply to every result."""
 
-    contract_version: Literal["0.1.0"] = "0.1.0"
+    contract_version: Literal["0.2.0"] = "0.2.0"
     batch_id: Identifier
     ecosystem: Ecosystem
     target_id: Target
@@ -334,6 +338,9 @@ class Score(DTO):
     value: Number | None
     organization_ids: tuple[Identifier, ...]
     reason: str | None
+    candidate_universe_id: Identifier | None = None
+    headline_eligible: bool | None = None
+    complete_outcomes: bool | None = None
 
 
 class Reveal(DTO):
@@ -345,6 +352,7 @@ class Reveal(DTO):
     selected_organization_ids: tuple[Identifier, ...]
     outcomes: tuple[Outcome, ...]
     selection_score: Score
+    selection_metrics: tuple[Score, ...] = ()
     comparators: tuple[Score, ...]
     limitations: tuple[str, ...]
 

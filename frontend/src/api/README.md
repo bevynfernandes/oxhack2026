@@ -1,7 +1,5 @@
-# API boundary
+# API client
 
-Reserved for the typed API client and generated OpenAPI types described in
-`PLAN.md`, section 8. Generate types only after the backend contract exists.
-There is no client, endpoint integration, or fabricated response fixture yet.
-
-Keep credentials out of browser code and all `VITE_` environment variables.
+`schema.d.ts` is generated from the committed C3 OpenAPI export. `client.ts` uses
+openapi-fetch and a bounded TanStack Query retry policy. Browser requests stay on
+the application's origin; there are no vendor calls or synthetic fallbacks.

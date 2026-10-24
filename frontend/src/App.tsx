@@ -1,25 +1,53 @@
-import type { ReactElement } from "react";
+import { NavLink, Route, Routes } from "react-router-dom";
+import BatchPicker from "./pages/rankings/BatchPicker";
+import BatchPage from "./pages/rankings/BatchPage";
+import EvaluationPage from "./pages/evaluation/EvaluationPage";
+import DataHealthPage from "./pages/data-health/DataHealthPage";
 
-/** Render the static project-template landing page. */
-export default function App(): ReactElement {
+/** Route the scouting workflow without bundling or silently loading test fixtures. */
+export default function App() {
   return (
-    <main>
-      <p className="status">Project template</p>
-      <h1>SignalShift</h1>
-      <p>
-        The frontend scaffold is ready. Product screens, data connections, and
-        forecasts have not been implemented.
-      </p>
-      <section aria-labelledby="planned-views">
-        <h2 id="planned-views">Planned views</h2>
-        <ul>
-          <li>Rankings</li>
-          <li>Tool detail</li>
-          <li>Historical replay</li>
-          <li>Evaluation</li>
-          <li>Data health</li>
-        </ul>
-      </section>
-    </main>
+    <>
+      <a className="skip-link" href="#main">
+        Skip to content
+      </a>
+      <header className="site-header">
+        <NavLink to="/" className="brand">
+          SignalShift<span>Developer-tool scouting</span>
+        </NavLink>
+        <nav aria-label="Main navigation">
+          <NavLink to="/">Forecasts</NavLink>
+          <NavLink to="/data-health">Data health</NavLink>
+        </nav>
+      </header>
+      <main id="main" tabIndex={-1}>
+        <Routes>
+          <Route path="/" element={<BatchPicker />} />
+          <Route path="/batches/:batchId" element={<BatchPage />} />
+          <Route
+            path="/batches/:batchId/tools/:toolId"
+            element={<BatchPage />}
+          />
+          <Route
+            path="/evaluations/:evaluationId"
+            element={<EvaluationPage />}
+          />
+          <Route path="/data-health" element={<DataHealthPage />} />
+          <Route
+            path="*"
+            element={
+              <>
+                <h1>Page not found</h1>
+                <NavLink to="/">Choose a published forecast</NavLink>
+              </>
+            }
+          />
+        </Routes>
+      </main>
+      <footer>
+        Package activity is a scouting signal, not a measure of users, revenue
+        or investment quality.
+      </footer>
+    </>
   );
 }
