@@ -1,5 +1,52 @@
 # C3 public API contract (0.4.0)
 
+## Company outlook additions
+
+`company-api-v1` adds three read-only routes alongside the download contracts:
+
+- `GET /api/v1/company-snapshots`: explicit published assessment/source choices.
+- `GET /api/v1/company-snapshots/{snapshot_id}/companies`: name-ordered company rows.
+- `GET /api/v1/company-snapshots/{snapshot_id}/companies/{company_id}`: a profile
+  with all three outcome sections, exact source metrics/events, frozen coverage,
+  effective family and redacted provenance. Comparison reuses these profiles.
+
+`PublishedCompanyRepository` composes `CompanySourceReader` with the lightweight
+`CompanyAssessmentReader` read port. The latter enumerates exact source IDs with
+complete published assessment sets and loads their C2 records. Construction has
+no I/O. Reads validate company/source identity, dates, synthetic/family state,
+foreign keys and evidence support. API code never creates assessments or scores.
+Unknown IDs are 404; corrupt or incomplete publications are 503.
+
+Inject the adapter through `create_app(company_repository=...)`. Company-only
+composition uses that adapter for readiness while legacy reads remain explicitly
+unavailable. A factory without either adapter serves no synthetic data. The
+application owner supplies and manages the actual storage readers.
+
+Source definitions, values, states, windows and event stages remain C1-owned;
+assessment text/status and horizons remain C2-owned. This assessment version
+only permits `evidence_only`/`unavailable` with null probability. Future outcome
+labels are outside this API. Raw artifact locations, locators and restricted
+source assertions are absent from public responses. Financial decimals serialize
+as exact strings. The existing download contract version remains 0.4.0.
+
+Restricted derived metric values/reasons are withheld using the explicit
+`restricted` public state. Private events and relationships are omitted; effective
+family uses public evidence only. Public coverage excludes restricted states and
+lists withheld metric IDs separately. Source/C2 composition delegates to Dev 1's
+`validate_company_assessments`; source-observed stale/private/unreviewed metrics
+can legitimately be C2 evidence gaps. The API does not infer that policy.
+
+Local runtime (the operator supplies a verified, restored root):
+
+```sh
+export SIGNALSHIFT_COMPANY_ROOT=/absolute/path/to/company-root
+export SIGNALSHIFT_COMPANY_PUBLICATIONS=company-assessments-vector-20261024-v1
+uv run uvicorn oxhack2026.api.company_runtime:create_company_app --factory
+```
+
+Missing/invalid configuration keeps readiness/data unavailable. Publication IDs
+are explicit; publishing a newer policy never silently changes the selection.
+
 `oxhack2026/api/schemas.py` is the source of truth. `openapi.json` and
 `frontend/src/api/schema.d.ts` are generated, not independently edited.
 
