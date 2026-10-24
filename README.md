@@ -95,3 +95,9 @@ For the three-developer implementation split, start with
 Read [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md), and
 [PLAN.md](PLAN.md). Keep generated datasets, credentials, and retained test
 outputs out of version control.
+
+Standalone startup research is available through the additive v2 backend. See the
+[local worker setup, API sequence and evidence semantics](docs/tasks/dev3/research-v2.md).
+It requires an explicit writable research root and opt-in collection worker; saved
+company publications are optional. The existing frontend needs the corresponding
+v2 domain-confirmation and multi-source presentation work before exposing this flow.

@@ -41,7 +41,9 @@ jobs:
           python-version: "3.12"
           enable-cache: true
       - run: uv sync --locked --all-extras --group docs
+      - run: uv run --frozen --no-sync playwright install --with-deps chromium
       - run: make check test build docs-test
+      - run: uv run --frozen --no-sync pytest tests/integration/api/test_research_v2_persistence.py -m integration
 
   frontend:
     runs-on: ubuntu-latest
