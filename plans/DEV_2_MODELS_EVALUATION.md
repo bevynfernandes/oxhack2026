@@ -1,5 +1,29 @@
 # Dev 2: Features, models, evaluation, and evidence
 
+## Active company-outlook checkpoints (2026-10-24)
+
+[PLAN.md](../PLAN.md) and [issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19)
+replace the package-growth ranking objective. Directory ownership remains
+unchanged. The numbered D2 tasks below preserve reusable download research;
+their targets and completion gates do not define company outcomes.
+
+| Task | Current deliverable | Acceptance |
+| --- | --- | --- |
+| D2-O1 | Three outcome definitions and separate label/assessment contracts | Reviewed observable labels, calendar horizons, maturity and unknown/conflict semantics |
+| D2-O2 | Deterministic evidence assessment consuming exact C1 records | Evidence-linked factors/risks, explicit missingness, no arbitrary probability |
+| D2-O3 | Cohort eligibility, multi-family features and mature labels | Historical inclusion/family control; no future evidence or silent negative labels |
+| D2-O4 | Outcome-specific baselines/models and chronological evaluation | Coverage, calibration, baseline comparison, frozen final holdout and release criteria |
+| D2-O5 | Published assessments/evaluations and prediction eligibility | Exact immutable artifacts; Dev 3 renders probability only through passed gate |
+
+Outcome IDs and initial policy are proposed in
+[PR #22](https://github.com/bevynfernandes/oxhack2026/pull/22).
+Preserve different reasons for shutdown, nongrowth and negative cash flow. Name
+the commercial target cash-flow self-sufficiency until a broader measurable
+viability definition is agreed. Downloads remain a traction feature; they
+cannot satisfy company commercial labels or establish predictive validity.
+
+## Retained download workstream reference
+
 **Branch:** `dev/models-evaluation`
 
 **Role:** Turn frozen observations into defensible forecasts and measure whether

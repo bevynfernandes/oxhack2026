@@ -1,5 +1,23 @@
 # Three-developer implementation guide
 
+## Current product and precedence
+
+The company-outlook specification in [PLAN.md](../PLAN.md) supersedes the
+original download-only product and its completion gates. Read the active
+D1-O*, D2-O*, D3-O* checkpoint tables at the top of the role plans first.
+The remaining guide preserves ownership, review, reproducibility and handoff
+protocols. Its original five-company/download/offline-demo milestones are
+historical reference and do not override the revised specification.
+
+Dev 1 owns shared plan edits. Source contracts belong to Dev 1, outcome and
+assessment rules to Dev 2, and API/UI projections to Dev 3. Agree additions in
+[issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19); each consumer
+reviews its boundary before contract freeze. The first product gate is a real
+multi-family company assessment with three outcome sections and usable comparison.
+A validated prediction model is a separate gate, not implied by that first flow.
+
+## Existing engineering coordination
+
 These plans divide implementation of SignalShift across three independent
 developer branches. Read this guide with [PLAN.md](../PLAN.md) and
 [AGENTS.md](../AGENTS.md). PLAN.md remains the product and research specification;
