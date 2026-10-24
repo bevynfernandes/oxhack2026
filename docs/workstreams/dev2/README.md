@@ -52,3 +52,9 @@ returns the additive `OutcomeDiagnostics` contract. Dev 3 can use its realized
 growth, model/baseline absolute count errors, and nullable unavailable states.
 The helper enforces matching frozen identity/windows and the truth's collection
 availability boundary before returning any actuals.
+
+Merged chronological protocol: PR #6. Merged reveal diagnostics: PR #8.
+D2-05a implements experimental CQR calculations with exact finite-sample order
+statistics, model-digest pairing, and empirical serving rejection reasons.
+No interval is validated by formula tests alone; actual chronological model
+predictions and final coverage/baseline evidence remain required.

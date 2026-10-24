@@ -108,6 +108,15 @@ class ObservationSeries(Contract):
         if self.entity_kind != expected_kind or self.ecosystem != expected_ecosystem:
             message = "Series entity kind and ecosystem must match its source"
             raise ValueError(message)
+        expected_unit = {
+            "npm": "downloads",
+            "pypi": "downloads",
+            "github": "events",
+            "hackernews": "mentions",
+        }[self.source]
+        if self.unit != expected_unit:
+            message = "Series unit must match its source"
+            raise ValueError(message)
         return self
 
 
@@ -376,6 +385,21 @@ class DatasetReader(Protocol):
             dataset_version: Published immutable dataset identifier.
         Returns:
             Validated catalogue for this exact dataset.
+        Raises:
+            KeyError: If the version does not exist.
+            OSError: If storage is unavailable.
+            ValueError: If artifact/schema validation fails.
+        """
+        ...
+
+    def series(self, dataset_version: str) -> tuple[ObservationSeries, ...]:
+        """List the frozen series identities for package-to-series resolution.
+
+        Args:
+            dataset_version: Exact published dataset identifier.
+        Returns:
+            All validated series in this dataset, with unique series IDs.
+            Consumers resolve packages using entity_kind and entity_id.
         Raises:
             KeyError: If the version does not exist.
             OSError: If storage is unavailable.
