@@ -499,6 +499,40 @@ button.secondary:hover {
   letter-spacing: -0.45px;
   font-weight: 800;
 }
+.pillar-expand {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 5px;
+  width: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+}
+.pillar-expand:hover {
+  background: transparent;
+  color: var(--terminal-accent, #087b63);
+}
+.pillar-expand::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  cursor: pointer;
+}
+.pillar-card:has(.pillar-expand:focus-visible) {
+  outline: 2px solid #087b63;
+  outline-offset: 2px;
+}
+.pillar-card > footer {
+  position: relative;
+  z-index: 1;
+}
 .pillar-card h3 svg {
   flex-shrink: 0;
   margin-top: 2px;

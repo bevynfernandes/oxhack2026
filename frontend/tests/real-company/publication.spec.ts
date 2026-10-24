@@ -131,3 +131,71 @@ test("real company publication supports list, source inspection and accessible c
     true,
   );
 });
+
+test("each company dimension opens the matching backend evidence on desktop and mobile", async ({
+  page,
+}) => {
+  const choices = await (
+    await page.request.get("/api/v1/company-snapshots")
+  ).json();
+  const snapshot = choices.items[0].assessment.publication_id;
+  const prefix = "/api/v1/company-snapshots/" + snapshot + "/companies";
+  const rows = (await (await page.request.get(prefix)).json()).items;
+  const names = [
+    "Adoption & Retention",
+    "Attention & Sentiment",
+    "Financial Health",
+    "Industry & Competition",
+    "Team & Execution",
+  ];
+  const mobileNames = ["Adoption", "Attention", "Finance", "Industry", "Team"];
+  for (const company of rows) {
+    const profile = await (
+      await page.request.get(prefix + "/" + company.company.company_id)
+    ).json();
+    await page.goto(
+      "/companies/" + snapshot + "/" + company.company.company_id,
+    );
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 800 });
+      for (const [index, name] of names.entries()) {
+        if (width === 390)
+          await page
+            .getByRole("group", { name: "Overview dimensions" })
+            .getByRole("button", { name: mobileNames[index], exact: true })
+            .click();
+        const expand = page.getByRole("button", {
+          name: "Expand dimension: " + name,
+          exact: true,
+        });
+        await expand.focus();
+        await page.keyboard.press("Enter");
+        const dialog = page.getByRole("dialog", { name, exact: true });
+        await expect(dialog).toBeVisible();
+        const section = profile.outlook.specialists[index];
+        for (const id of section.metric_observation_ids) {
+          const metric = profile.metrics.find(
+            (row: { observation_id: string }) => row.observation_id === id,
+          );
+          const definition = profile.definitions.find(
+            (row: { metric_id: string }) => row.metric_id === metric.metric_id,
+          );
+          await expect(
+            dialog.getByText(definition.label, { exact: true }),
+          ).toBeVisible();
+          if (metric.value?.kind === "decimal")
+            await expect(
+              dialog.getByText(metric.value.value, { exact: true }),
+            ).toBeVisible();
+        }
+        if (!section.metric_observation_ids.length)
+          await expect(
+            dialog.getByText("No measurements published"),
+          ).toBeVisible();
+        await page.keyboard.press("Escape");
+        await expect(dialog).not.toBeVisible();
+        await expect(expand).toBeFocused();
+      }
+    }
+  }
+});
