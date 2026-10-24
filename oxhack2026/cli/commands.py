@@ -168,3 +168,20 @@ def assessment_health(root: Path, publication_id: str) -> None:
 
     records = LocalCompanyAssessmentStore(root).assessments(publication_id)
     typer.echo(f"{publication_id}: {len(records)} verified company assessments")
+
+
+@data.command("company-backup")
+def company_backup(root: Path, archive: Path) -> None:
+    """Verify and back up all published company versions; emit the ZIP SHA-256."""
+    from oxhack2026.storage.recovery import backup_company_store
+
+    typer.echo(backup_company_store(root, archive))
+
+
+@data.command("company-restore")
+def company_restore(archive: Path, destination: Path, expected_sha256: str) -> None:
+    """Restore verified company publications into a new DESTINATION directory."""
+    from oxhack2026.storage.recovery import restore_company_store
+
+    restore_company_store(archive, destination, expected_sha256)
+    typer.echo("Company source and assessment publications verified and restored")
