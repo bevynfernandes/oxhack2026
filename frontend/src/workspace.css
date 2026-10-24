@@ -1391,7 +1391,7 @@ button.secondary:hover {
   .dossier-ledger strong {
     font-size: 8px;
   }
-  .dossier-ledger > button:last-child {
+  .dossier-ledger > .saved-assessment-action {
     display: none;
   }
   .dossier-ledger button {
@@ -1594,4 +1594,45 @@ button.secondary:hover {
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+.source-progress {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+}
+.source-progress > li {
+  border: 1px solid var(--terminal-line);
+  border-radius: 6px;
+  padding: 12px;
+  overflow-wrap: anywhere;
+}
+.source-progress > li > span {
+  float: right;
+  margin-left: 12px;
+}
+.source-progress blockquote {
+  margin: 12px 0;
+  font-size: 12px;
+}
+.dossier-inline-action {
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  min-height: 0;
+  border: 0;
+  text-align: left;
+  text-decoration: underline;
+}
+.research-start details {
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.research-start input:not([type="checkbox"]) {
+  width: 100%;
+}
+.terminal-view > main:has(.research-start) {
+  overflow: auto;
 }

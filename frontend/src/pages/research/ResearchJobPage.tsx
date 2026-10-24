@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { Link, useParams } from "react-router-dom";
-import { api } from "../../api/client";
+import { Link, useParams, useLocation } from "react-router-dom";
+import { api, type DTO } from "../../api/client";
 import { date, QueryState, Reasons } from "../../components/Common";
 import { researchResult } from "./client";
 
 /** Poll durable reads only and stop at terminal states or a read failure. */
-export default function ResearchJobPage() {
+function LegacyResearchJobPage() {
   const { jobId = "" } = useParams();
   const query = useQuery({
     queryKey: ["research-job", jobId],
@@ -109,6 +109,118 @@ export default function ResearchJobPage() {
                 Confirm a new research job
               </Link>
             )}
+          </div>
+        </section>
+      )}
+    </article>
+  );
+}
+
+export default function ResearchJobPage() {
+  const { pathname } = useLocation();
+  return pathname.startsWith("/research/v2/") ? (
+    <StandaloneJobPage />
+  ) : (
+    <LegacyResearchJobPage />
+  );
+}
+/** Show backend collector checkpoints without estimating progress. */
+export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
+  return (
+    <ul className="source-progress">
+      {sources.map((source) => (
+        <li key={source.provider}>
+          <strong>{source.name}</strong>
+          <span>{source.state}</span>
+          <Reasons reasons={source.reason_codes} />
+          {source.finished_at && (
+            <small>Finished {date(source.finished_at)}</small>
+          )}
+          {(source.evidence.length > 0 || source.observations.length > 0) && (
+            <details>
+              <summary>
+                Collected results · {source.observations.length} measurements ·{" "}
+                {source.evidence.length} excerpts
+              </summary>
+              {source.observations.map((row) => (
+                <p key={row.observation_id}>
+                  {row.metric_id.replaceAll("_", " ")}:{" "}
+                  {row.value == null
+                    ? "Unavailable"
+                    : row.value.toLocaleString("en-GB")}{" "}
+                  {row.unit} {row.missing_reason && " · " + row.missing_reason}
+                </p>
+              ))}
+              {source.evidence.slice(0, 3).map((row) => (
+                <blockquote key={row.evidence_id}>{row.excerpt}</blockquote>
+              ))}
+            </details>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+function StandaloneJobPage() {
+  const { jobId = "" } = useParams();
+  const query = useQuery({
+    queryKey: ["research-v2-job", jobId],
+    queryFn: async () =>
+      researchResult(
+        await api.GET("/api/v2/research-jobs/{job_id}", {
+          params: { path: { job_id: jobId } },
+        }),
+      ),
+    refetchInterval: (query) =>
+      !query.state.error &&
+      query.state.data &&
+      ["queued", "running"].includes(query.state.data.state)
+        ? 1500
+        : false,
+  });
+  const job = query.data;
+  return (
+    <article className="research-start">
+      <Link to="/">Companies</Link>
+      <h1>Research status</h1>
+      <QueryState
+        pending={query.isPending}
+        error={query.error}
+        retry={() => void query.refetch()}
+      />
+      {job && (
+        <section className="panel">
+          <h2 role="status">
+            {
+              {
+                queued: "Queued",
+                running: "Research in progress",
+                completed: "Research complete",
+                partial: "Partial results",
+                failed: "Research failed",
+              }[job.state]
+            }
+          </h2>
+          <p>
+            Each source reports its own result. A missing or failed source does
+            not erase successful results or establish company failure.
+          </p>
+          <Reasons reasons={job.reason_codes} />
+          <SourceProgress sources={job.sources} />
+          <div className="research-actions">
+            {job.report_id && (
+              <Link
+                className="button"
+                to={"/research/v2/reports/" + job.report_id}
+              >
+                Open research report
+              </Link>
+            )}
+            <Link to={"/research/identities/" + job.identity_id}>
+              {job.state === "failed"
+                ? "Review identity and confirm another attempt"
+                : "View confirmed identity"}
+            </Link>
           </div>
         </section>
       )}

@@ -51,6 +51,19 @@ export default function App() {
             path="/research/new/:snapshotId/:companyId"
             element={<StartResearchPage />}
           />
+          <Route path="/research/new" element={<StartResearchPage />} />
+          <Route
+            path="/research/identities/:identityId"
+            element={<StartResearchPage />}
+          />
+          <Route
+            path="/research/v2/jobs/:jobId"
+            element={<ResearchJobPage />}
+          />
+          <Route
+            path="/research/v2/reports/:reportId"
+            element={<ResearchReportPage />}
+          />
           <Route path="/research/jobs/:jobId" element={<ResearchJobPage />} />
           <Route
             path="/research/reports/:reportId"

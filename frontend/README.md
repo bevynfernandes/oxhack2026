@@ -137,3 +137,31 @@ No offline export or demo server is included in this workstream.
 - Real replay browser test: set SIGNALSHIFT_RESEARCH_ENABLED=1 and
   SIGNALSHIFT_REAL_REPORT_ID alongside the existing real-company test settings.
   Only reads are exercised against the verified partial replay; no new collection.
+
+### Standalone research (#64–#66)
+
+- **Research a new domain** opens `/research/new`. Preview reads identity pages;
+  full collection requires confirmation of the returned name, canonical domain,
+  redirects and conflicts at `/research/identities/:identityId`.
+- New jobs/reports use `/research/v2/jobs/:jobId` and
+  `/research/v2/reports/:reportId`; old saved/v1 links remain readable.
+- Search spans every explicitly configured publication and preserves the selected
+  publication in each link. Dotted company names and exact domains are supported.
+- Capabilities and provider checkpoints come from `/api/v2`. Polls stop at terminal
+  states or read errors. POSTs never retry automatically; 429 shows Retry-After.
+- Standalone reports omit saved-assessment navigation. Fresh measurements, claims,
+  retrieved events and capture provenance are inspectable in the existing drawer.
+  The backend currently leaves fresh metrics unassigned to model dimensions; the
+  UI provides a link to all fresh measurements instead of inventing a mapping.
+- **Refresh research** returns to explicit identity confirmation. It creates a new
+  job/report and preserves the prior immutable report. No numerical forecasts are
+  available; unavailable financials and incomplete counts remain explicit.
+- Runtime: configure `SIGNALSHIFT_RESEARCH_ROOT` and
+  `SIGNALSHIFT_RESEARCH_ENABLED=1` as documented in
+  `docs/tasks/dev3/research-v2.md`. JavaScript rendering is optional; provider
+  credentials and reviewed registry mappings remain server-side.
+- Live browser acceptance: set `SIGNALSHIFT_LIVE_RESEARCH_UI=1` with the real-company
+  Playwright configuration and a separate writable research root. It researches
+  Qdrant, PostHog and Linear through the UI, inspects genuine captures, refreshes
+  Linear and verifies the previous report bytes are unchanged. Default tests mock
+  providers; they do not claim live collection acceptance.

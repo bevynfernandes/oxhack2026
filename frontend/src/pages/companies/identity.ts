@@ -26,6 +26,7 @@ export function matchesCompanySearch(
 ): boolean {
   const value = query.trim().toLowerCase();
   if (!value) return true;
+  if (company.display_name.toLowerCase() === value) return true;
   if (value.includes(".") || value.includes("://")) {
     const host = companyDomain(
       value.includes("://") ? value : `https://${value}`,
