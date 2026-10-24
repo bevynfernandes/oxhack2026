@@ -83,7 +83,7 @@ def test_refitted_model_cannot_reuse_correction() -> None:
     changed = ModelReference.model_validate(
         model.model_dump()
         | {
-            "model_artifact": {"path": model.model_artifact.path, "sha256": "b" * 64},
+            "model_artifact": model.model_artifact.model_dump() | {"sha256": "b" * 64},
         }
     )
 
