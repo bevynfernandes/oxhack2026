@@ -6,12 +6,12 @@ import time
 from datetime import UTC, datetime
 from hashlib import sha256
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal, Self
 from urllib.parse import urlsplit
 
 import httpx
 import orjson
-from pydantic import Field
+from pydantic import Field, model_validator
 
 from oxhack2026.catalog.schemas import Contract, Identifier, PublicUrl, UtcInstant
 from oxhack2026.storage.artifacts import FileArtifactStore
@@ -27,6 +27,33 @@ class CaptureRequest(Contract):
 
     url: PublicUrl
     page: Annotated[int, Field(gt=0, le=100, strict=True)] | None = None
+    query_parameters: tuple[
+        tuple[
+            Literal[
+                "query",
+                "tags",
+                "restrictSearchableAttributes",
+                "numericFilters",
+                "hitsPerPage",
+                "page",
+            ],
+            Annotated[str, Field(max_length=512)],
+        ],
+        ...,
+    ] = ()
+
+    @model_validator(mode="after")
+    def validate_query_parameters(self) -> Self:
+        """Allow bounded non-secret search parameters only on the fixed HN API."""
+        if self.query_parameters and (
+            self.url != "https://hn.algolia.com/api/v1/search_by_date"
+            or self.page is not None
+            or len({key for key, _ in self.query_parameters})
+            != len(self.query_parameters)
+        ):
+            message = "Structured queries require the fixed HN endpoint and unique keys"
+            raise ValueError(message)
+        return self
 
 
 class HttpCapture(Contract):
@@ -51,7 +78,11 @@ def _download(request: CaptureRequest, client: httpx.Client) -> tuple[bytes, boo
         token = os.environ.get("GITHUB_TOKEN")
         if token:
             headers["Authorization"] = f"Bearer {token}"
-    params = {"per_page": 100, "page": request.page} if request.page else None
+    params: dict[str, str] | None = (
+        {"per_page": "100", "page": str(request.page)}
+        if request.page
+        else dict(request.query_parameters) or None
+    )
     for attempt in range(3):
         try:
             with client.stream(
@@ -109,7 +140,10 @@ def capture_get(
         OSError: For checkpoint/artifact persistence failure.
     """
     run = CaptureRun(run_id=run_id)
-    digest = sha256(request.model_dump_json().encode()).hexdigest()
+    request_bytes = request.model_dump_json(
+        exclude={"query_parameters"} if not request.query_parameters else None
+    ).encode()
+    digest = sha256(request_bytes).hexdigest()
     directory = root / "captures" / run.run_id
     path = directory / f"{digest}.json"
     store = FileArtifactStore(root)

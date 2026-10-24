@@ -69,6 +69,107 @@
         "title": "AssessmentStatement",
         "type": "object"
       },
+      "AttentionObservation": {
+        "additionalProperties": false,
+        "description": "Fresh exact-domain HN link count, outside all v1 C1 metric families.\n\nA missing value means a truncated query; zero is valid only for a complete\nbounded query. The count does not measure users, sentiment or success.",
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "definition": {
+            "default": "HN stories linking the exact confirmed domain during the declared window; not broad mentions, sentiment, users or independent endorsement.",
+            "title": "Definition",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "metric_id": {
+            "const": "hn_exact_domain_story_links_30d_v1",
+            "default": "hn_exact_domain_story_links_30d_v1",
+            "title": "Metric Id",
+            "type": "string"
+          },
+          "observation_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "reason_codes": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "observed",
+              "missing"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "unit": {
+            "const": "story_links",
+            "default": "story_links",
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "window": {
+            "$ref": "#/components/schemas/TimeWindow"
+          },
+          "window_end_exclusive": {
+            "const": true,
+            "default": true,
+            "title": "Window End Exclusive",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "observation_id",
+          "company_id",
+          "window",
+          "value",
+          "state",
+          "available_at",
+          "collected_at",
+          "evidence_ids",
+          "reason_codes"
+        ],
+        "title": "AttentionObservation",
+        "type": "object"
+      },
       "Baseline": {
         "additionalProperties": false,
         "description": "A saved comparator forecast, without any future outcome values.",
@@ -2639,6 +2740,316 @@
         "title": "ReportLink",
         "type": "object"
       },
+      "ResearchInventory": {
+        "additionalProperties": false,
+        "description": "Exact saved lineage and separately identified fresh public observations.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "capture_byte_size": {
+            "maximum": 4194304.0,
+            "minimum": 0.0,
+            "title": "Capture Byte Size",
+            "type": "integer"
+          },
+          "capture_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Capture Sha256",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/CompanySource"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "inventory_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Inventory Id",
+            "type": "string"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/AttentionObservation"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "saved_context": {
+            "$ref": "#/components/schemas/CompanyDetail"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inventory_id",
+          "company_id",
+          "as_of",
+          "synthetic",
+          "saved_context",
+          "observations",
+          "evidence",
+          "capture_sha256",
+          "capture_byte_size"
+        ],
+        "title": "ResearchInventory",
+        "type": "object"
+      },
+      "ResearchJob": {
+        "additionalProperties": false,
+        "description": "Durable research state; terminal times and report presence are consistent.\n\nRaises:\n    ValueError: Timestamps or completion/report state contradict the job state.",
+        "properties": {
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "job_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          },
+          "request": {
+            "$ref": "#/components/schemas/ResearchRequest"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "research-job-v1",
+            "default": "research-job-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchSourceState"
+            },
+            "maxItems": 1,
+            "minItems": 1,
+            "title": "Sources",
+            "type": "array"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "running",
+              "partial",
+              "completed",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "request",
+          "state",
+          "requested_at",
+          "sources"
+        ],
+        "title": "ResearchJob",
+        "type": "object"
+      },
+      "ResearchReport": {
+        "additionalProperties": false,
+        "description": "Immutable report embedding the unchanged model-owned outlook payload.",
+        "properties": {
+          "assessment_publication_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Assessment Publication Id",
+            "type": "string"
+          },
+          "data_version": {
+            "const": "research-inventory-v1",
+            "default": "research-inventory-v1",
+            "title": "Data Version",
+            "type": "string"
+          },
+          "inventory": {
+            "$ref": "#/components/schemas/ResearchInventory"
+          },
+          "job_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "null"
+          },
+          "outlook": {
+            "$ref": "#/components/schemas/StartupOutlook"
+          },
+          "report_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Report Id",
+            "type": "string"
+          },
+          "researched_at": {
+            "format": "date-time",
+            "title": "Researched At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "research-report-v1",
+            "default": "research-report-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_publication_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Source Publication Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "report_id",
+          "job_id",
+          "researched_at",
+          "source_publication_id",
+          "assessment_publication_id",
+          "inventory",
+          "outlook",
+          "limitations"
+        ],
+        "title": "ResearchReport",
+        "type": "object"
+      },
+      "ResearchRequest": {
+        "additionalProperties": false,
+        "description": "Exact saved identity confirmed by the user; domains are never fetched.",
+        "properties": {
+          "assessment_publication_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Assessment Publication Id",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "domain": {
+            "maxLength": 253,
+            "minLength": 4,
+            "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+            "title": "Domain",
+            "type": "string"
+          },
+          "identity_confirmed": {
+            "const": true,
+            "title": "Identity Confirmed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "assessment_publication_id",
+          "company_id",
+          "domain",
+          "identity_confirmed"
+        ],
+        "title": "ResearchRequest",
+        "type": "object"
+      },
+      "ResearchSourceState": {
+        "additionalProperties": false,
+        "description": "Actual bounded provider state, independent of model/data readiness.",
+        "properties": {
+          "provider": {
+            "const": "hn_algolia",
+            "default": "hn_algolia",
+            "title": "Provider",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "state": {
+            "enum": [
+              "pending",
+              "running",
+              "succeeded",
+              "partial",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "ResearchSourceState",
+        "type": "object"
+      },
       "Reveal": {
         "additionalProperties": false,
         "description": "Separate mature outcomes and scores; never nested in a forecast DTO.",
@@ -2879,6 +3290,168 @@
           "connector_status"
         ],
         "title": "SourceHealth",
+        "type": "object"
+      },
+      "SpecialistOutlook": {
+        "additionalProperties": false,
+        "description": "One group's source coverage, independent of its untrained model status.\n\nAttributes:\n    group_id: Fundamental metric group, not a success target.\n    data_status: Available means some usable observations, not training-ready.\n    metric_observation_ids: All assigned source observations, including gaps.\n    usable_metric_observation_ids: Fresh verified public observations only.\n    evidence_ids: Supporting evidence for usable observations only.\n    reason_codes: Data limitations and the absent-model reason.\n    model_status: Explicitly untrained; this version never serves forecasts.\n    prediction: Always null until a separately gated serving contract exists.\n\nRaises:\n    ValueError: References repeat, usable references are absent, or coverage\n        contradicts availability. Numerical forecasts are rejected.",
+        "properties": {
+          "data_status": {
+            "enum": [
+              "available",
+              "insufficient_data",
+              "not_applicable"
+            ],
+            "title": "Data Status",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "group_id": {
+            "enum": [
+              "adoption_retention",
+              "attention_sentiment",
+              "financial_health",
+              "industry_competition",
+              "team_execution"
+            ],
+            "title": "Group Id",
+            "type": "string"
+          },
+          "metric_observation_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Metric Observation Ids",
+            "type": "array"
+          },
+          "model_status": {
+            "const": "model_not_trained",
+            "default": "model_not_trained",
+            "title": "Model Status",
+            "type": "string"
+          },
+          "prediction": {
+            "title": "Prediction",
+            "type": "null"
+          },
+          "reason_codes": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "usable_metric_observation_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Usable Metric Observation Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "group_id",
+          "data_status",
+          "reason_codes"
+        ],
+        "title": "SpecialistOutlook",
+        "type": "object"
+      },
+      "StartupOutlook": {
+        "additionalProperties": false,
+        "description": "Five local-model placeholders attached to one exact company source vintage.\n\nAttributes:\n    schema_version: Additive research payload version; v1 assessments stay intact.\n    company_id: Exact source company identity, not a user-entered name.\n    source_snapshot_id: Immutable source publication consumed by the builder.\n    as_of: Source cutoff, never the current request clock.\n    grouping_policy_version: Version of the explicit metric-to-group mapping.\n    synthetic: Source fixture flag retained for API/UI consumers.\n    specialists: Exactly one section per group, including unavailable groups.\n    unassigned_metric_observation_ids: Observations without an approved mapping.\n    inference_runtime: Intended execution location; no inference has run.\n    overall_outlook: Null; this contract cannot fabricate an outlook index.\n    overall_reason_codes: Why a combined prediction cannot be served.\n\nRaises:\n    ValueError: Groups or observation assignments repeat or are incomplete.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "grouping_policy_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Grouping Policy Version",
+            "type": "string"
+          },
+          "inference_runtime": {
+            "const": "local_cpu",
+            "default": "local_cpu",
+            "title": "Inference Runtime",
+            "type": "string"
+          },
+          "overall_outlook": {
+            "title": "Overall Outlook",
+            "type": "null"
+          },
+          "overall_reason_codes": {
+            "default": [
+              "model_not_trained"
+            ],
+            "items": {
+              "const": "model_not_trained",
+              "type": "string"
+            },
+            "title": "Overall Reason Codes",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "startup-outlook-placeholder-v1",
+            "default": "startup-outlook-placeholder-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_snapshot_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Source Snapshot Id",
+            "type": "string"
+          },
+          "specialists": {
+            "items": {
+              "$ref": "#/components/schemas/SpecialistOutlook"
+            },
+            "title": "Specialists",
+            "type": "array"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "unassigned_metric_observation_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Unassigned Metric Observation Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_id",
+          "source_snapshot_id",
+          "as_of",
+          "grouping_policy_version",
+          "synthetic",
+          "specialists"
+        ],
+        "title": "StartupOutlook",
         "type": "object"
       },
       "TimeWindow": {
@@ -3876,6 +4449,217 @@
           }
         },
         "summary": "Reveal"
+      }
+    },
+    "/api/v1/research-jobs": {
+      "post": {
+        "description": "Confirm exact saved identity and enqueue bounded public-source collection.",
+        "operationId": "start_research",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Start Research"
+      }
+    },
+    "/api/v1/research-jobs/{job_id}": {
+      "get": {
+        "description": "Read actual persisted job state without running or restarting work.",
+        "operationId": "research_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Research Job"
+      }
+    },
+    "/api/v1/research-reports/{report_id}": {
+      "get": {
+        "description": "Read exact immutable report/source bytes without inference or collection.",
+        "operationId": "research_report",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Report Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Research Report"
       }
     },
     "/api/v1/tools/{tool_id}/history": {
