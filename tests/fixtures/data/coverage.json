@@ -1,0 +1,21 @@
+{
+  "synthetic": true,
+  "coverage": [
+    {
+      "series_id": "synthetic-npm-series",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-08T00:00:00Z"
+      },
+      "expected_days": 7,
+      "complete_days": 3,
+      "partial_days": 2,
+      "missing_days": 2,
+      "status": "partial",
+      "last_success_at": "2026-10-24T10:00:00Z",
+      "reasons": [
+        "synthetic_partial_source"
+      ]
+    }
+  ]
+}

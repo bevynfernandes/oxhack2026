@@ -1,8 +1,8 @@
 .DEFAULT_GOAL := help
-.PHONY: install notebooks check format test build docs docs-test frontend-install frontend-check help
+.PHONY: install notebooks check format test test-integration build docs docs-test frontend-install frontend-check help
 
 install: ## Install locked Python development dependencies.
-	uv sync --frozen --group docs
+	uv sync --frozen --inexact --all-extras --group docs
 
 notebooks: ## Install notebook helpers only into the local environment.
 	uv pip install --python .venv/bin/python ipykernel ipywidgets
@@ -16,8 +16,11 @@ format: ## Format Python source and organize imports.
 	uv run --frozen --no-sync ruff check --fix .
 	uv run --frozen --no-sync ruff format .
 
-test: ## Run the scaffold packaging checks.
+test: ## Run checks that require no external services.
 	uv run --frozen --no-sync pytest
+
+test-integration: ## Opt in to tests requiring configured local services.
+	uv run --frozen --no-sync pytest -m integration
 
 build: ## Build the Python package.
 	uv build --no-sources

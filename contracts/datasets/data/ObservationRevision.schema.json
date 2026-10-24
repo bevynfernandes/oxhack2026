@@ -1,0 +1,189 @@
+{
+  "$defs": {
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "A nonempty half-open interval [start, end), always in UTC.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Append-only vintage with measurement, knowledge and retrieval times.",
+  "properties": {
+    "schema_version": {
+      "const": "data-v1",
+      "default": "data-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "revision_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Revision Id",
+      "type": "string"
+    },
+    "series_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Series Id",
+      "type": "string"
+    },
+    "window": {
+      "$ref": "#/$defs/TimeWindow"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Value"
+    },
+    "completeness": {
+      "enum": [
+        "complete",
+        "partial",
+        "missing"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "published_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Published At"
+    },
+    "assumed_available_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Assumed Available At"
+    },
+    "available_at": {
+      "format": "date-time",
+      "title": "Available At",
+      "type": "string"
+    },
+    "availability_basis": {
+      "enum": [
+        "collected",
+        "vendor_published",
+        "assumed_lag"
+      ],
+      "title": "Availability Basis",
+      "type": "string"
+    },
+    "availability_policy_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Availability Policy Version",
+      "type": "string"
+    },
+    "first_collected_at": {
+      "format": "date-time",
+      "title": "First Collected At",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "format": "date-time",
+      "title": "Retrieved At",
+      "type": "string"
+    },
+    "extraction_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Extraction Id",
+      "type": "string"
+    },
+    "extraction_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Extraction Version",
+      "type": "string"
+    },
+    "filter_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Filter Version",
+      "type": "string"
+    },
+    "source_revision_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Source Revision Id"
+    },
+    "supersedes_revision_id": {
+      "anyOf": [
+        {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Supersedes Revision Id"
+    },
+    "raw_artifact_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Raw Artifact Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "revision_id",
+    "series_id",
+    "window",
+    "value",
+    "completeness",
+    "published_at",
+    "assumed_available_at",
+    "available_at",
+    "availability_basis",
+    "availability_policy_version",
+    "first_collected_at",
+    "retrieved_at",
+    "extraction_id",
+    "extraction_version",
+    "filter_version",
+    "source_revision_id",
+    "supersedes_revision_id",
+    "raw_artifact_sha256"
+  ],
+  "title": "ObservationRevision",
+  "type": "object"
+}

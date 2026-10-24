@@ -1,0 +1,71 @@
+{
+  "schema_version": "data-v1",
+  "catalog_version": "synthetic-catalog-v1",
+  "mapping_version": "synthetic-mapping-v1",
+  "recorded_at": "2026-10-24T12:00:00Z",
+  "cohort_kind": "contemporary_catalogue",
+  "synthetic": true,
+  "organizations": [
+    {
+      "organization_id": "synthetic-org",
+      "family_id": "synthetic-family",
+      "name": "Synthetic Example",
+      "kind": "company_backed"
+    }
+  ],
+  "tools": [
+    {
+      "tool_id": "synthetic-tool",
+      "organization_id": "synthetic-org",
+      "name": "Synthetic Tool",
+      "category": "evaluation",
+      "website_url": "https://example.com",
+      "inclusion_reason": "Synthetic contract example, not a verified startup.",
+      "earliest_eligibility_at": null
+    }
+  ],
+  "packages": [
+    {
+      "package_id": "synthetic-package",
+      "ecosystem": "npm",
+      "canonical_name": "@synthetic/tool"
+    }
+  ],
+  "repositories": [
+    {
+      "repository_id": 123456,
+      "full_name": "synthetic/tool"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "synthetic-evidence",
+      "kind": "official_installation",
+      "url": "https://example.com/docs",
+      "available_at": "2026-10-24T10:00:00Z",
+      "checked_at": "2026-10-24T10:00:00Z",
+      "assertion": "Synthetic installation mapping for fixture tests only.",
+      "source_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "mappings": [
+    {
+      "mapping_id": "synthetic-map",
+      "tool_id": "synthetic-tool",
+      "package_id": "synthetic-package",
+      "repository_id": 123456,
+      "valid_from": "2024-01-01T00:00:00Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "synthetic-reviewer",
+      "evidence_ids": [
+        "synthetic-evidence"
+      ]
+    }
+  ],
+  "limitations": [
+    "SYNTHETIC: not real observations or verified catalogue evidence."
+  ]
+}

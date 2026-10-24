@@ -1,0 +1,76 @@
+{
+  "schema_version": "data-v1",
+  "dataset_version": "synthetic-dataset-v1",
+  "catalog_version": "synthetic-catalog-v1",
+  "mapping_version": "synthetic-mapping-v1",
+  "created_at": "2026-10-24T12:00:00Z",
+  "code_revision": "synthetic-code",
+  "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "catalog": {
+    "path": "catalog.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 42,
+    "media_type": "application/json"
+  },
+  "series": {
+    "path": "series.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 42,
+    "media_type": "application/json"
+  },
+  "observations": {
+    "path": "observations.parquet",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 42,
+    "media_type": "application/vnd.apache.parquet"
+  },
+  "coverage": {
+    "path": "coverage.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 42,
+    "media_type": "application/json"
+  },
+  "extraction_manifests": [
+    {
+      "extraction_id": "synthetic-extraction",
+      "source": "npm",
+      "catalog_version": "synthetic-catalog-v1",
+      "requested_window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-02T00:00:00Z"
+      },
+      "retrieved_at": "2026-10-24T10:00:00Z",
+      "extraction_version": "npm-daily-v1",
+      "filter_version": "npm-unfiltered-v1",
+      "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "raw_artifacts": [
+        {
+          "path": "raw/synthetic.json",
+          "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "byte_size": 42,
+          "media_type": "application/json"
+        }
+      ],
+      "status": "complete",
+      "limitations": [
+        "Synthetic placeholder artifact hashes; not retrievable data."
+      ]
+    }
+  ],
+  "availability_policies": [
+    {
+      "policy_version": "npm-lag48-v1",
+      "source": "npm",
+      "basis": "assumed_lag",
+      "assumed_lag_hours": 48,
+      "description": "Project assumption; no vendor publication timestamp is asserted."
+    }
+  ],
+  "feature_definition_version": "features-v1",
+  "target_definition_version": "targets-v1",
+  "completeness": "partial",
+  "synthetic": true,
+  "limitations": [
+    "SYNTHETIC: placeholder hashes and paths, not a distributable dataset."
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "synthetic": true,
+  "series": [
+    {
+      "series_id": "synthetic-npm-series",
+      "source": "npm",
+      "entity_kind": "package",
+      "entity_id": "synthetic-package",
+      "ecosystem": "npm",
+      "metric": "daily_downloads",
+      "unit": "downloads",
+      "cadence": "day"
+    }
+  ]
+}
