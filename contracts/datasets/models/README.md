@@ -1,5 +1,14 @@
 # C2 numerical artifacts
 
+Company-outcome labels use the separate `company-labels-v1` contract in
+`models/company_contracts.py`. `CompanyOutcomeLabel` retains company/family and
+source-vintage identity, the exact calendar horizon, evaluation cutoff, explicit
+label state, nullable strict Boolean truth and source evidence. Unknown/conflicting
+labels remain null; observed negatives require their precise reason. These truth
+records are separate from pre-outcome assessments and download labels. Their
+schema enforces timing/missingness, while source-owned facts and reviewed target
+definitions must establish the actual truth. It cannot validate a success model.
+
 Model/feature manifests use `models-v2`; evaluation reports use `evaluation-v2`.
 Version 2 adopts C1's canonical `storage.contracts.ArtifactReference`: required
 relative path, SHA-256, byte size, and media type. The model module re-exports

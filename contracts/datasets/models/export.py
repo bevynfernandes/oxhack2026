@@ -11,6 +11,7 @@ from oxhack2026.evaluation.contracts import (
     RankedCandidate,
     ShortlistScore,
 )
+from oxhack2026.models.company_contracts import CompanyOutcomeLabel
 from oxhack2026.models.contracts import (
     FeatureManifest,
     FeatureRow,
@@ -35,6 +36,7 @@ if __name__ == "__main__":
         OutcomeDiagnostics,
         RankedCandidate,
         ShortlistScore,
+        CompanyOutcomeLabel,
     ):
         destination = Path(__file__).with_name(f"{contract.__name__}.schema.json")
         destination.write_bytes(
