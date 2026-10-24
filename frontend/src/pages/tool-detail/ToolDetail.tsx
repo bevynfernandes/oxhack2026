@@ -173,6 +173,13 @@ export default function ToolDetail({
           Cohort: {catalog.cohort_kind?.replaceAll("_", " ")}. Catalogue
           recorded {date(catalog.recorded_at ?? null)}.
         </p>
+        {catalog.membership_basis === "contemporary_reconstruction" && (
+          <p className="notice">
+            Membership uses the contemporary catalogue at its recording date.
+            Historical membership is unverified and subject to survivorship
+            bias.
+          </p>
+        )}
         <Reasons reasons={catalog.limitations ?? []} />
         <EvidenceList evidence={forecast.evidence} />
         <EvidenceList evidence={tool.mapping_evidence} />

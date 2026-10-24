@@ -27,20 +27,38 @@ def _check_catalog(snapshot: CatalogSnapshot, batch: s.ForecastBatch) -> None:
         raise ValueError(message)
 
 
-def map_catalog(snapshot: CatalogSnapshot, batch: s.ForecastBatch) -> s.Catalog:
+def map_catalog(
+    snapshot: CatalogSnapshot,
+    batch: s.ForecastBatch,
+    *,
+    allow_contemporary_reconstruction: bool = False,
+) -> s.Catalog:
     """Present verified, effective C1 package mappings for a frozen batch.
 
     Args:
         snapshot: Validated frozen catalogue, including actual verification dates.
         batch: Exact forecast scope and identity versions selected by the scout.
+        allow_contemporary_reconstruction: Explicitly select a contemporary cohort
+            at its recording time for a reconstructed batch. The default selects
+            effective mappings at the decision cutoff.
     Returns:
         Public identities with retrospective verification explicitly labelled.
         Contemporary cohort limitations remain visible rather than becoming a
         claim that today's catalogue was known at the historical decision.
     Raises:
-        ValueError: Versions disagree or a prospective mapping uses later evidence.
+        ValueError: Versions disagree, retrospective membership is requested for
+            another cohort/mode, or a prospective mapping uses later evidence.
     """
     _check_catalog(snapshot, batch)
+    if allow_contemporary_reconstruction and (
+        batch.mode != "reconstructed"
+        or snapshot.cohort_kind != "contemporary_catalogue"
+    ):
+        message = "Contemporary membership requires a reconstructed contemporary cohort"
+        raise ValueError(message)
+    selection_at = (
+        snapshot.recorded_at if allow_contemporary_reconstruction else batch.decision_at
+    )
     organizations = {item.organization_id: item for item in snapshot.organizations}
     tools = {item.tool_id: item for item in snapshot.tools}
     packages = {item.package_id: item for item in snapshot.packages}
@@ -52,8 +70,8 @@ def map_catalog(snapshot: CatalogSnapshot, batch: s.ForecastBatch) -> s.Catalog:
             mapping.verified
             and mapping.primary
             and package.ecosystem == batch.ecosystem
-            and mapping.valid_from <= batch.decision_at
-            and (mapping.valid_to is None or batch.decision_at < mapping.valid_to)
+            and mapping.valid_from <= selection_at
+            and (mapping.valid_to is None or selection_at < mapping.valid_to)
         ):
             continue
         tool = tools[mapping.tool_id]
@@ -102,6 +120,9 @@ def map_catalog(snapshot: CatalogSnapshot, batch: s.ForecastBatch) -> s.Catalog:
         tools=tuple(results),
         recorded_at=snapshot.recorded_at,
         cohort_kind=snapshot.cohort_kind,
+        membership_basis="contemporary_reconstruction"
+        if allow_contemporary_reconstruction
+        else "decision_time",
         limitations=snapshot.limitations,
     )
 

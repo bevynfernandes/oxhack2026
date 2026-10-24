@@ -134,6 +134,13 @@ function RankingsWorkspace({
         Reference window: {windowLabel(batch.reference_window)}. There is a
         reporting-lag gap before the forecast window.
       </p>
+      {catalog.membership_basis === "contemporary_reconstruction" && (
+        <p className="notice">
+          This reconstruction uses a contemporary catalogue. Membership was
+          selected when that catalogue was recorded; historical membership is
+          unverified and subject to survivorship bias.
+        </p>
+      )}
       {catalog.tools.some(
         (tool) => tool.mapping_verification === "retrospective",
       ) && (

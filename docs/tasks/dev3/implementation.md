@@ -27,3 +27,9 @@ passing synthetic browser tests.
 C1 and C2 presentation mapping now use C3 0.3.0. Retrospective mapping inspection
 is labelled explicitly; per-tool outcome diagnostics delegate to Dev 2. The next
 checkpoint closes contract-mapping gaps without claiming real-data completion.
+
+C3 0.4.0 adds an explicit contemporary-membership opt-in for reconstructed
+catalogues, with survivorship notices on rankings and tool detail. PR #17 now
+provides the real npm dataset handoff and local exact-version C1 reads; its ZIP
+and manifest checksums were independently verified. Source-package validation
+review, C2 publication and production API composition remain outstanding.
