@@ -13,7 +13,7 @@ from pydantic import (
     model_validator,
 )
 
-CONTRACT_VERSION = "0.2.0"
+CONTRACT_VERSION = "0.3.0"
 Identifier = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")]
 Ecosystem = Literal["npm", "pypi"]
 Target = Literal["downloads_next_30d_v1", "downloads_trailing_28d_at_91d_v1"]
@@ -100,7 +100,7 @@ class Evidence(DTO):
 class Freshness(DTO):
     """Published quality assessment, independent of model validation status."""
 
-    as_of: UTCDateTime
+    as_of: UTCDateTime | None
     stale: bool
     completeness: Literal["complete", "partial", "unavailable"]
     reasons: tuple[str, ...] = ()
@@ -118,6 +118,7 @@ class Tool(DTO):
     ecosystem: Ecosystem
     category: str
     representative: bool
+    mapping_verification: Literal["before_cutoff", "retrospective"] = "before_cutoff"
     mapping_evidence: tuple[Evidence, ...]
 
 
@@ -128,6 +129,11 @@ class Catalog(DTO):
     mapping_version: Identifier
     synthetic: bool
     tools: tuple[Tool, ...]
+    recorded_at: UTCDateTime | None = None
+    cohort_kind: Literal["contemporary_catalogue", "historical_eligibility"] = (
+        "contemporary_catalogue"
+    )
+    limitations: tuple[str, ...] = ()
 
 
 class Cutoff(DTO):
@@ -219,7 +225,7 @@ class Forecast(DTO):
 class ForecastBatch(DTO):
     """Frozen prediction payload; shared identity/time apply to every result."""
 
-    contract_version: Literal["0.2.0"] = "0.2.0"
+    contract_version: Literal["0.3.0"] = "0.3.0"
     batch_id: Identifier
     ecosystem: Ecosystem
     target_id: Target

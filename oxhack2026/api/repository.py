@@ -1,4 +1,4 @@
-"""Read port for Dev 1 adapters and Dev 2's authoritative shortlist scorer.
+"""Read port for API adapters over Dev 1 storage and Dev 2 numerical policy.
 
 Implementations read published artifacts only. They translate storage failures into
 RepositoryUnavailable and missing resources into ResourceNotFound. No method may

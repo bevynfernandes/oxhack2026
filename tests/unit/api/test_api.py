@@ -336,3 +336,27 @@ def test_revalidate_invalid_adapter_instances(
         update={"results": (invalid,)}
     )
     assert client.get(f"/api/v1/forecasts/{BATCH}").status_code == 503
+
+
+def test_retrospective_catalogue_cannot_appear_prospective(
+    client: TestClient, repository: Mock, bundle: FixtureBundle
+) -> None:
+    """Only explicitly labelled reconstruction can show later mapping inspection."""
+    original = bundle.catalog.tools[0]
+    evidence = original.mapping_evidence[0].model_copy(
+        update={"observed_at": datetime(2026, 1, 1, tzinfo=UTC)}
+    )
+    tool = original.model_copy(update={"mapping_evidence": (evidence,)})
+    repository.catalog.return_value = bundle.catalog.model_copy(
+        update={"tools": (tool,)}
+    )
+    assert client.get(f"/api/v1/catalog?batch_id={BATCH}").status_code == 503
+    tool = tool.model_copy(update={"mapping_verification": "retrospective"})
+    repository.catalog.return_value = bundle.catalog.model_copy(
+        update={"tools": (tool,)}
+    )
+    assert client.get(f"/api/v1/catalog?batch_id={BATCH}").status_code == 200
+    repository.forecast.return_value = bundle.forecast.model_copy(
+        update={"mode": "prospective"}
+    )
+    assert client.get(f"/api/v1/catalog?batch_id={BATCH}").status_code == 503

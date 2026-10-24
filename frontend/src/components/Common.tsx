@@ -15,7 +15,8 @@ export const metricValue = (value: number | null | undefined): string =>
       );
 export const percent = (value: number | null | undefined): string =>
   value == null ? "Unavailable" : `${count(value)}%`;
-export const date = (value: string): string => `${value.slice(0, 10)} UTC`;
+export const date = (value: string | null): string =>
+  value === null ? "Not recorded" : `${value.slice(0, 10)} UTC`;
 export const windowLabel = (window: DTO<"Window">): string =>
   `${date(window.start)} to ${date(window.end)} (end excluded)`;
 export const modeLabel = (mode: string): string =>
@@ -116,8 +117,10 @@ export function EvidenceList({ evidence }: { evidence: DTO<"Evidence">[] }) {
                   <li key={item.evidence_id}>
                     <p>{item.text}</p>
                     <small>
-                      {item.source} · observed {date(item.observed_at)} ·
-                      available {date(item.available_at)}
+                      {item.source} ·{" "}
+                      {item.kind === "mapping" ? "verified" : "observed"}{" "}
+                      {date(item.observed_at)} · available{" "}
+                      {date(item.available_at)}
                     </small>
                     {item.url && (
                       <p>

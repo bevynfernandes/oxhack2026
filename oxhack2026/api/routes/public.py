@@ -96,13 +96,20 @@ def catalog(
             and result.mapping_version == batch.provenance.mapping_version
             and result.synthetic == batch.provenance.synthetic
         )
-        _require(
-            all(
-                evidence.available_at <= batch.decision_at
-                for tool in result.tools
+        if batch.mode == "prospective":
+            _require(
+                result.recorded_at is not None
+                and result.recorded_at <= batch.decision_at
+            )
+        for tool in result.tools:
+            retrospective = any(
+                evidence.available_at > batch.decision_at
+                or evidence.observed_at > batch.decision_at
                 for evidence in tool.mapping_evidence
             )
-        )
+            _require(all(item.kind == "mapping" for item in tool.mapping_evidence))
+            _require((tool.mapping_verification == "retrospective") == retrospective)
+            _require(not retrospective or batch.mode == "reconstructed")
     if q:
         search = q.casefold()
         return result.model_copy(
