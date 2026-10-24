@@ -22,6 +22,8 @@ from oxhack2026.api.routes.public import (
     get_repository,
     router,
 )
+from oxhack2026.api.routes.research import router as research_router
+from oxhack2026.research.service import IdentityConfirmationRequired
 
 logger = logging.getLogger(__name__)
 
@@ -70,6 +72,17 @@ async def invalid(_request: Request, _error: Exception) -> JSONResponse:
     )
 
 
+async def identity_required(_request: Request, _error: Exception) -> JSONResponse:
+    """Return a safe 409 when the selected saved identity cannot be confirmed."""
+    return JSONResponse(
+        status_code=409,
+        content=s.Error(
+            code="identity_confirmation_required",
+            message="Confirm a company and domain from a saved publication.",
+        ).model_dump(),
+    )
+
+
 def create_app(
     repository: PublishedRepository | None = None,
     *,
@@ -87,6 +100,7 @@ def create_app(
         An ASGI application with strict public responses and redacted failures.
     """
     app = FastAPI(title="SignalShift", version=s.CONTRACT_VERSION)
+    app.include_router(research_router)
     if repository is not None:
         app.dependency_overrides[get_repository] = lambda: repository
         app.dependency_overrides[get_readiness_repository] = lambda: repository
@@ -101,6 +115,7 @@ def create_app(
     app.add_exception_handler(ResourceNotFound, not_found)
     app.add_exception_handler(ImmatureOutcome, immature)
     app.add_exception_handler(RequestValidationError, invalid)
+    app.add_exception_handler(IdentityConfirmationRequired, identity_required)
     app.include_router(router)
     app.include_router(company_router)
     return app

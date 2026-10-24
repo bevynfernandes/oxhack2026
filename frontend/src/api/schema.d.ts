@@ -244,6 +244,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/research-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Research
+         * @description Confirm exact saved identity and enqueue bounded public-source collection.
+         */
+        post: operations["start_research"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Research Job
+         * @description Read actual persisted job state without running or restarting work.
+         */
+        get: operations["research_job"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/research-reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Research Report
+         * @description Read exact immutable report/source bytes without inference or collection.
+         */
+        get: operations["research_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/tools/{tool_id}/history": {
         parameters: {
             query?: never;
@@ -314,6 +374,64 @@ export interface components {
             statement_id: string;
             /** Text */
             text: string;
+        };
+        /**
+         * AttentionObservation
+         * @description Fresh exact-domain HN link count, outside all v1 C1 metric families.
+         *
+         *     A missing value means a truncated query; zero is valid only for a complete
+         *     bounded query. The count does not measure users, sentiment or success.
+         */
+        AttentionObservation: {
+            /**
+             * Available At
+             * Format: date-time
+             */
+            available_at: string;
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Company Id */
+            company_id: string;
+            /**
+             * Definition
+             * @default HN stories linking the exact confirmed domain during the declared window; not broad mentions, sentiment, users or independent endorsement.
+             */
+            definition: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Metric Id
+             * @default hn_exact_domain_story_links_30d_v1
+             * @constant
+             */
+            metric_id: "hn_exact_domain_story_links_30d_v1";
+            /** Observation Id */
+            observation_id: string;
+            /** Reason Codes */
+            reason_codes: string[];
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "observed" | "missing";
+            /**
+             * Unit
+             * @default story_links
+             * @constant
+             */
+            unit: "story_links";
+            /** Value */
+            value: number | null;
+            window: components["schemas"]["TimeWindow"];
+            /**
+             * Window End Exclusive
+             * @default true
+             * @constant
+             */
+            window_end_exclusive: true;
         };
         /**
          * Baseline
@@ -1376,6 +1494,149 @@ export interface components {
             url: string;
         };
         /**
+         * ResearchInventory
+         * @description Exact saved lineage and separately identified fresh public observations.
+         */
+        ResearchInventory: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Capture Byte Size */
+            capture_byte_size: number;
+            /** Capture Sha256 */
+            capture_sha256: string;
+            /** Company Id */
+            company_id: string;
+            /** Evidence */
+            evidence: components["schemas"]["CompanySource"][];
+            /** Inventory Id */
+            inventory_id: string;
+            /** Observations */
+            observations: components["schemas"]["AttentionObservation"][];
+            saved_context: components["schemas"]["CompanyDetail"];
+            /** Synthetic */
+            synthetic: boolean;
+        };
+        /**
+         * ResearchJob
+         * @description Durable research state; terminal times and report presence are consistent.
+         *
+         *     Raises:
+         *         ValueError: Timestamps or completion/report state contradict the job state.
+         */
+        ResearchJob: {
+            /** Finished At */
+            finished_at?: string | null;
+            /** Job Id */
+            job_id: string;
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /** Report Id */
+            report_id?: string | null;
+            request: components["schemas"]["ResearchRequest"];
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /**
+             * Schema Version
+             * @default research-job-v1
+             * @constant
+             */
+            schema_version: "research-job-v1";
+            /** Sources */
+            sources: components["schemas"]["ResearchSourceState"][];
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "running" | "partial" | "completed" | "failed";
+        };
+        /**
+         * ResearchReport
+         * @description Immutable report embedding the unchanged model-owned outlook payload.
+         */
+        ResearchReport: {
+            /** Assessment Publication Id */
+            assessment_publication_id: string;
+            /**
+             * Data Version
+             * @default research-inventory-v1
+             * @constant
+             */
+            data_version: "research-inventory-v1";
+            inventory: components["schemas"]["ResearchInventory"];
+            /** Job Id */
+            job_id: string;
+            /** Limitations */
+            limitations: string[];
+            /** Model Version */
+            model_version?: null;
+            outlook: components["schemas"]["StartupOutlook"];
+            /** Report Id */
+            report_id: string;
+            /**
+             * Researched At
+             * Format: date-time
+             */
+            researched_at: string;
+            /**
+             * Schema Version
+             * @default research-report-v1
+             * @constant
+             */
+            schema_version: "research-report-v1";
+            /** Source Publication Id */
+            source_publication_id: string;
+        };
+        /**
+         * ResearchRequest
+         * @description Exact saved identity confirmed by the user; domains are never fetched.
+         */
+        ResearchRequest: {
+            /** Assessment Publication Id */
+            assessment_publication_id: string;
+            /** Company Id */
+            company_id: string;
+            /** Domain */
+            domain: string;
+            /**
+             * Identity Confirmed
+             * @constant
+             */
+            identity_confirmed: true;
+        };
+        /**
+         * ResearchSourceState
+         * @description Actual bounded provider state, independent of model/data readiness.
+         */
+        ResearchSourceState: {
+            /**
+             * Provider
+             * @default hn_algolia
+             * @constant
+             */
+            provider: "hn_algolia";
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "pending" | "running" | "succeeded" | "partial" | "failed";
+        };
+        /**
          * Reveal
          * @description Separate mature outcomes and scores; never nested in a forecast DTO.
          */
@@ -1455,6 +1716,124 @@ export interface components {
             revisions: number;
             /** Source */
             source: string;
+        };
+        /**
+         * SpecialistOutlook
+         * @description One group's source coverage, independent of its untrained model status.
+         *
+         *     Attributes:
+         *         group_id: Fundamental metric group, not a success target.
+         *         data_status: Available means some usable observations, not training-ready.
+         *         metric_observation_ids: All assigned source observations, including gaps.
+         *         usable_metric_observation_ids: Fresh verified public observations only.
+         *         evidence_ids: Supporting evidence for usable observations only.
+         *         reason_codes: Data limitations and the absent-model reason.
+         *         model_status: Explicitly untrained; this version never serves forecasts.
+         *         prediction: Always null until a separately gated serving contract exists.
+         *
+         *     Raises:
+         *         ValueError: References repeat, usable references are absent, or coverage
+         *             contradicts availability. Numerical forecasts are rejected.
+         */
+        SpecialistOutlook: {
+            /**
+             * Data Status
+             * @enum {string}
+             */
+            data_status: "available" | "insufficient_data" | "not_applicable";
+            /**
+             * Evidence Ids
+             * @default []
+             */
+            evidence_ids: string[];
+            /**
+             * Group Id
+             * @enum {string}
+             */
+            group_id: "adoption_retention" | "attention_sentiment" | "financial_health" | "industry_competition" | "team_execution";
+            /**
+             * Metric Observation Ids
+             * @default []
+             */
+            metric_observation_ids: string[];
+            /**
+             * Model Status
+             * @default model_not_trained
+             * @constant
+             */
+            model_status: "model_not_trained";
+            /** Prediction */
+            prediction?: null;
+            /** Reason Codes */
+            reason_codes: string[];
+            /**
+             * Usable Metric Observation Ids
+             * @default []
+             */
+            usable_metric_observation_ids: string[];
+        };
+        /**
+         * StartupOutlook
+         * @description Five local-model placeholders attached to one exact company source vintage.
+         *
+         *     Attributes:
+         *         schema_version: Additive research payload version; v1 assessments stay intact.
+         *         company_id: Exact source company identity, not a user-entered name.
+         *         source_snapshot_id: Immutable source publication consumed by the builder.
+         *         as_of: Source cutoff, never the current request clock.
+         *         grouping_policy_version: Version of the explicit metric-to-group mapping.
+         *         synthetic: Source fixture flag retained for API/UI consumers.
+         *         specialists: Exactly one section per group, including unavailable groups.
+         *         unassigned_metric_observation_ids: Observations without an approved mapping.
+         *         inference_runtime: Intended execution location; no inference has run.
+         *         overall_outlook: Null; this contract cannot fabricate an outlook index.
+         *         overall_reason_codes: Why a combined prediction cannot be served.
+         *
+         *     Raises:
+         *         ValueError: Groups or observation assignments repeat or are incomplete.
+         */
+        StartupOutlook: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Company Id */
+            company_id: string;
+            /** Grouping Policy Version */
+            grouping_policy_version: string;
+            /**
+             * Inference Runtime
+             * @default local_cpu
+             * @constant
+             */
+            inference_runtime: "local_cpu";
+            /** Overall Outlook */
+            overall_outlook?: null;
+            /**
+             * Overall Reason Codes
+             * @default [
+             *       "model_not_trained"
+             *     ]
+             */
+            overall_reason_codes: "model_not_trained"[];
+            /**
+             * Schema Version
+             * @default startup-outlook-placeholder-v1
+             * @constant
+             */
+            schema_version: "startup-outlook-placeholder-v1";
+            /** Source Snapshot Id */
+            source_snapshot_id: string;
+            /** Specialists */
+            specialists: components["schemas"]["SpecialistOutlook"][];
+            /** Synthetic */
+            synthetic: boolean;
+            /**
+             * Unassigned Metric Observation Ids
+             * @default []
+             */
+            unassigned_metric_observation_ids: string[];
         };
         /**
          * TimeWindow
@@ -2152,6 +2531,182 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Reveal"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    start_research: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ResearchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchJob"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    research_job: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchJob"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    research_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchReport"];
                 };
             };
             /** @description Not Found */

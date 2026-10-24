@@ -1,6 +1,6 @@
-# Research-job/report contract proposal for #46
+# Research-job/report contract for #46
 
-Status: proposed for agreement with Ivan and Daniyal before implementation.
+Status: agreed by Ivan and Daniyal in #46; implemented by the additive backend.
 This is additive; existing v1 assessment IDs, routes and saved links keep their
 meaning. No model training or new target semantics are approved by this proposal.
 
@@ -47,7 +47,7 @@ research. Invalid identity is 409; unknown IDs 404; invalid inputs 422.
 
 ## Immutable report
 
-Fields: `schema_version`, `report_id`, `job_id`, `company`, `researched_at`,
+Fields: `schema_version`, `report_id`, `job_id`, `researched_at`,
 `source_publication_id`, `assessment_publication_id`, `inventory`, `outlook`
 (the unchanged shared `StartupOutlook`), `data_version`, `model_version`,
 `limitations`.
@@ -71,7 +71,7 @@ Exactly five specialist IDs, in display order:
 
 Dev 2 owns `oxhack2026.models.startup_outlook`; the backend imports that shared
 payload rather than introducing a competing model policy. The field names below
-are a proposal pending the exact published model payload.
+match the merged #49 model payload.
 
 Embed `StartupOutlook` unchanged: section fields are `group_id`, `data_status`,
 `metric_observation_ids`, `usable_metric_observation_ids`, `evidence_ids`,
@@ -104,5 +104,37 @@ Backtesting is unavailable until reproducible evaluation artifacts exist.
   matching, source errors, recovery and privacy. Opt-in real API/browser checks
   cover source inspection, mobile and keyboard behavior.
 
-Open agreement: approve the known-company first slice and exact field/state names,
-or supply a narrower alternative before either backend or UI implements them.
+Known-company identity and shared mixed-vintage lineage were confirmed in #46.
+Arbitrary unknown-company resolution remains outside this first slice.
+
+
+## Run the local research worker
+
+- Configure `SIGNALSHIFT_COMPANY_ROOT` and `SIGNALSHIFT_COMPANY_PUBLICATIONS` as
+  for the existing company API, then set `SIGNALSHIFT_RESEARCH_ENABLED=1`.
+- Start `uvicorn oxhack2026.api.company_runtime:create_company_app --factory`
+  with **one ASGI process**. Two local threads bound concurrent research.
+  An exclusive POSIX lease rejects a second enabled process on the same root.
+- The configured root must be writable. Jobs live under `research-jobs`, report
+  publications in `research-reports.json`, and immutable report/raw bytes use the
+  existing content-addressed `objects` store. Do not edit these files manually.
+- Startup resumes queued jobs. An interrupted running job becomes failed with
+  `worker_interrupted`; explicitly start another refresh to collect new evidence.
+  Graceful shutdown waits for active workers. GET routes never start collection.
+- One refresh queries at most 100 HN stories on one page, up to three transport/
+  transient retries, 25 seconds per HTTP operation and 4 MiB per response. Access
+  denial/rate limits fail without bypass; extra pages produce partial state and
+  a missing count. The API does not claim that query results exhaust all HN links.
+- Use this local opt-in worker on a trusted development instance. It has no
+  authentication, admission quota or public deployment scheduler; do not expose
+  writable routes publicly as an unbounded shared service.
+- All timestamps come from actual request/worker/capture events. HN windows are
+  start-inclusive/end-exclusive. The response exposes capture SHA-256/size, never
+  local object paths. Report reads verify report and fresh raw hashes plus saved
+  source integrity; corrupt data returns the safe 503 envelope.
+- The embedded saved context retains its original coverage cutoff. The outlook
+  re-evaluates metric freshness at the new report cutoff; it does not rewrite
+  measurement/publication times or refresh old customer/financial facts.
+- Fresh source links point to the fixed public API endpoint. Exact query parameters
+  are persisted separately in the raw capture checkpoint; the measurement window,
+  confirmed identity and metric definition are exposed in the report inventory.
