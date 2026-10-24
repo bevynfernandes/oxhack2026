@@ -483,8 +483,16 @@ export default function CompanyDossier({
                   <span className="pillar-model">Untrained</span>
                 </div>
                 <h3>
-                  {group.name}
-                  <Icon name="arrow" />
+                  <button
+                    className="pillar-expand"
+                    aria-label={`Expand dimension: ${group.name}`}
+                    aria-haspopup="dialog"
+                    aria-controls="company-evidence-drawer"
+                    onClick={() => open({ kind: "driver", index })}
+                  >
+                    {group.name}
+                    <Icon name="arrow" />
+                  </button>
                 </h3>
                 <p className="pillar-description">{group.description}</p>
               </header>
@@ -538,6 +546,8 @@ export default function CompanyDossier({
                 </span>
                 <button
                   aria-label={`Inspect evidence: ${group.name}`}
+                  aria-haspopup="dialog"
+                  aria-controls="company-evidence-drawer"
                   onClick={() => open({ kind: "driver", index })}
                 >
                   Inspect evidence <Icon name="arrow" />
@@ -566,6 +576,7 @@ export default function CompanyDossier({
       </div>
       <dialog
         className="driver-dialog dossier-drawer"
+        id="company-evidence-drawer"
         ref={dialog}
         aria-labelledby="driver-dialog-title"
         onKeyDown={containFocus}

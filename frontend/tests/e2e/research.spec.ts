@@ -33,6 +33,10 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
   const inspect = page.getByRole("button", {
     name: "Inspect evidence: Attention & Sentiment",
   });
+  await page
+    .getByRole("button", { name: "Expand dimension: Attention & Sentiment" })
+    .click();
+  await page.keyboard.press("Escape");
   await inspect.click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
