@@ -1,5 +1,11 @@
 # SignalShift: startup outlook
 
+Latest direction: [startup prediction plan #46](https://github.com/bevynfernandes/oxhack2026/issues/46)
+and its [data-readiness and delivery plan](docs/tasks/dev2/startup-prediction-reset.md)
+update the scope below to Software/SaaS, single-company research and local backend
+models. Training waits for verified historical inputs and labels. Ivan retains
+the UI assignment; Bevyn owns the delegated data/backend audit.
+
 ## 1. Product decision
 
 Assess a startup's prospects using dated evidence about traction, commercial
