@@ -1,0 +1,27 @@
+{
+  "run_id": "company-vector-20261024-v1",
+  "snapshot_id": "company-vector-20261024-v1",
+  "npm_dataset_version": "npm-initial-20261024-v2",
+  "code_revision": "52b8451dcb0dc8bfaf00ba1f94b1fa60a480532b",
+  "cohort_version": "contemporary-vector-pair-v1",
+  "measurement_end": "2026-10-24T00:00:00Z",
+  "maximum_github_pages": 10,
+  "companies": [
+    {
+      "company_id": "qdrant",
+      "url": "https://qdrant.tech/blog/series-b-announcement/",
+      "announcement_date": "2026-03-12",
+      "amount_usd": "50000000",
+      "required_text": ["$50 million", "Series B", "AVP"],
+      "description": "Qdrant announced a $50 million Series B on 12 March 2026. Company-reported selected financing event; not a cash balance or complete funding history."
+    },
+    {
+      "company_id": "weaviate",
+      "url": "https://weaviate.io/company/about-us",
+      "announcement_date": "2023-04-21",
+      "amount_usd": "50000000",
+      "required_text": ["$50 Million", "Series B", "21 Apr, 2023"],
+      "description": "Weaviate's official company page links its 21 April 2023 announcement of a $50 million Series B. This selected historical event is not asserted to be the latest round or current financial health."
+    }
+  ]
+}
