@@ -111,3 +111,62 @@ test("directory pagination keeps every company reachable without growing the vie
     page.getByRole("link", { name: "Open dossier for Synthetic alpha" }),
   ).toBeVisible();
 });
+
+test("search covers every configured publication and dotted company names", async ({
+  page,
+}) => {
+  await page.route("**/api/v1/company-snapshots", async (route) => {
+    const response = await route.fetch();
+    const body = await response.json();
+    await route.fulfill({
+      json: {
+        items: [
+          ...body.items,
+          {
+            ...body.items[0],
+            assessment: {
+              ...body.items[0].assessment,
+              publication_id: "older-publication",
+              recorded_at: "2024-01-01T00:00:00Z",
+            },
+          },
+        ],
+      },
+    });
+  });
+  await page.route(
+    "**/api/v1/company-snapshots/older-publication/companies",
+    async (route) => {
+      const response = await page.request.get(
+        "/api/v1/company-snapshots/synthetic-assessments-v1/companies",
+      );
+      const body = await response.json();
+      await route.fulfill({
+        json: {
+          items: [
+            {
+              ...body.items[0],
+              company: {
+                ...body.items[0].company,
+                company_id: "node-js",
+                display_name: "Node.js",
+                website_url: "https://nodejs.example",
+              },
+            },
+          ],
+        },
+      });
+    },
+  );
+  await page.goto("/");
+  await page.getByLabel("Search companies").fill("Node.js");
+  await expect(
+    page.getByRole("link", { name: "Open dossier for Node.js" }),
+  ).toHaveAttribute("href", "/companies/older-publication/node-js");
+  await page
+    .getByLabel("Search companies")
+    .fill("nodejs.example.attacker.test");
+  await expect(
+    page.getByRole("link", { name: "Open dossier for Node.js" }),
+  ).toHaveCount(0);
+});

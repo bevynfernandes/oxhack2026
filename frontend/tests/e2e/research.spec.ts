@@ -311,3 +311,303 @@ test("terminal failed and completed jobs remain distinct from model readiness", 
     page.getByText(/Model readiness is shown separately/),
   ).toBeVisible();
 });
+
+const providers = [
+  "website",
+  "github",
+  "npm",
+  "hiring",
+  "hn",
+  "news",
+  "sec",
+  "companies_house",
+];
+const capabilities = {
+  storage_available: true,
+  collection_enabled: true,
+  worker_available: true,
+  browser_available: false,
+  providers: providers.map((provider) => ({
+    provider,
+    available: provider !== "sec",
+    reason: provider === "sec" ? "Reviewed mapping required" : null,
+  })),
+};
+const standaloneIdentity = {
+  identity_id: "identity-example",
+  request: { domain: "old.example" },
+  state: "ready",
+  requested_at: "2026-10-24T17:00:00Z",
+  requested_domain: "old.example",
+  canonical_domain: "new.example",
+  company_name: "Synthetic standalone",
+  evidence: [],
+  captures: [],
+  conflicts: [
+    "Homepage redirected from old.example to new.example; confirm this destination explicitly.",
+  ],
+  limitations: ["Website identity is not legal verification."],
+  official_links: [],
+  saved_context: null,
+};
+const sourceStates = providers.map((provider) => ({
+  provider,
+  name: provider === "hn" ? "Hacker News" : provider,
+  state:
+    provider === "website"
+      ? "completed"
+      : provider === "hn"
+        ? "partial"
+        : "skipped",
+  reason_codes:
+    provider === "hn"
+      ? ["hn_non_exhaustive_or_truncated"]
+      : provider === "website"
+        ? []
+        : ["unverified_account_mapping"],
+  captures: [],
+  evidence: [],
+  observations: [],
+  claims: [],
+  events: [],
+  links: [],
+}));
+const standaloneReport = {
+  schema_version: "research-report-v2",
+  report_id: "standalone-report",
+  job_id: "standalone-job",
+  researched_at: "2026-10-24T17:05:00Z",
+  identity: standaloneIdentity,
+  sources: sourceStates,
+  observations: [
+    {
+      observation_id: "fresh-count",
+      metric_id: "hn_complete_exact_domain_count_30d",
+      definition:
+        "Complete-window count; retrieved records are separate. Not users or sentiment.",
+      unit: "story_links",
+      value: null,
+      collected_at: "2026-10-24T17:05:00Z",
+      missing_reason: "non_exhaustive_or_truncated",
+      evidence_ids: [],
+      origin: "fresh",
+    },
+  ],
+  claims: [
+    {
+      claim_id: "claim",
+      text: "Company reports growth; no normalized revenue supplied.",
+      category: "revenue",
+      attribution: "company_reported",
+      evidence_ids: [],
+      conflicts_with: ["other-claim"],
+    },
+  ],
+  events: [],
+  evidence: [],
+  captures: [],
+  outlook: {
+    ...fixture.outlook,
+    specialists: fixture.outlook.specialists.map((row) => ({
+      ...row,
+      metric_observation_ids: [],
+      usable_metric_observation_ids: [],
+      reason_codes: ["no_approved_metric_group_mapping", "model_not_trained"],
+    })),
+  },
+  limitations: ["Bounded collection; no trained prediction."],
+};
+
+test("directory research previews v2 with exact saved context before confirmation", async ({
+  page,
+}) => {
+  let discoveries = 0;
+  const jobPosts: string[] = [];
+  page.on("request", (request) => {
+    if (
+      request.method() === "POST" &&
+      request.url().includes("research-jobs")
+    ) {
+      jobPosts.push(request.url());
+    }
+  });
+  await page.route("**/api/v2/research-capabilities", (route) =>
+    route.fulfill({ json: capabilities }),
+  );
+  await page.route("**/api/v2/research-identities", (route) => {
+    discoveries++;
+    expect(route.request().postDataJSON()).toEqual({
+      domain: "alpha.example",
+      company_id: "alpha",
+      assessment_publication_id: "synthetic-assessments-v1",
+    });
+    return route.fulfill({ status: 202, json: standaloneIdentity });
+  });
+  await page.route("**/api/v2/research-identities/*", (route) =>
+    route.fulfill({ json: standaloneIdentity }),
+  );
+  await page.goto("/");
+  const research = page.getByRole("link", {
+    name: "Research company Synthetic alpha",
+  });
+  await expect(research).toHaveAttribute(
+    "href",
+    "/research/new?domain=alpha.example&company=alpha&publication=synthetic-assessments-v1",
+  );
+  await research.click();
+  await expect(page.getByLabel("Company domain")).toHaveValue("alpha.example");
+  expect(discoveries).toBe(0);
+  await page.getByRole("button", { name: "Preview company" }).click();
+  await expect(page.getByRole("status")).toHaveText("Identity preview ready");
+  await expect(
+    page.getByRole("button", { name: "Confirm and start research" }),
+  ).toBeDisabled();
+  expect(discoveries).toBe(1);
+  expect(jobPosts).toEqual([]);
+});
+
+test("standalone discovery confirms redirected identity, retains partial results and explicitly refreshes", async ({
+  page,
+}) => {
+  let discoveries = 0,
+    starts = 0,
+    polls = 0;
+  await page.route("**/api/v2/research-capabilities", (route) =>
+    route.fulfill({ json: capabilities }),
+  );
+  await page.route("**/api/v2/research-identities", (route) => {
+    discoveries++;
+    expect(route.request().postDataJSON()).toEqual({ domain: "old.example" });
+    return route.fulfill({
+      status: 202,
+      json: { ...standaloneIdentity, state: "queued" },
+    });
+  });
+  await page.route("**/api/v2/research-identities/*", (route) =>
+    route.fulfill({ json: standaloneIdentity }),
+  );
+  await page.route("**/api/v2/research-jobs", (route) => {
+    starts++;
+    expect(route.request().postDataJSON()).toEqual({
+      identity_id: standaloneIdentity.identity_id,
+      identity_confirmed: true,
+    });
+    return route.fulfill({
+      status: 202,
+      json: {
+        job_id: starts === 1 ? "standalone-job" : "refreshed-job",
+        state: "queued",
+      },
+    });
+  });
+  await page.route("**/api/v2/research-jobs/*", (route) => {
+    polls++;
+    return route.fulfill({
+      json: {
+        job_id: "standalone-job",
+        identity_id: standaloneIdentity.identity_id,
+        state: polls === 1 ? "running" : "partial",
+        report_id: polls === 1 ? null : standaloneReport.report_id,
+        sources: sourceStates,
+        reason_codes: [],
+      },
+    });
+  });
+  await page.route("**/api/v2/research-reports/*", (route) =>
+    route.fulfill({ json: standaloneReport }),
+  );
+  await page.goto("/research/new");
+  await page.getByLabel("Company domain").fill("old.example");
+  await page.getByRole("button", { name: "Preview company" }).click();
+  await expect(page.getByRole("status")).toHaveText("Identity preview ready");
+  await expect(page.getByText("new.example", { exact: true })).toBeVisible();
+  const confirm = page.getByRole("button", {
+    name: "Confirm and start research",
+  });
+  await expect(confirm).toBeDisabled();
+  expect(starts).toBe(0);
+  await page.getByRole("checkbox").check();
+  await confirm.click();
+  await expect(page.getByRole("status")).toHaveText("Research in progress");
+  await expect(page.getByRole("status")).toHaveText("Partial results");
+  await expect(page.getByText("Hacker News", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("unverified account mapping").first(),
+  ).toBeVisible();
+  await page.getByRole("link", { name: "Open research report" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Synthetic standalone", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Saved assessment", exact: true }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Source inventory", exact: true })
+    .click();
+  await page.getByRole("tab", { name: "Measurements", exact: true }).click();
+  await expect(
+    page.getByRole("dialog").getByText("Unavailable", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("dialog").getByText(/Complete-window count/),
+  ).toBeVisible();
+  await page.keyboard.press("Escape");
+  await page.getByRole("link", { name: "Refresh research" }).click();
+  expect(starts).toBe(1);
+  await page.getByRole("checkbox").check();
+  await page
+    .getByRole("button", { name: "Confirm and start research" })
+    .click();
+  await expect(page).toHaveURL(/refreshed-job/);
+  expect(starts).toBe(2);
+  expect(discoveries).toBe(1);
+});
+
+test("standalone queue errors never retry POST and disabled collection stays readable", async ({
+  page,
+}) => {
+  let writes = 0;
+  await page.route("**/api/v2/research-capabilities", (route) =>
+    route.fulfill({ json: capabilities }),
+  );
+  await page.route("**/api/v2/research-identities", (route) => {
+    writes++;
+    return route.fulfill({
+      status: 429,
+      headers: { "Retry-After": "30" },
+      json: {},
+    });
+  });
+  await page.goto("/research/new");
+  await page.getByLabel("Company domain").fill("new.example");
+  await page.getByRole("button", { name: "Preview company" }).click();
+  await expect(page.getByRole("alert")).toContainText("Retry after 30 seconds");
+  expect(writes).toBe(1);
+  await page.route("**/api/v2/research-capabilities", (route) =>
+    route.fulfill({
+      json: {
+        ...capabilities,
+        collection_enabled: false,
+        worker_available: false,
+      },
+    }),
+  );
+  await page.reload();
+  await expect(
+    page.getByRole("button", { name: "Preview company" }),
+  ).toBeDisabled();
+  await page.route("**/api/v2/research-reports/*", (route) =>
+    route.fulfill({ json: standaloneReport }),
+  );
+  await page.goto("/research/v2/reports/standalone-report");
+  await expect(
+    page.getByRole("heading", { name: "Synthetic standalone", exact: true }),
+  ).toBeVisible();
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page
+    .getByRole("button", { name: "Sources & limitations", exact: true })
+    .click();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  expect(writes).toBe(1);
+});

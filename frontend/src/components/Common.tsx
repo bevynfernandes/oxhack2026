@@ -39,7 +39,10 @@ export function SourceLink({
       parsed.protocol === "https:" &&
       !parsed.username &&
       !parsed.password &&
-      !parsed.search &&
+      (!parsed.search ||
+        (parsed.host === "news.ycombinator.com" &&
+          parsed.pathname === "/item" &&
+          /^\?id=[1-9][0-9]*$/.test(parsed.search))) &&
       !parsed.hash;
   } catch {
     /* Invalid external text remains plain text. */

@@ -13,10 +13,11 @@ import {
   SourceLink,
   SyntheticNotice,
 } from "../../components/Common";
+import { SourceProgress } from "./ResearchJobPage";
 import Icon from "../../components/WorkspaceIcon";
 import { companyDomain } from "../companies/identity";
 import type { useCompany } from "../companies/shared";
-import type { fetchResearchReport } from "./client";
+import type { fetchResearchReport, fetchStandaloneReport } from "./client";
 import {
   metricPeriod,
   observationValue,
@@ -28,6 +29,7 @@ import {
 
 type Profile = NonNullable<ReturnType<typeof useCompany>["data"]>;
 type Report = Awaited<ReturnType<typeof fetchResearchReport>>;
+type StandaloneReport = Awaited<ReturnType<typeof fetchStandaloneReport>>;
 type Group = DTO<"SpecialistOutlook">["group_id"];
 const groups: {
   id: Group;
@@ -119,25 +121,49 @@ function containFocus(event: KeyboardEvent<HTMLDialogElement>) {
 export default function CompanyDossier({
   profile,
   report,
+  standalone,
 }: {
-  profile: Profile;
+  profile?: Profile;
   report?: Report;
+  standalone?: StandaloneReport;
 }) {
-  const outlook = report?.outlook ?? profile.outlook;
-  const cutoff = outlook?.as_of ?? profile.publication.source.as_of;
+  const company = profile?.company ?? {
+    company_id: standalone!.identity.identity_id,
+    display_name: standalone!.identity.company_name,
+    website_url: "https://" + standalone!.identity.canonical_domain,
+    stage: null,
+    segment: "Standalone research",
+    business_model: null,
+  };
+  const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
+  const cutoff = outlook?.as_of ?? profile?.publication.source.as_of;
+  const synthetic = profile?.publication.source.synthetic ?? false;
   const [mobileGroup, setMobileGroup] = useState(0);
   const [panel, setPanel] = useState<Panel>({ kind: "driver", index: 0 });
   const dialog = useRef<HTMLDialogElement>(null);
   const opener = useRef<HTMLElement | null>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const location = useLocation();
-  const savedPath = `/companies/${encodeURIComponent(profile.publication.assessment.publication_id)}/${encodeURIComponent(profile.company.company_id)}`;
-  const researchPath = `/research/new/${encodeURIComponent(profile.publication.assessment.publication_id)}/${encodeURIComponent(profile.company.company_id)}`;
+  const savedPath = profile
+    ? `/companies/${encodeURIComponent(profile.publication.assessment.publication_id)}/${encodeURIComponent(company.company_id)}`
+    : null;
+  const researchPath = standalone
+    ? "/research/identities/" + standalone.identity.identity_id
+    : "/research/new?" +
+      new URLSearchParams({
+        domain: companyDomain(company.website_url) ?? "",
+        ...(profile
+          ? {
+              company: company.company_id,
+              publication: profile.publication.assessment.publication_id,
+            }
+          : {}),
+      }).toString();
   const measurements = useMemo(() => {
     const definitions = new Map(
-      profile.definitions.map((row) => [row.metric_id, row]),
+      (profile?.definitions ?? []).map((row) => [row.metric_id, row]),
     );
-    const rows: Measurement[] = profile.metrics.map((row) => {
+    const rows: Measurement[] = (profile?.metrics ?? []).map((row) => {
       const definition = definitions.get(row.metric_id);
       return {
         id: row.observation_id,
@@ -160,9 +186,7 @@ export default function CompanyDossier({
         id: row.observation_id,
         label: "Hacker News exact-domain story links",
         value:
-          row.value === null
-            ? "Unavailable"
-            : row.value.toLocaleString("en-GB"),
+          row.value == null ? "Unavailable" : row.value.toLocaleString("en-GB"),
         unit: "story links",
         period: `${date(row.window.start)} to ${date(row.window.end)} (end excluded)`,
         available: row.available_at,
@@ -172,11 +196,50 @@ export default function CompanyDossier({
         evidence: row.evidence_ids,
         fresh: true,
       });
+    for (const row of standalone?.observations ?? [])
+      rows.push({
+        id: row.observation_id,
+        label: row.metric_id.replaceAll("_", " "),
+        value:
+          row.value == null ? "Unavailable" : row.value.toLocaleString("en-GB"),
+        unit: row.unit,
+        period: row.window
+          ? date(row.window.start) +
+            " to " +
+            date(row.window.end) +
+            " (end excluded)"
+          : "Measurement period not supplied",
+        available: "",
+        collected: row.collected_at,
+        definition: row.definition,
+        reason: row.missing_reason ?? null,
+        evidence: row.evidence_ids,
+        fresh: row.origin === "fresh",
+      });
     return new Map(rows.map((row) => [row.id, row]));
-  }, [profile, report]);
+  }, [profile, report, standalone]);
   const sources = useMemo(
-    () => [...(report?.inventory.evidence ?? []), ...profile.evidence],
-    [profile, report],
+    () => [
+      ...(report?.inventory.evidence ?? []),
+      ...(profile?.evidence ?? []),
+      ...(standalone?.evidence ?? []).map((row) => ({
+        evidence_id: row.evidence_id,
+        provider:
+          standalone?.sources.find((source) =>
+            source.evidence.some(
+              (item) => item.evidence_id === row.evidence_id,
+            ),
+          )?.name ?? "Identity preview",
+        kind: "fresh excerpt",
+        review_state: "retrieved; attribution in claims",
+        assertion: row.excerpt,
+        url: row.url,
+        available_at: null,
+        collected_at: row.collected_at,
+        published_at: null,
+      })),
+    ],
+    [profile, report, standalone],
   );
   const sourceMap = useMemo(
     () => new Map(sources.map((row) => [row.evidence_id, row])),
@@ -196,9 +259,13 @@ export default function CompanyDossier({
       (sum, row) => sum + row.usable_metric_observation_ids.length,
       0,
     ) ?? 0;
-  const partial = report?.inventory.observations.some((row) =>
-    row.reason_codes.includes("provider_results_truncated"),
-  );
+  const partial =
+    standalone?.sources.some((source) =>
+      ["partial", "failed"].includes(source.state),
+    ) ||
+    report?.inventory.observations.some((row) =>
+      row.reason_codes.includes("provider_results_truncated"),
+    );
   const currentGroup = groups[panel.index];
   const section =
     panel.kind === "driver" ? sections.get(currentGroup.id) : undefined;
@@ -218,13 +285,13 @@ export default function CompanyDossier({
   }, [location.hash]);
   const exportReport = () => {
     const url = URL.createObjectURL(
-      new Blob([JSON.stringify(report ?? profile, null, 2)], {
+      new Blob([JSON.stringify(standalone ?? report ?? profile, null, 2)], {
         type: "application/json",
       }),
     );
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `${profile.company.company_id}-research.json`;
+    anchor.download = `${company.company_id}-research.json`;
     anchor.click();
     URL.revokeObjectURL(url);
   };
@@ -244,7 +311,7 @@ export default function CompanyDossier({
                 </small>
                 <small>{row.period}</small>
                 <small>
-                  Available {date(row.available)} · Collected{" "}
+                  Available {date(row.available || null)} · Collected{" "}
                   {date(row.collected)}
                 </small>
                 <p>{row.definition}</p>
@@ -311,23 +378,22 @@ export default function CompanyDossier({
       <header className="dossier-company">
         <div className="dossier-identity">
           <div className="dossier-monogram" aria-hidden="true">
-            {profile.company.display_name.slice(0, 1)}
+            {company.display_name.slice(0, 1)}
           </div>
           <div>
             <div className="dossier-name">
-              <h1>{profile.company.display_name}</h1>
+              <h1>{company.display_name}</h1>
               <span className="stage-tag">
-                {profile.company.stage ?? "Stage undisclosed"}
+                {company.stage ?? "Stage undisclosed"}
               </span>
             </div>
             <p>
-              {profile.company.segment}
+              {company.segment}
               <span className="context-dot">·</span>
-              {profile.company.business_model ?? "Software company"}
+              {company.business_model ?? "Software company"}
             </p>
             <span className="dossier-domain">
-              {companyDomain(profile.company.website_url) ??
-                "Website not recorded"}
+              {companyDomain(company.website_url) ?? "Website not recorded"}
             </span>
           </div>
         </div>
@@ -337,7 +403,7 @@ export default function CompanyDossier({
             <span className="status-dot" />
             {usable} / {assigned} measurements
           </strong>
-          <small>Source-backed · as of {date(cutoff)}</small>
+          <small>Source-backed · as of {date(cutoff ?? null)}</small>
         </div>
         <div className="dossier-outlook">
           <span className="outlook-mark" aria-hidden="true">
@@ -351,7 +417,8 @@ export default function CompanyDossier({
         </div>
         <div className="dossier-actions">
           <Link className="button" to={researchPath}>
-            Research company <Icon name="arrow" />
+            {standalone ? "Refresh research" : "Research company"}{" "}
+            <Icon name="arrow" />
           </Link>
           <button className="secondary" onClick={exportReport}>
             <Icon name="file" />
@@ -359,14 +426,14 @@ export default function CompanyDossier({
           </button>
         </div>
       </header>
-      {(profile.publication.source.synthetic ||
-        partial ||
-        (report && !outlook?.forecasts)) && (
+      {(synthetic || partial || (report && !outlook?.forecasts)) && (
         <div className="dossier-banners">
-          <SyntheticNotice synthetic={profile.publication.source.synthetic} />
+          <SyntheticNotice synthetic={synthetic} />
           {partial && (
             <p className="notice warning" role="note">
-              Partial source results: attention count unavailable.{" "}
+              {standalone
+                ? "Partial source results: inspect provider coverage and limits."
+                : "Partial source results: attention count unavailable."}{" "}
               <button onClick={() => open({ kind: "sources", index: 0 })}>
                 View limitations
               </button>
@@ -375,7 +442,7 @@ export default function CompanyDossier({
           {report && !outlook?.forecasts && (
             <p className="notice" role="note">
               Legacy report: original analysis preserved.{" "}
-              <Link to={savedPath}>View original saved analysis</Link>
+              <Link to={savedPath!}>View original saved analysis</Link>
             </p>
           )}
         </div>
@@ -406,7 +473,7 @@ export default function CompanyDossier({
                 </span>
               </section>
             ))
-          : profile.assessment.outcomes.map((outcome) => (
+          : (profile?.assessment.outcomes ?? []).map((outcome) => (
               <section className="dossier-stat" key={outcome.outcome_id}>
                 <div>
                   <h3>{outcomeNames[outcome.outcome_id]}</h3>
@@ -422,14 +489,24 @@ export default function CompanyDossier({
             ))}
         <section className="dossier-stat">
           <div>
-            <h3>Source inventory</h3>
+            <h3>
+              <button
+                className="dossier-inline-action"
+                onClick={() => open({ kind: "sources", index: 0 })}
+              >
+                Source inventory
+              </button>
+            </h3>
             <div className="stat-value">
               {sources.length}
-              <span className="stat-unit"> sources</span>
+              <span className="stat-unit">
+                {" "}
+                {standalone ? "excerpts" : "sources"}
+              </span>
             </div>
             <p>
               {measurements.size} measurements ·{" "}
-              {report ? "Research report" : "Saved analysis"}
+              {standalone || report ? "Research report" : "Saved analysis"}
             </p>
           </div>
           <span className="stat-icon">
@@ -519,9 +596,15 @@ export default function CompanyDossier({
                       <Icon name={group.icon} />
                     </span>
                     <p>
-                      No verified measurements
-                      <br />
-                      published for this area.
+                      {standalone ? (
+                        "Dimension mapping is pending. Inspect fresh evidence in the source inventory."
+                      ) : (
+                        <>
+                          No verified measurements
+                          <br />
+                          published for this area.
+                        </>
+                      )}
                     </p>
                     <span>Evidence gap</span>
                   </div>
@@ -561,18 +644,31 @@ export default function CompanyDossier({
         <div>
           <Icon name="shield" />
           <strong>EVIDENCE LEDGER</strong>
-          <span>{sources.length} sources</span>
-          <span className="ledger-date">Cutoff {date(cutoff)}</span>
+          <span>
+            {sources.length} {standalone ? "excerpts" : "sources"}
+          </span>
+          <span className="ledger-date">Cutoff {date(cutoff ?? null)}</span>
           <span className="ledger-date">
-            {report ? "Fresh + saved context" : "Saved publication"}
+            {standalone
+              ? profile
+                ? "Fresh + saved context"
+                : "Fresh evidence"
+              : report
+                ? "Fresh + saved context"
+                : "Saved publication"}
           </span>
         </div>
         <button onClick={() => open({ kind: "sources", index: 0 })}>
           Sources & limitations <Icon name="arrow" />
         </button>
-        <button onClick={() => open({ kind: "sources", index: 2 })}>
-          Saved assessment
-        </button>
+        {profile && (
+          <button
+            className="saved-assessment-action"
+            onClick={() => open({ kind: "sources", index: 2 })}
+          >
+            Saved assessment
+          </button>
+        )}
       </div>
       <dialog
         className="driver-dialog dossier-drawer"
@@ -616,7 +712,12 @@ export default function CompanyDossier({
         >
           {(panel.kind === "driver"
             ? groups.map((group) => group.name)
-            : ["Sources", "Measurements", "Saved assessment", "Provenance"]
+            : [
+                "Sources",
+                "Measurements",
+                profile ? "Saved assessment" : "Identity",
+                "Provenance",
+              ]
           ).map((name, index) => (
             <button
               key={name}
@@ -663,6 +764,17 @@ export default function CompanyDossier({
                   ]
                 }
               />
+              {standalone && (
+                <p>
+                  Fresh evidence is not yet mapped to model dimensions.{" "}
+                  <button
+                    className="secondary"
+                    onClick={() => setPanel({ kind: "sources", index: 1 })}
+                  >
+                    Browse fresh measurements
+                  </button>
+                </p>
+              )}
               <h3>Observed evidence</h3>
               {renderMeasurements(
                 section?.metric_observation_ids ?? [],
@@ -671,6 +783,7 @@ export default function CompanyDossier({
             </>
           ) : panel.index === 0 ? (
             <>
+              {standalone && <FreshResearchEvidence report={standalone} />}
               <h3>Sources and review status</h3>
               <p>
                 Source verification is separate from model confidence. Original
@@ -702,11 +815,14 @@ export default function CompanyDossier({
                 ))}
               </ul>
               <h3>Limitations</h3>
-              <SyntheticNotice
-                synthetic={profile.publication.source.synthetic}
-              />
+              <SyntheticNotice synthetic={synthetic} />
               <Reasons
-                reasons={report?.limitations ?? profile.assessment.limitations}
+                reasons={
+                  standalone?.limitations ??
+                  report?.limitations ??
+                  profile?.assessment.limitations ??
+                  []
+                }
               />
               <p>
                 No trained prediction, confidence interval or backtest is
@@ -725,14 +841,33 @@ export default function CompanyDossier({
             </>
           ) : panel.index === 2 ? (
             <>
-              <h3>Original saved assessment</h3>
-              <p>
-                These retain their published outcome definitions and are not
-                aliases for the new forecast targets.
-              </p>
-              <Outcomes outcomes={profile.assessment.outcomes} />
+              <h3>
+                {profile ? "Original saved assessment" : "Confirmed identity"}
+              </h3>
+              {profile && (
+                <p>
+                  These retain their published outcome definitions and are not
+                  aliases for the new forecast targets.
+                </p>
+              )}
+              {!profile && standalone && (
+                <>
+                  <h3>Confirmed website identity</h3>
+                  <p>
+                    {standalone.identity.company_name} ·{" "}
+                    {standalone.identity.requested_domain} →{" "}
+                    {standalone.identity.canonical_domain}
+                  </p>
+                  <Reasons reasons={standalone.identity.conflicts} />
+                  <Reasons reasons={standalone.identity.limitations} />
+                  <p>
+                    No saved assessment is attached to this standalone report.
+                  </p>
+                </>
+              )}
+              {profile && <Outcomes outcomes={profile.assessment.outcomes} />}
               <h3>Evidence, risks and unknowns</h3>
-              {profile.assessment.statements.map((statement) => (
+              {(profile?.assessment.statements ?? []).map((statement) => (
                 <section key={statement.statement_id}>
                   <h4>{statement.role.replaceAll("_", " ")}</h4>
                   <p>{statement.text}</p>
@@ -748,7 +883,7 @@ export default function CompanyDossier({
                 </section>
               ))}
               <h3>Company events</h3>
-              {profile.events.length ? (
+              {profile?.events.length ? (
                 profile.events.map((event) => (
                   <section key={event.event_id}>
                     <h4>
@@ -764,16 +899,25 @@ export default function CompanyDossier({
           ) : (
             <>
               <h3>Versions and provenance</h3>
-              <PublicationNotice publication={profile.publication} />
-              <Coverage rows={profile.coverage} />
+              {profile && (
+                <PublicationNotice publication={profile.publication} />
+              )}
+              {profile && <Coverage rows={profile.coverage} />}
               <dl className="metadata">
                 {Object.entries({
-                  "Source cutoff": date(cutoff),
-                  "Saved source": profile.publication.source.snapshot_id,
+                  "Source cutoff": date(cutoff ?? null),
+                  "Saved source":
+                    profile?.publication.source.snapshot_id ??
+                    "No saved source",
                   "Saved assessment":
-                    profile.publication.assessment.publication_id,
-                  "Source mode": profile.publication.source.mode,
-                  Report: report?.report_id ?? "Saved analysis",
+                    profile?.publication.assessment.publication_id ??
+                    "No saved assessment",
+                  "Source mode":
+                    profile?.publication.source.mode ?? "Fresh collection",
+                  Report:
+                    standalone?.report_id ??
+                    report?.report_id ??
+                    "Saved analysis",
                   "Grouping policy":
                     outlook?.grouping_policy_version ?? "Not published",
                   "Model status": "Not trained",
@@ -784,10 +928,16 @@ export default function CompanyDossier({
                   </div>
                 ))}
               </dl>
-              <Reasons reasons={profile.publication.source.limitations} />
-              {report && (
+              <Reasons
+                reasons={profile?.publication.source.limitations ?? []}
+              />
+              {(standalone || report) && (
                 <Link
-                  to={`/research/jobs/${encodeURIComponent(report.job_id)}`}
+                  to={
+                    standalone
+                      ? "/research/v2/jobs/" + standalone.job_id
+                      : `/research/jobs/${encodeURIComponent(report!.job_id)}`
+                  }
                 >
                   View research status
                 </Link>
@@ -797,5 +947,66 @@ export default function CompanyDossier({
         </div>
       </dialog>
     </article>
+  );
+}
+
+function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
+  return (
+    <>
+      <h3>Fresh source coverage</h3>
+      <SourceProgress sources={report.sources} />
+      <h3>Attributed claims</h3>
+      <p>
+        Company statements, registry facts and coverage candidates are separate
+        from measured platform proxies.
+      </p>
+      {report.claims.length === 0 && <p>No attributed claims collected.</p>}
+      {report.claims.map((claim) => (
+        <details key={claim.claim_id}>
+          <summary>
+            {claim.attribution.replaceAll("_", " ")} · {claim.category}
+          </summary>
+          <p>{claim.text}</p>
+          <p>Published {claim.published_on ?? "Not supplied"}</p>
+          {claim.conflicts_with.length > 0 && (
+            <p className="notice warning">
+              Potential conflicting claims: {claim.conflicts_with.join(", ")}.
+              Dates or definitions may differ.
+            </p>
+          )}
+          {claim.evidence_ids.map((id) => {
+            const source = report.evidence.find(
+              (row) => row.evidence_id === id,
+            );
+            return source ? (
+              <p key={id}>
+                <SourceLink url={source.url}>Claim source</SourceLink> ·{" "}
+                {source.location} · Collected {date(source.collected_at)}
+              </p>
+            ) : null;
+          })}
+        </details>
+      ))}
+      <h3>Retrieved events</h3>
+      {report.events.map((event) => (
+        <details key={event.event_id}>
+          <summary>
+            {event.kind.replaceAll("_", " ")} · {event.title}
+          </summary>
+          <p>Published {event.published_at ?? "Not supplied"}</p>
+          <SourceLink url={event.url}>Event source</SourceLink>
+        </details>
+      ))}
+      <details>
+        <summary>Capture provenance ({report.captures.length})</summary>
+        {report.captures.map((capture) => (
+          <p key={capture.capture_id}>
+            <SourceLink url={capture.final_url}>Captured source</SourceLink> ·
+            Collected {date(capture.collected_at)} · {capture.parser_version} ·
+            SHA-256 {capture.artifact.sha256}
+          </p>
+        ))}
+      </details>
+    </>
   );
 }

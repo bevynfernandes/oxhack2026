@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueries } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { companyDomain, matchesCompanySearch } from "./identity";
 import { api, unwrap } from "../../api/client";
-import { date, QueryState, SyntheticNotice } from "../../components/Common";
+import { date, QueryState } from "../../components/Common";
 
 const PAGE_SIZE = 2;
 
@@ -17,27 +17,33 @@ export default function CompanyHomePage() {
     queryKey: ["company-publications"],
     queryFn: async () => unwrap(await api.GET("/api/v1/company-snapshots")),
   });
-  const latest = choices.data?.items
-    .slice()
-    .sort(
-      (a, b) =>
-        b.assessment.recorded_at.localeCompare(a.assessment.recorded_at) ||
-        a.assessment.publication_id.localeCompare(b.assessment.publication_id),
-    )[0];
-  const snapshot = latest?.assessment.publication_id ?? "";
-  const companies = useQuery({
-    queryKey: ["companies", snapshot],
-    enabled: Boolean(snapshot),
-    queryFn: async () =>
-      unwrap(
-        await api.GET("/api/v1/company-snapshots/{snapshot_id}/companies", {
-          params: { path: { snapshot_id: snapshot } },
-        }),
-      ),
+  const publications = choices.data?.items ?? [];
+  const companyQueries = useQueries({
+    queries: publications.map((publication) => {
+      const snapshot = publication.assessment.publication_id;
+      return {
+        queryKey: ["companies", snapshot],
+        queryFn: async () =>
+          unwrap(
+            await api.GET("/api/v1/company-snapshots/{snapshot_id}/companies", {
+              params: { path: { snapshot_id: snapshot } },
+            }),
+          ),
+      };
+    }),
   });
-  const rows = companies.data?.items.filter(({ company }) =>
-    matchesCompanySearch(company, search),
-  );
+  const rows =
+    publications.length > 0
+      ? companyQueries
+          .flatMap((query, index) =>
+            (query.data?.items ?? []).map((row) => ({
+              ...row,
+              publication: publications[index],
+              snapshot: publications[index].assessment.publication_id,
+            })),
+          )
+          .filter(({ company }) => matchesCompanySearch(company, search))
+      : undefined;
   if (legacySelection)
     return <Navigate to={`/explore${location.search}`} replace />;
   return (
@@ -80,16 +86,15 @@ export default function CompanyHomePage() {
             error={choices.error}
             retry={() => void choices.refetch()}
           />
-          {latest && (
-            <>
-              <SyntheticNotice synthetic={latest.source.synthetic} />
-              <QueryState
-                pending={companies.isPending}
-                error={companies.error}
-                retry={() => void companies.refetch()}
-              />
-            </>
-          )}
+          {companyQueries.map((query, index) => (
+            <QueryState
+              key={publications[index].assessment.publication_id}
+              pending={query.isPending}
+              error={query.error}
+              retry={() => void query.refetch()}
+            />
+          ))}
+
           {choices.data?.items.length === 0 && (
             <p role="status">No company assessments have been published yet.</p>
           )}
@@ -97,7 +102,7 @@ export default function CompanyHomePage() {
             <>
               <p className="directory-count" role="status">
                 {rows.length} {rows.length === 1 ? "company" : "companies"}{" "}
-                available · Evidence as of {date(latest!.source.as_of)}
+                available across configured publications
               </p>
               {rows.length === 0 && (
                 <p>
@@ -108,17 +113,24 @@ export default function CompanyHomePage() {
               <ul className="company-results">
                 {rows
                   .slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
-                  .map(({ company }) => (
-                    <li key={company.company_id}>
+                  .map(({ company, snapshot, publication }) => (
+                    <li key={snapshot + company.company_id}>
                       <div className="company-monogram" aria-hidden="true">
                         {company.display_name.slice(0, 1)}
                       </div>
                       <div>
                         <h3>{company.display_name}</h3>
-                        <p>{company.segment}</p>
+                        <p>
+                          {company.segment} · {date(publication.source.as_of)}
+                        </p>
+
                         <small>
-                          {companyDomain(company.website_url) ??
-                            "Website not recorded"}
+                          <span>
+                            {companyDomain(company.website_url) ??
+                              "Website not recorded"}
+                          </span>
+                          {publication.source.synthetic &&
+                            " · Synthetic test data"}
                         </small>
                       </div>
                       <div className="company-result-actions">
@@ -131,10 +143,12 @@ export default function CompanyHomePage() {
                         </Link>
                         <Link
                           to={
-                            "/research/new/" +
-                            encodeURIComponent(snapshot) +
-                            "/" +
-                            encodeURIComponent(company.company_id)
+                            "/research/new?" +
+                            new URLSearchParams({
+                              domain: companyDomain(company.website_url) ?? "",
+                              company: company.company_id,
+                              publication: snapshot,
+                            }).toString()
                           }
                           aria-label={
                             "Research company " + company.display_name
@@ -170,7 +184,7 @@ export default function CompanyHomePage() {
             </>
           )}
           <div className="directory-footer">
-            <span>Search does not collect new data.</span>
+            <Link to="/research/new">Research a new domain</Link>
             <Link to="/explore">Browse publications & compare companies</Link>
           </div>
         </section>
@@ -199,6 +213,7 @@ export default function CompanyHomePage() {
               </li>
             ))}
           </ol>
+
           <div className="home-model-note">
             Local model inference
             <br />

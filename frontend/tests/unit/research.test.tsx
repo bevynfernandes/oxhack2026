@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { expect, it } from "vitest";
 import { ResearchWorkspace } from "../../src/pages/research/ResearchReportPage";
+import { SourceLink } from "../../src/components/Common";
 import { researchResult } from "../../src/pages/research/client";
 import type { DTO } from "../../src/api/client";
 import fixture from "../../../tests/fixtures/api/research.json";
@@ -49,4 +50,24 @@ it.each([
       response: new Response("private", { status: Number(status) }),
     }),
   ).toThrow(String(message));
+});
+
+it("keeps validated HN item links clickable without admitting arbitrary query data", () => {
+  render(
+    <>
+      <SourceLink url="https://news.ycombinator.com/item?id=123">
+        HN story
+      </SourceLink>
+      <SourceLink url="https://news.ycombinator.com/item?id=123&token=private">
+        Invalid story
+      </SourceLink>
+      <SourceLink url="https://news.ycombinator.com.example/item?id=123">
+        Lookalike
+      </SourceLink>
+    </>,
+  );
+  expect(
+    screen.getByRole("link", { name: "HN story (opens new tab)" }),
+  ).toHaveAttribute("href", "https://news.ycombinator.com/item?id=123");
+  expect(screen.getAllByRole("link")).toHaveLength(1);
 });
