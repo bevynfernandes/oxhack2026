@@ -13,9 +13,8 @@ uv run --frozen --no-sync uvicorn oxhack2026.api.app:create_app --factory --host
 
 This default starts liveness and OpenAPI, with 503 readiness/data reads. There is
 no synthetic fallback, live vendor call, training or inference. No API-specific
-credential environment variables are required. Dev 1 supplies a composition
-factory calling `create_app(repository)` after constructing the actual read
-adapter and owns pool shutdown. Do not use this unconfigured factory as a ready
+credential environment variables are required. Dev 1 supplies storage interfaces and pool lifecycle. Dev 3 composes the API
+adapter over those interfaces; Dev 1 wires its factory into runtime startup. Do not use this unconfigured factory as a ready
 production release.
 
 Implement the port in `oxhack2026/api/repository.py` using existing storage reads
@@ -53,8 +52,8 @@ Verification: `make check test`, `npm --prefix frontend run build` and
 
 ## Remaining integration gate
 
-The model contracts and numerical policy are now merged. Dev 1 has not yet
-published C1, a real dataset or a repository implementation on main. D3-05 cannot pass with synthetic fixtures. Required:
+C1, C2 and numerical policy are now merged. The production repository, published
+forecast reads and real datasets still require their upstream implementation. D3-05 cannot pass with synthetic fixtures. Required:
 real npm catalog/observations, immutable batch/rankings/evidence/evaluation,
 mature outcomes, scorer, artifact hashes and portable retrieval instructions.
 The full no-vendor-call browser replay must be rerun against that composition.
@@ -82,10 +81,9 @@ raises `ImmatureOutcome` for an incomplete universe. Its returned first score is
 mean log growth; place later scores in `Reveal.selection_metrics`. Published
 comparator scores remain separate. No calculations are implemented in the API.
 
-C2 currently provides actual counts but no per-tool growth/error diagnostic
-artifact. Those public fields must remain null until Dev 2 supplies them. Do not
-infer missing diagnostics in the storage adapter or browser. Baseline orderings
-and tie-aware comparator scores must also come from the model workstream.
+Dev 2 now supplies per-tool diagnostics via `outcome_diagnostics`. The API maps
+those values without calculating formulas itself. Baseline orderings and
+tie-aware comparator scores must also come from the model workstream.
 
 Run the frontend with `npm --prefix frontend run dev`. Vite proxies `/api` to
 localhost:8000; production serves `frontend/dist` at `/`, with SPA fallback after
@@ -113,7 +111,33 @@ between screens. Reloading retains awareness of an earlier reveal and selected
 IDs, but discards the in-memory scorecards. Browser state is for personal scouting,
 not an authenticated prospective research ledger.
 
-Remaining: C1 repository/runtime composition, mapping cross-review, actual frozen
+Remaining: production repository/runtime composition, mapping cross-review, actual frozen
 npm artifacts, full real-data replay and performance/operational gates. API and UI
 are implemented and fixture-tested; D3-05 remains blocked by that upstream handoff.
 Demo/export/offline-serving work remains explicitly excluded.
+
+## C1 integration and C3 0.3.0
+
+C1 is now merged. `api/data_mapping.py` presents verified effective catalogue
+mappings, exact selected observation vintages and public source coverage.
+`map_history` rejects wrong package/series identities, future availability,
+late prospective collection and multiple vintages for the same day. It does not
+select a new revision or fill missing observations with zero.
+
+C3 0.3.0 allows an unknown freshness timestamp to remain null. It also preserves
+C1's actual catalogue recording and mapping inspection dates. Reconstructed
+catalogue evidence verified after the decision is explicitly retrospective in
+the API and UI; prospective catalogues reject it. This narrow mapping-provenance
+exception does not apply to numeric forecast evidence, which remains bounded by
+the observation and decision cutoffs.
+
+Dev 2's `outcome_diagnostics` is now available. `map_outcomes` delegates per-tool
+growth/errors to it; `map_reveal` combines those diagnostics with the shared
+shortlist scorer, exact outcome vintage and same-universe comparators. Missing
+outcomes stay null and incomplete eligible universes return 409.
+
+Dev 1 owns the actual storage implementation and application lifecycle. Dev 3
+owns the adapter composing those storage reads with these pure C1/C2 mappings.
+Remaining production dependencies are batch enumeration, forecast/evidence/
+evaluation/outcome reads, selected history-vintage publication and real npm
+artifacts. No parallel persistence or numerical implementation is introduced.

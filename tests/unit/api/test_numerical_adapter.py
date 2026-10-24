@@ -112,3 +112,48 @@ def test_shared_ranking_and_nonrepresentatives(
     assert excluded.exclusions[0].reasons == ("not_organization_representative",)
     with pytest.raises(ValueError, match="requested batch"):
         map_rankings("another-batch", (row,), context.representatives, presentation)
+
+
+def test_per_tool_diagnostics_use_shared_policy(
+    row: ForecastResult, outcome: MatureOutcome, context: ScoringContext
+) -> None:
+    """Reveal diagnostics use Dev 2 values, including missing/immature safeguards."""
+    from oxhack2026.api.numerical_policy import map_outcomes
+
+    result = map_outcomes((row,), (outcome,), context.as_of)[0]
+    assert result.actual_downloads == 3900
+    assert result.realized_growth_pct == pytest.approx(30)
+    assert result.model_absolute_error == 300
+    assert result.baseline_absolute_error == 900
+    assert map_outcomes((row,), (), context.as_of)[0].actual_downloads is None
+    with pytest.raises(ImmatureOutcome):
+        map_outcomes((row,), (outcome,), datetime(2025, 2, 6, tzinfo=UTC))
+    with pytest.raises(ValueError, match="one vintage"):
+        map_outcomes((row,), (outcome, outcome), context.as_of)
+
+
+def test_reveal_composition_freezes_vintage_and_original_forecast(
+    row: ForecastResult, outcome: MatureOutcome, context: ScoringContext
+) -> None:
+    """Assemble full truth/metrics without altering the original saved prediction."""
+    from oxhack2026.api.numerical_policy import ReplayPresentation, map_reveal
+
+    before = row.model_dump_json()
+    selection = RevealRequest(organization_ids=("synthetic-org",))
+    presentation = ReplayPresentation(
+        context, outcome.outcome_vintage, (), ("Synthetic fixture.",)
+    )
+    result = map_reveal((row,), (outcome,), selection, presentation)
+    assert result.selected_organization_ids == selection.organization_ids
+    assert result.outcomes[0].model_absolute_error == 300
+    assert len(result.selection_metrics) == 3
+    assert row.model_dump_json() == before
+    with pytest.raises(ValueError, match="published vintage"):
+        map_reveal(
+            (row,),
+            (outcome,),
+            selection,
+            ReplayPresentation(context, "another-vintage", (), ()),
+        )
+    with pytest.raises(ImmatureOutcome):
+        map_reveal((), (), selection, presentation)

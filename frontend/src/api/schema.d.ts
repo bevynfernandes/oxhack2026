@@ -225,8 +225,21 @@ export interface components {
         Catalog: {
             /** Catalog Version */
             catalog_version: string;
+            /**
+             * Cohort Kind
+             * @default contemporary_catalogue
+             * @enum {string}
+             */
+            cohort_kind: "contemporary_catalogue" | "historical_eligibility";
+            /**
+             * Limitations
+             * @default []
+             */
+            limitations: string[];
             /** Mapping Version */
             mapping_version: string;
+            /** Recorded At */
+            recorded_at?: string | null;
             /** Synthetic */
             synthetic: boolean;
             /** Tools */
@@ -440,10 +453,10 @@ export interface components {
             batch_id: string;
             /**
              * Contract Version
-             * @default 0.2.0
+             * @default 0.3.0
              * @constant
              */
-            contract_version: "0.2.0";
+            contract_version: "0.3.0";
             /**
              * Decision At
              * Format: date-time
@@ -484,11 +497,8 @@ export interface components {
          * @description Published quality assessment, independent of model validation status.
          */
         Freshness: {
-            /**
-             * As Of
-             * Format: date-time
-             */
-            as_of: string;
+            /** As Of */
+            as_of: string | null;
             /**
              * Completeness
              * @enum {string}
@@ -509,7 +519,7 @@ export interface components {
         Health: {
             /**
              * Contract Version
-             * @default 0.2.0
+             * @default 0.3.0
              */
             contract_version: string;
             /**
@@ -785,6 +795,12 @@ export interface components {
             ecosystem: "npm" | "pypi";
             /** Mapping Evidence */
             mapping_evidence: components["schemas"]["Evidence"][];
+            /**
+             * Mapping Verification
+             * @default before_cutoff
+             * @enum {string}
+             */
+            mapping_verification: "before_cutoff" | "retrospective";
             /** Organization Id */
             organization_id: string;
             /** Organization Name */

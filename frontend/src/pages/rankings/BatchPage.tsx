@@ -134,6 +134,16 @@ function RankingsWorkspace({
         Reference window: {windowLabel(batch.reference_window)}. There is a
         reporting-lag gap before the forecast window.
       </p>
+      {catalog.tools.some(
+        (tool) => tool.mapping_verification === "retrospective",
+      ) && (
+        <p className="notice">
+          Some identities were verified retrospectively. Inspect the tool's
+          mapping dates and cohort limitations before interpreting this
+          reconstruction.
+        </p>
+      )}
+      <Reasons reasons={catalog.limitations ?? []} />
       <section className="panel">
         <div className="section-heading">
           <h2>Published growth ranking</h2>
