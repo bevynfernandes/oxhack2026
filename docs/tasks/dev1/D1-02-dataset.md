@@ -37,4 +37,43 @@ previous dataset.
 This checkpoint does not implement PostgreSQL migrations, forecast/outcome storage,
 scheduled model jobs, the model-owned baseline generation, or the API-owned adapter.
 It is a working local dataset layer, not completion of every Dev 1 task. Real-bundle
-location, hashes and coverage will be recorded here after extraction/verification.
+location, hashes and coverage are recorded below.
+
+## Real dataset handoff
+
+Dataset `npm-initial-20261024-v1`: 17,570 selected daily records, ten series,
+1,757 complete vendor days per series, zero absent requested days. Measurement
+window is `[2022-01-01, 2026-10-24)`. Fifty bounded extraction checkpoints include
+actual collection timestamps. npm rate-limited one attempt; the resumed job reused
+30 completed checkpoints. A subsequent full rerun produced the identical manifest.
+
+The compressed bundle is attached to the repository's draft release
+`data-npm-initial-20261024-v1`, accessible to authenticated collaborators:
+
+```sh
+gh release download data-npm-initial-20261024-v1 \
+  --repo bevynfernandes/oxhack2026 --dir artifacts/received
+cd artifacts/received
+shasum -a 256 -c npm-initial-20261024-v1.sha256
+unzip npm-initial-20261024-v1.zip -d bundle
+cd ../..
+uv run --frozen --no-sync python -m oxhack2026 data dataset-validate \
+  artifacts/received/bundle
+```
+
+ZIP SHA-256: `ce80d3e637b77fec8528ba319c0846d3b41de9414736351daea26508706bf023`.
+Manifest SHA-256: `062478ab3a5abe05b04ebf5a68c6bb96ecde5a8f942d4a13927ab6839c25d2f4`.
+The 862,703-byte ZIP includes raw responses, normalized Parquet, catalogue,
+coverage, source/checkpoint metadata and an already published local index. It has
+no credentials. `LocalDatasetStore(Path(root)).bundle("npm-initial-20261024-v1")`
+loads its complete validated contents; the C1 reader methods work unchanged.
+
+First positive registry counts vary from 2022 to 2025. Neither first-positive
+dates nor vendor zeros prove historical product ownership or eligibility. In
+particular, current package names may have earlier usage. This remains a labelled
+contemporary reconstruction suitable for the integration path.
+
+Validation after merging current main: `make check test build docs-test` passes
+341 unit tests; six explicit filesystem integration tests pass. Local logs and
+the saved extraction/transfer checks are retained under
+`tests/outputs/dev1-dataset-20261024/`.

@@ -6,7 +6,7 @@ checkpoint do not mark unrelated plan sections complete.
 | Task | Status | Evidence / remaining acceptance work |
 | --- | --- | --- |
 | D1-01 contracts/bootstrap | Complete | Merged #9 and #11, both consumer reviews, schema fixtures, lightweight imports and opt-in service tests |
-| D1-02 catalogue/npm | In progress | #13 extractor/raw store merged; ten-tool catalogue, durable extraction and candidate bundle in current checkpoint; transferable real handoff and expansion toward 20 organizations remain |
+| D1-02 catalogue/npm | Initial handoff complete; expansion remains | #13 extractor/raw store merged; #17 supplies ten-tool catalogue, 17,570 real daily rows, durable replay and checksummed draft-release transfer. Expansion toward 20 organizations remains |
 | D1-03 storage/publication | In progress | Local artifact store and dataset CAS/readers implemented; PostgreSQL schema/migrations, C2 forecast/evidence/evaluation/outcome persistence remain |
 | D1-04 end-to-end integration | Pending | Requires real data handoff, Dev 2 baseline artifacts, storage import, Dev 3 adapter and complete historical reveal |
 | D1-05 jobs/CLI | Partial | Data CLI and extraction locks/checkpoints implemented; scheduler, watermarks/leases, refresh jobs and model/demo command registration remain |
