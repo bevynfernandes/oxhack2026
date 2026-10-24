@@ -26,11 +26,12 @@ retain their existing coverage.
   prebuilt wheels. Copying a large wheel cache can cost more than downloading it.
 - The browser job installs only the API/data Python extras, without development
   tools. The Python job retains all extras needed by its tests and type checks.
-- Chromium binaries are downloaded rather than cached. Python's research browser
-  uses the default headless shell, so its installer uses `--only-shell`.
-  Frontend tests select `channel: "chromium"`, so their installer uses `--no-shell`
-  to download full Chromium without the unused headless shell. Both still install
-  Linux system dependencies.
+- Chromium binaries are downloaded rather than cached. The backend requires both
+  full Chromium for its availability probe and the headless shell for rendering,
+  so its existing installation is retained. Frontend tests select
+  `channel: "chromium"`, so their installer uses `--no-shell` to download full
+  Chromium without the unused headless shell. Both still install Linux system
+  dependencies.
 
 At this project's current size, TypeScript compilation and frontend unit tests
 take seconds. Separate TypeScript build caches, test shards, custom browser
