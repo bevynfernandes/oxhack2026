@@ -1,0 +1,538 @@
+{
+  "schema_version": "research-report-v1",
+  "report_id": "report-synthetic-job",
+  "job_id": "synthetic-job",
+  "researched_at": "2026-10-24T17:00:00Z",
+  "source_publication_id": "synthetic-companies-v1",
+  "assessment_publication_id": "synthetic-assessments-v1",
+  "inventory": {
+    "inventory_id": "research-inventory-synthetic-job",
+    "company_id": "alpha",
+    "as_of": "2026-10-24T17:00:00Z",
+    "synthetic": true,
+    "saved_context": {
+      "publication": {
+        "schema_version": "company-api-v1",
+        "source": {
+          "schema_version": "company-source-v1",
+          "snapshot_id": "synthetic-companies-v1",
+          "as_of": "2025-02-01T00:00:00Z",
+          "recorded_at": "2025-02-01T00:00:00Z",
+          "cohort_version": "synthetic-cohort-v1",
+          "code_revision": "synthetic-code",
+          "configuration_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "synthetic": true,
+          "mode": "contemporary",
+          "limitations": [
+            "Synthetic contract fixture; no real company evidence."
+          ]
+        },
+        "assessment": {
+          "schema_version": "company-assessment-publication-v1",
+          "publication_id": "synthetic-assessments-v1",
+          "source_snapshot_id": "synthetic-companies-v1",
+          "as_of": "2025-02-01T00:00:00Z",
+          "recorded_at": "2025-02-01T00:00:00Z",
+          "policy_version": "synthetic-company-evidence-v1",
+          "synthetic": true,
+          "company_ids": [
+            "alpha",
+            "beta"
+          ]
+        },
+        "company_count": 2
+      },
+      "company": {
+        "company_id": "alpha",
+        "display_name": "Synthetic alpha",
+        "website_url": "https://alpha.example",
+        "segment": "synthetic",
+        "business_model": null,
+        "stage": null,
+        "context_as_of": "2025-02-01T00:00:00Z",
+        "evidence_ids": [
+          "alpha-source"
+        ]
+      },
+      "assessment": {
+        "schema_version": "company-assessments-v1",
+        "assessment_id": "synthetic-alpha-assessment-v1",
+        "company_id": "alpha",
+        "family_id": "alpha",
+        "family_reason_codes": [],
+        "source_snapshot_id": "synthetic-companies-v1",
+        "policy_version": "synthetic-company-evidence-v1",
+        "as_of": "2025-02-01T00:00:00Z",
+        "first_recorded_at": "2025-02-01T00:00:00Z",
+        "mode": "reconstructed",
+        "outcomes": [
+          {
+            "outcome_id": "operating_growth_24m_v1",
+            "horizon_end": "2027-02-01T00:00:00Z",
+            "assessment_status": "evidence_only",
+            "summary": "SDK activity does not establish commercial growth.",
+            "statement_ids": [
+              "alpha-traction",
+              "alpha-gap"
+            ],
+            "reason_codes": [
+              "no_validated_outcome_model"
+            ],
+            "probability": null
+          },
+          {
+            "outcome_id": "commercial_viability_12m_v1",
+            "horizon_end": "2026-02-01T00:00:00Z",
+            "assessment_status": "unavailable",
+            "summary": "Cash-flow self-sufficiency cannot be assessed.",
+            "statement_ids": [
+              "alpha-gap"
+            ],
+            "reason_codes": [
+              "operating_cash_flow_unavailable"
+            ],
+            "probability": null
+          },
+          {
+            "outcome_id": "financing_or_acquisition_24m_v1",
+            "horizon_end": "2027-02-01T00:00:00Z",
+            "assessment_status": "evidence_only",
+            "summary": "Future financing or acquisition remains unknown.",
+            "statement_ids": [
+              "alpha-financing"
+            ],
+            "reason_codes": [
+              "no_validated_outcome_model"
+            ],
+            "probability": null
+          }
+        ],
+        "statements": [
+          {
+            "statement_id": "alpha-traction",
+            "role": "observation",
+            "text": "Synthetic SDK activity is recorded; company growth is not established.",
+            "evidence_ids": [
+              "alpha-source"
+            ],
+            "metric_observation_ids": [
+              "alpha-sdk_downloads_30d_v1"
+            ],
+            "event_ids": [],
+            "missing_metric_ids": []
+          },
+          {
+            "statement_id": "alpha-gap",
+            "role": "evidence_gap",
+            "text": "Comparable operating cash flow is unavailable.",
+            "evidence_ids": [],
+            "metric_observation_ids": [],
+            "event_ids": [],
+            "missing_metric_ids": [
+              "operating_cashflow_12m_usd_v1"
+            ]
+          },
+          {
+            "statement_id": "alpha-financing",
+            "role": "observation",
+            "text": "A synthetic financing report is recorded; completion is not established.",
+            "evidence_ids": [
+              "alpha-source"
+            ],
+            "metric_observation_ids": [],
+            "event_ids": [
+              "alpha-funding"
+            ],
+            "missing_metric_ids": []
+          }
+        ],
+        "synthetic": true,
+        "limitations": [
+          "Synthetic contract fixture only."
+        ]
+      },
+      "family": {
+        "company_id": "alpha",
+        "assessment_at": "2025-02-01T00:00:00Z",
+        "family_id": "alpha",
+        "reason_codes": [],
+        "relationship_ids": [
+          "alpha-family"
+        ]
+      },
+      "definitions": [
+        {
+          "metric_id": "sdk_downloads_30d_v1",
+          "family": "traction",
+          "label": "sdk_downloads_30d_v1",
+          "definition": "Synthetic test metric definition.",
+          "unit": "downloads",
+          "value_kind": "integer",
+          "scope": "product",
+          "applicability": "Synthetic companies only.",
+          "maximum_age_days": 10,
+          "currency": null
+        },
+        {
+          "metric_id": "sdk_releases_30d_v1",
+          "family": "execution",
+          "label": "sdk_releases_30d_v1",
+          "definition": "Synthetic test metric definition.",
+          "unit": "releases",
+          "value_kind": "integer",
+          "scope": "product",
+          "applicability": "Synthetic companies only.",
+          "maximum_age_days": 10,
+          "currency": null
+        },
+        {
+          "metric_id": "operating_cashflow_12m_usd_v1",
+          "family": "commercial",
+          "label": "operating_cashflow_12m_usd_v1",
+          "definition": "Synthetic test metric definition.",
+          "unit": "USD",
+          "value_kind": "decimal",
+          "scope": "company",
+          "applicability": "Synthetic companies only.",
+          "maximum_age_days": 10,
+          "currency": "USD"
+        }
+      ],
+      "metrics": [
+        {
+          "observation_id": "alpha-sdk_downloads_30d_v1",
+          "company_id": "alpha",
+          "metric_id": "sdk_downloads_30d_v1",
+          "window": {
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-31T00:00:00Z"
+          },
+          "measured_at": null,
+          "value": {
+            "kind": "integer",
+            "value": 0
+          },
+          "state": "observed",
+          "reason": null,
+          "evidence_ids": [
+            "alpha-source"
+          ],
+          "available_at": "2025-02-01T00:00:00Z",
+          "collected_at": "2025-02-01T00:00:00Z"
+        },
+        {
+          "observation_id": "alpha-sdk_releases_30d_v1",
+          "company_id": "alpha",
+          "metric_id": "sdk_releases_30d_v1",
+          "window": {
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-31T00:00:00Z"
+          },
+          "measured_at": null,
+          "value": {
+            "kind": "integer",
+            "value": 0
+          },
+          "state": "observed",
+          "reason": null,
+          "evidence_ids": [
+            "alpha-source"
+          ],
+          "available_at": "2025-02-01T00:00:00Z",
+          "collected_at": "2025-02-01T00:00:00Z"
+        },
+        {
+          "observation_id": "alpha-operating_cashflow_12m_usd_v1",
+          "company_id": "alpha",
+          "metric_id": "operating_cashflow_12m_usd_v1",
+          "window": {
+            "start": "2025-01-01T00:00:00Z",
+            "end": "2025-01-31T00:00:00Z"
+          },
+          "measured_at": null,
+          "value": null,
+          "state": "missing",
+          "reason": "No synthetic financial disclosure.",
+          "evidence_ids": [],
+          "available_at": "2025-02-01T00:00:00Z",
+          "collected_at": "2025-02-01T00:00:00Z"
+        }
+      ],
+      "events": [
+        {
+          "available_at": "2025-02-01T00:00:00Z",
+          "collected_at": "2025-02-01T00:00:00Z",
+          "event_id": "alpha-funding",
+          "company_id": "alpha",
+          "kind": "funding",
+          "stage": "reported",
+          "occurred_on": "2025-01-15",
+          "date_precision": "day",
+          "description": "Synthetic company-reported financing event.",
+          "evidence_ids": [
+            "alpha-source"
+          ],
+          "supersedes_id": null
+        }
+      ],
+      "relationships": [
+        {
+          "relationship_id": "alpha-family",
+          "company_id": "alpha",
+          "subject_kind": "family",
+          "subject_id": "alpha",
+          "valid_from": "2025-02-01T00:00:00Z",
+          "valid_to": null,
+          "evidence_ids": [
+            "alpha-source"
+          ]
+        }
+      ],
+      "coverage": [
+        {
+          "company_id": "alpha",
+          "family": "traction",
+          "applicable_metric_ids": [
+            "sdk_downloads_30d_v1"
+          ],
+          "observed_metric_ids": [
+            "sdk_downloads_30d_v1"
+          ],
+          "missing_metric_ids": [],
+          "conflicting_metric_ids": [],
+          "inapplicable_metric_ids": [],
+          "stale_metric_ids": [],
+          "restricted_metric_ids": []
+        },
+        {
+          "company_id": "alpha",
+          "family": "commercial",
+          "applicable_metric_ids": [
+            "operating_cashflow_12m_usd_v1"
+          ],
+          "observed_metric_ids": [],
+          "missing_metric_ids": [
+            "operating_cashflow_12m_usd_v1"
+          ],
+          "conflicting_metric_ids": [],
+          "inapplicable_metric_ids": [],
+          "stale_metric_ids": [],
+          "restricted_metric_ids": []
+        },
+        {
+          "company_id": "alpha",
+          "family": "execution",
+          "applicable_metric_ids": [
+            "sdk_releases_30d_v1"
+          ],
+          "observed_metric_ids": [
+            "sdk_releases_30d_v1"
+          ],
+          "missing_metric_ids": [],
+          "conflicting_metric_ids": [],
+          "inapplicable_metric_ids": [],
+          "stale_metric_ids": [],
+          "restricted_metric_ids": []
+        },
+        {
+          "company_id": "alpha",
+          "family": "market_financing",
+          "applicable_metric_ids": [],
+          "observed_metric_ids": [],
+          "missing_metric_ids": [],
+          "conflicting_metric_ids": [],
+          "inapplicable_metric_ids": [],
+          "stale_metric_ids": [],
+          "restricted_metric_ids": []
+        }
+      ],
+      "evidence": [
+        {
+          "evidence_id": "alpha-source",
+          "provider": "synthetic",
+          "access": "public",
+          "url": "https://alpha.example/evidence",
+          "assertion": "Synthetic evidence only.",
+          "published_at": null,
+          "available_at": "2025-02-01T00:00:00Z",
+          "collected_at": "2025-02-01T00:00:00Z",
+          "availability_basis": "first_observed",
+          "kind": "platform_observed",
+          "review_state": "verified"
+        }
+      ]
+    },
+    "observations": [
+      {
+        "observation_id": "hn-observation-synthetic-job",
+        "metric_id": "hn_exact_domain_story_links_30d_v1",
+        "company_id": "alpha",
+        "definition": "HN stories linking the exact confirmed domain during the declared window; not broad mentions, sentiment, users or independent endorsement.",
+        "unit": "story_links",
+        "window": {
+          "start": "2026-09-24T17:00:00Z",
+          "end": "2026-10-24T17:00:00Z"
+        },
+        "window_end_exclusive": true,
+        "value": null,
+        "state": "missing",
+        "available_at": "2026-10-24T17:00:00Z",
+        "collected_at": "2026-10-24T17:00:00Z",
+        "evidence_ids": [
+          "hn-evidence-synthetic-job"
+        ],
+        "reason_codes": [
+          "provider_results_truncated"
+        ]
+      }
+    ],
+    "evidence": [
+      {
+        "evidence_id": "hn-evidence-synthetic-job",
+        "provider": "hn_algolia",
+        "access": "public",
+        "url": "https://hn.algolia.com/api/v1/search_by_date",
+        "assertion": "Bounded HN query is truncated; a complete count is unavailable.",
+        "published_at": null,
+        "available_at": "2026-10-24T17:00:00Z",
+        "collected_at": "2026-10-24T17:00:00Z",
+        "availability_basis": "first_observed",
+        "kind": "platform_observed",
+        "review_state": "verified"
+      }
+    ],
+    "capture_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "capture_byte_size": 59
+  },
+  "outlook": {
+    "schema_version": "startup-outlook-placeholder-v1",
+    "company_id": "alpha",
+    "source_snapshot_id": "research-inventory-synthetic-job",
+    "as_of": "2026-10-24T17:00:00Z",
+    "grouping_policy_version": "research-metric-groups-v1",
+    "synthetic": true,
+    "specialists": [
+      {
+        "group_id": "adoption_retention",
+        "data_status": "insufficient_data",
+        "metric_observation_ids": [],
+        "usable_metric_observation_ids": [],
+        "evidence_ids": [],
+        "reason_codes": [
+          "model_not_trained",
+          "no_assigned_metrics"
+        ],
+        "model_status": "model_not_trained",
+        "prediction": null
+      },
+      {
+        "group_id": "attention_sentiment",
+        "data_status": "insufficient_data",
+        "metric_observation_ids": [
+          "hn-observation-synthetic-job"
+        ],
+        "usable_metric_observation_ids": [],
+        "evidence_ids": [],
+        "reason_codes": [
+          "model_not_trained",
+          "provider_results_truncated"
+        ],
+        "model_status": "model_not_trained",
+        "prediction": null
+      },
+      {
+        "group_id": "financial_health",
+        "data_status": "insufficient_data",
+        "metric_observation_ids": [
+          "alpha-operating_cashflow_12m_usd_v1"
+        ],
+        "usable_metric_observation_ids": [],
+        "evidence_ids": [],
+        "reason_codes": [
+          "missing",
+          "model_not_trained"
+        ],
+        "model_status": "model_not_trained",
+        "prediction": null
+      },
+      {
+        "group_id": "industry_competition",
+        "data_status": "insufficient_data",
+        "metric_observation_ids": [],
+        "usable_metric_observation_ids": [],
+        "evidence_ids": [],
+        "reason_codes": [
+          "model_not_trained",
+          "no_assigned_metrics"
+        ],
+        "model_status": "model_not_trained",
+        "prediction": null
+      },
+      {
+        "group_id": "team_execution",
+        "data_status": "insufficient_data",
+        "metric_observation_ids": [],
+        "usable_metric_observation_ids": [],
+        "evidence_ids": [],
+        "reason_codes": [
+          "model_not_trained",
+          "no_assigned_metrics"
+        ],
+        "model_status": "model_not_trained",
+        "prediction": null
+      }
+    ],
+    "unassigned_metric_observation_ids": [
+      "alpha-sdk_downloads_30d_v1",
+      "alpha-sdk_releases_30d_v1"
+    ],
+    "inference_runtime": "local_cpu",
+    "overall_outlook": null,
+    "overall_reason_codes": [
+      "model_not_trained"
+    ],
+    "forecasts": [
+      {
+        "outcome_id": "growth",
+        "horizon_months": 24,
+        "definition_status": "pending_label_policy",
+        "model_status": "model_not_trained",
+        "prediction": null,
+        "reason_codes": [
+          "target_definition_pending",
+          "model_not_trained"
+        ]
+      },
+      {
+        "outcome_id": "survival",
+        "horizon_months": 24,
+        "definition_status": "pending_label_policy",
+        "model_status": "model_not_trained",
+        "prediction": null,
+        "reason_codes": [
+          "target_definition_pending",
+          "model_not_trained"
+        ]
+      },
+      {
+        "outcome_id": "financial_health",
+        "horizon_months": 12,
+        "definition_status": "pending_label_policy",
+        "model_status": "model_not_trained",
+        "prediction": null,
+        "reason_codes": [
+          "target_definition_pending",
+          "model_not_trained"
+        ]
+      }
+    ]
+  },
+  "data_version": "research-inventory-v1",
+  "model_version": null,
+  "limitations": [
+    "Fresh research covers one bounded HN exact-domain link query only.",
+    "Other metrics are saved context with their original measurement dates; their usability is re-evaluated at the report cutoff.",
+    "HN links do not establish broad sentiment, customers or company success.",
+    "Unknown-company identity resolution and trained predictions are unavailable."
+  ]
+}

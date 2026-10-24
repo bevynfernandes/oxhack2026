@@ -804,3 +804,252 @@ input[type="search"] {
     padding-inline: 1rem;
   }
 }
+
+.company-result-actions,
+.research-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+.company-result-actions {
+  justify-content: flex-end;
+  font-size: 0.85rem;
+}
+.research-start {
+  max-width: 760px;
+  margin: 0 auto;
+}
+.identity-confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin: 1.5rem 0;
+}
+.identity-confirm input {
+  flex: 0 0 auto;
+}
+.research-actions {
+  margin-block: 1.25rem;
+}
+.prediction-workspace {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+.workspace-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-block: 2rem;
+}
+.workspace-header h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+}
+.workspace-header p {
+  margin-bottom: 0;
+}
+.workspace-date {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #57685e;
+}
+.workspace-outlook {
+  padding: 1.75rem 1.75rem 0;
+}
+.workspace-outlook h2 {
+  font-size: 1.65rem;
+  margin: 0.5rem 0;
+}
+.workspace-outlook > p:not(.eyebrow) {
+  color: #57685e;
+  font-size: 0.9rem;
+  max-width: 75ch;
+}
+.workspace-forecasts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 1.5rem;
+}
+.workspace-forecast {
+  padding: 1.25rem 1rem 1.25rem 0;
+  border-top: 1px solid #dce4dc;
+}
+.workspace-forecast + .workspace-forecast {
+  padding-left: 1rem;
+  border-left: 1px solid #dce4dc;
+}
+.workspace-forecast h3 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+  font-size: 0.95rem;
+}
+.workspace-forecast h3 span {
+  color: #57685e;
+  font-size: 0.75rem;
+  font-weight: 400;
+}
+.workspace-forecast p {
+  font-size: 0.8rem;
+  color: #57685e;
+}
+.workspace-forecast .forecast-value {
+  font-size: 1.05rem;
+  color: #243731;
+}
+.workspace-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.workspace-drivers {
+  background: white;
+  border: 1px solid #dce4dc;
+  border-radius: 10px;
+}
+.workspace-driver {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 1.25rem;
+  gap: 1rem;
+  align-items: center;
+}
+.workspace-driver + .workspace-driver {
+  border-top: 1px solid #dce4dc;
+}
+.workspace-driver h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.95rem;
+}
+.driver-state {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 1rem;
+  font-size: 0.75rem;
+  color: #57685e;
+}
+.workspace-notes {
+  margin: 0;
+  align-self: start;
+}
+.workspace-notes p,
+.workspace-notes a {
+  font-size: 0.85rem;
+}
+.workspace-notes h3 {
+  font-size: 0.95rem;
+  margin-top: 1.5rem;
+}
+.research-source-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+.research-source-list li {
+  padding: 1.25rem;
+  border: 1px solid #dce4dc;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+.driver-dialog {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: min(650px, 100%);
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid #dce4dc;
+  color: #243731;
+  background: white;
+}
+.driver-dialog::backdrop {
+  background: rgb(20 35 29 / 28%);
+}
+.driver-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  border-bottom: 1px solid #dce4dc;
+}
+.driver-dialog-header h2 {
+  margin: 0;
+}
+.driver-tabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 1rem;
+  overflow-x: auto;
+  border-bottom: 1px solid #dce4dc;
+}
+.driver-tabs button {
+  flex-shrink: 0;
+  background: white;
+  color: #57685e;
+  border: 0;
+  font-size: 0.8rem;
+}
+.driver-tabs button[aria-selected="true"] {
+  background: #edf3ee;
+  color: #226354;
+}
+.driver-panel {
+  padding: 1.5rem;
+}
+.driver-panel p {
+  font-size: 0.875rem;
+}
+.research-metrics > div {
+  padding-block: 1rem;
+  border-top: 1px solid #dce4dc;
+}
+.research-metrics dt {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #243731;
+  text-transform: none;
+}
+.research-metrics dd {
+  margin-top: 0.5rem;
+}
+.research-metrics dd > strong {
+  font-size: 1.15rem;
+}
+@media (max-width: 760px) {
+  .company-result-actions {
+    grid-column: 2;
+    justify-content: flex-start;
+  }
+  .workspace-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .workspace-grid,
+  .research-source-list,
+  .workspace-forecasts {
+    grid-template-columns: 1fr;
+  }
+  .workspace-forecast + .workspace-forecast {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .workspace-driver {
+    padding: 1rem;
+  }
+  .workspace-outlook {
+    padding-inline: 1.25rem;
+  }
+}
