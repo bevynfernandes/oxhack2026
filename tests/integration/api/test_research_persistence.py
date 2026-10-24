@@ -11,6 +11,7 @@ from fastapi.testclient import TestClient
 
 from oxhack2026.api.app import create_app
 from oxhack2026.api.company_repository import PublishedCompanyRepository
+from oxhack2026.api.company_runtime import create_company_app
 from oxhack2026.api.routes.research import get_research_service
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.company_assessments import CompanyAssessment
@@ -102,6 +103,11 @@ def test_research_api_persistence_raw_integrity_and_saved_links(
         )
     reopened = LocalResearchStore(root)
     assert reopened.job(job_id).state == finished["state"]
+    assert reopened.jobs() == (reopened.job(job_id),)
+    immutable = reopened.report(report_id)
+    reopened.publish(immutable)
+    with pytest.raises(ValueError, match="immutable"):
+        reopened.publish(immutable.model_copy(update={"limitations": ("changed",)}))
     assert reopened.report(report_id).model_dump_json().encode() == report_bytes
     assert (
         repository.company("research-context", "alpha").model_dump_json(),
@@ -115,3 +121,23 @@ def test_research_api_persistence_raw_integrity_and_saved_links(
         corrupt = client.get(f"/api/v1/research-reports/{report_id}")
     assert corrupt.status_code == 503
     assert str(root) not in corrupt.text
+
+
+def test_enabled_runtime_rejects_a_second_worker_process(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The POSIX lease prevents overlapping recovery and releases on shutdown."""
+    root = Path("tests/outputs/research-lease") / uuid4().hex
+    monkeypatch.setenv("SIGNALSHIFT_COMPANY_ROOT", str(root))
+    monkeypatch.setenv("SIGNALSHIFT_COMPANY_PUBLICATIONS", "explicit-publication")
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_ENABLED", "1")
+
+    with TestClient(create_company_app()) as first:
+        assert first.get("/api/v1/health/live").status_code == 200
+        with (
+            pytest.raises(BlockingIOError),
+            TestClient(create_company_app()),
+        ):
+            pytest.fail("A second research process acquired the exclusive lease")
+    with TestClient(create_company_app()) as restarted:
+        assert restarted.get("/api/v1/health/live").status_code == 200

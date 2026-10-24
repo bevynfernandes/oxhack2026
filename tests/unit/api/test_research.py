@@ -376,3 +376,120 @@ def test_executor_rejection_records_failure(
         service.create(REQUEST)
 
     assert service.store.save_job.call_args.args[0].state == "failed"  # type: ignore[attr-defined]
+
+
+@pytest.mark.parametrize("state", ["running", "completed", "partial", "failed"])
+def test_contradictory_job_state_is_rejected(state: str) -> None:
+    """Queued timestamps and source metadata cannot masquerade as actual progress."""
+    with pytest.raises(ValidationError):
+        ResearchJob.model_validate(_job().model_dump() | {"state": state})
+
+
+def test_structured_capture_queries_are_provider_scoped() -> None:
+    """Structured parameters cannot fetch another host or store arbitrary secrets."""
+    with pytest.raises(ValidationError):
+        CaptureRequest(
+            url="https://example.com",
+            query_parameters=(("query", "alpha.example"),),
+        )
+    with pytest.raises(ValidationError):
+        CaptureRequest.model_validate(
+            {
+                "url": "https://hn.algolia.com/api/v1/search_by_date",
+                "query_parameters": (("api_key", "private-value"),),
+            }
+        )
+
+
+def test_job_storage_has_bounded_reads_and_safe_identity() -> None:
+    """Mocked filesystem reads reject absent, oversized and mismatched job data."""
+    store = LocalResearchStore(Path("mock"))
+    with (
+        patch.object(Path, "open", side_effect=FileNotFoundError),
+        pytest.raises(KeyError),
+    ):
+        store.job("missing")
+    with patch.object(Path, "open") as opened:
+        stream = opened.return_value.__enter__.return_value
+        stream.read.return_value = b"x" * 65537
+        with pytest.raises(ValueError, match="budget"):
+            store.job("synthetic-job")
+        stream.read.return_value = _job().model_dump_json().encode()
+        with pytest.raises(ValueError, match="identity"):
+            store.job("different-job")
+    with pytest.raises(ValueError):
+        store.job("../escape")
+
+
+def test_job_storage_refuses_terminal_rewrites() -> None:
+    """The atomic transition check rejects illegal progress before a write."""
+    store = LocalResearchStore(Path("mock"))
+    with (
+        patch("oxhack2026.research.store.file_lock"),
+        patch.object(LocalResearchStore, "job", return_value=_job()),
+        patch("oxhack2026.research.store.atomic_write") as write,
+        pytest.raises(ValueError, match="transition"),
+    ):
+        store.save_job(_job())
+    write.assert_not_called()
+
+
+def test_report_route_checks_raw_and_saved_source_integrity(
+    context: tuple[CompanySourceSnapshot, CompanyDetail],
+) -> None:
+    """A report with missing saved lineage is unavailable, not an unknown ID."""
+    source, saved = context
+    service = _service(saved)
+    captured = _capture({"hits": [], "nbHits": 0, "nbPages": 0})
+    report = build_report(_job(), saved, source, captured)
+    service.store.report.return_value = report  # type: ignore[attr-defined]
+    service.sources.snapshot.side_effect = KeyError("private-location")  # type: ignore[attr-defined]
+    app = create_app()
+    app.dependency_overrides[get_research_service] = lambda: service
+
+    with TestClient(app) as client:
+        response = client.get(f"/api/v1/research-reports/{report.report_id}")
+
+    assert response.status_code == 503
+    assert "private-location" not in response.text
+
+
+def test_saved_measurements_are_rechecked_for_staleness_at_report_cutoff(
+    context: tuple[CompanySourceSnapshot, CompanyDetail],
+) -> None:
+    """A refresh never makes saved old measurements fresh merely by copying them."""
+    source, saved = context
+    captured = _capture({"hits": [], "nbHits": 0, "nbPages": 0})
+    with patch.dict(
+        "oxhack2026.research.report._METRIC_GROUPS",
+        {"sdk_downloads_30d_v1": "adoption_retention"},
+    ):
+        report = build_report(_job(), saved, source, captured)
+
+    adoption = report.outlook.specialists[0]
+    assert adoption.data_status == "insufficient_data"
+    assert "stale" in adoption.reason_codes
+    assert adoption.usable_metric_observation_ids == ()
+    assert report.inventory.saved_context.metrics[0] == saved.metrics[0]
+
+
+@pytest.mark.parametrize("review", ["restricted", "unreviewed"])
+def test_fresh_capture_cannot_bypass_privacy_or_review(
+    context: tuple[CompanySourceSnapshot, CompanyDetail], review: str
+) -> None:
+    """Fresh output rejects private/unreviewed evidence rather than promoting it."""
+    source, saved = context
+    captured = _capture({"hits": [], "nbHits": 0, "nbPages": 0})
+    evidence = captured.evidence.model_copy(
+        update={"access": "restricted", "url": None}
+        if review == "restricted"
+        else {"review_state": "unreviewed"}
+    )
+
+    with pytest.raises(ValueError, match="public verified"):
+        build_report(
+            _job(),
+            saved,
+            source,
+            AttentionCapture(captured.observation, evidence, True),
+        )
