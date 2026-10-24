@@ -5,6 +5,7 @@ repo_name: bevynfernandes/oxhack2026
 nav:
   - Home: index.md
   - Module boundaries: modules.md
+  - CI performance: ci-performance.md
   - Task handoff template: tasks/TEMPLATE.md
 theme:
   name: material

@@ -2,7 +2,13 @@ name: Project checks
 
 on:
   push:
+    branches: [main]
   pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -17,6 +23,10 @@ jobs:
           version: "0.13.0"
           python-version: "3.12"
           enable-cache: true
+          cache-suffix: api-runtime
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
       - run: uv sync --locked --no-dev --extra api --extra data
       - name: Verify lightweight API composition imports
         run: |
@@ -40,12 +50,16 @@ jobs:
           version: "0.13.0"
           python-version: "3.12"
           enable-cache: true
+          cache-suffix: python
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
       - run: uv sync --locked --all-extras --group docs
       - run: uv run --frozen --no-sync playwright install --with-deps chromium
       - run: make check test build docs-test
       - run: uv run --frozen --no-sync pytest tests/integration/api/test_research_v2_persistence.py -m integration
 
-  frontend:
+  frontend-checks:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -57,23 +71,54 @@ jobs:
           node-version-file: frontend/.nvmrc
           cache: npm
           cache-dependency-path: frontend/package-lock.json
-      - run: npm ci
+      - run: npm ci --prefer-offline --no-fund
       - run: npm run format:check
       - run: npm run build
       - run: npm run test
+
+  browser:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci --prefer-offline --no-fund
       - uses: astral-sh/setup-uv@v6
         with:
           version: "0.13.0"
           python-version: "3.12"
           enable-cache: true
-      - run: uv sync --project .. --locked --extra api --extra data
-      - run: npx playwright install --with-deps chromium
+          cache-suffix: browser
+          cache-dependency-glob: |
+            pyproject.toml
+            uv.lock
+      - run: uv sync --project .. --locked --no-dev --extra api --extra data
+      - run: npx playwright install --with-deps --no-shell chromium
       - run: npm run test:e2e
         env:
           SIGNALSHIFT_TEST_RUN: ci-${{ github.run_id }}-${{ github.run_attempt }}
       - uses: actions/upload-artifact@v4
-        if: always()
+        if: ${{ !cancelled() }}
         with:
           name: browser-results-${{ github.run_id }}-${{ github.run_attempt }}
           path: tests/outputs/
           retention-days: 14
+
+  frontend:
+    if: ${{ !cancelled() }}
+    needs: [frontend-checks, browser]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require frontend checks and browser tests
+        env:
+          CHECKS_RESULT: ${{ needs.frontend-checks.result }}
+          BROWSER_RESULT: ${{ needs.browser.result }}
+        run: |
+          test "$CHECKS_RESULT" = success
+          test "$BROWSER_RESULT" = success
