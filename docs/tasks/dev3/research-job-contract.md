@@ -48,11 +48,15 @@ research. Invalid identity is 409; unknown IDs 404; invalid inputs 422.
 ## Immutable report
 
 Fields: `schema_version`, `report_id`, `job_id`, `company`, `researched_at`,
-`source_publication_id`, `assessment_publication_id`, `specialists`, `overall`,
-`data_version`, `model_version`, `limitations`.
+`source_publication_id`, `assessment_publication_id`, `inventory`, `outlook`
+(the unchanged shared `StartupOutlook`), `data_version`, `model_version`,
+`limitations`.
 
-The source publication references exact C1 facts and raw capture hashes. The old
-assessment publication is labelled saved context, not recomputed after refresh.
+The source publication references exact saved C1 facts and raw capture hashes.
+Fresh attention has a separately versioned research inventory and never enters a
+v1 C1 metric family or the old saved publication. All fresh observation/evidence
+IDs resolve within that immutable inventory. The old assessment publication is
+labelled saved context, not recomputed after refresh.
 Report/public projections withhold raw object locations, restricted contents and
 private derived facts. Public evidence references retain actual availability and
 collection time; retrospective collection does not become historical knowledge.
@@ -69,22 +73,23 @@ Dev 2 owns `oxhack2026.models.startup_outlook`; the backend imports that shared
 payload rather than introducing a competing model policy. The field names below
 are a proposal pending the exact published model payload.
 
-Each section carries `data_status`, `model_status`, `metric_ids`, `evidence_ids`,
-`prediction`, `reason_codes`, and sourced explanatory statements.
-`data_status`: `available`, `partial`, `insufficient_data`, `not_applicable`.
-`model_status`: `model_not_trained`, `validation_failed`, `validated`.
-These states are independent: observed data does not imply a trained model.
+Embed `StartupOutlook` unchanged: section fields are `group_id`, `data_status`,
+`metric_observation_ids`, `usable_metric_observation_ids`, `evidence_ids`,
+`model_status`, `prediction` and `reason_codes`. `data_status` is `available`,
+`insufficient_data` or `not_applicable`; model status is only `model_not_trained`.
+Provider truncation/partial collection belongs in job/source state, not a new
+model state. Available observations do not imply training readiness.
 
 Until Daniyal freezes feasible target/model contracts, `prediction` is null with
 `model_not_trained`. A later non-null prediction must name the target version,
 endpoint/horizon, fitted artifact, feature schema, training snapshot, split and
 validation versions. No placeholder number or compatibility alias for v1 targets.
 
-`overall` contains a null `value`, `model_status: model_not_trained`, and explicit
-reasons (`no_approved_trained_artifacts`, `utility_mapping_not_frozen`). Missing
-components are not zero and are not reweighted. No bubble score or success badge.
-Model/data versions remain independently nullable with reasons. Backtesting is
-unavailable until reproducible evaluation artifacts exist.
+Use the shared null `overall_outlook` and `overall_reason_codes:
+[model_not_trained]`; do not introduce a competing `overall.value` wrapper.
+Missing components are not zero and are not reweighted. No bubble score or
+success badge. Model/data versions remain independently nullable with reasons.
+Backtesting is unavailable until reproducible evaluation artifacts exist.
 
 ## Acceptance for this slice
 
