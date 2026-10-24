@@ -12,11 +12,11 @@ test("company homepage searches and opens a saved analysis with keyboard", async
   await expect(page.getByText(/No companies match your search/)).toBeVisible();
   await page.getByLabel("Search companies").fill("alpha");
   const analysis = page.getByRole("link", {
-    name: "View analysis for Synthetic alpha",
+    name: "View saved analysis for Synthetic alpha",
   });
   await expect(analysis).toBeVisible();
   await expect(
-    page.getByRole("link", { name: "View analysis for Synthetic beta" }),
+    page.getByRole("link", { name: "View saved analysis for Synthetic beta" }),
   ).toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.screenshot({
@@ -34,6 +34,12 @@ test("company homepage searches and opens a saved analysis with keyboard", async
     path: testInfo.outputPath("homepage-mobile.png"),
     fullPage: true,
   });
+  await page.getByLabel("Search companies").fill("https://www.alpha.example/");
+  await expect(analysis).toBeVisible();
+  await page.getByLabel("Search companies").fill("alpha.example.attacker.test");
+  await expect(page.getByText(/No companies match your search/)).toBeVisible();
+  await page.getByLabel("Search companies").fill("alpha.example");
+  await expect(page.getByText("alpha.example", { exact: true })).toBeVisible();
   await analysis.focus();
   await page.keyboard.press("Enter");
   await expect(

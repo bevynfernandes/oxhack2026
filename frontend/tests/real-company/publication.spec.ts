@@ -21,7 +21,7 @@ test("real company publication supports list, source inspection and accessible c
   const firstCompany = rows[0].company.display_name;
   await page.getByLabel("Search companies").fill(firstCompany);
   await expect(
-    page.getByRole("link", { name: `View analysis for ${firstCompany}` }),
+    page.getByRole("link", { name: `View saved analysis for ${firstCompany}` }),
   ).toBeVisible();
   await page.screenshot({
     path: testInfo.outputPath("real-homepage.png"),
@@ -29,7 +29,7 @@ test("real company publication supports list, source inspection and accessible c
   });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page
-    .getByRole("link", { name: `View analysis for ${firstCompany}` })
+    .getByRole("link", { name: `View saved analysis for ${firstCompany}` })
     .click();
   await expect(
     page.getByRole("heading", { name: "Company outlook" }),
