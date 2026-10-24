@@ -1,5 +1,5 @@
 {
-  "schema_version": "models-v1",
+  "schema_version": "models-v2",
   "dataset_version": "synthetic-dataset-v1",
   "mapping_version": "synthetic-mapping-v1",
   "feature_schema_version": "features-v1",
@@ -8,11 +8,15 @@
   "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
   "features": {
     "path": "synthetic/fixture.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 0,
+    "media_type": "application/json"
   },
   "labels": {
     "path": "synthetic/fixture.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 0,
+    "media_type": "application/json"
   },
   "synthetic": true,
   "limitations": [

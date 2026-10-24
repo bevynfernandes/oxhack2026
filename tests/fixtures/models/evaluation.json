@@ -1,5 +1,5 @@
 {
-  "schema_version": "evaluation-v1",
+  "schema_version": "evaluation-v2",
   "evaluation_id": "synthetic-evaluation-v1",
   "experiment_id": "synthetic-experiment",
   "ecosystem": "npm",
@@ -27,7 +27,9 @@
   "metric_definitions": [],
   "experiment_manifest": {
     "path": "synthetic/fixture.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 0,
+    "media_type": "application/json"
   },
   "effective_block_count": 0,
   "statistical_superiority": false,

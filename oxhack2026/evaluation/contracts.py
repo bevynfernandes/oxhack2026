@@ -65,7 +65,7 @@ class CohortCounts(Contract):
 class EvaluationReport(Contract):
     """Result state with exact periods, frozen protocol, and reproducible files."""
 
-    schema_version: Literal["evaluation-v1"] = "evaluation-v1"
+    schema_version: Literal["evaluation-v2"] = "evaluation-v2"
     evaluation_id: str
     experiment_id: str
     ecosystem: Ecosystem

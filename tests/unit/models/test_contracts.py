@@ -96,17 +96,32 @@ def test_schema_exports_do_not_drift(contract: type[Contract]) -> None:
 )
 def test_artifact_paths_cannot_escape_bundle(path: str) -> None:
     """Reject unsafe artifact paths before any filesystem read is attempted."""
-    with pytest.raises(ValidationError, match="bundle root"):
-        ArtifactReference(path=path, sha256="a" * 64)
+    with pytest.raises(ValidationError, match="relative path"):
+        ArtifactReference(
+            path=path,
+            sha256="a" * 64,
+            byte_size=0,
+            media_type="application/octet-stream",
+        )
 
 
 def test_artifact_digest_and_safe_path() -> None:
     """Accept a relative hashed artifact and reject malformed hashes."""
-    artifact = ArtifactReference(path="models/ridge.bin", sha256="a" * 64)
+    artifact = ArtifactReference(
+        path="models/ridge.bin",
+        sha256="a" * 64,
+        byte_size=0,
+        media_type="application/octet-stream",
+    )
 
     assert artifact.path == "models/ridge.bin"
     with pytest.raises(ValidationError):
-        ArtifactReference(path="models/ridge.bin", sha256="unknown")
+        ArtifactReference(
+            path="models/ridge.bin",
+            sha256="unknown",
+            byte_size=0,
+            media_type="application/octet-stream",
+        )
 
 
 @pytest.mark.parametrize("hour_offset", [None, 1, -1])

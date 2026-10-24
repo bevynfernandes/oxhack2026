@@ -2,7 +2,7 @@
   "$defs": {
     "ArtifactReference": {
       "additionalProperties": false,
-      "description": "Relative bundle path and SHA-256 digest; paths cannot escape the bundle.",
+      "description": "Hashed artifact relative to a configured bundle root, never a signed URL.",
       "properties": {
         "path": {
           "minLength": 1,
@@ -13,11 +13,29 @@
           "pattern": "^[0-9a-f]{64}$",
           "title": "Sha256",
           "type": "string"
+        },
+        "byte_size": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Byte Size",
+          "type": "integer"
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/x-ndjson",
+            "application/vnd.apache.parquet",
+            "application/octet-stream"
+          ],
+          "title": "Media Type",
+          "type": "string"
         }
       },
       "required": [
         "path",
-        "sha256"
+        "sha256",
+        "byte_size",
+        "media_type"
       ],
       "title": "ArtifactReference",
       "type": "object"
@@ -204,8 +222,8 @@
   "description": "Result state with exact periods, frozen protocol, and reproducible files.",
   "properties": {
     "schema_version": {
-      "const": "evaluation-v1",
-      "default": "evaluation-v1",
+      "const": "evaluation-v2",
+      "default": "evaluation-v2",
       "title": "Schema Version",
       "type": "string"
     },
