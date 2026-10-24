@@ -1,0 +1,116 @@
+{
+  "additionalProperties": false,
+  "description": "One company/outcome's truth at an explicit, immutable evaluation vintage.\n\nAttributes:\n    schema_version: Company-label interchange version, separate from downloads.\n    company_id: Stable company identity resolved by the source catalogue.\n    family_id: Ownership-family identity for grouping and leakage checks.\n    source_snapshot_id: Exact source vintage supporting the label decision.\n    outcome_id: Separate operating/growth, viability or financing-event target.\n    decision_at: Original assessment cutoff, not the outcome publication date.\n    horizon_end: Exact calendar anniversary for the chosen outcome.\n    evaluated_at: UTC cutoff for the selected evaluation/source vintage.\n    label_state: Observed truth, incomplete horizon, missing or conflicting facts.\n    value: Strict Boolean truth only for mature observed labels; otherwise null.\n    available_at: Time all label support was knowable, including full follow-up.\n    evidence_ids: Source-owned immutable evidence identifiers, never predictions.\n    reason_codes: Precise observed negative reasons or missing-label exclusions.\n\nRaises:\n    ValueError: Dates, maturity, Boolean truth or provenance are contradictory.",
+  "properties": {
+    "schema_version": {
+      "const": "company-labels-v1",
+      "default": "company-labels-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "company_id": {
+      "minLength": 1,
+      "title": "Company Id",
+      "type": "string"
+    },
+    "family_id": {
+      "minLength": 1,
+      "title": "Family Id",
+      "type": "string"
+    },
+    "source_snapshot_id": {
+      "minLength": 1,
+      "title": "Source Snapshot Id",
+      "type": "string"
+    },
+    "outcome_id": {
+      "enum": [
+        "operating_growth_24m_v1",
+        "commercial_viability_12m_v1",
+        "financing_or_acquisition_24m_v1"
+      ],
+      "title": "Outcome Id",
+      "type": "string"
+    },
+    "decision_at": {
+      "format": "date-time",
+      "title": "Decision At",
+      "type": "string"
+    },
+    "horizon_end": {
+      "format": "date-time",
+      "title": "Horizon End",
+      "type": "string"
+    },
+    "evaluated_at": {
+      "format": "date-time",
+      "title": "Evaluated At",
+      "type": "string"
+    },
+    "label_state": {
+      "enum": [
+        "observed",
+        "immature",
+        "unobserved",
+        "conflicting"
+      ],
+      "title": "Label State",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Value"
+    },
+    "available_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Available At"
+    },
+    "evidence_ids": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "company_id",
+    "family_id",
+    "source_snapshot_id",
+    "outcome_id",
+    "decision_at",
+    "horizon_end",
+    "evaluated_at",
+    "label_state"
+  ],
+  "title": "CompanyOutcomeLabel",
+  "type": "object"
+}
