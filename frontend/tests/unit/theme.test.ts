@@ -37,6 +37,8 @@ it.each([
   ["accent", "surface"],
   ["accent", "selected"],
   ["canvas", "accent"],
+  ["text", "action"],
+  ["text", "action-hover"],
   ["warning", "warning-surface"],
   ["danger", "danger-surface"],
   ["positive", "surface"],

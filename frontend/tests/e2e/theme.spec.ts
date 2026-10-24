@@ -60,6 +60,12 @@ for (const viewport of [
         ),
         name,
       ).toBe(true);
+      expect(
+        await page
+          .getByRole("main")
+          .evaluate((node) => node.scrollWidth <= node.clientWidth),
+        `${name} main region must not hide controls off screen`,
+      ).toBe(true);
       expect((await auditAccessibility(page)).violations, name).toEqual([]);
       if (name === "report") {
         await page
@@ -157,7 +163,7 @@ test("theme can roll back to the preserved light styles and respects forced colo
     page
       .locator("html")
       .evaluate((node) => getComputedStyle(node).backgroundColor);
-  expect(await canvas()).toBe("rgb(9, 15, 27)");
+  expect(await canvas()).toBe("rgb(13, 13, 36)");
   await page.evaluate(() =>
     document.documentElement.classList.remove("theme-techno-classical"),
   );

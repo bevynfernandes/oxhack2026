@@ -1,4 +1,12 @@
-/* Opt-in layer: existing layout, responsive rules and shared motion stay intact. */
+/* Opt-in presentation layer; original styles and shared motion remain intact. */
+@font-face {
+  font-family: "Barlow Condensed";
+  src: url("./assets/barlow-condensed-latin-200.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 200;
+  font-display: swap;
+}
+
 @font-face {
   font-family: "Barlow Condensed";
   src: url("./assets/barlow-condensed-latin-600.woff2") format("woff2");
@@ -9,15 +17,17 @@
 
 :root.theme-techno-classical {
   color-scheme: dark;
-  --theme-canvas: #090f1b;
-  --theme-surface: #101a2a;
-  --theme-raised: #172438;
-  --theme-text: #f1ecdf;
-  --theme-muted: #acb9cb;
-  --theme-line: #34445b;
-  --theme-control-line: #7185a2;
-  --theme-accent: #8bb5ff;
-  --theme-selected: #203655;
+  --theme-canvas: #0d0d24;
+  --theme-surface: #14142b;
+  --theme-raised: #202037;
+  --theme-text: #f2f0e9;
+  --theme-muted: #b5b5c5;
+  --theme-line: #414154;
+  --theme-control-line: #7e7e99;
+  --theme-accent: #aaaaff;
+  --theme-action: #0000f2;
+  --theme-action-hover: #3030ff;
+  --theme-selected: #29294c;
   --theme-warning: #e8c58b;
   --theme-warning-surface: #292316;
   --theme-danger: #ffb0a7;
@@ -35,10 +45,11 @@
 
 .theme-techno-classical .app-shell {
   background-color: var(--theme-canvas);
-  background-image:
-    linear-gradient(rgb(241 236 223 / 2%) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(241 236 223 / 2%) 1px, transparent 1px);
-  background-size: 48px 48px;
+  background-image: url("./assets/grain.svg");
+  background-size: 128px 128px;
+  border: 4px solid var(--theme-action);
+  grid-template-rows: 76px minmax(0, 1fr) 30px;
+  grid-template-columns: minmax(0, 1fr);
 }
 .theme-techno-classical ::selection {
   color: var(--theme-text);
@@ -49,7 +60,7 @@
 }
 .theme-techno-classical :is(h1, h2, h3, h4) {
   font-family: var(--theme-display);
-  font-weight: 600;
+  font-weight: 200;
   letter-spacing: 0.01em;
   color: var(--theme-text);
 }
@@ -110,15 +121,15 @@
   border-color: var(--theme-accent);
 }
 .theme-techno-classical :is(button, .button) {
-  color: var(--theme-canvas);
-  background-color: var(--theme-accent);
-  border-color: var(--theme-accent);
+  color: var(--theme-text);
+  background-color: var(--theme-action);
+  border-color: var(--theme-control-line);
   border-radius: 3px;
 }
 .theme-techno-classical :is(button:hover, .button:hover) {
-  color: var(--theme-canvas);
-  background-color: #bad2ff;
-  border-color: #bad2ff;
+  color: var(--theme-text);
+  background-color: var(--theme-action-hover);
+  border-color: var(--theme-accent);
 }
 .theme-techno-classical button.secondary {
   color: var(--theme-text);
@@ -207,7 +218,7 @@
     .pillar-card h3
   ) {
   font-family: var(--theme-display);
-  font-weight: 600;
+  font-weight: 200;
   letter-spacing: 0.01em;
 }
 .theme-techno-classical .dossier-stat h3 {
@@ -370,13 +381,6 @@
   font-family: var(--theme-mono);
   font-variant-numeric: tabular-nums;
 }
-@media (min-width: 801px) {
-  .theme-techno-classical .research-start > .page-heading {
-    background: url("./assets/observatory.svg") no-repeat right center / 130px
-      72px;
-    padding-right: 140px;
-  }
-}
 .theme-techno-classical .skip-link:focus {
   position: fixed;
   top: 8px;
@@ -420,7 +424,7 @@
     .home-directory .company-results h3
   ) {
   font-family: var(--theme-display);
-  font-weight: 600;
+  font-weight: 200;
   letter-spacing: 0.015em;
 }
 .theme-techno-classical
@@ -588,24 +592,6 @@
   :is(.table-scroll, .comparison-scroll, .pillar-measurements):focus-visible {
   outline-offset: -3px;
 }
-@media (min-width: 801px) {
-  .theme-techno-classical .home-terminal-heading::after {
-    content: "";
-    width: 150px;
-    height: 82px;
-    flex: 0 0 150px;
-    background: url("./assets/observatory.svg") no-repeat center / contain;
-  }
-  .theme-techno-classical .home-terminal-heading .directory-status {
-    margin-left: auto;
-  }
-}
-@media (forced-colors: active) {
-  .theme-techno-classical .home-terminal-heading::after {
-    background-image: none;
-  }
-}
-
 /* A zoomed or short viewport must scroll instead of compressing evidence away. */
 @media (max-height: 600px) {
   .theme-techno-classical .terminal-view > main {
@@ -620,5 +606,449 @@
     max-height: none;
     margin-block: 0;
     flex-shrink: 0;
+  }
+}
+
+/* Editorial composition: open space, etched plates and fine ruled sections. */
+.theme-techno-classical .site-header {
+  padding-inline: clamp(16px, 4vw, 64px);
+  background: transparent;
+}
+.theme-techno-classical .site-header .brand strong {
+  font: 200 36px/1 var(--theme-display);
+  letter-spacing: -0.04em;
+}
+.theme-techno-classical .brand .brand-symbol {
+  border-radius: 0;
+  background: transparent;
+  color: var(--theme-text);
+}
+.theme-techno-classical .brand .terminal-tag {
+  border: 0;
+  background: transparent;
+  padding-inline: 0;
+  letter-spacing: 0.12em;
+}
+.theme-techno-classical .site-header nav a {
+  font: 600 15px/1.2 var(--theme-display);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-block: 24px;
+}
+.theme-techno-classical .terminal-breadcrumb {
+  font: 10px/1.5 var(--theme-mono);
+}
+.theme-techno-classical :is(button, .button) {
+  font-family: var(--theme-display);
+  font-weight: 600;
+  letter-spacing: 0.025em;
+}
+.theme-techno-classical button.motion-disclosure-trigger {
+  font-family: inherit;
+}
+.theme-techno-classical .app-shell > main {
+  min-width: 0;
+  padding: 28px clamp(16px, 4vw, 64px);
+}
+.theme-techno-classical .terminal-view > main {
+  overflow: auto;
+}
+.theme-techno-classical .terminal-home {
+  width: min(1200px, 100%);
+  max-height: none;
+  margin-block: 0;
+  flex-shrink: 0;
+  gap: 36px;
+}
+.theme-techno-classical .home-terminal-heading {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 24px;
+  min-height: 330px;
+  padding-block: 12px 24px;
+}
+.theme-techno-classical .home-terminal-heading::after {
+  content: "";
+  grid-column: 2;
+  grid-row: 1 / 3;
+  align-self: stretch;
+  background: url("./assets/armillary.svg") no-repeat center / contain;
+  pointer-events: none;
+}
+.theme-techno-classical .home-terminal-heading h1 {
+  max-width: 8em;
+  margin: 18px 0;
+  font-size: clamp(54px, 6vw, 80px);
+  font-weight: 200;
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+.theme-techno-classical .home-terminal-heading p:last-child {
+  max-width: 35em;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.theme-techno-classical .home-terminal-heading .directory-status {
+  grid-column: 1;
+  margin: 0;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.theme-techno-classical .home-terminal-grid {
+  gap: 40px;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+}
+.theme-techno-classical
+  .terminal-home
+  :is(.home-directory, .home-fundamentals) {
+  padding: 24px 0;
+  border: 0;
+  border-top: 1px solid var(--theme-control-line);
+  border-radius: 0;
+  background: transparent;
+}
+.theme-techno-classical .home-directory-heading h2 {
+  font-size: 34px;
+  font-weight: 200;
+}
+.theme-techno-classical .home-fundamentals h2 {
+  font-size: 38px;
+  font-weight: 200;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.theme-techno-classical .home-directory .company-results h3 {
+  font-size: 24px;
+  font-weight: 200;
+}
+.theme-techno-classical .home-directory .company-result-actions .button {
+  font-size: 13px;
+  min-height: 36px;
+}
+.theme-techno-classical .home-directory .company-monogram {
+  border-radius: 50%;
+  font-size: 24px;
+  font-weight: 200;
+  background: transparent;
+}
+.theme-techno-classical .home-fundamentals li {
+  font-weight: 400;
+}
+.theme-techno-classical .home-fundamentals li span {
+  color: var(--theme-accent);
+}
+.theme-techno-classical
+  :is(.page-heading h1, .company-directory h1, .methodology h1) {
+  font-size: clamp(40px, 5vw, 72px);
+  font-weight: 200;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+.theme-techno-classical .research-start {
+  width: min(1040px, 100%);
+  flex-shrink: 0;
+  padding-block: 12px 28px;
+}
+.theme-techno-classical .research-start > .page-heading {
+  min-height: 260px;
+  padding-block: 28px;
+  padding-right: 35%;
+  margin-block: 20px;
+  background: url("./assets/armillary.svg") no-repeat right center / 30% auto;
+}
+.theme-techno-classical .research-start .page-heading h1 {
+  font-size: clamp(48px, 6vw, 80px);
+  font-weight: 200;
+  line-height: 1;
+}
+.theme-techno-classical .research-start .panel {
+  padding: 24px;
+  border-top: 1px solid var(--theme-control-line);
+}
+.theme-techno-classical .company-dossier {
+  height: 100%;
+  min-height: 0;
+  flex-shrink: 0;
+  gap: 12px;
+}
+.theme-techno-classical .dossier-company {
+  background: transparent;
+  padding: 12px 0 24px;
+  border-width: 0 0 1px;
+  border-radius: 0;
+  min-height: 140px;
+}
+.theme-techno-classical .dossier-name h1 {
+  font-size: clamp(36px, 3.5vw, 56px);
+  font-weight: 200;
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+.theme-techno-classical .dossier-monogram {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  font: 200 38px/1 var(--theme-display);
+  background: url("./assets/grain.svg"), var(--theme-surface);
+  box-shadow: none;
+}
+.theme-techno-classical
+  :is(.dossier-stat, .pillar-card, .dossier-ledger, .panel, .summary-grid) {
+  border-radius: 0;
+}
+.theme-techno-classical .dossier-stat {
+  border-width: 1px 0 0;
+  padding-top: 18px;
+  background: transparent;
+}
+.theme-techno-classical .pillar-card {
+  border-top-width: 1px;
+  padding-top: 20px;
+}
+.theme-techno-classical .pillar-card h3 {
+  font-size: clamp(21px, 2vw, 28px);
+  font-weight: 200;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.theme-techno-classical .pillar-expand {
+  font: inherit;
+  letter-spacing: inherit;
+}
+.theme-techno-classical .dossier-drawer .driver-dialog-header h2 {
+  font-size: 38px;
+  font-weight: 200;
+  line-height: 1.1;
+}
+.theme-techno-classical .dossier-drawer {
+  border-top: 4px solid var(--theme-action);
+}
+.theme-techno-classical .dossier-ledger {
+  border-width: 1px 0 0;
+  background: transparent;
+}
+.theme-techno-classical .dossier-section-label h2 {
+  font: 600 15px/1.2 var(--theme-display);
+  letter-spacing: 0.1em;
+}
+.theme-techno-classical .app-shell > footer {
+  font-family: var(--theme-mono);
+  font-size: 9px;
+}
+@media (max-width: 1100px) {
+  .theme-techno-classical .terminal-breadcrumb {
+    display: none;
+  }
+  .theme-techno-classical .home-terminal-heading {
+    min-height: 300px;
+  }
+}
+@media (max-width: 800px) {
+  .theme-techno-classical .app-shell {
+    grid-template-rows: 62px minmax(0, 1fr) 30px;
+    border-width: 3px;
+  }
+  .theme-techno-classical .site-header {
+    padding-inline: 12px;
+    gap: 12px;
+  }
+  .theme-techno-classical .site-header .brand {
+    gap: 7px;
+  }
+  .theme-techno-classical .site-header .brand strong {
+    font-size: 28px;
+  }
+  .theme-techno-classical .site-header nav a {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+    padding-block: 18px;
+  }
+  .theme-techno-classical .app-shell > main {
+    padding: 18px 14px;
+  }
+  .theme-techno-classical .home-terminal-heading {
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) 100px;
+    gap: 12px;
+    padding-block: 10px;
+  }
+  .theme-techno-classical .home-terminal-heading h1 {
+    font-size: clamp(42px, 8vw, 64px);
+    margin-top: 12px;
+  }
+  .theme-techno-classical .home-terminal-heading p:last-child {
+    font-size: 11px;
+  }
+  .theme-techno-classical .home-terminal-heading::after {
+    grid-row: 1;
+    background-position: center 30px;
+  }
+  .theme-techno-classical .home-terminal-grid {
+    grid-template-columns: 1fr;
+  }
+  .theme-techno-classical .terminal-home {
+    gap: 12px;
+  }
+  .theme-techno-classical .home-directory {
+    padding-top: 16px;
+  }
+  .theme-techno-classical .research-start > .page-heading {
+    min-height: 0;
+    padding: 18px 0;
+    background: none;
+  }
+  .theme-techno-classical .research-start .page-heading h1 {
+    font-size: 48px;
+  }
+  .theme-techno-classical .research-start .panel {
+    padding: 16px;
+  }
+  .theme-techno-classical .company-dossier {
+    min-height: 0;
+    gap: 9px;
+  }
+  .theme-techno-classical .dossier-company {
+    min-height: 0;
+    padding-block: 0 12px;
+  }
+  .theme-techno-classical .dossier-name h1 {
+    font-size: 36px;
+  }
+  .theme-techno-classical .dossier-monogram {
+    width: 40px;
+    height: 40px;
+    font-size: 25px;
+  }
+  .theme-techno-classical .pillar-card h3 {
+    font-size: 26px;
+  }
+  .theme-techno-classical .dossier-drawer .driver-dialog-header h2 {
+    font-size: 32px;
+  }
+}
+@media (forced-colors: active) {
+  .theme-techno-classical .app-shell,
+  .theme-techno-classical .dossier-monogram,
+  .theme-techno-classical .research-start > .page-heading,
+  .theme-techno-classical .home-terminal-heading::after {
+    background-image: none;
+  }
+}
+
+.theme-techno-classical select {
+  min-width: 0;
+}
+.theme-techno-classical .snapshot-picker {
+  grid-template-columns: minmax(0, 1fr);
+  width: min(680px, 100%);
+}
+/* Keep paginated company actions in view on short phones. */
+@media (max-width: 800px) and (max-height: 700px) {
+  .theme-techno-classical .terminal-home {
+    gap: 8px;
+  }
+  .theme-techno-classical .home-terminal-heading {
+    padding: 0;
+    gap: 8px;
+  }
+  .theme-techno-classical .home-terminal-heading .eyebrow {
+    margin-block: 0 6px;
+    font-size: 8px;
+  }
+  .theme-techno-classical .home-terminal-heading h1 {
+    font-size: 32px;
+    margin-block: 6px;
+  }
+  .theme-techno-classical .home-terminal-heading p:last-child {
+    font-size: 10px;
+    line-height: 1.4;
+  }
+  .theme-techno-classical .home-directory {
+    padding-block: 12px 0;
+  }
+  .theme-techno-classical .home-directory-heading h2 {
+    font-size: 24px;
+  }
+  .theme-techno-classical .terminal-search {
+    margin-top: 8px;
+  }
+  .theme-techno-classical .directory-count {
+    margin-block: 8px;
+  }
+  .theme-techno-classical .home-directory .company-results li {
+    padding-block: 8px;
+  }
+  .theme-techno-classical .home-directory .company-results h3 {
+    font-size: 20px;
+  }
+  .theme-techno-classical .directory-footer {
+    padding-top: 8px;
+    margin-top: 8px;
+  }
+}
+
+.theme-techno-classical main:has(> .company-dossier) {
+  padding-block: 16px;
+}
+@media (max-height: 800px) and (min-width: 801px) {
+  .theme-techno-classical .company-dossier {
+    gap: 8px;
+  }
+  .theme-techno-classical .dossier-company {
+    min-height: 80px;
+    padding-block: 8px 12px;
+  }
+  .theme-techno-classical .dossier-name h1 {
+    font-size: 36px;
+  }
+  .theme-techno-classical .dossier-monogram {
+    width: 46px;
+    height: 46px;
+    font-size: 30px;
+  }
+  .theme-techno-classical .dossier-stat {
+    padding-top: 10px;
+  }
+  .theme-techno-classical .pillar-card {
+    padding-top: 12px;
+  }
+  .theme-techno-classical .pillar-card h3 {
+    font-size: 21px;
+  }
+}
+@media (max-width: 800px) {
+  .theme-techno-classical .dossier-stat {
+    padding-top: 8px;
+  }
+  .theme-techno-classical .dossier-section-label h2 {
+    font-size: 12px;
+  }
+  .theme-techno-classical .pillar-card {
+    padding-top: 11px;
+  }
+}
+@media (max-width: 800px) and (max-height: 700px) {
+  .theme-techno-classical .company-dossier {
+    gap: 6px;
+  }
+  .theme-techno-classical .dossier-company {
+    padding-bottom: 8px;
+  }
+  .theme-techno-classical .dossier-name h1 {
+    font-size: 30px;
+  }
+  .theme-techno-classical .dossier-stat {
+    padding-top: 6px;
+  }
+  .theme-techno-classical .pillar-card h3 {
+    font-size: 22px;
+  }
+}
+@media (max-height: 600px) {
+  .theme-techno-classical .company-dossier {
+    height: auto;
+    min-height: 650px;
   }
 }
