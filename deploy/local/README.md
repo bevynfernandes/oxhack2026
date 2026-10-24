@@ -51,3 +51,23 @@ Docker is unavailable in this workspace: this recipe has not passed a container
 build/runtime gate. No cloud resources, TLS endpoint, PostgreSQL migration or
 managed backup is claimed. Deployment requires verified provider access/credits
 and its own acceptance checks.
+
+## On-demand standalone research
+
+Enable the local worker with `SIGNALSHIFT_RESEARCH_ENABLED=1` and mount a persistent,
+writable `SIGNALSHIFT_RESEARCH_ROOT` owned by container UID 10001. The root defaults
+to `SIGNALSHIFT_COMPANY_ROOT` when set. Standalone research requires no saved company
+publications. Use one ASGI process; an exclusive lease prevents two workers sharing
+the same research store. The API image includes Chromium; set
+`SIGNALSHIFT_RESEARCH_BROWSER=1` to enable its isolated fallback. Keep the artifact
+volume when restarting; reports remain readable with collection disabled.
+
+```sh
+docker run --rm -p 8000:8000 \
+  --mount type=bind,src=/absolute/writable-research-store,dst=/research \
+  -e SIGNALSHIFT_RESEARCH_ROOT=/research \
+  -e SIGNALSHIFT_RESEARCH_ENABLED=1 \
+  -e SIGNALSHIFT_RESEARCH_BROWSER=1 signalshift-api
+```
+
+See the [v2 API, limits and provider configuration](../../docs/tasks/dev3/research-v2.md).
