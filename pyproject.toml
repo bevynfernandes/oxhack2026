@@ -58,6 +58,7 @@ exclude = ["*:Zone.Identifier"]
 
 [tool.mypy]
 files = ["oxhack2026", "tests"]
+exclude = ["^tests/outputs/"]
 python_version = "3.12"
 disallow_untyped_defs = true
 disallow_any_unimported = true
