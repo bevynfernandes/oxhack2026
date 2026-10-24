@@ -1,0 +1,98 @@
+{
+  "additionalProperties": false,
+  "description": "Separately revealed truth and model-owned per-tool numerical diagnostics.",
+  "properties": {
+    "forecast_id": {
+      "title": "Forecast Id",
+      "type": "string"
+    },
+    "outcome_vintage": {
+      "title": "Outcome Vintage",
+      "type": "string"
+    },
+    "actual_downloads": {
+      "minimum": 0,
+      "title": "Actual Downloads",
+      "type": "integer"
+    },
+    "realized_growth_pct": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Realized Growth Pct"
+    },
+    "model_absolute_error": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Absolute Error"
+    },
+    "baseline_absolute_error": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline Absolute Error"
+    },
+    "model_log_absolute_error": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Model Log Absolute Error"
+    },
+    "baseline_log_absolute_error": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline Log Absolute Error"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "forecast_id",
+    "outcome_vintage",
+    "actual_downloads",
+    "realized_growth_pct"
+  ],
+  "title": "OutcomeDiagnostics",
+  "type": "object"
+}
