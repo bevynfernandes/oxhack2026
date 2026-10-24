@@ -82,6 +82,17 @@ def test_company_routes_preserve_outcomes_zero_unknowns_and_sources(
     for forbidden in ("raw_artifact", "locator", "label_state", "success_score"):
         assert forbidden not in response.text
     assert detail["publication"] == listing["publication"]
+    outlook = detail["outlook"]
+    assert outlook["company_id"] == "alpha"
+    assert outlook["source_snapshot_id"] == SNAPSHOT
+    assert outlook["overall_outlook"] is None
+    assert len(outlook["specialists"]) == 5
+    assert [row["horizon_months"] for row in outlook["forecasts"]] == [24, 24, 12]
+    public_metrics = {row["observation_id"] for row in detail["metrics"]}
+    assert all(
+        set(row["metric_observation_ids"]) <= public_metrics
+        for row in outlook["specialists"]
+    )
 
 
 def test_restricted_evidence_contents_and_urls_are_redacted(

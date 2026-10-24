@@ -25,7 +25,7 @@ test("real partial research replay preserves immutable legacy report and source 
   await expect(page.getByText(/Partial source results/)).toBeVisible();
   await expect(page.getByText("24 months")).toHaveCount(0);
   await page
-    .getByRole("button", { name: "Inspect Attention & Sentiment" })
+    .getByRole("button", { name: "Inspect evidence: Attention & Sentiment" })
     .click();
   const dialog = page.getByRole("dialog");
   await expect(dialog.getByText("Unavailable", { exact: true })).toBeVisible();

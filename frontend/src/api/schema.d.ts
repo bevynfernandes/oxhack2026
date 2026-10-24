@@ -611,6 +611,7 @@ export interface components {
             family: components["schemas"]["FamilyResolution"];
             /** Metrics */
             metrics: components["schemas"]["CompanyMetric"][];
+            outlook?: components["schemas"]["StartupOutlook"] | null;
             publication: components["schemas"]["CompanyPublication"];
             /** Relationships */
             relationships: components["schemas"]["CompanyRelationship"][];

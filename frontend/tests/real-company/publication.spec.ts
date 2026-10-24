@@ -21,7 +21,7 @@ test("real company publication supports list, source inspection and accessible c
   const firstCompany = rows[0].company.display_name;
   await page.getByLabel("Search companies").fill(firstCompany);
   await expect(
-    page.getByRole("link", { name: `View saved analysis for ${firstCompany}` }),
+    page.getByRole("link", { name: `Open dossier for ${firstCompany}` }),
   ).toBeVisible();
   await page.screenshot({
     path: testInfo.outputPath("real-homepage.png"),
@@ -29,10 +29,10 @@ test("real company publication supports list, source inspection and accessible c
   });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page
-    .getByRole("link", { name: `View saved analysis for ${firstCompany}` })
+    .getByRole("link", { name: `Open dossier for ${firstCompany}` })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Company outlook" }),
+    page.getByRole("heading", { name: "Overall outlook unavailable" }),
   ).toBeVisible();
   await page.goto("/explore");
   await page.getByLabel("Assessment snapshot").selectOption(snapshot);
@@ -69,6 +69,9 @@ test("real company publication supports list, source inspection and accessible c
   await page
     .getByRole("link", { name: rows[0].company.display_name, exact: true })
     .click();
+  await page
+    .getByRole("button", { name: "Saved assessment", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Cash-flow self-sufficiency" }),
   ).toBeVisible();
@@ -76,10 +79,10 @@ test("real company publication supports list, source inspection and accessible c
     page.getByText("Assessment unavailable", { exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: /Inspect \d+ supporting source/ })
+    .getByRole("button", { name: /Inspect \d+ supporting source/ })
     .first()
     .click();
-  await expect(page.locator("details#sources")).toHaveAttribute("open", "");
+  await expect(page.getByRole("dialog")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Original source (opens new tab)" }).first(),
   ).toBeVisible();

@@ -2,7 +2,8 @@
 
 Decision: 2026-10-24, after comparing both supplied Stitch HTML exports,
 screenshots and DESIGN.md with the merged backend. The user approved the
-structure and horizons below. Ivan continues to own frontend implementation.
+structure and horizons below. The user subsequently requested a direct UI rebuild
+from the original Stitch export, with no overview scrolling.
 Training remains on hold; no validated numerical prediction is available.
 
 ## Page hierarchy
@@ -50,21 +51,24 @@ the original saved analysis; do not derive new lanes from the old outcomes.
 Starting fresh research remains an explicit confirmed action. The generated
 OpenAPI/TypeScript field is optional for this compatibility boundary.
 
-## Canonical frontend reference
+## Current frontend implementation
 
-Use [the reference README](https://github.com/bevynfernandes/oxhack2026/blob/main/design/prediction-workspace/README.md) and
-`design/prediction-workspace/index.html` in the repository. The HTML is standalone
-and dependency-free; the illustrative company has no invented measurements.
-It provides the visual hierarchy and a working detail dialog/tab interaction.
-It is a reference to port into React, not a second application or data source.
+`frontend/src/pages/research/CompanyDossier.tsx` and `frontend/src/workspace.css`
+implement the original Stitch dossier: compact header, company identity, four
+summary tiles, five parallel pillars and a bottom evidence ledger. The overview
+fits the viewport; source details scroll inside a right-hand drawer. Phones switch
+between pillars in place. Local fonts avoid third-party browser requests.
 
-Keep the supplied Stitch design's restrained surfaces, teal accent and inspectable
-sections. Replace Investment Grade, pedestal scores, copied hashes, verification
-percentages and continuous decoration with a dated startup forecast and readable
-limitations. Use natural page scrolling, compact driver rows and mobile layouts.
-Five tall fixed-height columns and decorative charts are not required.
+Saved profiles and fresh reports share this component. The API now projects the
+same explicit metric grouping into saved company details (`company-metric-groups-v2`).
+Unknown metrics remain unassigned. Old embedded profiles omit the optional
+projection when serialized, preserving immutable report bytes.
 
-## Ivan's implementation acceptance
+The earlier `design/prediction-workspace/index.html` is archived and superseded
+for visual implementation. Keep the supplied Stitch layout and the approved
+prediction semantics; no investment grades or fabricated scores.
+
+## Implementation acceptance
 
 - Preserve name/domain search and exact identity confirmation. Current research
   supports known saved companies only; unknown companies remain an explicit gap.
@@ -87,13 +91,15 @@ The existing private Qdrant replay shared in #46 predates forecast metadata; use
 it for legacy compatibility. New report tests exercise the approved three lanes.
 Any new live run must retain its actual capture and cannot rewrite that replay.
 
-## Verification of this handoff
+## Verification
 
-Local checks: 640 Python tests, 17 frontend tests, three durable API integrations,
-Ruff, mypy, strict docs, generated types, build and formatting. The retained real
-Qdrant report also reads and serializes byte-identically without adding forecasts.
-Reference browser checks at 1440/768/390 pixels report no page overflow or axe
-violations. Dialog focus wrapping, arrow-key tabs, Escape/focus return and reduced
-motion pass; screenshots/results remain in `.cache/stitch-review/screenshots`.
-This verifies the reference and contract, not Ivan's pending app integration or
-model predictive performance.
+Full Python checks, Ruff, mypy, strict docs, generated types, frontend build,
+formatting and 23 frontend unit tests pass. Browser acceptance: 21 fixture tests
+and two real-publication/replay tests. Overview bounds and nonoverlapping metrics
+are checked at 1440×900, 1366×768, 1280×720, 390×844 and 375×667. Drawer focus,
+Escape, keyboard tabs, source links, exact JSON export and directory pagination
+are covered. Automated accessibility checks pass.
+
+The retained Qdrant report still serializes byte-identically without adding
+forecasts. Screenshots/results remain under ignored `tests/outputs/dossier-*`.
+These checks establish UI/contract behavior, not predictive performance.

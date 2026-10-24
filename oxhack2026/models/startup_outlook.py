@@ -32,6 +32,16 @@ FORECAST_HORIZONS: dict[ForecastOutcomeId, int] = {
     "survival": 24,
     "financial_health": 12,
 }
+_COMPANY_METRIC_GROUPS: dict[str, SpecialistGroupId] = {
+    "npm_downloads_30d_v1": "adoption_retention",
+    "npm_downloads_previous_30d_v1": "adoption_retention",
+    "sdk_downloads_30d_v1": "adoption_retention",
+    "active_paying_customers_v1": "adoption_retention",
+    "github_stable_releases_90d_v1": "team_execution",
+    "sdk_releases_30d_v1": "team_execution",
+    "revenue_12m_usd_v1": "financial_health",
+    "operating_cashflow_12m_usd_v1": "financial_health",
+}
 
 
 class OutcomeForecast(Contract):
@@ -281,4 +291,28 @@ def build_untrained_outlook(
             OutcomeForecast(outcome_id=outcome_id, horizon_months=months)
             for outcome_id, months in FORECAST_HORIZONS.items()
         ),
+    )
+
+
+def build_company_outlook(
+    snapshot: CompanySourceSnapshot, company_id: str
+) -> StartupOutlook:
+    """Apply one explicit group policy to saved profiles and research reports.
+
+    Args:
+        snapshot: Verified company source at the intended evidence cutoff.
+        company_id: Exact company in the source.
+    Returns:
+        Five source-backed driver sections and three null forecast placeholders.
+    Raises:
+        ValueError: Company identity or source references are invalid.
+    """
+    definitions = {row.metric_id for row in snapshot.definitions}
+    mapping = {
+        key: value
+        for key, value in _COMPANY_METRIC_GROUPS.items()
+        if key in definitions
+    }
+    return build_untrained_outlook(
+        snapshot, company_id, mapping, "company-metric-groups-v2"
     )

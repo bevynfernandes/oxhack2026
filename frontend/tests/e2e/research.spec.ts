@@ -22,8 +22,16 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
   await expect(page.getByText("24 months")).toHaveCount(2);
   await expect(page.getByText("12 months")).toBeVisible();
   await expect(page.getByText(/Partial source results/)).toBeVisible();
+  const downloadReady = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export report" }).click();
+  const download = await downloadReady;
+  await download.saveAs(info.outputPath("exported-report.json"));
+  const stream = await download.createReadStream();
+  let exported = "";
+  for await (const chunk of stream) exported += chunk.toString();
+  expect(JSON.parse(exported)).toEqual(fixture);
   const inspect = page.getByRole("button", {
-    name: "Inspect Attention & Sentiment",
+    name: "Inspect evidence: Attention & Sentiment",
   });
   await inspect.click();
   const dialog = page.getByRole("dialog");
@@ -85,6 +93,10 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
     fullPage: true,
   });
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page
+    .getByRole("group", { name: "Overview dimensions" })
+    .getByRole("button", { name: "Attention", exact: true })
+    .click();
   await inspect.click();
   expect(await dialog.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(
     true,
@@ -96,6 +108,54 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
     path: info.outputPath("driver-mobile.png"),
     fullPage: false,
   });
+});
+
+test("dossier overview fits laptop and mobile viewports without scrolling or overlapping metrics", async ({
+  page,
+}) => {
+  await serveReport(page);
+  await page.goto(reportUrl);
+  await expect(
+    page.getByRole("heading", { name: "Overall outlook unavailable" }),
+  ).toBeVisible();
+  for (const [width, height] of [
+    [1440, 900],
+    [1366, 768],
+    [1280, 720],
+    [390, 844],
+    [375, 667],
+  ]) {
+    await page.setViewportSize({ width, height });
+    const layout = await page.evaluate(() => {
+      const main = document.querySelector("main")!;
+      const ledger = document
+        .querySelector(".dossier-ledger")!
+        .getBoundingClientRect();
+      const cards = [
+        ...document.querySelectorAll<HTMLElement>(".pillar-card"),
+      ].filter((el) => el.getClientRects().length > 0);
+      return {
+        pageFits:
+          document.documentElement.scrollHeight <= innerHeight &&
+          document.documentElement.scrollWidth <= innerWidth,
+        mainFits: main.scrollHeight <= main.clientHeight,
+        ledgerVisible: ledger.bottom <= innerHeight - 24,
+        cardsFit: cards.every((card) => {
+          const metrics = card
+            .querySelector(".pillar-measurements")!
+            .getBoundingClientRect();
+          const footer = card.querySelector("footer")!.getBoundingClientRect();
+          return metrics.bottom <= footer.top && footer.bottom <= ledger.top;
+        }),
+      };
+    });
+    expect(layout, `${width}x${height}`).toEqual({
+      pageFits: true,
+      mainFits: true,
+      ledgerVisible: true,
+      cardsFit: true,
+    });
+  }
 });
 
 test("legacy reports retain original meanings and unavailable reports show a retry", async ({

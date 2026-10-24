@@ -1,4 +1,13 @@
-import { ApiError, unwrap } from "../../api/client";
+import { api, ApiError, unwrap } from "../../api/client";
+
+/** Load one immutable report using the shared safe error handling. */
+export async function fetchResearchReport(reportId: string) {
+  return researchResult(
+    await api.GET("/api/v1/research-reports/{report_id}", {
+      params: { path: { report_id: reportId } },
+    }),
+  );
+}
 
 /** Keep research errors actionable without exposing response bodies. */
 export function researchResult<T>(result: { data?: T; response: Response }): T {

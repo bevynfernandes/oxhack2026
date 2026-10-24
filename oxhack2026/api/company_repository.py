@@ -15,6 +15,7 @@ from oxhack2026.api.repository import RepositoryUnavailable, ResourceNotFound
 from oxhack2026.api.schemas import Health
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.company_assessments import CompanyAssessment
+from oxhack2026.models.startup_outlook import build_company_outlook
 from oxhack2026.storage.company import CompanySourceReader, metadata, resolve_family
 from oxhack2026.storage.company_assessments import (
     CompanyAssessmentPublication,
@@ -229,6 +230,7 @@ class PublishedCompanyRepository:
                 if row.company_id == company_id
             ),
             coverage=public_coverage(source, company_id),
+            outlook=build_company_outlook(source, company_id),
             evidence=tuple(
                 s.public_source(row)
                 for row in source.evidence

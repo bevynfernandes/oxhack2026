@@ -68,10 +68,12 @@ ignores that file. The build fails on generated-type drift.
 
 ## Product behavior
 
-- `/` lists explicit assessment snapshots, with name/segment search and
+- `/explore` lists explicit assessment snapshots, with name/segment search and
   segment/stage/evidence filters. URL state survives reload and browser Back.
-- Profiles show three outcome sections, source-linked statements, metrics grouped
-  by family, event stages, source dates/review state and expandable provenance.
+- Profiles use the Stitch dossier: four summary tiles, five fundamental pillars
+  and an evidence ledger. The overview fits a laptop viewport without scrolling;
+  mobile controls switch pillars in place. Sources, measurements, original saved
+  outcomes and provenance remain available in a keyboard-accessible side drawer.
 - `/compare` accepts two or three distinct companies from the selected snapshot.
   It reuses the same profiles and definitions; stage/model unknowns remain visible.
 - Decimal values remain exact strings. Missing, restricted, not-applicable,
@@ -113,8 +115,8 @@ No offline export or demo server is included in this workstream.
 
 - `/` starts with company search and opens one saved analysis. The default is the latest assessment publication by recorded date (publication ID breaks ties); it does not start a research job.
 - `/explore` retains explicit publication selection, filters and comparison. Older `/?snapshot=...` links redirect there with their selection intact.
-- Profiles retain the three existing outcomes and metric definitions. Publication metadata is expandable; dates and synthetic-data notices stay visible.
-- Visual references and collaborator guidance are in private issue #43: shadcn/ui components, Radix disclosure patterns, Motion accessibility/examples and Lucide icons. This pass uses native controls and CSS with no new dependencies.
+- Profiles retain the three existing outcomes and metric definitions in the saved-assessment drawer. Dates and synthetic-data notices stay visible.
+- The original Stitch export guides the dossier layout. Plus Jakarta Sans and JetBrains Mono are bundled locally; icons use SVG and disclosure uses native dialog controls.
 - Short entrance and hover transitions respect reduced-motion settings. No animated scores, implied live research or invented probabilities.
 
 ### Prediction workspace (#55)

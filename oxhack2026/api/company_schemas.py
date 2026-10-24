@@ -2,7 +2,7 @@
 
 from typing import Literal, Self
 
-from pydantic import model_validator
+from pydantic import Field, model_validator
 
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime
 from oxhack2026.catalog.company import (
@@ -23,6 +23,7 @@ from oxhack2026.models.company_assessments import (
     CompanyAssessment,
     CompanyOutcomeAssessment,
 )
+from oxhack2026.models.startup_outlook import StartupOutlook
 from oxhack2026.storage.company_assessments import CompanyAssessmentPublication
 
 
@@ -149,3 +150,6 @@ class CompanyDetail(DTO):
     relationships: tuple[CompanyRelationship, ...]
     coverage: tuple[PublicCompanyCoverage, ...]
     evidence: tuple[CompanySource, ...]
+    outlook: StartupOutlook | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )

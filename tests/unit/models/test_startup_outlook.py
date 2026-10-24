@@ -12,6 +12,7 @@ from oxhack2026.models.startup_outlook import (
     SpecialistGroupId,
     SpecialistOutlook,
     StartupOutlook,
+    build_company_outlook,
     build_untrained_outlook,
 )
 
@@ -71,6 +72,24 @@ def test_source_identity_zero_and_five_groups_round_trip() -> None:
     assert all(
         "beta" not in key for row in outlook.specialists for key in row.evidence_ids
     )
+
+
+def test_saved_company_policy_assigns_known_metrics_without_guessing() -> None:
+    """Saved and fresh views share verified zero handling and explicit grouping."""
+    source = _source()
+
+    outlook = build_company_outlook(source, "alpha")
+
+    assert outlook.grouping_policy_version == "company-metric-groups-v2"
+    adoption = _section(outlook, "adoption_retention")
+    assert adoption.data_status == "available"
+    assert adoption.usable_metric_observation_ids
+    assert adoption.evidence_ids == ("alpha-source",)
+    assert _section(outlook, "industry_competition").metric_observation_ids == ()
+    assert outlook.forecasts is not None
+    assert [row.horizon_months for row in outlook.forecasts] == [24, 24, 12]
+    assert all(row.prediction is None for row in outlook.forecasts)
+    assert outlook.overall_outlook is None
 
 
 def test_unavailable_groups_and_financial_gaps_remain_distinct() -> None:
