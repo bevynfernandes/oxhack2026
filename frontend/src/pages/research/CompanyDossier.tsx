@@ -114,7 +114,14 @@ function containFocus(event: KeyboardEvent<HTMLDialogElement>) {
     ...event.currentTarget.querySelectorAll<HTMLElement>(
       'button:not([disabled]):not([tabindex="-1"]), a[href], summary, [tabindex="0"]',
     ),
-  ].filter((element) => element.getClientRects().length > 0);
+  ].filter(
+    (element) =>
+      element.tabIndex >= 0 &&
+      !element.matches(":disabled") &&
+      !element.closest("[inert], [hidden]") &&
+      getComputedStyle(element).visibility === "visible" &&
+      element.getClientRects().length > 0,
+  );
   const first = elements[0];
   const last = elements.at(-1);
   if (event.shiftKey && document.activeElement === first) {

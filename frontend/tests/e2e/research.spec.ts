@@ -626,3 +626,47 @@ test("standalone queue errors never retry POST and disabled collection stays rea
   expect((await auditAccessibility(page)).violations).toEqual([]);
   expect(writes).toBe(1);
 });
+
+test("source drawer wraps focus past collapsed provenance and includes expanded links", async ({
+  page,
+}) => {
+  await page.route("**/api/v2/research-reports/*", (route) =>
+    route.fulfill({
+      json: {
+        ...standaloneReport,
+        captures: [
+          {
+            capture_id: "keyboard-capture",
+            final_url: "https://new.example/evidence",
+            collected_at: standaloneReport.researched_at,
+            parser_version: "test-v1",
+            artifact: { sha256: "test-capture-sha256" },
+          },
+        ],
+      },
+    }),
+  );
+  await page.goto("/research/v2/reports/standalone-report");
+  await page
+    .getByRole("button", { name: "Source inventory", exact: true })
+    .click();
+  const dialog = page.getByRole("dialog");
+  const close = dialog.getByRole("button", { name: "Close", exact: true });
+  const trigger = dialog.getByRole("button", {
+    name: "Capture provenance (1)",
+  });
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await close.focus();
+  await page.keyboard.press("Shift+Tab");
+  await expect(trigger).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+  await trigger.click();
+  const source = dialog.getByRole("link", { name: "Captured source" });
+  await expect(source).toBeVisible();
+  await close.focus();
+  await page.keyboard.press("Shift+Tab");
+  await expect(source).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(close).toBeFocused();
+});
