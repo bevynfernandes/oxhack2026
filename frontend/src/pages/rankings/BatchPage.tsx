@@ -50,7 +50,7 @@ export default function BatchPage() {
   const query = useBatch(batchId);
   return (
     <>
-      <Link to="/">Choose another forecast</Link>
+      <Link to="/traction">Choose another forecast</Link>
       <QueryState
         pending={query.isPending}
         error={query.error}

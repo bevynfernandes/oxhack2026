@@ -1,9 +1,11 @@
-# Company outlook: Dev 3 design and integration proposal
+# Company outlook: Dev 3 design and integration
 
 Coordination: [issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19).
 This records the user's revised objective. The old download-only task checklist
 does not measure completion of the company-outlook product. Shared outcome and
-source contracts are being coordinated before new public schemas are frozen.
+source contracts are reviewed and integrated in #32/#39/#41. The company
+list/profile/compare implementation has passed real API/browser acceptance.
+The implementation PR supplies independent review and CI before release.
 
 ## Product decision
 
@@ -17,7 +19,7 @@ Present three assessments independently:
 | Assessment | Horizon | Questions the view must answer |
 | --- | --- | --- |
 | Operating and growing | 24 months | Is the business continuing to operate, and what supports its growth outlook? |
-| Commercial viability | 12 months | What evidence supports sustainable commercial operation? What remains private or unknown? |
+| Cash-flow self-sufficiency | 12 months | Is the company operating with nonnegative operating cash flow over the ending twelve months? What remains private or unknown? |
 | Funding or acquisition | 24 months | What financing or acquisition outcome is assessed? What would the event establish, and what would it leave unknown? |
 
 Dev 2 owns precise labels, censoring and model semantics. A funding round is not
@@ -27,7 +29,8 @@ metrics alone may be insufficient to estimate commercial viability.
 
 ## Information architecture
 
-Primary navigation: **Companies**, **Compare**, **Methodology**. Source health
+Primary navigation: **Companies**, **Traction research**, **Methodology**.
+Comparison starts from the company selection bar. Source health
 is available within evidence/methodology. Existing download forecast screens
 remain identifiable traction research; they must not masquerade as company
 success predictions. Do not move the landing page to the company workflow until
