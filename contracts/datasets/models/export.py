@@ -22,6 +22,7 @@ from oxhack2026.models.contracts import (
     MatureOutcome,
     ModelReference,
 )
+from oxhack2026.models.startup_outlook import StartupOutlook
 
 if __name__ == "__main__":
     for contract in (
@@ -39,6 +40,7 @@ if __name__ == "__main__":
         ShortlistScore,
         CompanyOutcomeLabel,
         CompanyAssessment,
+        StartupOutlook,
     ):
         destination = Path(__file__).with_name(f"{contract.__name__}.schema.json")
         destination.write_bytes(
