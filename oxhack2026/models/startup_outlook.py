@@ -26,6 +26,44 @@ SPECIALIST_GROUP_IDS: tuple[SpecialistGroupId, ...] = (
 )
 DataStatus = Literal["available", "insufficient_data", "not_applicable"]
 _Reasons = Annotated[tuple[Identifier, ...], Field(min_length=1)]
+ForecastOutcomeId = Literal["growth", "survival", "financial_health"]
+FORECAST_HORIZONS: dict[ForecastOutcomeId, int] = {
+    "growth": 24,
+    "survival": 24,
+    "financial_health": 12,
+}
+
+
+class OutcomeForecast(Contract):
+    """An agreed product horizon without an approved label policy or model.
+
+    Attributes:
+        outcome_id: Product outcome, separate from specialist groups/v1 targets.
+        horizon_months: Approved calendar-month horizon from the report cutoff.
+        definition_status: Detailed labels/thresholds still require a data review.
+        model_status: No training or inference has run for this outcome.
+        prediction: Always null; no probability or score is permitted.
+        reason_codes: Both label-policy and model limitations, in display order.
+
+    Raises:
+        ValueError: Horizon disagrees with the outcome or a prediction is injected.
+    """
+
+    outcome_id: ForecastOutcomeId
+    horizon_months: Annotated[int, Field(strict=True, gt=0)]
+    definition_status: Literal["pending_label_policy"] = "pending_label_policy"
+    model_status: Literal["model_not_trained"] = "model_not_trained"
+    prediction: None = None
+    reason_codes: tuple[
+        Literal["target_definition_pending"], Literal["model_not_trained"]
+    ] = ("target_definition_pending", "model_not_trained")
+
+    @model_validator(mode="after")
+    def _validate_horizon(self) -> Self:
+        if self.horizon_months != FORECAST_HORIZONS[self.outcome_id]:
+            message = "Forecast horizon must match the approved product outcome"
+            raise ValueError(message)
+        return self
 
 
 def _data_status(has_usable: bool, states: set[str]) -> DataStatus:
@@ -104,6 +142,8 @@ class StartupOutlook(Contract):
         inference_runtime: Intended execution location; no inference has run.
         overall_outlook: Null; this contract cannot fabricate an outlook index.
         overall_reason_codes: Why a combined prediction cannot be served.
+        forecasts: Three outcome placeholders for new reports. Absent in older
+            reports; omitted on serialization to preserve their original bytes.
 
     Raises:
         ValueError: Groups or observation assignments repeat or are incomplete.
@@ -124,6 +164,9 @@ class StartupOutlook(Contract):
     overall_reason_codes: tuple[Literal["model_not_trained"], ...] = (
         "model_not_trained",
     )
+    forecasts: tuple[OutcomeForecast, ...] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
     @model_validator(mode="after")
     def _validate_inventory(self) -> Self:
@@ -140,6 +183,11 @@ class StartupOutlook(Contract):
             raise ValueError(message)
         if not self.overall_reason_codes:
             message = "Unavailable overall outlook requires a reason"
+            raise ValueError(message)
+        if self.forecasts is not None and tuple(
+            row.outcome_id for row in self.forecasts
+        ) != tuple(FORECAST_HORIZONS):
+            message = "Forecasts require growth, survival and financial health in order"
             raise ValueError(message)
         return self
 
@@ -229,4 +277,8 @@ def build_untrained_outlook(
         synthetic=snapshot.synthetic,
         specialists=tuple(sections),
         unassigned_metric_observation_ids=tuple(sorted(unassigned)),
+        forecasts=tuple(
+            OutcomeForecast(outcome_id=outcome_id, horizon_months=months)
+            for outcome_id, months in FORECAST_HORIZONS.items()
+        ),
     )

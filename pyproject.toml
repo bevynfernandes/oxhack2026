@@ -23,7 +23,7 @@ data = [
     "httpx>=0.28,<1",
     "orjson>=3,<4",
     "polars>=1,<2",
-    "pydantic>=2,<3",
+    "pydantic>=2.12,<3",
     "pydantic-settings>=2,<3",
 ]
 storage = [

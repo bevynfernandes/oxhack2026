@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SignalShift — Startup outlook reference</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --paper: #f6f7f4;
+        --surface: #fff;
+        --ink: #202c28;
+        --muted: #5f6e67;
+        --line: #dce2dc;
+        --accent: #155e52;
+        --tint: #edf4ef;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--paper);
+        color: var(--ink);
+        font:
+          14px/1.55 -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+      button,
+      input {
+        font: inherit;
+      }
+      button,
+      a {
+        -webkit-tap-highlight-color: transparent;
+      }
+      button {
+        cursor: pointer;
+      }
+      a {
+        color: var(--accent);
+        text-underline-offset: 3px;
+      }
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 4px;
+      }
+      h1,
+      h2,
+      h3,
+      p {
+        margin: 0;
+      }
+      h1 {
+        font-size: 29px;
+        font-weight: 650;
+        letter-spacing: -0.035em;
+      }
+      h2 {
+        font-size: 19px;
+        font-weight: 650;
+        letter-spacing: -0.02em;
+      }
+      h3 {
+        font-size: 15px;
+        font-weight: 650;
+      }
+      small,
+      .muted {
+        color: var(--muted);
+      }
+      .reference {
+        padding: 8px 24px;
+        background: var(--tint);
+        color: var(--accent);
+        text-align: center;
+        font-size: 12px;
+      }
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--line);
+      }
+      .topbar-inner {
+        max-width: 1160px;
+        margin: auto;
+        padding: 18px 28px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+      }
+      .brand {
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: -0.025em;
+      }
+      .topbar nav {
+        display: flex;
+        gap: 24px;
+        font-size: 13px;
+      }
+      .topbar nav a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      main {
+        max-width: 1160px;
+        padding: 34px 28px 60px;
+        margin: auto;
+      }
+      .back {
+        font-size: 13px;
+      }
+      .company {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin: 26px 0;
+      }
+      .identity {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+      }
+      .monogram {
+        display: grid;
+        place-items: center;
+        width: 56px;
+        height: 56px;
+        flex-shrink: 0;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--surface);
+        color: var(--accent);
+        font-size: 19px;
+        font-weight: 650;
+      }
+      .company-context {
+        color: var(--muted);
+        margin-top: 3px;
+      }
+      .research-context {
+        text-align: right;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .research-context strong {
+        display: block;
+        color: var(--ink);
+        font-size: 13px;
+      }
+      .section-nav {
+        display: flex;
+        gap: 26px;
+        margin-bottom: 28px;
+        padding: 0 0 13px;
+        border-bottom: 1px solid var(--line);
+        overflow-x: auto;
+      }
+      .section-nav a {
+        white-space: nowrap;
+        text-decoration: none;
+        font-size: 13px;
+      }
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+      }
+      .outlook {
+        padding: 25px 28px 0;
+      }
+      .eyebrow {
+        color: var(--accent);
+        font-size: 11px;
+        font-weight: 650;
+        letter-spacing: 0.075em;
+        text-transform: uppercase;
+      }
+      .outlook-heading {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .outlook h2 {
+        margin: 9px 0;
+        font-size: 27px;
+      }
+      .outlook-copy {
+        max-width: 680px;
+        color: var(--muted);
+      }
+      .state {
+        align-self: flex-start;
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .forecasts {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        margin-top: 26px;
+      }
+      .forecast {
+        padding: 22px 24px 24px 0;
+        border-top: 1px solid var(--line);
+      }
+      .forecast + .forecast {
+        padding-left: 24px;
+        border-left: 1px solid var(--line);
+      }
+      .forecast-title {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .forecast-title span {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .forecast-value {
+        margin: 13px 0 4px;
+        font-size: 18px;
+        letter-spacing: -0.02em;
+      }
+      .forecast p:last-child {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .report-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+        gap: 30px;
+        margin-top: 34px;
+      }
+      .section-intro {
+        margin: 5px 0 18px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .driver {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 20px 22px;
+      }
+      .driver + .driver {
+        border-top: 1px solid var(--line);
+      }
+      .driver p {
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .driver-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px 18px;
+        margin-top: 10px;
+        color: var(--muted);
+        font-size: 11px;
+      }
+      .inspect {
+        align-self: center;
+        padding: 7px 10px;
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        color: var(--accent);
+        background: var(--surface);
+        font-size: 12px;
+        transition: background-color 140ms;
+      }
+      .inspect:hover {
+        background: var(--tint);
+      }
+      .notes {
+        padding: 21px;
+      }
+      .notes h3 {
+        margin-bottom: 7px;
+      }
+      .notes p {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .notes + .notes {
+        border-top: 1px solid var(--line);
+      }
+      .notes ul {
+        margin: 11px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .notes li + li {
+        margin-top: 7px;
+      }
+      .sources {
+        margin-top: 33px;
+      }
+      .empty-source {
+        margin-top: 14px;
+        padding: 22px;
+      }
+      .empty-source p {
+        color: var(--muted);
+        margin-top: 4px;
+        font-size: 13px;
+      }
+      footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        margin-top: 25px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      dialog {
+        position: fixed;
+        inset: 0 0 0 auto;
+        margin: 0;
+        width: min(650px, 100%);
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+        padding: 0;
+        border: 0;
+        border-left: 1px solid var(--line);
+        color: var(--ink);
+        background: var(--surface);
+      }
+      dialog::backdrop {
+        background: rgb(20 35 29 / 28%);
+      }
+      .dialog-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px;
+        padding: 24px;
+        border-bottom: 1px solid var(--line);
+      }
+      .dialog-tabs {
+        display: flex;
+        gap: 4px;
+        padding: 12px 20px;
+        overflow-x: auto;
+        border-bottom: 1px solid var(--line);
+      }
+      .dialog-tabs button {
+        padding: 7px 8px;
+        border: 0;
+        border-radius: 4px;
+        background: transparent;
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .dialog-tabs button[aria-selected="true"] {
+        background: var(--tint);
+        color: var(--accent);
+      }
+      .dialog-body {
+        padding: 26px;
+      }
+      .dialog-body > p {
+        margin-top: 10px;
+        color: var(--muted);
+      }
+      .dialog-section {
+        margin-top: 27px;
+        padding-top: 20px;
+        border-top: 1px solid var(--line);
+      }
+      .dialog-section p {
+        margin-top: 7px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .metric-list {
+        margin: 8px 0 0;
+      }
+      .metric-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        padding: 13px 0;
+        border-bottom: 1px solid var(--line);
+        font-size: 13px;
+      }
+      .metric-row dt {
+        flex: 1;
+      }
+      .metric-row dd {
+        margin: 0;
+        color: var(--muted);
+      }
+      @media (max-width: 800px) {
+        .report-grid {
+          grid-template-columns: 1fr;
+          gap: 26px;
+        }
+        .research-context {
+          max-width: 160px;
+        }
+      }
+      @media (max-width: 540px) {
+        .section-nav {
+          flex-wrap: wrap;
+          gap: 10px 18px;
+        }
+        main {
+          padding: 24px 18px 40px;
+        }
+        .topbar-inner {
+          padding: 16px 18px;
+          gap: 16px;
+        }
+        .topbar nav {
+          gap: 16px;
+        }
+        .company {
+          align-items: flex-start;
+          flex-direction: column;
+          gap: 15px;
+        }
+        .research-context {
+          max-width: none;
+          text-align: left;
+        }
+        h1 {
+          font-size: 25px;
+        }
+        .company-context {
+          font-size: 12px;
+        }
+        .outlook {
+          padding: 22px 20px 0;
+        }
+        .outlook-heading {
+          display: block;
+        }
+        .state {
+          display: block;
+          margin-top: 7px;
+        }
+        .outlook h2 {
+          font-size: 23px;
+        }
+        .forecasts {
+          grid-template-columns: 1fr;
+          margin-top: 22px;
+        }
+        .forecast,
+        .forecast + .forecast {
+          padding: 17px 0;
+          border-left: 0;
+        }
+        .forecast-value {
+          margin-top: 7px;
+        }
+        .driver {
+          padding: 18px;
+        }
+        .driver-meta {
+          display: block;
+        }
+        .driver-meta span {
+          display: block;
+          margin-top: 4px;
+        }
+        footer {
+          flex-direction: column;
+          gap: 5px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <aside class="reference" aria-label="Reference status">
+      Layout reference · Illustrative company · No live research or model
+      results
+    </aside>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <span class="brand">SignalShift</span>
+        <nav aria-label="Main navigation">
+          <a href="#outlook">Outlook</a><a href="#sources">Sources</a>
+        </nav>
+      </div>
+    </header>
+    <main>
+      <p class="back muted">Company research / Northstar</p>
+      <header class="company">
+        <div class="identity">
+          <div class="monogram" aria-hidden="true">N</div>
+          <div>
+            <h1>Northstar</h1>
+            <p class="company-context">
+              northstar.example · Illustrative SaaS company
+            </p>
+          </div>
+        </div>
+        <p class="research-context">
+          <strong>Research not started</strong>No saved measurements loaded
+        </p>
+      </header>
+      <nav class="section-nav" aria-label="Report sections">
+        <a href="#outlook">Startup outlook</a
+        ><a href="#drivers">Fundamental drivers</a
+        ><a href="#sources">Sources & limitations</a>
+      </nav>
+      <section
+        id="outlook"
+        class="panel outlook"
+        aria-labelledby="outlook-title"
+      >
+        <div class="outlook-heading">
+          <p class="eyebrow">Overall startup outlook</p>
+          <span class="state">No validated model</span>
+        </div>
+        <h2 id="outlook-title">Forecast unavailable</h2>
+        <p class="outlook-copy">
+          The outlook will combine growth, survival and financial health.
+          Predictions need verified historical data and validated local models.
+        </p>
+        <div class="forecasts">
+          <section class="forecast" aria-labelledby="growth-title">
+            <div class="forecast-title">
+              <h3 id="growth-title">Growth</h3>
+              <span>24 months</span>
+            </div>
+            <p class="forecast-value">Not yet available</p>
+            <p>Model not trained. Outcome criteria pending.</p>
+          </section>
+          <section class="forecast" aria-labelledby="survival-title">
+            <div class="forecast-title">
+              <h3 id="survival-title">Survival</h3>
+              <span>24 months</span>
+            </div>
+            <p class="forecast-value">Not yet available</p>
+            <p>Model not trained. Outcome criteria pending.</p>
+          </section>
+          <section class="forecast" aria-labelledby="financial-title">
+            <div class="forecast-title">
+              <h3 id="financial-title">Financial health</h3>
+              <span>12 months</span>
+            </div>
+            <p class="forecast-value">Not yet available</p>
+            <p>Model not trained. Outcome criteria pending.</p>
+          </section>
+        </div>
+      </section>
+      <div class="report-grid">
+        <section id="drivers" aria-labelledby="drivers-title">
+          <h2 id="drivers-title">Fundamental drivers</h2>
+          <p class="section-intro">
+            The evidence behind the outlook, grouped into five areas.
+          </p>
+          <div class="panel" id="driver-list"></div>
+        </section>
+        <aside aria-label="Research coverage and model validation">
+          <h2>Research context</h2>
+          <p class="section-intro">What is known, and what remains open.</p>
+          <div class="panel">
+            <section class="notes">
+              <h3>No measurements loaded</h3>
+              <p>
+                This reference shows an empty report. In the app, each metric
+                will carry its source and measurement date.
+              </p>
+            </section>
+            <section class="notes">
+              <h3>Important distinctions</h3>
+              <ul>
+                <li>Public attention does not establish customer growth.</li>
+                <li>Funding raised is not remaining cash or runway.</li>
+                <li>Missing evidence does not mean company failure.</li>
+              </ul>
+            </section>
+            <section class="notes" id="validation">
+              <h3>Historical validation</h3>
+              <p>
+                No validated backtest is available. Historical accuracy and
+                uncertainty will appear only after reproducible evaluation.
+              </p>
+            </section>
+          </div>
+        </aside>
+      </div>
+      <section class="sources" id="sources" aria-labelledby="sources-title">
+        <h2 id="sources-title">Sources & limitations</h2>
+        <div class="panel empty-source">
+          <h3>No source records loaded</h3>
+          <p>
+            A researched report will link each fact to its original source and
+            preserve measurement, availability and collection dates. Source
+            verification and forecast confidence are separate.
+          </p>
+        </div>
+      </section>
+      <footer>
+        <span>SignalShift · Startup outlook</span
+        ><span
+          >Design reference only. No numerical forecast or investment
+          grade.</span
+        >
+      </footer>
+    </main>
+    <dialog id="driver-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-header">
+        <div>
+          <p class="eyebrow">Fundamental driver</p>
+          <h2 id="dialog-title">Driver details</h2>
+        </div>
+        <button class="inspect" id="close-dialog" autofocus>Close</button>
+      </div>
+      <div
+        class="dialog-tabs"
+        role="tablist"
+        aria-label="Fundamental drivers"
+        id="driver-tabs"
+      ></div>
+      <div
+        class="dialog-body"
+        role="tabpanel"
+        id="driver-panel"
+        tabindex="0"
+      ></div>
+    </dialog>
+    <script>
+      const drivers = [
+        {
+          id: "adoption_retention",
+          name: "Adoption & Retention",
+          short: "Adoption",
+          description: "Customer growth, usage and retention.",
+          metrics: [
+            "Active paying customers",
+            "Customer growth",
+            "Customer retention",
+          ],
+          limitation:
+            "Traffic, package downloads and signups are applicable proxies; they do not establish paying customers or retention.",
+        },
+        {
+          id: "attention_sentiment",
+          name: "Attention & Sentiment",
+          short: "Attention",
+          description: "Public attention and its relationship to adoption.",
+          metrics: [
+            "Dated mention activity",
+            "Independent coverage",
+            "Supported sentiment",
+          ],
+          limitation:
+            "The current research provider counts bounded exact-domain HN story links. That is not broad social sentiment or a customer count.",
+        },
+        {
+          id: "financial_health",
+          name: "Financial Health",
+          short: "Financials",
+          description: "Revenue, cash resilience and financing context.",
+          metrics: [
+            "Comparable revenue",
+            "Operating cash flow",
+            "Cash and recent burn",
+          ],
+          limitation:
+            "Private financial data often remains unavailable. Do not infer ARR, cash or runway from funding rounds or product telemetry.",
+        },
+        {
+          id: "industry_competition",
+          name: "Industry & Competition",
+          short: "Industry",
+          description: "Market demand, competitive pressure and positioning.",
+          metrics: [
+            "Dated industry demand",
+            "Comparable peer activity",
+            "Competitive concentration",
+          ],
+          limitation:
+            "A historical sector series and stable peer definitions must be verified before these can support model training.",
+        },
+        {
+          id: "team_execution",
+          name: "Team & Execution",
+          short: "Execution",
+          description: "Delivery, continuity and relevant execution evidence.",
+          metrics: [
+            "Product delivery cadence",
+            "Team continuity",
+            "Customer execution",
+          ],
+          limitation:
+            "Use relevant dated evidence. Current biographies, employer prestige or headcount cannot replace historical execution data.",
+        },
+      ];
+      const dialog = document.getElementById("driver-dialog");
+      const panel = document.getElementById("driver-panel");
+      const tabs = document.getElementById("driver-tabs");
+      let activeIndex = 0;
+      function selectDriver(index) {
+        activeIndex = index;
+        const driver = drivers[index];
+        document.getElementById("dialog-title").textContent = driver.name;
+        tabs.querySelectorAll("button").forEach((tab, tabIndex) => {
+          tab.setAttribute("aria-selected", String(tabIndex === index));
+          tab.tabIndex = tabIndex === index ? 0 : -1;
+        });
+        panel.setAttribute("aria-labelledby", "tab-" + driver.id);
+        panel.replaceChildren();
+        const description = document.createElement("p");
+        description.textContent = driver.description;
+        panel.append(description);
+        const metrics = document.createElement("section");
+        metrics.className = "dialog-section";
+        const title = document.createElement("h3");
+        title.textContent = "Potential metrics";
+        const note = document.createElement("p");
+        note.textContent =
+          "Candidates subject to data coverage; no measurements are loaded.";
+        metrics.append(title, note);
+        const list = document.createElement("dl");
+        list.className = "metric-list";
+        driver.metrics.forEach((name) => {
+          const row = document.createElement("div");
+          row.className = "metric-row";
+          const term = document.createElement("dt");
+          term.textContent = name;
+          const value = document.createElement("dd");
+          value.textContent = "Unavailable";
+          row.append(term, value);
+          list.append(row);
+        });
+        metrics.append(list);
+        panel.append(metrics);
+        [
+          [
+            "Specialist analysis",
+            "Model not trained. No prediction, metric score or feature contribution is available.",
+          ],
+          ["Evidence and limitations", driver.limitation],
+        ].forEach(([heading, copy]) => {
+          const section = document.createElement("section");
+          section.className = "dialog-section";
+          const title = document.createElement("h3");
+          title.textContent = heading;
+          const paragraph = document.createElement("p");
+          paragraph.textContent = copy;
+          section.append(title, paragraph);
+          panel.append(section);
+        });
+      }
+      drivers.forEach((driver, index) => {
+        const row = document.createElement("article");
+        row.className = "driver";
+        const copy = document.createElement("div");
+        const title = document.createElement("h3");
+        title.textContent = driver.name;
+        const description = document.createElement("p");
+        description.textContent = driver.description;
+        const metadata = document.createElement("div");
+        metadata.className = "driver-meta";
+        ["Data: not loaded", "Model: not trained"].forEach((text) => {
+          const span = document.createElement("span");
+          span.textContent = text;
+          metadata.append(span);
+        });
+        copy.append(title, description, metadata);
+        const button = document.createElement("button");
+        button.className = "inspect";
+        button.textContent = "Inspect";
+        button.setAttribute("aria-label", "Inspect " + driver.name);
+        button.addEventListener("click", () => {
+          selectDriver(index);
+          dialog.showModal();
+        });
+        row.append(copy, button);
+        document.getElementById("driver-list").append(row);
+        const tab = document.createElement("button");
+        tab.textContent = driver.short;
+        tab.id = "tab-" + driver.id;
+        tab.setAttribute("role", "tab");
+        tab.setAttribute("aria-controls", "driver-panel");
+        tab.setAttribute("aria-selected", String(index === 0));
+        tab.tabIndex = index === 0 ? 0 : -1;
+        tab.addEventListener("click", () => selectDriver(index));
+        tabs.append(tab);
+      });
+      tabs.addEventListener("keydown", (event) => {
+        let next = activeIndex;
+        if (event.key === "ArrowRight")
+          next = (activeIndex + 1) % drivers.length;
+        else if (event.key === "ArrowLeft")
+          next = (activeIndex + drivers.length - 1) % drivers.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = drivers.length - 1;
+        else return;
+        event.preventDefault();
+        selectDriver(next);
+        tabs.children[next].focus();
+      });
+      document
+        .getElementById("close-dialog")
+        .addEventListener("click", () => dialog.close());
+      dialog.addEventListener("keydown", (event) => {
+        if (event.key !== "Tab") return;
+        const focusable = dialog.querySelectorAll(
+          'button:not([disabled]):not([tabindex="-1"]), [href], [tabindex="0"]',
+        );
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      });
+    </script>
+  </body>
+</html>

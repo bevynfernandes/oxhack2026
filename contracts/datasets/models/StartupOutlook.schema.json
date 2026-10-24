@@ -1,5 +1,68 @@
 {
   "$defs": {
+    "OutcomeForecast": {
+      "additionalProperties": false,
+      "description": "An agreed product horizon without an approved label policy or model.\n\nAttributes:\n    outcome_id: Product outcome, separate from specialist groups/v1 targets.\n    horizon_months: Approved calendar-month horizon from the report cutoff.\n    definition_status: Detailed labels/thresholds still require a data review.\n    model_status: No training or inference has run for this outcome.\n    prediction: Always null; no probability or score is permitted.\n    reason_codes: Both label-policy and model limitations, in display order.\n\nRaises:\n    ValueError: Horizon disagrees with the outcome or a prediction is injected.",
+      "properties": {
+        "outcome_id": {
+          "enum": [
+            "growth",
+            "survival",
+            "financial_health"
+          ],
+          "title": "Outcome Id",
+          "type": "string"
+        },
+        "horizon_months": {
+          "exclusiveMinimum": 0,
+          "title": "Horizon Months",
+          "type": "integer"
+        },
+        "definition_status": {
+          "const": "pending_label_policy",
+          "default": "pending_label_policy",
+          "title": "Definition Status",
+          "type": "string"
+        },
+        "model_status": {
+          "const": "model_not_trained",
+          "default": "model_not_trained",
+          "title": "Model Status",
+          "type": "string"
+        },
+        "prediction": {
+          "default": null,
+          "title": "Prediction",
+          "type": "null"
+        },
+        "reason_codes": {
+          "default": [
+            "target_definition_pending",
+            "model_not_trained"
+          ],
+          "maxItems": 2,
+          "minItems": 2,
+          "prefixItems": [
+            {
+              "const": "target_definition_pending",
+              "type": "string"
+            },
+            {
+              "const": "model_not_trained",
+              "type": "string"
+            }
+          ],
+          "title": "Reason Codes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "outcome_id",
+        "horizon_months"
+      ],
+      "title": "OutcomeForecast",
+      "type": "object"
+    },
     "SpecialistOutlook": {
       "additionalProperties": false,
       "description": "One group's source coverage, independent of its untrained model status.\n\nAttributes:\n    group_id: Fundamental metric group, not a success target.\n    data_status: Available means some usable observations, not training-ready.\n    metric_observation_ids: All assigned source observations, including gaps.\n    usable_metric_observation_ids: Fresh verified public observations only.\n    evidence_ids: Supporting evidence for usable observations only.\n    reason_codes: Data limitations and the absent-model reason.\n    model_status: Explicitly untrained; this version never serves forecasts.\n    prediction: Always null until a separately gated serving contract exists.\n\nRaises:\n    ValueError: References repeat, usable references are absent, or coverage\n        contradicts availability. Numerical forecasts are rejected.",
@@ -82,7 +145,7 @@
     }
   },
   "additionalProperties": false,
-  "description": "Five local-model placeholders attached to one exact company source vintage.\n\nAttributes:\n    schema_version: Additive research payload version; v1 assessments stay intact.\n    company_id: Exact source company identity, not a user-entered name.\n    source_snapshot_id: Immutable source publication consumed by the builder.\n    as_of: Source cutoff, never the current request clock.\n    grouping_policy_version: Version of the explicit metric-to-group mapping.\n    synthetic: Source fixture flag retained for API/UI consumers.\n    specialists: Exactly one section per group, including unavailable groups.\n    unassigned_metric_observation_ids: Observations without an approved mapping.\n    inference_runtime: Intended execution location; no inference has run.\n    overall_outlook: Null; this contract cannot fabricate an outlook index.\n    overall_reason_codes: Why a combined prediction cannot be served.\n\nRaises:\n    ValueError: Groups or observation assignments repeat or are incomplete.",
+  "description": "Five local-model placeholders attached to one exact company source vintage.\n\nAttributes:\n    schema_version: Additive research payload version; v1 assessments stay intact.\n    company_id: Exact source company identity, not a user-entered name.\n    source_snapshot_id: Immutable source publication consumed by the builder.\n    as_of: Source cutoff, never the current request clock.\n    grouping_policy_version: Version of the explicit metric-to-group mapping.\n    synthetic: Source fixture flag retained for API/UI consumers.\n    specialists: Exactly one section per group, including unavailable groups.\n    unassigned_metric_observation_ids: Observations without an approved mapping.\n    inference_runtime: Intended execution location; no inference has run.\n    overall_outlook: Null; this contract cannot fabricate an outlook index.\n    overall_reason_codes: Why a combined prediction cannot be served.\n    forecasts: Three outcome placeholders for new reports. Absent in older\n        reports; omitted on serialization to preserve their original bytes.\n\nRaises:\n    ValueError: Groups or observation assignments repeat or are incomplete.",
   "properties": {
     "schema_version": {
       "const": "startup-outlook-placeholder-v1",
@@ -151,6 +214,21 @@
       },
       "title": "Overall Reason Codes",
       "type": "array"
+    },
+    "forecasts": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/OutcomeForecast"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Forecasts"
     }
   },
   "required": [
