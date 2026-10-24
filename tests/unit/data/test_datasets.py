@@ -2,11 +2,14 @@
 
 from dataclasses import replace
 from datetime import UTC, datetime
+from hashlib import sha256
 from io import BytesIO
 
+import orjson
 import polars as pl
 import pytest
 
+from oxhack2026.catalog.schemas import CatalogSnapshot, Package
 from oxhack2026.storage.codec import decode_observations, encode_observations
 from oxhack2026.storage.contracts import (
     ArtifactStore,
@@ -17,9 +20,96 @@ from oxhack2026.storage.contracts import (
 )
 from oxhack2026.storage.datasets import (
     DatasetBundle,
+    load_bundle,
     select_observations,
     validate_bundle,
 )
+
+
+@pytest.mark.parametrize("forge_request", [False, True])
+def test_valid_package_swap_cannot_reassign_downloads(
+    synthetic_bundle: tuple[DatasetBundle, ArtifactStore], forge_request: bool
+) -> None:
+    """Correctly hashed tables cannot attribute another package's raw downloads."""
+    bundle, artifacts = synthetic_bundle
+    package = Package(
+        package_id="other-valid", ecosystem="npm", canonical_name="other-package"
+    )
+    catalog = CatalogSnapshot.model_validate(
+        bundle.catalog.model_dump()
+        | {
+            "packages": (*bundle.catalog.packages, package),
+        }
+    )
+    series_id = "npm-" + sha256(package.canonical_name.encode()).hexdigest()
+    series = ObservationSeries.model_validate(
+        bundle.series[0].model_dump()
+        | {
+            "entity_id": package.package_id,
+            "series_id": series_id,
+        }
+    )
+    rows = tuple(
+        ObservationRevision.model_validate(row.model_dump() | {"series_id": series_id})
+        for row in bundle.observations
+    )
+    coverage = [
+        row.model_dump(mode="json") | {"series_id": series_id}
+        for row in bundle.coverage
+    ]
+    extractions = [row.model_dump() for row in bundle.manifest.extraction_manifests]
+    if forge_request:
+        request = {
+            "package": package.model_dump(mode="json"),
+            "catalog_version": catalog.catalog_version,
+            "window": bundle.manifest.extraction_manifests[
+                0
+            ].requested_window.model_dump(mode="json"),
+        }
+        extractions[0]["configuration_sha256"] = sha256(
+            orjson.dumps(request, option=orjson.OPT_SORT_KEYS)
+        ).hexdigest()
+    manifest = DatasetManifest.model_validate(
+        bundle.manifest.model_dump()
+        | {
+            "catalog": artifacts.write(
+                catalog.model_dump_json().encode(), "application/json"
+            ),
+            "series": artifacts.write(
+                orjson.dumps([series.model_dump(mode="json")]), "application/json"
+            ),
+            "observations": artifacts.write(
+                encode_observations(rows), "application/vnd.apache.parquet"
+            ),
+            "coverage": artifacts.write(orjson.dumps(coverage), "application/json"),
+            "extraction_manifests": extractions,
+        }
+    )
+    message = "raw package" if forge_request else "pinned extraction request"
+    with pytest.raises(ValueError, match=message):
+        load_bundle(manifest, artifacts)
+
+
+def test_noncanonical_npm_series_identity_rejected(
+    synthetic_bundle: tuple[DatasetBundle, ArtifactStore],
+) -> None:
+    """A canonical source/package identity determines its stable series ID."""
+    bundle, _ = synthetic_bundle
+    changed = ObservationSeries.model_validate(
+        bundle.series[0].model_dump() | {"series_id": "fake"}
+    )
+    rows = tuple(
+        ObservationRevision.model_validate(row.model_dump() | {"series_id": "fake"})
+        for row in bundle.observations
+    )
+    coverage = tuple(
+        type(row).model_validate(row.model_dump() | {"series_id": "fake"})
+        for row in bundle.coverage
+    )
+    with pytest.raises(ValueError, match="pinned extraction request"):
+        validate_bundle(
+            replace(bundle, series=(changed,), observations=rows, coverage=coverage)
+        )
 
 
 def test_parquet_preserves_zero_null_count_and_utc(

@@ -77,3 +77,21 @@ Validation after merging current main: `make check test build docs-test` passes
 341 unit tests; six explicit filesystem integration tests pass. Local logs and
 the saved extraction/transfer checks are retained under
 `tests/outputs/dev1-dataset-20261024/`.
+
+## Attribution review correction
+
+The validator now binds each npm series to the canonical package ID and the
+hashed extraction request, then checks the package inside the verified raw
+response. Reassigning a valid package or forging only the request metadata is
+rejected. Regression cases cover both attacks and a noncanonical series ID.
+The original real bundle passes the stricter checks unchanged.
+
+New assemblies explicitly pin `downloads-features-v1` / `targets-v1`, matching
+Dev 2's definitions. The already published v1 retains its original
+`features-v1` / `downloads-v1` metadata; consumers must not silently reinterpret
+it. Its frozen extraction run must be replayed with its recorded code revision;
+adding configuration fields does not authorize changing the persisted run.
+
+Post-review validation: 344 unit tests and six explicit filesystem integration
+tests pass; Ruff and whole-repository mypy pass. Retained logs are under
+`tests/outputs/startup-outlook-20261024/`.

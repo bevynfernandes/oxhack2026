@@ -22,6 +22,8 @@ class NpmRun(Contract):
     dataset_version: Identifier
     window: TimeWindow
     code_revision: Identifier
+    feature_definition_version: Identifier = "downloads-features-v1"
+    target_definition_version: Identifier = "targets-v1"
 
 
 def extract_catalog(catalog: CatalogSnapshot, root: Path, run: NpmRun) -> DatasetBundle:
@@ -95,5 +97,7 @@ def extract_catalog(catalog: CatalogSnapshot, root: Path, run: NpmRun) -> Datase
         ),
         code_revision=run.code_revision,
         configuration_sha256=sha256(configuration).hexdigest(),
+        feature_definition_version=run.feature_definition_version,
+        target_definition_version=run.target_definition_version,
     )
     return write_candidate(catalog, extractions, root, config)

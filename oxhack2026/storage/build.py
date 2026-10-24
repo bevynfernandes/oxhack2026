@@ -35,8 +35,8 @@ class CandidateConfig(Contract):
     created_at: UtcInstant
     code_revision: Identifier
     configuration_sha256: Sha256
-    feature_definition_version: Identifier = "features-v1"
-    target_definition_version: Identifier = "downloads-v1"
+    feature_definition_version: Identifier = "downloads-features-v1"
+    target_definition_version: Identifier = "targets-v1"
 
 
 def _coverage(
