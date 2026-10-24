@@ -1,7 +1,6 @@
 """Versioned numerical artifacts; importing these types starts no services."""
 
 from datetime import UTC, datetime
-from pathlib import PurePosixPath
 from typing import Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
@@ -12,8 +11,9 @@ from oxhack2026.features.definitions import (
     require_utc,
     target_windows,
 )
+from oxhack2026.storage.contracts import ArtifactReference as ArtifactReference
 
-SCHEMA_VERSION: Literal["models-v1"] = "models-v1"
+SCHEMA_VERSION: Literal["models-v2"] = "models-v2"
 Ecosystem = Literal["npm", "pypi"]
 TargetId = Literal["downloads_next_30d_v1", "downloads_trailing_28d_at_91d_v1"]
 ForecastMode = Literal["reconstructed", "prospective"]
@@ -32,31 +32,6 @@ class Contract(BaseModel):
     """Immutable, strict artifacts rejecting unknown fields and nonfinite numbers."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, allow_inf_nan=False)
-
-
-class ArtifactReference(Contract):
-    """Relative bundle path and SHA-256 digest; paths cannot escape the bundle."""
-
-    path: str = Field(min_length=1)
-    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-
-    @field_validator("path")
-    @classmethod
-    def validate_path(cls, value: str) -> str:
-        """Return a relative POSIX path or raise ValueError for unsafe paths.
-
-        Args:
-            value: Artifact path relative to the receiving bundle root.
-        Returns:
-            The unchanged safe path.
-        Raises:
-            ValueError: If the path is absolute, traverses parents, or uses backslashes.
-        """
-        path = PurePosixPath(value)
-        if path.is_absolute() or ".." in path.parts or "\\" in value or value == ".":
-            message = "Artifact paths must stay within the bundle root"
-            raise ValueError(message)
-        return value
 
 
 class TimeWindow(Contract):
@@ -298,7 +273,7 @@ class MatureOutcome(Contract):
 class FeatureManifest(Contract):
     """Feature/label bundle binding source data, policies, code, and schemas."""
 
-    schema_version: Literal["models-v1"] = SCHEMA_VERSION
+    schema_version: Literal["models-v2"] = SCHEMA_VERSION
     dataset_version: str
     mapping_version: str
     feature_schema_version: str
@@ -314,7 +289,7 @@ class FeatureManifest(Contract):
 class ForecastManifest(Contract):
     """Published batch with outcomes stored as separate versioned artifacts."""
 
-    schema_version: Literal["models-v1"] = SCHEMA_VERSION
+    schema_version: Literal["models-v2"] = SCHEMA_VERSION
     batch_id: str
     windows: TargetWindows
     ecosystem: Ecosystem
