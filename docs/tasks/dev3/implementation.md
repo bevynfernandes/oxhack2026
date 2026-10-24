@@ -15,7 +15,8 @@ is excluded. The original download checklist below is historical.
 | D3-O4 real adapter | Merged | #32 storage composition, #39 local runtime; #41 exact policy selection and rollout/retirement regression |
 | D3-O5 real acceptance | Verified locally | Restored Qdrant/Weaviate C1/C2 bundle, real API/browser, all three outcomes, four metric families, mobile/keyboard/axe |
 
-Validation after publication pinning: 540 Python units, 104 API cases, real API
+Validation after publication pinning and main integration: 562 Python tests
+(including 104 API cases), real API
 acceptance, 14 frontend unit tests, 12 browser cases and one separate real-data
 browser flow. Ruff, mypy, generated-contract drift, TypeScript, formatting and
 production frontend build pass. Reports/screenshots are retained under ignored
