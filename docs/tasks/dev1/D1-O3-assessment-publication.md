@@ -41,3 +41,10 @@ Saved synthetic C1/C2 composition fixtures exercise successful reads and rejecti
 of wrong source/company/family/time/synthetic identity, missing support, mixed
 policies and incomplete company coverage. Opt-in filesystem tests cover exact
 reads, repeated publication, failed pointer writes, lost CAS and raw corruption.
+
+For Dev 3's source-scoped read port, inject
+`SourceScopedAssessmentReader(store, ("explicit-publication-id",))`. It implements
+`snapshot_ids()` and `assessments(source_snapshot_id)`. The configuration selects
+one exact assessment policy publication per source; ambiguous duplicate source
+selections fail. Publishing a newer policy never changes this selection. This
+adapter contains no model policy or public DTO mapping.

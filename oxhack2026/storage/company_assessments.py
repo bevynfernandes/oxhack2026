@@ -317,3 +317,35 @@ class LocalCompanyAssessmentStore:
                 updated.model_dump_json().encode(),
             )
         return manifest
+
+
+@dataclass(frozen=True)
+class SourceScopedAssessmentReader:
+    """Adapt explicitly selected batches to the API's source-snapshot read port.
+
+    Multiple policies can assess one source snapshot. Configuration must select
+    exactly one publication per source; no latest/current selection is inferred.
+    Construction performs no I/O; reads validate the configured publications.
+    """
+
+    store: CompanyAssessmentReader
+    publication_ids: tuple[str, ...]
+
+    def _mapping(self) -> dict[str, str]:
+        selected: dict[str, str] = {}
+        for publication_id in self.publication_ids:
+            manifest = self.store.manifest(publication_id)
+            if manifest.source_snapshot_id in selected:
+                message = "API selection requires one assessment publication per source"
+                raise ValueError(message)
+            self.store.assessments(publication_id)
+            selected[manifest.source_snapshot_id] = publication_id
+        return selected
+
+    def snapshot_ids(self) -> tuple[str, ...]:
+        """Enumerate source IDs with an exact selected and verified assessment batch."""
+        return tuple(sorted(self._mapping()))
+
+    def assessments(self, source_snapshot_id: str) -> tuple[CompanyAssessment, ...]:
+        """Read the configured batch for this source; unknown sources raise KeyError."""
+        return self.store.assessments(self._mapping()[source_snapshot_id])

@@ -55,3 +55,36 @@ def test_assessment_publication_and_rollback(
     (root / source.evidence[0].raw_artifact.path).write_bytes(b"corruption")
     with pytest.raises(ValueError, match="SHA-256"):
         store.assessments("first")
+
+
+def test_source_scoped_api_selection_is_explicit(
+    company_source: tuple[CompanySourceSnapshot, ArtifactStore],
+    company_assessments: tuple[CompanyAssessment, ...],
+) -> None:
+    """A new policy publication cannot silently change an API's configured batch."""
+    from oxhack2026.storage.company_assessments import SourceScopedAssessmentReader
+
+    source, artifacts = company_source
+    root = Path("tests/outputs/assessment-api-selection") / uuid4().hex
+    source_store = LocalCompanyStore(root)
+    for item in source.evidence:
+        source_store.artifacts.write(
+            artifacts.read(item.raw_artifact), item.raw_artifact.media_type
+        )
+    source_store.publish(source, None)
+    store = LocalCompanyAssessmentStore(root)
+    store.publish("first", company_assessments, None)
+    newer = tuple(
+        CompanyAssessment.model_validate(
+            row.model_dump() | {"policy_version": "new-policy"}
+        )
+        for row in company_assessments
+    )
+    store.publish("second", newer, "first")
+    selected = SourceScopedAssessmentReader(store, ("first",))
+    assert selected.snapshot_ids() == (source.snapshot_id,)
+    assert selected.assessments(source.snapshot_id) == company_assessments
+    with pytest.raises(KeyError):
+        selected.assessments("absent")
+    with pytest.raises(ValueError, match="one assessment"):
+        SourceScopedAssessmentReader(store, ("first", "second")).snapshot_ids()
