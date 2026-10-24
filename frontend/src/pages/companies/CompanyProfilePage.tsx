@@ -1,6 +1,12 @@
 import { useEffect, useRef } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { date, QueryState, Reasons, SourceLink } from "../../components/Common";
+import {
+  date,
+  QueryState,
+  Reasons,
+  SourceLink,
+  SyntheticNotice,
+} from "../../components/Common";
 import {
   Coverage,
   families,
@@ -35,7 +41,7 @@ export default function CompanyProfilePage() {
   );
   return (
     <>
-      <Link to={`/?${new URLSearchParams({ snapshot: snapshotId })}`}>
+      <Link to={`/explore?${new URLSearchParams({ snapshot: snapshotId })}`}>
         Companies
       </Link>
       <QueryState
@@ -56,7 +62,22 @@ export default function CompanyProfilePage() {
               Company website
             </SourceLink>
           </header>
-          <PublicationNotice publication={profile.publication} />
+          <SyntheticNotice synthetic={profile.publication.source.synthetic} />
+          <p className="disclaimer">
+            Evidence as of {date(profile.publication.source.as_of)}
+          </p>
+          <details>
+            <summary>Assessment date and publication details</summary>
+            <PublicationNotice publication={profile.publication} />
+          </details>
+          <nav className="profile-sections" aria-label="Analysis sections">
+            <a href="#outlook-heading">Outlook</a>
+            <a href="#signals-heading">Evidence & risks</a>
+            <a href="#metrics-heading">Metrics</a>
+            <a href="#sources" onClick={openSources}>
+              Sources
+            </a>
+          </nav>
           <section aria-labelledby="outlook-heading">
             <h2 id="outlook-heading">Company outlook</h2>
             <p>

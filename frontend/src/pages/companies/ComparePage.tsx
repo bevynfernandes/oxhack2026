@@ -53,7 +53,7 @@ export default function ComparePage() {
     );
   return (
     <>
-      <Link to={`/?${params}`}>Change company selection</Link>
+      <Link to={`/explore?${params}`}>Change company selection</Link>
       <header className="page-heading">
         <h1>Compare companies</h1>
         <p>

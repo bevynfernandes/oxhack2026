@@ -4,6 +4,7 @@ import BatchPage from "./pages/rankings/BatchPage";
 import EvaluationPage from "./pages/evaluation/EvaluationPage";
 import DataHealthPage from "./pages/data-health/DataHealthPage";
 import MethodologyPage from "./pages/methodology/MethodologyPage";
+import CompanyHomePage from "./pages/companies/CompanyHomePage";
 import CompanyListPage from "./pages/companies/CompanyListPage";
 import CompanyProfilePage from "./pages/companies/CompanyProfilePage";
 import ComparePage from "./pages/companies/ComparePage";
@@ -23,13 +24,14 @@ export default function App() {
           <NavLink to="/" end>
             Companies
           </NavLink>
-          <NavLink to="/traction">Traction research</NavLink>
+          <NavLink to="/explore">Compare & explore</NavLink>
           <NavLink to="/methodology">Methodology</NavLink>
         </nav>
       </header>
       <main id="main" tabIndex={-1}>
         <Routes>
-          <Route path="/" element={<CompanyListPage />} />
+          <Route path="/" element={<CompanyHomePage />} />
+          <Route path="/explore" element={<CompanyListPage />} />
           <Route
             path="/companies/:snapshotId/:companyId"
             element={<CompanyProfilePage />}
@@ -61,6 +63,8 @@ export default function App() {
       <footer>
         Company outlooks describe published evidence and its limits. Package
         activity alone does not establish company growth.{" "}
+        <NavLink to="/traction">Traction research</NavLink>
+        {" · "}
         <NavLink to="/data-health">Data health</NavLink>
       </footer>
     </>

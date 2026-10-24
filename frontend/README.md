@@ -108,3 +108,11 @@ ignores that file. The build fails on generated-type drift.
 API errors must remain JSON errors. Cache hashed assets immutably; revalidate
 `index.html`. Dev 1 owns the reverse proxy, TLS, request limits and resource setup.
 No offline export or demo server is included in this workstream.
+
+### Company-first interface
+
+- `/` starts with company search and opens one saved analysis. The default is the latest assessment publication by recorded date (publication ID breaks ties); it does not start a research job.
+- `/explore` retains explicit publication selection, filters and comparison. Older `/?snapshot=...` links redirect there with their selection intact.
+- Profiles retain the three existing outcomes and metric definitions. Publication metadata is expandable; dates and synthetic-data notices stay visible.
+- Visual references and collaborator guidance are in private issue #43: shadcn/ui components, Radix disclosure patterns, Motion accessibility/examples and Lucide icons. This pass uses native controls and CSS with no new dependencies.
+- Short entrance and hover transitions respect reduced-motion settings. No animated scores, implied live research or invented probabilities.

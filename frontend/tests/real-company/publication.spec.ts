@@ -18,6 +18,23 @@ test("real company publication supports list, source inspection and accessible c
   page.on("request", (request) => requests.push(request.url()));
 
   await page.goto("/");
+  const firstCompany = rows[0].company.display_name;
+  await page.getByLabel("Search companies").fill(firstCompany);
+  await expect(
+    page.getByRole("link", { name: `View analysis for ${firstCompany}` }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath("real-homepage.png"),
+    fullPage: true,
+  });
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page
+    .getByRole("link", { name: `View analysis for ${firstCompany}` })
+    .click();
+  await expect(
+    page.getByRole("heading", { name: "Company outlook" }),
+  ).toBeVisible();
+  await page.goto("/explore");
   await page.getByLabel("Assessment snapshot").selectOption(snapshot);
   await expect(
     page.getByText("Synthetic test data.", { exact: true }),

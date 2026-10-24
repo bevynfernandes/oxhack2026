@@ -28,7 +28,12 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
+  projects: [
+    {
+      name: "chromium",
+      use: { ...devices["Desktop Chrome"], channel: "chromium" },
+    },
+  ],
   webServer: [
     {
       command: `../.venv/bin/uvicorn --app-dir ../tests/fixtures/api server:create_app --factory --host 127.0.0.1 --port ${apiPort}`,
