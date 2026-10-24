@@ -95,3 +95,14 @@ adding configuration fields does not authorize changing the persisted run.
 Post-review validation: 344 unit tests and six explicit filesystem integration
 tests pass; Ruff and whole-repository mypy pass. Retained logs are under
 `tests/outputs/startup-outlook-20261024/`.
+
+A metadata-only `npm-initial-20261024-v2` bundle is now attached to the **same**
+draft release `data-npm-initial-20261024-v1`. Download with
+`--pattern 'npm-initial-20261024-v2.*'`. It pins the corrected consumer definitions
+and records the source manifest plus reissue configuration. All 17,570 observations,
+raw bytes, collection times and catalogue mappings are unchanged; v1 is retained.
+
+V2 ZIP SHA-256: `a8f3a4cc2d13dc2e3ee3450e1c507a34f05c279e6432566ccad854e89a781928`.
+V2 manifest SHA-256: `c5af606a5e2c3795faf39a4b92623d046e8c01d4e065ab704c0c4a0b0eca4a34`.
+The ZIP is 838,296 bytes. Use v2 for the current Dev 2 definition contract; this
+is still download evidence, not a startup-outcome model or training cohort.
