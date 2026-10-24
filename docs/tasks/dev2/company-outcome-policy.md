@@ -1,5 +1,11 @@
 # Company outlook: Dev 2 policy proposal
 
+Later clarification (24 October 2026): the current top cards are growth (24 months),
+survival (24 months) and financial health (12 months). The financing/acquisition
+label below is an older, separate endpoint and must not be renamed survival.
+See [trained dimension models and the three-card mapping](public-dimension-training-20261024.md)
+for actual public-data training results and the user-selected descriptive AScore.
+
 Tracks [#19](https://github.com/bevynfernandes/oxhack2026/issues/19), following
 the user's replacement of the download-only product goal. The user requested
 all three outcomes below. This proposal defines their semantics before new

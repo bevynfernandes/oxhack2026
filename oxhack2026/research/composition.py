@@ -3,9 +3,12 @@
 import re
 from collections import defaultdict
 from datetime import UTC, datetime
+from math import log, log1p
+from urllib.parse import unquote, urlsplit
 from uuid import uuid4
 
 from oxhack2026.api.research_v2_schemas import Claim, Identity, Job, Observation, Report
+from oxhack2026.models.dimension_serving import DimensionInputs, DimensionModelRegistry
 from oxhack2026.models.startup_outlook import (
     FORECAST_HORIZONS,
     SPECIALIST_GROUP_IDS,
@@ -53,12 +56,84 @@ def _conflicting_claims(job: Job) -> tuple[Claim, ...]:
     )
 
 
-def compose(job: Job, identity: Identity) -> Report:
+def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
+    rows = [
+        row
+        for source in job.sources
+        for row in source.observations
+        if row.metric_id in {"npm_downloads_latest_30d", "npm_downloads_previous_30d"}
+    ]
+    adoption: tuple[tuple[float, ...] | None, tuple[str, ...], str] = (
+        None,
+        (),
+        "requires_complete_adjacent_npm_windows",
+    )
+    if len(rows) == 2 and len({row.metric_id for row in rows}) == 2:
+        selected = {row.metric_id: row for row in rows}
+        current, previous = (
+            selected["npm_downloads_latest_30d"],
+            selected["npm_downloads_previous_30d"],
+        )
+        from datetime import timedelta
+
+        evidence = {
+            row.evidence_id: row for source in job.sources for row in source.evidence
+        }
+        packages = []
+        for row in (current, previous):
+            names = set()
+            for key in row.evidence_ids:
+                item = evidence.get(key)
+                if item is None:
+                    continue
+                parsed = urlsplit(item.url)
+                if parsed.hostname == "api.npmjs.org" and parsed.path.startswith(
+                    "/downloads/range/"
+                ):
+                    names.add(unquote(parsed.path.split("/", 4)[-1]))
+            packages.append(names)
+        if (
+            current.window is not None
+            and previous.window is not None
+            and previous.window.end == current.window.start
+            and all(
+                row.value is not None
+                and row.value >= 1000
+                and float(row.value).is_integer()
+                and row.unit == "downloads"
+                and row.missing_reason is None
+                and row.window is not None
+                and row.window.end - row.window.start == timedelta(days=30)
+                for row in rows
+            )
+            and len(packages[0]) == 1
+            and packages[0] == packages[1]
+            and current.value is not None
+            and previous.value is not None
+        ):
+            adoption = (
+                (
+                    log1p(current.value),
+                    log1p(previous.value),
+                    log((current.value + 1) / (previous.value + 1)),
+                ),
+                (current.observation_id, previous.observation_id),
+                "experimental_sdk_proxy_only",
+            )
+    return DimensionInputs(
+        outlook.company_id, outlook.source_snapshot_id, outlook.as_of, adoption
+    )
+
+
+def compose(
+    job: Job, identity: Identity, models: DimensionModelRegistry | None = None
+) -> Report:
     """Build a fresh report; saved context alone never qualifies as a fresh result.
 
     Args:
         job: Source checkpoints after every enabled collector has stopped.
         identity: Exact confirmed discovery preview, including conflicts/context.
+        models: Optional verified experimental bundle; old report bytes are untouched.
     Returns:
         Validated immutable report retaining claims without invented metrics.
     """
@@ -121,7 +196,11 @@ def compose(job: Job, identity: Identity) -> Report:
             "Saved context retains its original collection dates and "
             "synthetic flag in identity.saved_context."
         ),
-        "Numerical forecasts remain null; no models were trained or run.",
+        (
+            "Outcome forecasts remain null; experimental dimensions are separate."
+            if models
+            else "Numerical forecasts remain null; no models were trained or run."
+        ),
     ]
     limitations.extend(
         f"{source.name}: {', '.join(source.reason_codes)}"
@@ -140,5 +219,8 @@ def compose(job: Job, identity: Identity) -> Report:
         evidence=(*identity.evidence, *support),
         captures=(*identity.captures, *captures),
         outlook=outlook,
+        dimension_models=models.evaluate_inputs(_dimension_inputs(job, outlook))
+        if models
+        else None,
         limitations=tuple(limitations),
     )

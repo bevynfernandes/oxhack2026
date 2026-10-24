@@ -32,6 +32,7 @@ def test_runtime_composes_only_explicit_publications(
     monkeypatch.setenv("SIGNALSHIFT_COMPANY_ROOT", "/mock/company-root")
     monkeypatch.setenv("SIGNALSHIFT_COMPANY_PUBLICATIONS", "first-v1, second-v2")
     with (
+        patch("oxhack2026.api.company_runtime._dimension_registry", return_value=None),
         patch("oxhack2026.api.company_runtime.LocalCompanyStore") as sources,
         patch("oxhack2026.api.company_runtime.LocalCompanyAssessmentStore") as models,
         patch(
@@ -44,5 +45,8 @@ def test_runtime_composes_only_explicit_publications(
         sources.assert_called_once_with(Path("/mock/company-root"))
         models.assert_called_once_with(Path("/mock/company-root"))
         repository.assert_called_once_with(
-            sources.return_value, models.return_value, ("first-v1", "second-v2")
+            sources.return_value,
+            models.return_value,
+            ("first-v1", "second-v2"),
+            dimension_models=None,
         )

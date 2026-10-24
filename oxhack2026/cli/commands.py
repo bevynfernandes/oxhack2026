@@ -6,6 +6,7 @@ from pathlib import Path
 import typer
 
 from oxhack2026.catalog.schemas import CatalogSnapshot
+from oxhack2026.cli.models import app as models
 from oxhack2026.ingest.pipeline import NpmRun, extract_catalog
 from oxhack2026.storage.artifacts import FileArtifactStore
 from oxhack2026.storage.contracts import ArtifactReference, DatasetManifest
@@ -20,6 +21,7 @@ app = typer.Typer(
 )
 data = typer.Typer(help="Validate, extract and publish immutable datasets.")
 app.add_typer(data, name="data")
+app.add_typer(models, name="models")
 
 
 @data.command("catalog-validate")
