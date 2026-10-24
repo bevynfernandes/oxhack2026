@@ -1,0 +1,166 @@
+{
+  "$defs": {
+    "SpecialistOutlook": {
+      "additionalProperties": false,
+      "description": "One group's source coverage, independent of its untrained model status.\n\nAttributes:\n    group_id: Fundamental metric group, not a success target.\n    data_status: Available means some usable observations, not training-ready.\n    metric_observation_ids: All assigned source observations, including gaps.\n    usable_metric_observation_ids: Fresh verified public observations only.\n    evidence_ids: Supporting evidence for usable observations only.\n    reason_codes: Data limitations and the absent-model reason.\n    model_status: Explicitly untrained; this version never serves forecasts.\n    prediction: Always null until a separately gated serving contract exists.\n\nRaises:\n    ValueError: References repeat, usable references are absent, or coverage\n        contradicts availability. Numerical forecasts are rejected.",
+      "properties": {
+        "group_id": {
+          "enum": [
+            "adoption_retention",
+            "attention_sentiment",
+            "financial_health",
+            "industry_competition",
+            "team_execution"
+          ],
+          "title": "Group Id",
+          "type": "string"
+        },
+        "data_status": {
+          "enum": [
+            "available",
+            "insufficient_data",
+            "not_applicable"
+          ],
+          "title": "Data Status",
+          "type": "string"
+        },
+        "metric_observation_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Metric Observation Ids",
+          "type": "array"
+        },
+        "usable_metric_observation_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Usable Metric Observation Ids",
+          "type": "array"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "reason_codes": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "model_status": {
+          "const": "model_not_trained",
+          "default": "model_not_trained",
+          "title": "Model Status",
+          "type": "string"
+        },
+        "prediction": {
+          "default": null,
+          "title": "Prediction",
+          "type": "null"
+        }
+      },
+      "required": [
+        "group_id",
+        "data_status",
+        "reason_codes"
+      ],
+      "title": "SpecialistOutlook",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Five local-model placeholders attached to one exact company source vintage.\n\nAttributes:\n    schema_version: Additive research payload version; v1 assessments stay intact.\n    company_id: Exact source company identity, not a user-entered name.\n    source_snapshot_id: Immutable source publication consumed by the builder.\n    as_of: Source cutoff, never the current request clock.\n    grouping_policy_version: Version of the explicit metric-to-group mapping.\n    synthetic: Source fixture flag retained for API/UI consumers.\n    specialists: Exactly one section per group, including unavailable groups.\n    unassigned_metric_observation_ids: Observations without an approved mapping.\n    inference_runtime: Intended execution location; no inference has run.\n    overall_outlook: Null; this contract cannot fabricate an outlook index.\n    overall_reason_codes: Why a combined prediction cannot be served.\n\nRaises:\n    ValueError: Groups or observation assignments repeat or are incomplete.",
+  "properties": {
+    "schema_version": {
+      "const": "startup-outlook-placeholder-v1",
+      "default": "startup-outlook-placeholder-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "company_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Company Id",
+      "type": "string"
+    },
+    "source_snapshot_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Source Snapshot Id",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "grouping_policy_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Grouping Policy Version",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "specialists": {
+      "items": {
+        "$ref": "#/$defs/SpecialistOutlook"
+      },
+      "title": "Specialists",
+      "type": "array"
+    },
+    "unassigned_metric_observation_ids": {
+      "default": [],
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Unassigned Metric Observation Ids",
+      "type": "array"
+    },
+    "inference_runtime": {
+      "const": "local_cpu",
+      "default": "local_cpu",
+      "title": "Inference Runtime",
+      "type": "string"
+    },
+    "overall_outlook": {
+      "default": null,
+      "title": "Overall Outlook",
+      "type": "null"
+    },
+    "overall_reason_codes": {
+      "default": [
+        "model_not_trained"
+      ],
+      "items": {
+        "const": "model_not_trained",
+        "type": "string"
+      },
+      "title": "Overall Reason Codes",
+      "type": "array"
+    }
+  },
+  "required": [
+    "company_id",
+    "source_snapshot_id",
+    "as_of",
+    "grouping_policy_version",
+    "synthetic",
+    "specialists"
+  ],
+  "title": "StartupOutlook",
+  "type": "object"
+}
