@@ -726,6 +726,16 @@
             "title": "Definitions",
             "type": "array"
           },
+          "dimension_models": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyDimensionModels"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "events": {
             "items": {
               "$ref": "#/components/schemas/CompanyEvent"
@@ -784,6 +794,54 @@
           "evidence"
         ],
         "title": "CompanyDetail",
+        "type": "object"
+      },
+      "CompanyDimensionModels": {
+        "additionalProperties": false,
+        "description": "Current experimental model overlay, separate from immutable assessments.\n\nAttributes:\n    schema_version: Independent proxy-inference contract version.\n    company_id: Exact company evaluated from the selected source publication.\n    source_snapshot_id: Exact source whose inputs were consumed.\n    as_of: Measurement cutoff, not an assertion of historical model availability.\n    model_bundle_sha256: Exact training-run manifest used for this overlay.\n    dimensions: Five verified trained proxies, each with its own eligibility.\nRaises:\n    ValueError: The five dimensions are absent, duplicated or out of order.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "dimensions": {
+            "items": {
+              "$ref": "#/components/schemas/DimensionModelView"
+            },
+            "title": "Dimensions",
+            "type": "array"
+          },
+          "model_bundle_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Model Bundle Sha256",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "experimental-dimensions-v1",
+            "default": "experimental-dimensions-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_snapshot_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Source Snapshot Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "company_id",
+          "source_snapshot_id",
+          "as_of",
+          "model_bundle_sha256",
+          "dimensions"
+        ],
+        "title": "CompanyDimensionModels",
         "type": "object"
       },
       "CompanyEvent": {
@@ -1681,6 +1739,122 @@
           "value"
         ],
         "title": "DecimalValue",
+        "type": "object"
+      },
+      "DimensionModelView": {
+        "additionalProperties": false,
+        "description": "A trained proxy's availability, company eligibility and optional index.\n\nAttributes:\n    group_id: The dimension represented by this independent proxy model.\n    model_status: Actual verified weights exist; this is not outcome validation.\n    architecture: The portable baseline or validation-recommended comparator.\n    target: Plain-language target, distinct from the three company forecasts.\n    model_sha256: Exact fitted artifact digest, without local storage paths.\n    eligibility: Whether this company's inputs support experimental inference.\n    score: Training-outcome percentile, never a company-success probability.\n    predicted_value: Model output in the explicitly named transformed units.\n    prediction_unit: Units of the raw proxy prediction.\n    metric_observation_ids: Exact source inputs consumed by this inference.\n    reason_codes: Missingness, applicability and experimental-quality reasons.\n    limitations: Training population and quality restrictions.\nRaises:\n    ValueError: An unavailable model carries a score or a prediction is partial.",
+        "properties": {
+          "architecture": {
+            "title": "Architecture",
+            "type": "string"
+          },
+          "eligibility": {
+            "enum": [
+              "eligible",
+              "insufficient_data",
+              "not_applicable",
+              "unreliable"
+            ],
+            "title": "Eligibility",
+            "type": "string"
+          },
+          "group_id": {
+            "enum": [
+              "adoption_retention",
+              "attention_sentiment",
+              "financial_health",
+              "industry_competition",
+              "team_execution"
+            ],
+            "title": "Group Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "metric_observation_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Metric Observation Ids",
+            "type": "array"
+          },
+          "model_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Model Sha256",
+            "type": "string"
+          },
+          "model_status": {
+            "const": "experimental_trained",
+            "default": "experimental_trained",
+            "title": "Model Status",
+            "type": "string"
+          },
+          "predicted_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Value"
+          },
+          "prediction_unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prediction Unit"
+          },
+          "reason_codes": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "maximum": 100.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group_id",
+          "architecture",
+          "target",
+          "model_sha256",
+          "eligibility",
+          "reason_codes",
+          "limitations"
+        ],
+        "title": "DimensionModelView",
         "type": "object"
       },
       "DiscoveryRequest": {
@@ -3537,6 +3711,16 @@
             },
             "title": "Claims",
             "type": "array"
+          },
+          "dimension_models": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyDimensionModels"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "events": {
             "items": {

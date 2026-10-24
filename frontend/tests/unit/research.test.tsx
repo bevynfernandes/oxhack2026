@@ -39,6 +39,55 @@ it("does not add forecasts when opening an older immutable report", () => {
     screen.getByRole("link", { name: "View original saved analysis" }),
   ).toHaveAttribute("href", "/companies/synthetic-assessments-v1/alpha");
 });
+it("shows attached trained dimensions separately from unavailable company forecasts", () => {
+  const groups: DTO<"SpecialistOutlook">["group_id"][] = [
+    "adoption_retention",
+    "attention_sentiment",
+    "financial_health",
+    "industry_competition",
+    "team_execution",
+  ];
+  const attached: DTO<"ResearchReport"> = {
+    ...report,
+    inventory: {
+      ...report.inventory,
+      saved_context: {
+        ...report.inventory.saved_context,
+        dimension_models: {
+          schema_version: "experimental-dimensions-v1",
+          company_id: "alpha",
+          source_snapshot_id: "synthetic-companies-v1",
+          as_of: "2025-02-01T00:00:00Z",
+          model_bundle_sha256: "a".repeat(64),
+          dimensions: groups.map((group, index) => ({
+            group_id: group,
+            model_status: "experimental_trained",
+            architecture: "Test model",
+            target: "Test proxy, not success",
+            model_sha256: "b".repeat(64),
+            eligibility: index ? "insufficient_data" : "eligible",
+            score: index ? null : 34.8,
+            predicted_value: index ? null : 0.1,
+            prediction_unit: index ? null : "log growth",
+            metric_observation_ids: index ? [] : ["current", "previous"],
+            reason_codes: ["experimental_proxy"],
+            limitations: ["Not validated company success"],
+          })),
+        },
+      },
+    },
+  };
+  render(
+    <MemoryRouter>
+      <ResearchWorkspace report={attached} />
+    </MemoryRouter>,
+  );
+  expect(screen.getAllByText("Trained · experimental")).toHaveLength(5);
+  expect(screen.getByText("SDK demand index: 34.8 / 100")).toBeVisible();
+  expect(screen.queryByText("Untrained")).toBeNull();
+  expect(screen.getAllByText("Prediction unavailable")).toHaveLength(3);
+  expect(screen.getByText(/outcome models pending/)).toBeVisible();
+});
 it.each([
   [409, "identity"],
   [503, "unavailable"],

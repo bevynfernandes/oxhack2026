@@ -38,6 +38,18 @@ The optional environment template is `.env.example`. See the
 [local runtime runbook](deploy/local/README.md) for explicit company publication
 selection. Optional provider credentials do not activate services.
 
+Five public-data dimension baselines have been trained, with 72 additional model
+configuration fit attempts (71 converged), retained evaluation results and an
+explicit descriptive AScore recipe. See the
+[training results and top-three forecast mapping](docs/tasks/dev2/public-dimension-training-20261024.md)
+and the earlier [source research](docs/tasks/dev2/public-model-research-20261024.md).
+`python -m oxhack2026 models --help` exposes audits, `train-public`,
+`compare-public`, and dated company-outcome experiments. The API loads a packaged, digest-verified baseline bundle and attaches
+experimental model status to saved profiles and new research reports. Complete
+matched npm windows receive an SDK-demand index; unsupported inputs abstain. The
+three company-outcome cards remain unavailable, and execution inference is
+withheld because its held-out benchmark is unreliable.
+
 ## Frontend and API
 
 ```bash
