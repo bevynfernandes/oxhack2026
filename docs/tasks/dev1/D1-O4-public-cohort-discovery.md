@@ -51,3 +51,20 @@ this run did not acquire a verified dated raw dataset or establish feature-vinta
 provenance from it. It is not used as ground truth. Public pages cannot reliably
 supply private cash flow across this cohort. Calibration remains blocked until
 sufficient dated, mature labels and historical features actually exist.
+
+## First primary-source follow-up: Datree
+
+- Retained inactive company `yc-13053`, linked to its exact discovery row.
+- Captured its primary YC profile and company-owned repository README.
+- The README reports closure of the supporting commercial company in July 2023,
+  while explaining that the standalone open-source tool remains usable.
+- Preserve month precision; do not invent an exact shutdown day or infer closure
+  solely from a repository being archived.
+- Reviewed manifest: `data/catalog/datree-discovery-followup-20261024-v1.json`.
+- Pinned README commit: `0c3b63e6ce9688cdb5ad3bf06768875664cf15be`.
+- Transfer ZIP SHA-256:
+  `830697e826743212d1621d0f7bba81797307757166990b7ba24f4021a89d7d43`.
+- Both raw captures and metadata are in the separate draft-release ZIP
+  `datree-discovery-followup-20261024-v1.zip`.
+- Labels remain unresolved pending dated identity, feature-vintage and Dev 2
+  policy review. The original discovery ledger remains immutable.
