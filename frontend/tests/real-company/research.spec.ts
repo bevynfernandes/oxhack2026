@@ -34,6 +34,7 @@ test("real partial research replay preserves immutable legacy report and source 
     dialog.getByRole("link", { name: "Original source (opens new tab)" }),
   ).toHaveAttribute("href", "https://hn.algolia.com/api/v1/search_by_date");
   await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
   expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.screenshot({
     path: info.outputPath("real-research-desktop.png"),

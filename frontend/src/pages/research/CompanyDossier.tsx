@@ -645,7 +645,12 @@ export default function CompanyDossier({
                 </h3>
                 <p className="pillar-description">{group.description}</p>
               </header>
-              <div className="pillar-measurements">
+              <div
+                className="pillar-measurements"
+                tabIndex={0}
+                role="region"
+                aria-label={`${group.name} measurements`}
+              >
                 {coverage && (
                   <small className="more-metrics">
                     {coverage.status} evidence · {coverage.claim_ids.length}{" "}
@@ -1015,7 +1020,7 @@ export default function CompanyDossier({
               <h3>Company events</h3>
               {profile?.events.length ? (
                 profile.events.map((event) => (
-                  <section key={event.event_id}>
+                  <section key={event.event_id} className="evidence-event">
                     <h4>
                       {event.occurred_on ?? "Date unknown"} · {event.kind}
                     </h4>
@@ -1103,7 +1108,9 @@ function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
           }
         >
           <p>{claim.text}</p>
-          <p>Published {claim.published_on ?? "Not supplied"}</p>
+          <p className="evidence-timestamp">
+            Published {claim.published_on ?? "Not supplied"}
+          </p>
           {claim.conflicts_with.length > 0 && (
             <p className="notice warning">
               Potential conflicting claims: {claim.conflicts_with.join(", ")}.
@@ -1126,6 +1133,7 @@ function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
       <h3>Retrieved events</h3>
       {report.events.map((event) => (
         <MotionDisclosure
+          className="evidence-event"
           key={event.event_id}
           summary={
             <>
@@ -1134,7 +1142,9 @@ function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
             </>
           }
         >
-          <p>Published {event.published_at ?? "Not supplied"}</p>
+          <p className="evidence-timestamp">
+            Published {event.published_at ?? "Not supplied"}
+          </p>
           <SourceLink url={event.url}>Event source</SourceLink>
         </MotionDisclosure>
       ))}
