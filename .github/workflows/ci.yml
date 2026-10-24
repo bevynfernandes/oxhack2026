@@ -17,7 +17,7 @@ jobs:
           version: "0.13.0"
           python-version: "3.12"
           enable-cache: true
-      - run: uv sync --locked --group docs
+      - run: uv sync --locked --all-extras --group docs
       - run: make check test build docs-test
 
   frontend:
