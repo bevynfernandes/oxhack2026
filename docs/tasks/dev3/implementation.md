@@ -1,5 +1,21 @@
 # Dev 3 checkpoints
 
+## Product scope revision
+
+The user redirected the product to multi-metric startup success/failure assessment
+on 2026-10-24. [Issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19)
+coordinates source/outcome contracts and the shared specification update, owned
+by Dev 1. The checklist below describes reusable implementation from the original
+download-scoping phase; it is not completion of the revised product.
+
+The current Dev 3 design and dependency sequence are documented in
+[STARTUP_OUTLOOK.md](../../workstreams/dev3/STARTUP_OUTLOOK.md). Immediate work:
+restrained visual revision, company list/profile/compare, agreed additive C3
+contracts, production multi-family company reads and real browser acceptance.
+Unknown/private metrics and unvalidated outcome probabilities remain explicit.
+
+## Reusable original checkpoints
+
 | Task | State | Evidence / dependency |
 | --- | --- | --- |
 | D3-01 C3 | Implemented, C1 mapping review pending | Pydantic/OpenAPI/generated TypeScript; synthetic fixtures; C2 mapping tests |

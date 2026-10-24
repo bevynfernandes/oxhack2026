@@ -7,10 +7,10 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #172c27;
-  background: #f4f6f2;
+  color: #20242c;
+  background: #f7f8fa;
   font-synthesis: none;
-  line-height: 1.6;
+  line-height: 1.5;
 }
 * {
   box-sizing: border-box;
@@ -19,11 +19,11 @@ body {
   margin: 0;
 }
 a {
-  color: #126045;
+  color: #284b8d;
   text-underline-offset: 0.2em;
 }
 a:hover {
-  color: #093f2e;
+  color: #19335f;
 }
 button,
 select,
@@ -33,18 +33,19 @@ input {
 button,
 .button {
   display: inline-block;
-  background: #145c44;
+  background: #284b8d;
   color: white;
-  border: 1px solid #145c44;
-  padding: 0.65rem 1rem;
-  border-radius: 0.4rem;
-  font-weight: 650;
+  border: 1px solid #284b8d;
+  padding: 0.55rem 0.85rem;
+  min-height: 44px;
+  border-radius: 0.25rem;
+  font-weight: 600;
   cursor: pointer;
   text-decoration: none;
 }
 button:hover,
 .button:hover {
-  background: #0b422f;
+  background: #19335f;
   color: white;
 }
 button:disabled {
@@ -53,66 +54,74 @@ button:disabled {
 }
 button.secondary {
   background: #fff;
-  color: #145c44;
+  color: #284b8d;
 }
 input[type="checkbox"] {
   width: 1.25rem;
   height: 1.25rem;
-  accent-color: #145c44;
+  accent-color: #284b8d;
 }
 :focus-visible {
-  outline: 3px solid #ab6100;
+  outline: 3px solid #3566b5;
   outline-offset: 4px;
 }
 .site-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 2rem;
-  padding: 1.25rem max(1.25rem, calc((100vw - 1280px) / 2));
-  border-bottom: 1px solid #d9e1da;
+  gap: 1.5rem;
+  padding: 0.85rem max(1.25rem, calc((100vw - 1280px) / 2));
+  border-bottom: 1px solid #dfe3e8;
   background: white;
 }
 .brand {
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: 1.15rem;
+  font-weight: 700;
   text-decoration: none;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.02em;
 }
 .brand span {
   display: block;
-  font-size: 0.7rem;
-  letter-spacing: 0.04em;
-  font-weight: 500;
-  color: #53655e;
-  text-transform: uppercase;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #5d6573;
 }
 nav {
   display: flex;
   gap: 1.5rem;
 }
+nav a {
+  padding: 0.4rem 0;
+  text-decoration: none;
+  color: #5d6573;
+  border-bottom: 2px solid transparent;
+}
+nav a[aria-current="page"] {
+  color: #20242c;
+  border-color: #284b8d;
+}
 main {
   max-width: 1320px;
   min-height: 75vh;
   margin: 0 auto;
-  padding: 2.5rem 1.25rem 4rem;
+  padding: 1.75rem 1.25rem 3rem;
 }
 footer {
   padding: 1.5rem;
-  text-align: center;
-  border-top: 1px solid #d9e1da;
-  color: #53655e;
-  font-size: 0.85rem;
+  text-align: left;
+  border-top: 1px solid #dfe3e8;
+  color: #5d6573;
+  font-size: 0.8rem;
 }
 h1 {
-  font-size: clamp(2rem, 4vw, 3.4rem);
-  line-height: 1.12;
-  letter-spacing: -0.04em;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  line-height: 1.25;
+  letter-spacing: -0.025em;
   max-width: 850px;
-  margin: 0.5rem 0 1rem;
+  margin: 0.35rem 0 0.75rem;
 }
 h2 {
-  font-size: 1.3rem;
+  font-size: 1.1rem;
   margin-top: 0;
 }
 h3 {
@@ -122,21 +131,19 @@ p {
   max-width: 85ch;
 }
 .page-heading {
-  margin: 2rem 0;
+  margin: 1rem 0 1.5rem;
 }
 .eyebrow {
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.12em;
-  font-weight: 750;
-  color: #53655e;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #5d6573;
 }
 .panel {
-  padding: 1.75rem;
+  padding: 1.25rem;
   background: white;
-  border: 1px solid #d9e1da;
-  border-radius: 0.7rem;
-  margin: 1.5rem 0;
+  border: 1px solid #dfe3e8;
+  border-radius: 0.25rem;
+  margin: 1.25rem 0;
 }
 .section-heading {
   display: flex;
@@ -153,14 +160,14 @@ label {
   display: grid;
   gap: 0.5rem;
   font-size: 0.85rem;
-  font-weight: 650;
+  font-weight: 600;
 }
 select {
   padding: 0.6rem;
-  border: 1px solid #899f94;
-  border-radius: 0.3rem;
+  border: 1px solid #aab2bf;
+  border-radius: 0.25rem;
   background: white;
-  color: #172c27;
+  color: #20242c;
   max-width: 100%;
 }
 .batch-list {
@@ -173,39 +180,38 @@ select {
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  border-top: 1px solid #d9e1da;
+  border-top: 1px solid #dfe3e8;
   padding: 1.25rem 0;
 }
 .batch-list p {
   font-size: 0.85rem;
   margin: 0.3rem 0 0;
-  color: #53655e;
+  color: #5d6573;
 }
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  border: 1px solid #d9e1da;
-  background: #edf2eb;
-  border-radius: 0.5rem;
+  border: 1px solid #dfe3e8;
+  background: white;
+  border-radius: 0.25rem;
 }
 .summary-grid > div {
-  padding: 1.2rem;
+  padding: 1rem;
 }
 .summary-grid span {
   display: block;
   font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
+  color: #5d6573;
   margin-bottom: 0.4rem;
 }
 .summary-grid strong {
   display: block;
-  font-size: 1.15rem;
+  font-size: 1.05rem;
 }
 .notice {
-  padding: 1rem;
-  border-left: 4px solid #8a9f93;
-  background: #edf2eb;
+  padding: 0.75rem 1rem;
+  border-left: 2px solid #9da9bc;
+  background: #f0f3f7;
 }
 .warning {
   background: #fff4d8;
@@ -217,7 +223,7 @@ select {
 }
 .disclaimer,
 small {
-  color: #53655e;
+  color: #5d6573;
   font-size: 0.8rem;
 }
 small {
@@ -236,40 +242,40 @@ table {
 }
 caption {
   text-align: left;
-  color: #53655e;
+  color: #5d6573;
   padding: 0.5rem 0;
 }
 th,
 td {
   text-align: left;
   vertical-align: top;
-  padding: 0.9rem 0.7rem;
-  border-bottom: 1px solid #d9e1da;
+  padding: 0.75rem 0.65rem;
+  border-bottom: 1px solid #dfe3e8;
 }
 thead {
-  background: #f4f6f2;
+  background: #f7f8fa;
 }
 thead th {
   font-size: 0.75rem;
-  color: #53655e;
+  color: #5d6573;
 }
 tbody tr:hover {
-  background: #f8faf6;
+  background: #f5f7fb;
 }
 .reasons {
   font-size: 0.8rem;
-  color: #53655e;
+  color: #5d6573;
   padding-left: 1.25rem;
 }
 details {
   margin: 1rem 0;
   padding: 1rem;
-  border: 1px solid #d9e1da;
-  border-radius: 0.4rem;
+  border: 1px solid #dfe3e8;
+  border-radius: 0.25rem;
 }
 summary {
   cursor: pointer;
-  font-weight: 650;
+  font-weight: 600;
 }
 .metadata {
   display: grid;
@@ -278,7 +284,7 @@ summary {
 }
 dt {
   font-size: 0.75rem;
-  color: #53655e;
+  color: #5d6573;
   text-transform: capitalize;
 }
 dd {
@@ -286,7 +292,7 @@ dd {
   overflow-wrap: anywhere;
 }
 .receipt {
-  border-top: 2px solid #d9e1da;
+  border-top: 1px solid #dfe3e8;
   margin-top: 1.5rem;
   padding-top: 1rem;
 }
