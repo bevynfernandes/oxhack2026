@@ -25,24 +25,24 @@ for (const viewport of [
   { width: 1440, height: 900 },
   { width: 375, height: 812 },
 ]) {
-  test(`shared surfaces preserve readable content at ${viewport.width}px`, async ({
-    page,
-  }, info) => {
-    await page.setViewportSize(viewport);
-    await page.route("**/api/v1/research-reports/*", (route) =>
-      route.fulfill({ json: report }),
-    );
-    await page.route("**/api/v2/research-capabilities", (route) =>
-      route.fulfill({
-        json: {
-          collection_enabled: true,
-          worker_available: true,
-          browser_available: false,
-          providers: [],
-        },
-      }),
-    );
-    for (const [name, path, heading] of screens) {
+  for (const [name, path, heading] of screens) {
+    test(`${name} surface preserves readable content at ${viewport.width}px`, async ({
+      page,
+    }, info) => {
+      await page.setViewportSize(viewport);
+      await page.route("**/api/v1/research-reports/*", (route) =>
+        route.fulfill({ json: report }),
+      );
+      await page.route("**/api/v2/research-capabilities", (route) =>
+        route.fulfill({
+          json: {
+            collection_enabled: true,
+            worker_available: true,
+            browser_available: false,
+            providers: [],
+          },
+        }),
+      );
       await page.goto(path);
       await expect(
         page.getByRole("heading", { name: heading, exact: true }),
@@ -72,6 +72,6 @@ for (const viewport of [
         await page.keyboard.press("Escape");
         await expect(page.getByRole("dialog")).not.toBeVisible();
       }
-    }
-  });
+    });
+  }
 }

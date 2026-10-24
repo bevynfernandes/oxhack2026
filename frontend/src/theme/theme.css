@@ -1,0 +1,393 @@
+/* Opt-in layer: existing layout, responsive rules and shared motion stay intact. */
+@font-face {
+  font-family: "Barlow Condensed";
+  src: url("./assets/barlow-condensed-latin-600.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+}
+
+:root.theme-techno-classical {
+  color-scheme: dark;
+  --theme-canvas: #090f1b;
+  --theme-surface: #101a2a;
+  --theme-raised: #172438;
+  --theme-text: #f1ecdf;
+  --theme-muted: #acb9cb;
+  --theme-line: #34445b;
+  --theme-control-line: #7185a2;
+  --theme-accent: #8bb5ff;
+  --theme-selected: #203655;
+  --theme-warning: #e8c58b;
+  --theme-warning-surface: #292316;
+  --theme-danger: #ffb0a7;
+  --theme-danger-surface: #321f25;
+  --theme-positive: #a7d1bf;
+  --theme-display: "Barlow Condensed", "Plus Jakarta Sans Variable", sans-serif;
+  --theme-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  --terminal-line: var(--theme-line);
+  --terminal-muted: var(--theme-muted);
+  --terminal-green: var(--theme-accent);
+  --terminal-accent: var(--theme-accent);
+  color: var(--theme-text);
+  background: var(--theme-canvas);
+}
+
+.theme-techno-classical .app-shell {
+  background-color: var(--theme-canvas);
+  background-image:
+    linear-gradient(rgb(241 236 223 / 2%) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(241 236 223 / 2%) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.theme-techno-classical ::selection {
+  color: var(--theme-text);
+  background: var(--theme-selected);
+}
+.theme-techno-classical :focus-visible {
+  outline-color: var(--theme-accent);
+}
+.theme-techno-classical :is(h1, h2, h3, h4) {
+  font-family: var(--theme-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--theme-text);
+}
+.theme-techno-classical :is(.page-heading h1, .home-terminal-heading h1) {
+  letter-spacing: 0.015em;
+}
+.theme-techno-classical
+  :is(
+    .micro-label,
+    .eyebrow,
+    .horizon-tag,
+    time,
+    .metadata,
+    .workspace-date,
+    .ledger-date
+  ) {
+  font-family: var(--theme-mono);
+  font-variant-numeric: tabular-nums;
+}
+.theme-techno-classical :is(.site-header, .app-shell > footer) {
+  background: var(--theme-canvas);
+  border-color: var(--theme-line);
+  box-shadow: none;
+}
+.theme-techno-classical .site-header .brand {
+  color: var(--theme-text);
+}
+.theme-techno-classical .brand .brand-symbol {
+  color: var(--theme-accent);
+  background: var(--theme-surface);
+  border-color: var(--theme-control-line);
+  border-radius: 3px;
+}
+.theme-techno-classical .brand .terminal-tag {
+  color: var(--theme-muted);
+  background: var(--theme-surface);
+  border-color: var(--theme-line);
+  border-radius: 2px;
+}
+.theme-techno-classical :is(a, .dossier-domain) {
+  color: var(--theme-accent);
+}
+.theme-techno-classical a:hover {
+  color: var(--theme-text);
+}
+.theme-techno-classical
+  :is(
+    nav a,
+    .terminal-breadcrumb,
+    .terminal-breadcrumb span,
+    .app-shell > footer,
+    .app-shell > footer a
+  ) {
+  color: var(--theme-muted);
+}
+.theme-techno-classical .site-header nav a[aria-current="page"] {
+  color: var(--theme-accent);
+  border-color: var(--theme-accent);
+}
+.theme-techno-classical :is(button, .button) {
+  color: var(--theme-canvas);
+  background-color: var(--theme-accent);
+  border-color: var(--theme-accent);
+  border-radius: 3px;
+}
+.theme-techno-classical :is(button:hover, .button:hover) {
+  color: var(--theme-canvas);
+  background-color: #bad2ff;
+  border-color: #bad2ff;
+}
+.theme-techno-classical button.secondary {
+  color: var(--theme-text);
+  background-color: var(--theme-raised);
+  border-color: var(--theme-control-line);
+}
+.theme-techno-classical button.secondary:hover {
+  background-color: var(--theme-selected);
+  color: var(--theme-text);
+}
+.theme-techno-classical :is(input, select) {
+  color: var(--theme-text);
+  background-color: var(--theme-canvas);
+  border: 1px solid var(--theme-control-line);
+  border-radius: 3px;
+  accent-color: var(--theme-accent);
+}
+.theme-techno-classical input:not([type="checkbox"]) {
+  padding: 0.6rem;
+  min-width: 0;
+}
+.theme-techno-classical input::placeholder {
+  color: var(--theme-muted);
+  opacity: 1;
+}
+.theme-techno-classical
+  :is(
+    .panel,
+    .motion-disclosure,
+    .dossier-company,
+    .dossier-stat,
+    .pillar-card,
+    .dossier-ledger
+  ) {
+  color: var(--theme-text);
+  background-color: var(--theme-surface);
+  border-color: var(--theme-line);
+  border-radius: 4px;
+  box-shadow: none;
+}
+.theme-techno-classical
+  :is(
+    small,
+    caption,
+    dt,
+    .disclaimer,
+    .reasons,
+    .eyebrow,
+    .micro-label,
+    .dossier-identity p,
+    .context-dot,
+    .dossier-readiness small,
+    .dossier-outlook small,
+    .dossier-stat h3,
+    .dossier-stat p,
+    .stat-unit,
+    .dossier-section-label h2,
+    .dossier-section-label p,
+    .model-label,
+    .pillar-top,
+    .pillar-model,
+    .pillar-description,
+    .pillar-measurements dt,
+    .more-metrics,
+    .pillar-empty,
+    .pillar-model-note p,
+    .pillar-model-note small,
+    .pillar-model-note .micro-label,
+    .pillar-status,
+    .dossier-ledger,
+    .dossier-ledger strong,
+    .drawer-empty,
+    .dossier-drawer .driver-panel > p,
+    .research-metrics small,
+    .research-metrics p,
+    .dossier-sources small,
+    .dossier-sources p,
+    .dossier-sources li > div span
+  ) {
+  color: var(--theme-muted);
+}
+.theme-techno-classical
+  :is(
+    .dossier-name h1,
+    .dossier-drawer .driver-dialog-header h2,
+    .pillar-card h3
+  ) {
+  font-family: var(--theme-display);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.theme-techno-classical .dossier-stat h3 {
+  font-family: var(--theme-mono);
+}
+.theme-techno-classical
+  :is(
+    .dossier-monogram,
+    .outlook-mark,
+    .stat-icon,
+    .pillar-model,
+    .pillar-empty-icon,
+    .drawer-model-state
+  ) {
+  color: var(--theme-muted);
+  background: var(--theme-raised);
+  border-color: var(--theme-line);
+  border-radius: 3px;
+  box-shadow: none;
+}
+.theme-techno-classical .dossier-monogram {
+  color: var(--theme-text);
+  font-family: var(--theme-display);
+}
+.theme-techno-classical .stage-tag {
+  color: var(--theme-muted);
+  background: var(--theme-raised);
+  border-color: var(--theme-line);
+}
+.theme-techno-classical .horizon-tag {
+  color: var(--theme-accent);
+  background: var(--theme-selected);
+  outline: 1px solid var(--theme-line);
+  border-radius: 2px;
+}
+.theme-techno-classical
+  :is(
+    .dossier-outlook,
+    .pillar-measurements,
+    .pillar-card > footer,
+    .dossier-sources li,
+    .driver-dialog-header,
+    .dossier-drawer .driver-tabs,
+    .research-metrics > div,
+    .drawer-empty
+  ) {
+  border-color: var(--theme-line);
+}
+.theme-techno-classical
+  :is(
+    .pillar-measurements dd,
+    .drawer-model-state strong,
+    .research-metrics dt
+  ) {
+  color: var(--theme-text);
+}
+.theme-techno-classical .pillar-card {
+  border-top-color: var(--theme-accent);
+}
+.theme-techno-classical .pillar-card.pillar-gap {
+  border-top-color: var(--theme-warning);
+}
+.theme-techno-classical .pillar-card:hover {
+  border-inline-color: var(--theme-control-line);
+  border-bottom-color: var(--theme-control-line);
+  box-shadow: none;
+}
+.theme-techno-classical .pillar-card:has(.pillar-expand:focus-visible) {
+  outline-color: var(--theme-accent);
+}
+.theme-techno-classical
+  :is(
+    .pillar-expand,
+    .pillar-card footer button,
+    .dossier-ledger button,
+    .dossier-inline-action,
+    .dossier-banners button,
+    button.motion-disclosure-trigger
+  ) {
+  color: inherit;
+  background-color: transparent;
+  border-color: transparent;
+}
+.theme-techno-classical
+  :is(
+    .pillar-expand:hover,
+    .pillar-card footer button:hover,
+    .dossier-ledger button,
+    .dossier-ledger svg
+  ) {
+  color: var(--theme-accent);
+}
+.theme-techno-classical :is(.pillar-card h3 svg, .dossier-outlook h2) {
+  color: var(--theme-muted);
+}
+.theme-techno-classical :is(.pillar-empty > span:last-child, .stale-label) {
+  color: var(--theme-warning);
+}
+.theme-techno-classical .pillar-status.available {
+  color: var(--theme-positive);
+}
+.theme-techno-classical .pillar-status.available .status-dot {
+  background: var(--theme-positive);
+}
+.theme-techno-classical :is(.notice, .dossier-banners .notice) {
+  color: var(--theme-text);
+  background-color: var(--theme-raised);
+  border-color: var(--theme-control-line);
+}
+.theme-techno-classical :is(.notice.warning, .dossier-banners .notice.warning) {
+  color: var(--theme-warning);
+  background-color: var(--theme-warning-surface);
+  border-color: var(--theme-warning);
+}
+.theme-techno-classical :is(.notice.error, .dossier-banners .notice.error) {
+  color: var(--theme-danger);
+  background-color: var(--theme-danger-surface);
+  border-color: var(--theme-danger);
+}
+.theme-techno-classical :is(.notice .reasons, .notice small) {
+  color: inherit;
+}
+.theme-techno-classical .dossier-drawer {
+  color: var(--theme-text);
+  background: var(--theme-surface);
+  border-color: var(--theme-control-line);
+}
+.theme-techno-classical .dossier-drawer::backdrop {
+  background: rgb(3 7 14 / 72%);
+}
+.theme-techno-classical
+  :is(.dossier-drawer .driver-tabs button, .pillar-mobile-tabs button) {
+  color: var(--theme-muted);
+  background-color: var(--theme-surface);
+  border-color: var(--theme-control-line);
+}
+.theme-techno-classical
+  :is(
+    .dossier-drawer .driver-tabs button[aria-selected="true"],
+    .pillar-mobile-tabs button[aria-pressed="true"]
+  ) {
+  color: var(--theme-accent);
+  background-color: var(--theme-selected);
+  border-color: var(--theme-accent);
+}
+.theme-techno-classical .research-start .page-heading {
+  border-bottom: 1px solid var(--theme-line);
+  padding-bottom: 1rem;
+}
+.theme-techno-classical .research-start .page-heading h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+.theme-techno-classical .research-start .source-progress > li {
+  background: var(--theme-canvas);
+  border-color: var(--theme-line);
+  border-radius: 3px;
+}
+.theme-techno-classical
+  :is(.source-progress-state, .research-start .disclaimer) {
+  font-family: var(--theme-mono);
+  font-variant-numeric: tabular-nums;
+}
+@media (min-width: 801px) {
+  .theme-techno-classical .research-start > .page-heading {
+    background: url("./assets/observatory.svg") no-repeat right center / 130px
+      72px;
+    padding-right: 140px;
+  }
+}
+.theme-techno-classical .skip-link:focus {
+  position: fixed;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+}
+@media (forced-colors: active) {
+  .theme-techno-classical .app-shell,
+  .theme-techno-classical .research-start > .page-heading {
+    background-image: none;
+  }
+}
