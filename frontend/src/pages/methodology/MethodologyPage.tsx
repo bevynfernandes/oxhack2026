@@ -11,6 +11,51 @@ export default function MethodologyPage() {
         </p>
       </header>
 
+      <section aria-labelledby="research-direction-heading">
+        <h2 id="research-direction-heading">
+          Research reports and saved analyses
+        </h2>
+        <p>
+          Saved analyses show evidence recorded at a fixed date. Opening one
+          does not collect new information. A fresh research report will
+          identify the company and website, show the actual research status, and
+          keep partial results and source failures visible.
+        </p>
+        <p>
+          The next report format focuses on Software/SaaS companies through five
+          areas:
+        </p>
+        <ul>
+          <li>
+            Adoption and retention: customer activity, growth and retention,
+            with traffic or downloads labelled as proxies.
+          </li>
+          <li>
+            Attention and sentiment: dated coverage and mentions, with the
+            limits of each source.
+          </li>
+          <li>
+            Financial health: supported revenue, cash-flow and financing
+            evidence; funding alone does not establish solvency.
+          </li>
+          <li>
+            Industry and competition: market context and comparable companies.
+          </li>
+          <li>Team and execution: supported delivery and team evidence.</li>
+        </ul>
+        <p>
+          Data availability and model readiness are separate. A section can
+          contain useful facts while its model is not trained. Missing data is
+          not a negative prediction, and an unavailable overall outlook is not a
+          zero score.
+        </p>
+        <p>
+          This report format is being developed. The saved analyses below retain
+          their existing outcome definitions; they are not renamed as survival
+          or overall success predictions.
+        </p>
+      </section>
+
       <section aria-labelledby="outcomes-heading">
         <h2 id="outcomes-heading">Three separate outcomes</h2>
         <p>

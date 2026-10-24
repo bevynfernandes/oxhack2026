@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
+import { companyDomain, matchesCompanySearch } from "./identity";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState, SyntheticNotice } from "../../components/Common";
 
@@ -32,9 +33,7 @@ export default function CompanyHomePage() {
       ),
   });
   const rows = companies.data?.items.filter(({ company }) =>
-    `${company.display_name} ${company.segment}`
-      .toLocaleLowerCase()
-      .includes(search.trim().toLocaleLowerCase()),
+    matchesCompanySearch(company, search),
   );
   if (legacySelection)
     return <Navigate to={`/explore${location.search}`} replace />;
@@ -60,12 +59,16 @@ export default function CompanyHomePage() {
           Search companies
           <input
             type="search"
-            placeholder="Search by company or sector…"
+            placeholder="Company name or website domain…"
             value={search}
-            maxLength={120}
+            maxLength={253}
             onChange={(event) => setSearch(event.target.value)}
           />
         </label>
+        <p className="disclaimer">
+          Open an existing report below. This searches saved companies; it does
+          not start new research.
+        </p>
         <QueryState
           pending={choices.isPending}
           error={choices.error}
@@ -91,7 +94,10 @@ export default function CompanyHomePage() {
               available · Evidence as of {date(latest!.source.as_of)}
             </p>
             {rows.length === 0 && (
-              <p>No companies match your search. Try another name or sector.</p>
+              <p>
+                No companies match your search. Try another company name or
+                exact website domain.
+              </p>
             )}
             <ul className="company-results">
               {rows.map(({ company }) => (
@@ -102,13 +108,17 @@ export default function CompanyHomePage() {
                   <div>
                     <h3>{company.display_name}</h3>
                     <p>{company.segment}</p>
+                    <small>
+                      {companyDomain(company.website_url) ??
+                        "Website not recorded"}
+                    </small>
                   </div>
                   <Link
                     className="company-open"
-                    aria-label={`View analysis for ${company.display_name}`}
+                    aria-label={`View saved analysis for ${company.display_name}`}
                     to={`/companies/${encodeURIComponent(snapshot)}/${encodeURIComponent(company.company_id)}`}
                   >
-                    View analysis <span aria-hidden="true">↗</span>
+                    View saved analysis <span aria-hidden="true">↗</span>
                   </Link>
                 </li>
               ))}
