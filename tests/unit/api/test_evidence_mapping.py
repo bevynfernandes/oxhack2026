@@ -1,5 +1,6 @@
 """Source-grounded mapping regressions; no real model or network requests."""
 
+import sys
 from concurrent.futures import Executor
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -355,6 +356,20 @@ def test_mapping_routes_are_additive_and_reads_do_not_enqueue(tmp_path: Path) ->
         assert client.get(f"/api/v2/research-mapping-jobs/{job_id}").status_code == 200
         assert executor.submit.call_count == 1
         assert client.get("/api/v2/research-mapping-jobs/missing").status_code == 404
+
+
+def test_capabilities_do_not_import_collection_or_interpretation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Stored-read installations can inspect capabilities without research extras."""
+    monkeypatch.setitem(sys.modules, "oxhack2026.research.evidence_mapping", None)
+    monkeypatch.delenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", raising=False)
+    monkeypatch.setenv("GEMINI_API_KEY", "")
+    service = V2Service(V2Store(tmp_path))
+    capability = service.mapping_capability()
+    assert capability.mode == "rules_gemini"
+    assert capability.enabled is False
+    assert capability.gemini_available is False
 
 
 def test_unknown_configuration_and_page_families(

@@ -125,13 +125,21 @@ class V2Service:
 
     def mapping_capability(self) -> MappingCapability:
         """Read mapping configuration and optional SDK presence without API calls."""
-        from oxhack2026.explanations.config import gemini_api_key
-        from oxhack2026.research.evidence_mapping import mapping_mode
-
-        available = (
-            bool(gemini_api_key()) and importlib.util.find_spec("google") is not None
+        from oxhack2026.explanations.config import (
+            DEFAULT_MODEL,
+            gemini_api_key,
+            mapping_mode,
         )
-        available = available and importlib.util.find_spec("google.genai") is not None
+
+        model = os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL
+        if "-live" in model:
+            installed = importlib.util.find_spec("websockets") is not None
+        else:
+            installed = importlib.util.find_spec("google") is not None
+            installed = (
+                installed and importlib.util.find_spec("google.genai") is not None
+            )
+        available = bool(gemini_api_key()) and installed
         return MappingCapability(
             enabled=self.executor is not None and self.mapping_enabled,
             mode=mapping_mode(),
