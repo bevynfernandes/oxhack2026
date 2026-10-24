@@ -14,6 +14,7 @@ import {
   MotionProvider,
   MotionButton,
   MotionLink,
+  MotionNavLink,
   MotionDisclosure,
   MotionDialog,
   MotionState,
@@ -218,4 +219,41 @@ it("retains a single state node and does not animate identical polling states", 
   );
   expect(screen.getAllByRole("status")).toHaveLength(1);
   expect(screen.getByRole("status")).toBe(status);
+});
+
+it("preserves NavLink callback and object styles across active route changes", () => {
+  const style = vi.fn(({ isActive }: { isActive: boolean }) => ({
+    color: isActive ? "red" : "blue",
+  }));
+  render(
+    <MemoryRouter initialEntries={["/one"]}>
+      <MotionProvider reducedMotion>
+        <MotionNavLink to="/one" style={style}>
+          One
+        </MotionNavLink>
+        <MotionNavLink to="/two" style={{ color: "green" }}>
+          Two
+        </MotionNavLink>
+      </MotionProvider>
+    </MemoryRouter>,
+  );
+  const one = screen.getByRole("link", { name: "One" });
+  const two = screen.getByRole("link", { name: "Two" });
+  expect(one.style.color).toBe("red");
+  expect(two.style.color).toBe("green");
+  expect(one.style.backgroundImage).toContain("--motion-state-opacity");
+  expect(style).toHaveBeenCalledWith(
+    expect.objectContaining({
+      isActive: true,
+      isPending: false,
+      isTransitioning: false,
+    }),
+  );
+  fireEvent.click(two);
+  expect(one.style.color).toBe("blue");
+  expect(two.style.color).toBe("green");
+  expect(two).toHaveAttribute("aria-current", "page");
+  expect(style).toHaveBeenCalledWith(
+    expect.objectContaining({ isActive: false }),
+  );
 });
