@@ -4,6 +4,33 @@ import raw from "../../../tests/fixtures/api/scouting.json" with { type: "json" 
 
 const batch = raw.forecast.batch_id;
 
+test("retrospective membership is disclosed in rankings and tool evidence", async ({
+  page,
+}) => {
+  await page.route("**/api/v1/catalog?*", async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({
+      response,
+      json: {
+        ...(await response.json()),
+        membership_basis: "contemporary_reconstruction",
+        recorded_at: "2026-10-24T12:00:00Z",
+      },
+    });
+  });
+  await page.goto(`/batches/${batch}`);
+  await expect(
+    page.getByText(/This reconstruction uses a contemporary/),
+  ).toBeVisible();
+  await page.goto(`/batches/${batch}/tools/tool-1`);
+  await expect(
+    page.getByText(/Membership uses the contemporary catalogue/),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Historical membership is unverified/),
+  ).toBeVisible();
+});
+
 test("complete scouting replay keeps future truth separate and freezes the submitted selection", async ({
   page,
 }) => {

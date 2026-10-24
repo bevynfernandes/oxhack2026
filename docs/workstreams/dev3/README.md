@@ -141,3 +141,25 @@ owns the adapter composing those storage reads with these pure C1/C2 mappings.
 Remaining production dependencies are batch enumeration, forecast/evidence/
 evaluation/outcome reads, selected history-vintage publication and real npm
 artifacts. No parallel persistence or numerical implementation is introduced.
+
+## Contemporary catalogue integration
+
+PR #17 supplies an exact-version local dataset reader and a transferable real npm
+bundle. Its catalogue mappings start at their actual 2026 inspection date. For a
+reconstructed batch explicitly using this contemporary cohort, the composition
+must call `map_catalog(snapshot, batch, allow_contemporary_reconstruction=True)`.
+This selects effective mappings at `snapshot.recorded_at` and sets C3 0.4.0
+`membership_basis` to `contemporary_reconstruction`. Strict cutoff-based mapping
+selection remains the default. The opt-in is rejected for prospective batches
+and historical-eligibility cohorts; dates and version checks are retained.
+
+The API and both catalogue views expose that historical membership is unverified
+and subject to survivorship bias. Membership selection and evidence inspection
+are separate facts: old evidence may still be genuinely available before the
+cutoff even when a cohort is selected retrospectively.
+
+The real dataset archive and manifest hashes were independently checked during
+review of #17, and its published bundle loaded with ten series and 17,570 daily
+observations. The source-package attribution review finding remains with Dev 1.
+C2 forecast/evaluation/outcome publication and production API composition are
+still required for D3-05; the dataset alone is not a complete real-data replay.

@@ -1,4 +1,4 @@
-# C3 public API contract (0.3.0)
+# C3 public API contract (0.4.0)
 
 `oxhack2026/api/schemas.py` is the source of truth. `openapi.json` and
 `frontend/src/api/schema.d.ts` are generated, not independently edited.
@@ -38,6 +38,14 @@ freshness timestamps. Numeric forecast evidence remains cutoff-bounded. `Publish
 read/scoring boundary for Dev 1's adapter, not a second persistence system.
 Cross-owner mapping approval and real artifact acceptance remain tracked in
 https://github.com/bevynfernandes/oxhack2026/issues/1.
+
+C3 0.4.0 adds catalogue `membership_basis`. `decision_time` selects mappings at
+the forecast cutoff. `contemporary_reconstruction` explicitly selects at the
+frozen catalogue's `recorded_at`, only for reconstructed contemporary cohorts.
+The API rejects this membership basis for prospective batches or historical
+eligibility cohorts. Actual mapping verification dates remain unchanged and are
+independent of the membership-selection basis. The UI displays the survivorship
+limitation in both rankings and tool detail.
 
 `tests/fixtures/api/scouting.json` is wholly synthetic, including identities,
 measurements, forecasts and comparison values. It is test input only and is never
