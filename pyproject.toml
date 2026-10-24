@@ -69,7 +69,7 @@ show_error_codes = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-addopts = "-ra"
+addopts = "-ra -m 'not integration'"
 markers = ["integration: checks requiring explicit local service setup"]
 
 [tool.ruff]

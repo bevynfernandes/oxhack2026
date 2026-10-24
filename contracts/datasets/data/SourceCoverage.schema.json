@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "A nonempty half-open interval [start, end), always in UTC.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Daily source coverage distinguishing complete, partial and absent rows.",
+  "properties": {
+    "series_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Series Id",
+      "type": "string"
+    },
+    "window": {
+      "$ref": "#/$defs/TimeWindow"
+    },
+    "expected_days": {
+      "maximum": 9223372036854775807,
+      "minimum": 0,
+      "title": "Expected Days",
+      "type": "integer"
+    },
+    "complete_days": {
+      "maximum": 9223372036854775807,
+      "minimum": 0,
+      "title": "Complete Days",
+      "type": "integer"
+    },
+    "partial_days": {
+      "maximum": 9223372036854775807,
+      "minimum": 0,
+      "title": "Partial Days",
+      "type": "integer"
+    },
+    "missing_days": {
+      "maximum": 9223372036854775807,
+      "minimum": 0,
+      "title": "Missing Days",
+      "type": "integer"
+    },
+    "status": {
+      "enum": [
+        "complete",
+        "partial",
+        "missing"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "last_success_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Last Success At"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    }
+  },
+  "required": [
+    "series_id",
+    "window",
+    "expected_days",
+    "complete_days",
+    "partial_days",
+    "missing_days",
+    "status",
+    "last_success_at",
+    "reasons"
+  ],
+  "title": "SourceCoverage",
+  "type": "object"
+}

@@ -1,0 +1,81 @@
+{
+  "additionalProperties": false,
+  "description": "Stable source/entity/metric identity; a replacement package is a new series.",
+  "properties": {
+    "series_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Series Id",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "npm",
+        "pypi",
+        "github",
+        "hackernews"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "entity_kind": {
+      "enum": [
+        "package",
+        "repository",
+        "domain"
+      ],
+      "title": "Entity Kind",
+      "type": "string"
+    },
+    "entity_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Entity Id",
+      "type": "string"
+    },
+    "ecosystem": {
+      "anyOf": [
+        {
+          "enum": [
+            "npm",
+            "pypi"
+          ],
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Ecosystem"
+    },
+    "metric": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Metric",
+      "type": "string"
+    },
+    "unit": {
+      "enum": [
+        "downloads",
+        "events",
+        "mentions"
+      ],
+      "title": "Unit",
+      "type": "string"
+    },
+    "cadence": {
+      "const": "day",
+      "default": "day",
+      "title": "Cadence",
+      "type": "string"
+    }
+  },
+  "required": [
+    "series_id",
+    "source",
+    "entity_kind",
+    "entity_id",
+    "ecosystem",
+    "metric",
+    "unit"
+  ],
+  "title": "ObservationSeries",
+  "type": "object"
+}
