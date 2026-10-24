@@ -82,3 +82,13 @@ forecasts remain null. No training libraries or pickle are needed for this path.
 `SIGNALSHIFT_DIMENSION_MODELS_ROOT` can select a different exact verified portable
 bundle. Restart the API after changing the bundle. Existing immutable reports keep
 their original contents.
+
+For evidence interpretation, install `--extra research --extra explanations` in
+addition to the API/data profile (the API image includes both). Enable
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini` for the shared Gemini Live default,
+or retain `rules` for deterministic mapping. A personal `GEMINI_API_KEY` overrides
+the private repository's backend default; an explicit empty environment value
+disables it. `GEMINI_MODEL` changes the model only by explicit configuration.
+To re-map existing reports without fetching sources, enable
+`SIGNALSHIFT_RESEARCH_MAPPING_ENABLED=1` and keep collection disabled. The same
+single-process lease, writable artifact root and durable report rules apply.

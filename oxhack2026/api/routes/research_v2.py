@@ -5,6 +5,7 @@ from collections.abc import Callable
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from oxhack2026.api.evidence_mapping_schemas import MappingJob, MappingJobRequest
 from oxhack2026.api.repository import RepositoryUnavailable
 from oxhack2026.api.research_v2_schemas import (
     PROVIDERS,
@@ -122,3 +123,19 @@ def report(report_id: Identifier, service: V2Service | None = _dependency) -> Re
     """Read the immutable report and verify all capture hashes without source
     fetching."""
     return _call(lambda: _read(lambda: _service(service).store.report(report_id)))
+
+
+@router.post("/research-mapping-jobs", status_code=202, operation_id="research_v2_map")
+def start_mapping(
+    request: MappingJobRequest, service: V2Service | None = _dependency
+) -> MappingJob:
+    """Explicitly re-map retained evidence into a new immutable report."""
+    return _call(lambda: _service(service).create_mapping(request))
+
+
+@router.get("/research-mapping-jobs/{job_id}", operation_id="research_v2_mapping_job")
+def mapping_job(
+    job_id: Identifier, service: V2Service | None = _dependency
+) -> MappingJob:
+    """Read durable interpretation progress without enqueueing or vendor access."""
+    return _call(lambda: _read(lambda: _service(service).store.mapping_job(job_id)))

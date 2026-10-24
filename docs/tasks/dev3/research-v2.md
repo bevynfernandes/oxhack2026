@@ -127,3 +127,67 @@ JavaScript fixture.
 Provider semantics: [npm daily download counts](https://github.com/npm/registry/blob/main/docs/download-counts.md),
 [GitHub limits](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api),
 and [SEC APIs](https://www.sec.gov/search-filings/edgar-application-programming-interfaces).
+
+## Evidence mapping and retained-capture re-mapping
+
+New reports include optional `mapping` metadata under the existing v2 contract.
+Old reports omit it and remain readable without changing their stored bytes.
+The mapper extracts capture-only normalized documents, preserving exact Unicode
+quotes, character offsets, document hashes, DOM locations and raw capture IDs.
+It retains tables and headings and excludes navigation and hidden content. Website
+statements remain attributed claims; subject ambiguity, customer stories and
+quotations cannot establish company financial measurements. Exact ISO currencies,
+locale-aware decimals, explicit dates and qualifiers are retained as attributed
+numeric context. Ambiguous amounts and missing measurement periods remain gaps.
+
+The five dimensions contain separate claim, event and observation references.
+Measured status requires fresh supported provider observations; reported status
+means attributed claims/events only. Mapping coverage is separate from trained
+experimental dimension models and does not create outcome probabilities. Existing
+company model payloads remain attached. Unknown definitions, rejected model
+proposals and bounded interpretation coverage have explicit reasons.
+
+Install the `research` and `explanations` extras for interpretation. The default
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` performs no model requests. Set
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini` to enable the optional interpreter,
+whose default is `gemini-3.8-live-extended-thinking`, using Google's Live API.
+The adapter enables audio output and transcription, discards audio immediately,
+and receives data through an asynchronous, local-only evidence submission function.
+It waits for explicit `IDLE` rather than stopping on `turnComplete`.
+Structured output is not supported by this Live model; every submitted proposal
+is instead strictly validated locally against the same evidence schema.
+An explicit `GEMINI_MODEL=gemma-4-31b-it` selects native structured text calls.
+`GEMINI_MODEL` overrides the model explicitly; errors never select another model.
+The private repository contains a shared backend default in
+`oxhack2026/explanations/internal-gemini.env`, as requested by the repository owner.
+A process `GEMINI_API_KEY` overrides it; an explicitly empty value disables it.
+The key is excluded from public API DTOs, captured prompts, logs and frontend
+configuration. Other provider credentials remain local environment configuration.
+
+Each mapping run has a sixty-second deadline, at most six bounded requests, a
+conservative sixty-thousand input-token reservation and two simultaneous model
+operations. `SIGNALSHIFT_GEMINI_RPM` and `SIGNALSHIFT_GEMINI_TPM` configure the
+shared process quota (defaults ten requests and sixty thousand reserved tokens per
+minute). These are application limits, not claims about Google's project quota.
+The mapper caches exact prompt/model responses as hashed artifacts, independently
+validates concepts, subjects and contiguous quotes and checkpoints each batch.
+Unavailability or malformed responses preserve deterministic results as partial.
+No browsing, external tool execution or external source instructions reach the
+interpreter as trusted instructions.
+
+`POST /api/v2/research-mapping-jobs` with `{"source_report_id":"..."}` explicitly
+queues interpretation of retained captures. Poll
+`GET /api/v2/research-mapping-jobs/{job_id}` while pending/running. Equivalent
+active requests coalesce and share the research queue limits. Completion links a
+new immutable report with `derived_from_report_id`; original collection times,
+source cutoff and capture artifacts are preserved. It does not refresh sources.
+`SIGNALSHIFT_RESEARCH_MAPPING_ENABLED=1` enables this worker independently of source
+collection. Capabilities expose mapping mode, local credential/SDK configuration
+and worker availability without contacting Google. Stored reads need neither
+worker nor credentials. Restart recovery preserves completed cached batches.
+
+Google documents the [Live model protocol](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-live-extended-thinking),
+[Gemma text API](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api)
+and [project-specific quotas](https://ai.google.dev/gemini-api/docs/rate-limits).
+A configured key/model is not proof of a successful provider generation; live
+acceptance must record actual results separately from mocked regression tests.

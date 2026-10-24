@@ -428,6 +428,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/research-mapping-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Mapping
+         * @description Explicitly re-map retained evidence into a new immutable report.
+         */
+        post: operations["research_v2_map"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/research-mapping-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Mapping Job
+         * @description Read durable interpretation progress without enqueueing or vendor access.
+         */
+        get: operations["research_v2_mapping_job"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/research-reports/{report_id}": {
         parameters: {
             query?: never;
@@ -622,6 +662,7 @@ export interface components {
              * @default 300
              */
             deadline_seconds: number;
+            mapping?: components["schemas"]["MappingCapability"] | null;
             /**
              * Network Operations
              * @default 8
@@ -1287,6 +1328,47 @@ export interface components {
             value: string;
         };
         /**
+         * DimensionCoverage
+         * @description Evidence coverage without implying a trained model or verified prose.
+         */
+        DimensionCoverage: {
+            /**
+             * Claim Ids
+             * @default []
+             */
+            claim_ids: string[];
+            /**
+             * Event Ids
+             * @default []
+             */
+            event_ids: string[];
+            /**
+             * Group Id
+             * @enum {string}
+             */
+            group_id: "adoption_retention" | "attention_sentiment" | "financial_health" | "industry_competition" | "team_execution";
+            /**
+             * Mapping Ids
+             * @default []
+             */
+            mapping_ids: string[];
+            /**
+             * Observation Ids
+             * @default []
+             */
+            observation_ids: string[];
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "measured" | "reported" | "missing" | "not_applicable";
+        };
+        /**
          * DimensionModelView
          * @description A trained proxy's availability, company eligibility and optional index.
          *
@@ -1775,6 +1857,7 @@ export interface components {
             identity_id: string;
             /** Job Id */
             job_id: string;
+            mapping?: components["schemas"]["MappingProgress"] | null;
             /**
              * Reason Codes
              * @default []
@@ -1816,6 +1899,262 @@ export interface components {
             identity_confirmed: true;
             /** Identity Id */
             identity_id: string;
+        };
+        /**
+         * MappedRecord
+         * @description An attributable interpretation; source support does not verify truth.
+         */
+        MappedRecord: {
+            /**
+             * Attribution
+             * @enum {string}
+             */
+            attribution: "platform_measured" | "company_reported" | "registry" | "coverage_candidate";
+            /** Concept */
+            concept: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Exact Decimal */
+            exact_decimal?: string | null;
+            /**
+             * Group Id
+             * @enum {string}
+             */
+            group_id: "adoption_retention" | "attention_sentiment" | "financial_health" | "industry_competition" | "team_execution";
+            /**
+             * Language
+             * @default und
+             */
+            language: string;
+            /** Mapping Id */
+            mapping_id: string;
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "rule" | "gemini";
+            /**
+             * Metric Eligible
+             * @default false
+             */
+            metric_eligible: boolean;
+            numerical_context?: components["schemas"]["NumericalContext"] | null;
+            /** Published On */
+            published_on?: string | null;
+            /**
+             * Qualifier
+             * @default unknown
+             * @enum {string}
+             */
+            qualifier: "exact" | "approximate" | "lower_bound" | "upper_bound" | "range" | "unknown";
+            /**
+             * Quotes
+             * @default []
+             */
+            quotes: components["schemas"]["QuoteAnchor"][];
+            /** Reason Codes */
+            reason_codes: string[];
+            /** Record Id */
+            record_id: string;
+            /**
+             * Record Type
+             * @enum {string}
+             */
+            record_type: "observation" | "claim" | "event";
+            /** Resource */
+            resource?: string | null;
+            /**
+             * Subject
+             * @enum {string}
+             */
+            subject: "company" | "product" | "customer" | "third_party" | "unresolved";
+            /** Subject Name */
+            subject_name: string;
+        };
+        /**
+         * MappingBundle
+         * @description Immutable mapping provenance and its exact supporting artifacts.
+         */
+        MappingBundle: {
+            /**
+             * Artifacts
+             * @default []
+             */
+            artifacts: components["schemas"]["ArtifactReference"][];
+            /** Derived From Report Id */
+            derived_from_report_id?: string | null;
+            /** Dimensions */
+            dimensions: components["schemas"]["DimensionCoverage"][];
+            /**
+             * Dispositions
+             * @default []
+             */
+            dispositions: components["schemas"]["MappingDisposition"][];
+            /**
+             * Generation Attempts
+             * @default 0
+             */
+            generation_attempts: number;
+            /**
+             * Input Tokens
+             * @default 0
+             */
+            input_tokens: number;
+            /**
+             * Mapped At
+             * Format: date-time
+             */
+            mapped_at: string;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "rules" | "rules_gemini";
+            /** Model */
+            model?: string | null;
+            /** Model Version */
+            model_version?: string | null;
+            /**
+             * Output Tokens
+             * @default 0
+             */
+            output_tokens: number;
+            /**
+             * Parser Version
+             * @default evidence-document-v2
+             * @enum {string}
+             */
+            parser_version: "evidence-document-v1" | "evidence-document-v2";
+            /**
+             * Policy Version
+             * @default public-evidence-mapping-v1
+             * @constant
+             */
+            policy_version: "public-evidence-mapping-v1";
+            /**
+             * Prompt Version
+             * @default evidence-proposals-v1
+             * @constant
+             */
+            prompt_version: "evidence-proposals-v1";
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /** Records */
+            records: components["schemas"]["MappedRecord"][];
+            /**
+             * Schema Version
+             * @default evidence-mapping-v1
+             * @constant
+             */
+            schema_version: "evidence-mapping-v1";
+            /**
+             * Source As Of
+             * Format: date-time
+             */
+            source_as_of: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "completed" | "partial";
+        };
+        /**
+         * MappingCapability
+         * @description Local configuration only; no vendor probe is performed.
+         */
+        MappingCapability: {
+            /**
+             * Deadline Seconds
+             * @default 60
+             */
+            deadline_seconds: number;
+            /** Enabled */
+            enabled: boolean;
+            /** Gemini Available */
+            gemini_available: boolean;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "rules" | "rules_gemini";
+            /** Reason */
+            reason?: string | null;
+        };
+        /**
+         * MappingDisposition
+         * @description Explain why a candidate was rejected or remains unmapped.
+         */
+        MappingDisposition: {
+            /** Candidate Id */
+            candidate_id: string;
+            /** Reason */
+            reason: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "rejected" | "unmapped";
+        };
+        /**
+         * MappingJob
+         * @description Durable re-mapping work sharing the research worker capacity.
+         */
+        MappingJob: {
+            /** Job Id */
+            job_id: string;
+            progress?: components["schemas"]["MappingProgress"];
+            /** Report Id */
+            report_id?: string | null;
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /**
+             * Schema Version
+             * @default research-mapping-job-v1
+             * @constant
+             */
+            schema_version: "research-mapping-job-v1";
+            /** Source Report Id */
+            source_report_id: string;
+        };
+        /**
+         * MappingJobRequest
+         * @description Explicitly request a new interpretation of retained source evidence.
+         */
+        MappingJobRequest: {
+            /** Source Report Id */
+            source_report_id: string;
+        };
+        /**
+         * MappingProgress
+         * @description Durable mapping progress, independent of collection sources.
+         */
+        MappingProgress: {
+            /**
+             * Completed Batches
+             * @default 0
+             */
+            completed_batches: number;
+            /** Finished At */
+            finished_at?: string | null;
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * State
+             * @default pending
+             * @enum {string}
+             */
+            state: "pending" | "running" | "completed" | "partial" | "failed" | "skipped";
         };
         /**
          * Metric
@@ -1873,6 +2212,32 @@ export interface components {
              * @enum {string}
              */
             value_kind: "integer" | "decimal" | "boolean";
+        };
+        /**
+         * NumericalContext
+         * @description An attributed numeric expression; normalization does not verify its truth.
+         */
+        NumericalContext: {
+            /** Currency */
+            currency?: string | null;
+            /** Measurement End */
+            measurement_end?: string | null;
+            /** Measurement Instant */
+            measurement_instant?: string | null;
+            /** Measurement Start */
+            measurement_start?: string | null;
+            /**
+             * Qualifier
+             * @enum {string}
+             */
+            qualifier: "exact" | "approximate" | "lower_bound" | "upper_bound";
+            /**
+             * Unit
+             * @enum {string}
+             */
+            unit: "currency" | "percent" | "count";
+            /** Value Decimal */
+            value_decimal: string;
         };
         /**
          * Observation
@@ -2053,6 +2418,38 @@ export interface components {
             stale_metric_ids: string[];
         };
         /**
+         * QuoteAnchor
+         * @description Exact selection in a hashed, normalized document derived from a capture.
+         */
+        QuoteAnchor: {
+            /** Block Id */
+            block_id: string;
+            /** Capture Id */
+            capture_id: string;
+            /** Document Sha256 */
+            document_sha256: string;
+            /** End */
+            end: number;
+            /** Evidence Id */
+            evidence_id: string;
+            /** Exact */
+            exact: string;
+            /** Location */
+            location: string;
+            /**
+             * Prefix
+             * @default
+             */
+            prefix: string;
+            /** Start */
+            start: number;
+            /**
+             * Suffix
+             * @default
+             */
+            suffix: string;
+        };
+        /**
          * Ranking
          * @description Ordered representatives supplied by shared numerical policy.
          */
@@ -2102,6 +2499,7 @@ export interface components {
             job_id: string;
             /** Limitations */
             limitations: string[];
+            mapping?: components["schemas"]["MappingBundle"] | null;
             /** Observations */
             observations: components["schemas"]["Observation"][];
             outlook: components["schemas"]["StartupOutlook"];
@@ -3677,6 +4075,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Job"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_map: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MappingJobRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MappingJob"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_mapping_job: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MappingJob"];
                 };
             };
             /** @description Validation Error */

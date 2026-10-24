@@ -6,6 +6,7 @@ from typing import TypeVar
 
 from pydantic import BaseModel, TypeAdapter
 
+from oxhack2026.api.evidence_mapping_schemas import MappingJob
 from oxhack2026.api.research_v2_schemas import Identity, Job, Report
 from oxhack2026.api.schemas import Identifier
 from oxhack2026.storage.artifacts import FileArtifactStore
@@ -138,6 +139,9 @@ class V2Store:
         artifacts = FileArtifactStore(self.root)
         for capture in report.captures:
             artifacts.read(capture.artifact)
+        if report.mapping:
+            for reference in report.mapping.artifacts:
+                artifacts.read(reference)
         path = self._path("reports", report.report_id)
         with file_lock(path.with_suffix(".lock")):
             if path.exists():
@@ -160,4 +164,53 @@ class V2Store:
             raise ValueError(message)
         for capture in result.captures:
             artifacts.read(capture.artifact)
+        if result.mapping:
+            for artifact in result.mapping.artifacts:
+                artifacts.read(artifact)
         return result
+
+    def mapping_job(self, job_id: str) -> MappingJob:
+        """Read a mapping job; raise KeyError if absent or ValueError if corrupt."""
+        result = self._read("mapping-jobs", job_id, MappingJob)
+        if result.job_id != job_id:
+            message = "Mapping job disagrees with storage key"
+            raise ValueError(message)
+        return result
+
+    def mapping_jobs(self) -> tuple[MappingJob, ...]:
+        """Read re-mapping work for shared queue accounting and recovery."""
+        return tuple(
+            self.mapping_job(path.stem)
+            for path in (self.root / "research-v2" / "mapping-jobs").glob("*.json")
+        )
+
+    def save_mapping_job(self, job: MappingJob) -> None:
+        """Persist monotonic progress; reject terminal rewrites and source changes."""
+        job = MappingJob.model_validate_json(job.model_dump_json())
+        path = self._path("mapping-jobs", job.job_id)
+        with file_lock(path.with_suffix(".lock")):
+            try:
+                previous = self.mapping_job(job.job_id)
+            except KeyError:
+                if job.progress.state != "pending":
+                    message = "Mapping jobs must begin pending"
+                    raise ValueError(message) from None
+            else:
+                if (
+                    previous.progress.state not in {"pending", "running"}
+                    or (
+                        previous.progress.state == "running"
+                        and job.progress.state == "pending"
+                    )
+                    or previous.source_report_id != job.source_report_id
+                    or previous.requested_at != job.requested_at
+                    or job.progress.completed_batches
+                    < previous.progress.completed_batches
+                    or (
+                        previous.progress.started_at is not None
+                        and job.progress.started_at != previous.progress.started_at
+                    )
+                ):
+                    message = "Mapping job transition or checkpoint rewrite is invalid"
+                    raise ValueError(message)
+            atomic_write(path, job.model_dump_json().encode())

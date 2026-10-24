@@ -280,6 +280,16 @@
             "title": "Deadline Seconds",
             "type": "integer"
           },
+          "mapping": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MappingCapability"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "network_operations": {
             "default": 8,
             "title": "Network Operations",
@@ -1741,6 +1751,83 @@
         "title": "DecimalValue",
         "type": "object"
       },
+      "DimensionCoverage": {
+        "additionalProperties": false,
+        "description": "Evidence coverage without implying a trained model or verified prose.",
+        "properties": {
+          "claim_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Claim Ids",
+            "type": "array"
+          },
+          "event_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "group_id": {
+            "enum": [
+              "adoption_retention",
+              "attention_sentiment",
+              "financial_health",
+              "industry_competition",
+              "team_execution"
+            ],
+            "title": "Group Id",
+            "type": "string"
+          },
+          "mapping_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Mapping Ids",
+            "type": "array"
+          },
+          "observation_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Observation Ids",
+            "type": "array"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "measured",
+              "reported",
+              "missing",
+              "not_applicable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "group_id",
+          "status"
+        ],
+        "title": "DimensionCoverage",
+        "type": "object"
+      },
       "DimensionModelView": {
         "additionalProperties": false,
         "description": "A trained proxy's availability, company eligibility and optional index.\n\nAttributes:\n    group_id: The dimension represented by this independent proxy model.\n    model_status: Actual verified weights exist; this is not outcome validation.\n    architecture: The portable baseline or validation-recommended comparator.\n    target: Plain-language target, distinct from the three company forecasts.\n    model_sha256: Exact fitted artifact digest, without local storage paths.\n    eligibility: Whether this company's inputs support experimental inference.\n    score: Training-outcome percentile, never a company-success probability.\n    predicted_value: Model output in the explicitly named transformed units.\n    prediction_unit: Units of the raw proxy prediction.\n    metric_observation_ids: Exact source inputs consumed by this inference.\n    reason_codes: Missingness, applicability and experimental-quality reasons.\n    limitations: Training population and quality restrictions.\nRaises:\n    ValueError: An unavailable model carries a score or a prediction is partial.",
@@ -2912,6 +2999,16 @@
             "title": "Job Id",
             "type": "string"
           },
+          "mapping": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MappingProgress"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "reason_codes": {
             "default": [],
             "items": {
@@ -3004,6 +3101,543 @@
           "identity_confirmed"
         ],
         "title": "JobRequest",
+        "type": "object"
+      },
+      "MappedRecord": {
+        "additionalProperties": false,
+        "description": "An attributable interpretation; source support does not verify truth.",
+        "properties": {
+          "attribution": {
+            "enum": [
+              "platform_measured",
+              "company_reported",
+              "registry",
+              "coverage_candidate"
+            ],
+            "title": "Attribution",
+            "type": "string"
+          },
+          "concept": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Concept",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "exact_decimal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Exact Decimal"
+          },
+          "group_id": {
+            "enum": [
+              "adoption_retention",
+              "attention_sentiment",
+              "financial_health",
+              "industry_competition",
+              "team_execution"
+            ],
+            "title": "Group Id",
+            "type": "string"
+          },
+          "language": {
+            "default": "und",
+            "title": "Language",
+            "type": "string"
+          },
+          "mapping_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Mapping Id",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "rule",
+              "gemini"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "metric_eligible": {
+            "default": false,
+            "title": "Metric Eligible",
+            "type": "boolean"
+          },
+          "numerical_context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/NumericalContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "published_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
+          "qualifier": {
+            "default": "unknown",
+            "enum": [
+              "exact",
+              "approximate",
+              "lower_bound",
+              "upper_bound",
+              "range",
+              "unknown"
+            ],
+            "title": "Qualifier",
+            "type": "string"
+          },
+          "quotes": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/QuoteAnchor"
+            },
+            "title": "Quotes",
+            "type": "array"
+          },
+          "reason_codes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "record_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Record Id",
+            "type": "string"
+          },
+          "record_type": {
+            "enum": [
+              "observation",
+              "claim",
+              "event"
+            ],
+            "title": "Record Type",
+            "type": "string"
+          },
+          "resource": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resource"
+          },
+          "subject": {
+            "enum": [
+              "company",
+              "product",
+              "customer",
+              "third_party",
+              "unresolved"
+            ],
+            "title": "Subject",
+            "type": "string"
+          },
+          "subject_name": {
+            "title": "Subject Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mapping_id",
+          "record_type",
+          "record_id",
+          "group_id",
+          "concept",
+          "subject",
+          "subject_name",
+          "attribution",
+          "method",
+          "evidence_ids",
+          "reason_codes"
+        ],
+        "title": "MappedRecord",
+        "type": "object"
+      },
+      "MappingBundle": {
+        "additionalProperties": false,
+        "description": "Immutable mapping provenance and its exact supporting artifacts.",
+        "properties": {
+          "artifacts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ArtifactReference"
+            },
+            "title": "Artifacts",
+            "type": "array"
+          },
+          "derived_from_report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Derived From Report Id"
+          },
+          "dimensions": {
+            "items": {
+              "$ref": "#/components/schemas/DimensionCoverage"
+            },
+            "title": "Dimensions",
+            "type": "array"
+          },
+          "dispositions": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/MappingDisposition"
+            },
+            "title": "Dispositions",
+            "type": "array"
+          },
+          "generation_attempts": {
+            "default": 0,
+            "maximum": 6.0,
+            "minimum": 0.0,
+            "title": "Generation Attempts",
+            "type": "integer"
+          },
+          "input_tokens": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Input Tokens",
+            "type": "integer"
+          },
+          "mapped_at": {
+            "format": "date-time",
+            "title": "Mapped At",
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "rules",
+              "rules_gemini"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
+          "output_tokens": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Output Tokens",
+            "type": "integer"
+          },
+          "parser_version": {
+            "default": "evidence-document-v2",
+            "enum": [
+              "evidence-document-v1",
+              "evidence-document-v2"
+            ],
+            "title": "Parser Version",
+            "type": "string"
+          },
+          "policy_version": {
+            "const": "public-evidence-mapping-v1",
+            "default": "public-evidence-mapping-v1",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "prompt_version": {
+            "const": "evidence-proposals-v1",
+            "default": "evidence-proposals-v1",
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/MappedRecord"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "schema_version": {
+            "const": "evidence-mapping-v1",
+            "default": "evidence-mapping-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_as_of": {
+            "format": "date-time",
+            "title": "Source As Of",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "completed",
+              "partial"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mapped_at",
+          "source_as_of",
+          "state",
+          "mode",
+          "records",
+          "dimensions"
+        ],
+        "title": "MappingBundle",
+        "type": "object"
+      },
+      "MappingCapability": {
+        "additionalProperties": false,
+        "description": "Local configuration only; no vendor probe is performed.",
+        "properties": {
+          "deadline_seconds": {
+            "default": 60,
+            "title": "Deadline Seconds",
+            "type": "integer"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "gemini_available": {
+            "title": "Gemini Available",
+            "type": "boolean"
+          },
+          "mode": {
+            "enum": [
+              "rules",
+              "rules_gemini"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "enabled",
+          "mode",
+          "gemini_available"
+        ],
+        "title": "MappingCapability",
+        "type": "object"
+      },
+      "MappingDisposition": {
+        "additionalProperties": false,
+        "description": "Explain why a candidate was rejected or remains unmapped.",
+        "properties": {
+          "candidate_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Candidate Id",
+            "type": "string"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "rejected",
+              "unmapped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "candidate_id",
+          "state",
+          "reason"
+        ],
+        "title": "MappingDisposition",
+        "type": "object"
+      },
+      "MappingJob": {
+        "additionalProperties": false,
+        "description": "Durable re-mapping work sharing the research worker capacity.",
+        "properties": {
+          "job_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "progress": {
+            "$ref": "#/components/schemas/MappingProgress"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "research-mapping-job-v1",
+            "default": "research-mapping-job-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_report_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Source Report Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "source_report_id",
+          "requested_at"
+        ],
+        "title": "MappingJob",
+        "type": "object"
+      },
+      "MappingJobRequest": {
+        "additionalProperties": false,
+        "description": "Explicitly request a new interpretation of retained source evidence.",
+        "properties": {
+          "source_report_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Source Report Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_report_id"
+        ],
+        "title": "MappingJobRequest",
+        "type": "object"
+      },
+      "MappingProgress": {
+        "additionalProperties": false,
+        "description": "Durable mapping progress, independent of collection sources.",
+        "properties": {
+          "completed_batches": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Completed Batches",
+            "type": "integer"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "partial",
+              "failed",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "title": "MappingProgress",
         "type": "object"
       },
       "Metric": {
@@ -3174,6 +3808,90 @@
           "maximum_age_days"
         ],
         "title": "MetricDefinition",
+        "type": "object"
+      },
+      "NumericalContext": {
+        "additionalProperties": false,
+        "description": "An attributed numeric expression; normalization does not verify its truth.",
+        "properties": {
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "measurement_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measurement End"
+          },
+          "measurement_instant": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measurement Instant"
+          },
+          "measurement_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measurement Start"
+          },
+          "qualifier": {
+            "enum": [
+              "exact",
+              "approximate",
+              "lower_bound",
+              "upper_bound"
+            ],
+            "title": "Qualifier",
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "currency",
+              "percent",
+              "count"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "value_decimal": {
+            "pattern": "^-?\\d+(?:\\.\\d+)?$",
+            "title": "Value Decimal",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value_decimal",
+          "unit",
+          "qualifier"
+        ],
+        "title": "NumericalContext",
         "type": "object"
       },
       "Observation": {
@@ -3601,6 +4319,76 @@
         "title": "PublicCompanyCoverage",
         "type": "object"
       },
+      "QuoteAnchor": {
+        "additionalProperties": false,
+        "description": "Exact selection in a hashed, normalized document derived from a capture.",
+        "properties": {
+          "block_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Block Id",
+            "type": "string"
+          },
+          "capture_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Capture Id",
+            "type": "string"
+          },
+          "document_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Document Sha256",
+            "type": "string"
+          },
+          "end": {
+            "exclusiveMinimum": 0.0,
+            "title": "End",
+            "type": "integer"
+          },
+          "evidence_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "exact": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Exact",
+            "type": "string"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "prefix": {
+            "default": "",
+            "maxLength": 120,
+            "title": "Prefix",
+            "type": "string"
+          },
+          "start": {
+            "minimum": 0.0,
+            "title": "Start",
+            "type": "integer"
+          },
+          "suffix": {
+            "default": "",
+            "maxLength": 120,
+            "title": "Suffix",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "capture_id",
+          "document_sha256",
+          "block_id",
+          "exact",
+          "start",
+          "end",
+          "location"
+        ],
+        "title": "QuoteAnchor",
+        "type": "object"
+      },
       "Ranking": {
         "additionalProperties": false,
         "description": "Ordered representatives supplied by shared numerical policy.",
@@ -3750,6 +4538,16 @@
             },
             "title": "Limitations",
             "type": "array"
+          },
+          "mapping": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MappingBundle"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "observations": {
             "items": {
@@ -6238,6 +7036,86 @@
           }
         },
         "summary": "Job"
+      }
+    },
+    "/api/v2/research-mapping-jobs": {
+      "post": {
+        "description": "Explicitly re-map retained evidence into a new immutable report.",
+        "operationId": "research_v2_map",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MappingJobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start Mapping"
+      }
+    },
+    "/api/v2/research-mapping-jobs/{job_id}": {
+      "get": {
+        "description": "Read durable interpretation progress without enqueueing or vendor access.",
+        "operationId": "research_v2_mapping_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MappingJob"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Mapping Job"
       }
     },
     "/api/v2/research-reports/{report_id}": {

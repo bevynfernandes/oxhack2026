@@ -80,7 +80,14 @@ def configure_research(
             False,
         )
         app.dependency_overrides[get_research_service] = lambda: legacy
-    if os.environ.get("SIGNALSHIFT_RESEARCH_ENABLED") != "1":
+    collection_enabled = os.environ.get("SIGNALSHIFT_RESEARCH_ENABLED") == "1"
+    mapping_enabled = (
+        os.environ.get(
+            "SIGNALSHIFT_RESEARCH_MAPPING_ENABLED", "1" if collection_enabled else "0"
+        )
+        == "1"
+    )
+    if not collection_enabled and not mapping_enabled:
         return app
 
     @asynccontextmanager
@@ -96,10 +103,12 @@ def configure_research(
                     executor,
                     repository,
                     dimension_models=dimension_models,
+                    collection_enabled=collection_enabled,
+                    mapping_enabled=mapping_enabled,
                 )
                 _app.dependency_overrides[get_v2_service] = lambda: service
                 service.recover()
-                if repository is not None:
+                if repository is not None and collection_enabled:
                     legacy_service = ResearchService(
                         repository,
                         legacy_sources,

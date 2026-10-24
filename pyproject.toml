@@ -34,12 +34,18 @@ storage = [
 ]
 models = ["catboost>=1.2,<2", "numpy>=2,<3", "scikit-learn>=1.6,<2"]
 bigquery = ["google-cloud-bigquery>=3,<4"]
-explanations = ["google-genai>=1,<2"]
+explanations = [
+    "google-genai>=1,<2",
+    "python-dotenv>=1,<2",
+    "websockets>=14,<16",
+]
 cli = ["typer>=0.16,<1"]
 research = [
+    "babel>=2.17,<3",
     "beautifulsoup4>=4.13,<5",
     "lxml>=6,<7",
     "playwright>=1.55,<2",
+    "trafilatura>=2.0,<3",
 ]
 
 [dependency-groups]
@@ -75,6 +81,7 @@ show_error_codes = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+norecursedirs = ["outputs"]
 addopts = "-ra -m 'not integration'"
 markers = ["integration: checks requiring explicit local service setup"]
 
