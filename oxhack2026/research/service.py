@@ -44,6 +44,7 @@ class ResearchService:
     sources: CompanySourceReader
     store: LocalResearchStore
     executor: Executor
+    collection_enabled: bool = True
 
     def create(self, request: ResearchRequest) -> ResearchJob:
         """Confirm saved identity and persist/enqueue work; never collect inline.
@@ -57,6 +58,8 @@ class ResearchService:
             RepositoryUnavailable: Published data or worker is unavailable.
             OSError: Job persistence fails before enqueueing.
         """
+        if not self.collection_enabled:
+            raise RepositoryUnavailable
         try:
             saved = self.repository.company(
                 request.assessment_publication_id, request.company_id

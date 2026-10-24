@@ -324,10 +324,152 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/research-capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Capabilities
+         * @description Read configured worker, browser and provider availability without vendor
+         *     requests.
+         */
+        get: operations["research_v2_capabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/research-identities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Discover
+         * @description Queue bounded identity discovery; collection requires a subsequent
+         *     confirmation.
+         */
+        post: operations["research_v2_discover"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/research-identities/{identity_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Identity
+         * @description Read exact identity status, redirect conflicts, evidence and optional saved
+         *     context.
+         */
+        get: operations["research_v2_identity"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/research-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start
+         * @description Confirm the preview and coalesce active work; terminal refreshes create new
+         *     reports.
+         */
+        post: operations["research_v2_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/research-jobs/{job_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Job
+         * @description Read durable per-source progress; never enqueue or restart work.
+         */
+        get: operations["research_v2_job"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/research-reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Report
+         * @description Read the immutable report and verify all capture hashes without source
+         *     fetching.
+         */
+        get: operations["research_v2_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * ArtifactReference
+         * @description Hashed artifact relative to a configured bundle root, never a signed URL.
+         */
+        ArtifactReference: {
+            /** Byte Size */
+            byte_size: number;
+            /**
+             * Media Type
+             * @enum {string}
+             */
+            media_type: "application/json" | "application/x-ndjson" | "application/vnd.apache.parquet" | "application/octet-stream";
+            /** Path */
+            path: string;
+            /** Sha256 */
+            sha256: string;
+        };
         /**
          * AssessmentStatement
          * @description A deterministic fact, risk or explicitly identified evidence gap.
@@ -457,6 +599,96 @@ export interface components {
             value: boolean;
         };
         /**
+         * Capabilities
+         * @description Independent storage, worker and browser availability.
+         */
+        Capabilities: {
+            /**
+             * Active Jobs
+             * @default 2
+             */
+            active_jobs: number;
+            /** Browser Available */
+            browser_available: boolean;
+            /**
+             * Capture Bytes
+             * @default 33554432
+             */
+            capture_bytes: number;
+            /** Collection Enabled */
+            collection_enabled: boolean;
+            /**
+             * Deadline Seconds
+             * @default 300
+             */
+            deadline_seconds: number;
+            /**
+             * Network Operations
+             * @default 8
+             */
+            network_operations: number;
+            /** Providers */
+            providers: components["schemas"]["ProviderCapability"][];
+            /**
+             * Queued Jobs
+             * @default 8
+             */
+            queued_jobs: number;
+            /**
+             * Request Budget
+             * @default 120
+             */
+            request_budget: number;
+            /**
+             * Response Bytes
+             * @default 4194304
+             */
+            response_bytes: number;
+            /**
+             * Schema Version
+             * @default research-capabilities-v2
+             * @constant
+             */
+            schema_version: "research-capabilities-v2";
+            /** Storage Available */
+            storage_available: boolean;
+            /** Worker Available */
+            worker_available: boolean;
+        };
+        /**
+         * Capture
+         * @description Integrity-checked raw response; URLs omit query data and credentials.
+         */
+        Capture: {
+            artifact: components["schemas"]["ArtifactReference"];
+            /** Capture Id */
+            capture_id: string;
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Content Type */
+            content_type: string;
+            /** Final Url */
+            final_url: string;
+            /**
+             * Parser Version
+             * @default research-extract-v2
+             * @constant
+             */
+            parser_version: "research-extract-v2";
+            /**
+             * Rendered
+             * @default false
+             */
+            rendered: boolean;
+            /** Status Code */
+            status_code: number;
+            /** Url */
+            url: string;
+        };
+        /**
          * Catalog
          * @description Versioned catalogue; batch reads use the batch's frozen mapping.
          */
@@ -488,6 +720,32 @@ export interface components {
             synthetic: boolean;
             /** Tools */
             tools: components["schemas"]["Tool"][];
+        };
+        /**
+         * Claim
+         * @description Attributed statement, not a normalized financial metric.
+         */
+        Claim: {
+            /**
+             * Attribution
+             * @enum {string}
+             */
+            attribution: "company_reported" | "registry" | "coverage_candidate";
+            /** Category */
+            category: string;
+            /** Claim Id */
+            claim_id: string;
+            /**
+             * Conflicts With
+             * @default []
+             */
+            conflicts_with: string[];
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Published On */
+            published_on?: string | null;
+            /** Text */
+            text: string;
         };
         /**
          * CompanyAssessment
@@ -993,6 +1251,18 @@ export interface components {
             value: string;
         };
         /**
+         * DiscoveryRequest
+         * @description Domain input and optional exact saved context; no collection confirmation.
+         */
+        DiscoveryRequest: {
+            /** Assessment Publication Id */
+            assessment_publication_id?: string | null;
+            /** Company Id */
+            company_id?: string | null;
+            /** Domain */
+            domain: string;
+        };
+        /**
          * Error
          * @description Stable public failure code and safe user-facing description.
          */
@@ -1051,6 +1321,24 @@ export interface components {
              */
             target_id: "downloads_next_30d_v1" | "downloads_trailing_28d_at_91d_v1";
             test_window: components["schemas"]["Window"];
+        };
+        /**
+         * Event
+         * @description Dated retrieved record; occurrence does not establish business outcomes.
+         */
+        Event: {
+            /** Event Id */
+            event_id: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Kind */
+            kind: string;
+            /** Published At */
+            published_at?: string | null;
+            /** Title */
+            title: string;
+            /** Url */
+            url: string;
         };
         /**
          * Evidence
@@ -1228,6 +1516,11 @@ export interface components {
             /** Stale */
             stale: boolean;
         };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
         /**
          * Health
          * @description Process or repository readiness, without sensitive configuration.
@@ -1290,6 +1583,59 @@ export interface components {
             window: components["schemas"]["Window"];
         };
         /**
+         * Identity
+         * @description Discovered brand identity; never establishes legal or account ownership.
+         */
+        Identity: {
+            /** Canonical Domain */
+            canonical_domain: string;
+            /**
+             * Captures
+             * @default []
+             */
+            captures: components["schemas"]["Capture"][];
+            /** Company Name */
+            company_name: string;
+            /**
+             * Conflicts
+             * @default []
+             */
+            conflicts: string[];
+            /**
+             * Evidence
+             * @default []
+             */
+            evidence: components["schemas"]["ResearchEvidence"][];
+            /** Finished At */
+            finished_at?: string | null;
+            /** Identity Id */
+            identity_id: string;
+            /**
+             * Limitations
+             * @default []
+             */
+            limitations: string[];
+            /**
+             * Official Links
+             * @default []
+             */
+            official_links: string[];
+            request: components["schemas"]["DiscoveryRequest"];
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /** Requested Domain */
+            requested_domain: string;
+            saved_context?: components["schemas"]["CompanyDetail"] | null;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "queued" | "running" | "ready" | "failed";
+        };
+        /**
          * IntegerValue
          * @description Exact count, excluding Boolean and coercible string/float inputs.
          */
@@ -1322,6 +1668,59 @@ export interface components {
             status: "validated";
             /** Upper */
             upper: number;
+        };
+        /**
+         * Job
+         * @description Durable multi-source work; complete collector checkpoints survive recovery.
+         */
+        Job: {
+            /** Finished At */
+            finished_at?: string | null;
+            /** Identity Id */
+            identity_id: string;
+            /** Job Id */
+            job_id: string;
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /** Report Id */
+            report_id?: string | null;
+            /**
+             * Requested At
+             * Format: date-time
+             */
+            requested_at: string;
+            /**
+             * Schema Version
+             * @default research-job-v2
+             * @constant
+             */
+            schema_version: "research-job-v2";
+            /** Sources */
+            sources: components["schemas"]["SourceState"][];
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * State
+             * @default queued
+             * @enum {string}
+             */
+            state: "queued" | "running" | "partial" | "completed" | "failed";
+        };
+        /**
+         * JobRequest
+         * @description Explicit confirmation of the exact preview, including any redirect conflicts.
+         */
+        JobRequest: {
+            /**
+             * Identity Confirmed
+             * @constant
+             */
+            identity_confirmed: true;
+            /** Identity Id */
+            identity_id: string;
         };
         /**
          * Metric
@@ -1379,6 +1778,47 @@ export interface components {
              * @enum {string}
              */
             value_kind: "integer" | "decimal" | "boolean";
+        };
+        /**
+         * Observation
+         * @description Measured proxy or explicit gap; measurement time differs from collection.
+         */
+        Observation: {
+            /**
+             * Applicability
+             * @default applicable
+             * @enum {string}
+             */
+            applicability: "applicable" | "unknown" | "not_applicable";
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Definition */
+            definition: string;
+            /**
+             * Evidence Ids
+             * @default []
+             */
+            evidence_ids: string[];
+            /** Metric Id */
+            metric_id: string;
+            /** Missing Reason */
+            missing_reason?: string | null;
+            /** Observation Id */
+            observation_id: string;
+            /**
+             * Origin
+             * @default fresh
+             * @enum {string}
+             */
+            origin: "fresh" | "saved";
+            /** Unit */
+            unit: string;
+            /** Value */
+            value?: number | null;
+            window?: components["schemas"]["Window"] | null;
         };
         /**
          * Outcome
@@ -1473,6 +1913,21 @@ export interface components {
             synthetic: boolean;
         };
         /**
+         * ProviderCapability
+         * @description Configuration-only provider availability; never probes a vendor.
+         */
+        ProviderCapability: {
+            /** Available */
+            available: boolean;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "website" | "github" | "npm" | "hiring" | "hn" | "news" | "sec" | "companies_house";
+            /** Reason */
+            reason?: string | null;
+        };
+        /**
          * PublicCompanyCoverage
          * @description Coverage counts public observations and withheld metrics separately.
          */
@@ -1534,12 +1989,70 @@ export interface components {
             shortfall_reason: string | null;
         };
         /**
+         * Report
+         * @description Immutable standalone report with raw artifact lineage and null forecasts.
+         */
+        Report: {
+            /** Captures */
+            captures: components["schemas"]["Capture"][];
+            /** Claims */
+            claims: components["schemas"]["Claim"][];
+            /** Events */
+            events: components["schemas"]["Event"][];
+            /** Evidence */
+            evidence: components["schemas"]["ResearchEvidence"][];
+            identity: components["schemas"]["Identity"];
+            /** Job Id */
+            job_id: string;
+            /** Limitations */
+            limitations: string[];
+            /** Observations */
+            observations: components["schemas"]["Observation"][];
+            outlook: components["schemas"]["StartupOutlook"];
+            /** Report Id */
+            report_id: string;
+            /**
+             * Researched At
+             * Format: date-time
+             */
+            researched_at: string;
+            /**
+             * Schema Version
+             * @default research-report-v2
+             * @constant
+             */
+            schema_version: "research-report-v2";
+            /** Sources */
+            sources: components["schemas"]["SourceState"][];
+        };
+        /**
          * ReportLink
          * @description Public immutable report link without signed storage credentials.
          */
         ReportLink: {
             /** Label */
             label: string;
+            /** Url */
+            url: string;
+        };
+        /**
+         * ResearchEvidence
+         * @description Public excerpt and deterministic extraction location in a retained capture.
+         */
+        ResearchEvidence: {
+            /** Capture Id */
+            capture_id: string;
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Evidence Id */
+            evidence_id: string;
+            /** Excerpt */
+            excerpt: string;
+            /** Location */
+            location: string;
             /** Url */
             url: string;
         };
@@ -1768,6 +2281,64 @@ export interface components {
             source: string;
         };
         /**
+         * SourceState
+         * @description One collector checkpoint, including skipped and interrupted work.
+         */
+        SourceState: {
+            /**
+             * Captures
+             * @default []
+             */
+            captures: components["schemas"]["Capture"][];
+            /**
+             * Claims
+             * @default []
+             */
+            claims: components["schemas"]["Claim"][];
+            /**
+             * Events
+             * @default []
+             */
+            events: components["schemas"]["Event"][];
+            /**
+             * Evidence
+             * @default []
+             */
+            evidence: components["schemas"]["ResearchEvidence"][];
+            /** Finished At */
+            finished_at?: string | null;
+            /**
+             * Links
+             * @default []
+             */
+            links: string[];
+            /** Name */
+            name: string;
+            /**
+             * Observations
+             * @default []
+             */
+            observations: components["schemas"]["Observation"][];
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "website" | "github" | "npm" | "hiring" | "hn" | "news" | "sec" | "companies_house";
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /** Started At */
+            started_at?: string | null;
+            /**
+             * State
+             * @default pending
+             * @enum {string}
+             */
+            state: "pending" | "running" | "completed" | "partial" | "failed" | "skipped";
+        };
+        /**
          * SpecialistOutlook
          * @description One group's source coverage, independent of its untrained model status.
          *
@@ -1939,6 +2510,19 @@ export interface components {
             tool_id: string;
             /** Tool Name */
             tool_name: string;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Context */
+            ctx?: Record<string, never>;
+            /** Input */
+            input?: unknown;
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
         };
         /**
          * Window
@@ -2858,6 +3442,185 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    research_v2_capabilities: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Capabilities"];
+                };
+            };
+        };
+    };
+    research_v2_discover: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscoveryRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Identity"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_identity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                identity_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Identity"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JobRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_job: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };
