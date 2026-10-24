@@ -1,0 +1,51 @@
+{
+  "review_version": "datree-discovery-followup-20261024-v1",
+  "cohort_version": "yc-winter2020-discovery-20261024-v1",
+  "company_id": "yc-13053",
+  "company_name": "Datree",
+  "captures": [
+    {
+      "request": {
+        "url": "https://www.ycombinator.com/companies/datree",
+        "page": null
+      },
+      "collected_at": "2026-10-24T15:52:45.741940Z",
+      "artifact": {
+        "path": "objects/d4/d44865bbb11f1acf162b3d0c074ebc0de4e4bfd5f872352d6b095055c7b86344",
+        "sha256": "d44865bbb11f1acf162b3d0c074ebc0de4e4bfd5f872352d6b095055c7b86344",
+        "byte_size": 103381,
+        "media_type": "application/octet-stream"
+      },
+      "has_next_page": false
+    },
+    {
+      "request": {
+        "url": "https://raw.githubusercontent.com/datreeio/datree/0c3b63e6ce9688cdb5ad3bf06768875664cf15be/README.md",
+        "page": null
+      },
+      "collected_at": "2026-10-24T15:52:45.988703Z",
+      "artifact": {
+        "path": "objects/ea/ea9c0199135271da3752c43c1afffd2b84d5f7855ab2d39694f42b5d6c67202c",
+        "sha256": "ea9c0199135271da3752c43c1afffd2b84d5f7855ab2d39694f42b5d6c67202c",
+        "byte_size": 2788,
+        "media_type": "application/octet-stream"
+      },
+      "has_next_page": false
+    }
+  ],
+  "reviewed_observations": [
+    "Primary YC profile currently lists Datree as inactive.",
+    "Company-owned repository README reports the supporting commercial company closed in July 2023.",
+    "README states the standalone open-source tool can still run."
+  ],
+  "reported_event_month": "2023-07",
+  "exact_event_date": null,
+  "source_commit": "0c3b63e6ce9688cdb5ad3bf06768875664cf15be",
+  "first_available_basis": "first_observed_at_actual_capture",
+  "outcome_label": null,
+  "remaining_review": [
+    "Verify company/legal/family identity for the intended historical cutoff.",
+    "Obtain pre-cutoff feature vintages and apply Dev 2 outcome/source/maturity policy.",
+    "Month precision must not be converted to an invented event day."
+  ]
+}
