@@ -1,0 +1,2219 @@
+{
+  "components": {
+    "schemas": {
+      "Baseline": {
+        "additionalProperties": false,
+        "description": "A saved comparator forecast, without any future outcome values.",
+        "properties": {
+          "model_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Model Id",
+            "type": "string"
+          },
+          "predicted_downloads": {
+            "minimum": 0.0,
+            "title": "Predicted Downloads",
+            "type": "number"
+          }
+        },
+        "required": [
+          "model_id",
+          "predicted_downloads"
+        ],
+        "title": "Baseline",
+        "type": "object"
+      },
+      "Catalog": {
+        "additionalProperties": false,
+        "description": "Versioned catalogue; batch reads use the batch's frozen mapping.",
+        "properties": {
+          "catalog_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Catalog Version",
+            "type": "string"
+          },
+          "mapping_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Mapping Version",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/Tool"
+            },
+            "title": "Tools",
+            "type": "array"
+          }
+        },
+        "required": [
+          "catalog_version",
+          "mapping_version",
+          "synthetic",
+          "tools"
+        ],
+        "title": "Catalog",
+        "type": "object"
+      },
+      "Cutoff": {
+        "additionalProperties": false,
+        "description": "An explicitly published, selectable forecast batch.",
+        "properties": {
+          "batch_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "decision_at": {
+            "format": "date-time",
+            "title": "Decision At",
+            "type": "string"
+          },
+          "ecosystem": {
+            "enum": [
+              "npm",
+              "pypi"
+            ],
+            "title": "Ecosystem",
+            "type": "string"
+          },
+          "evaluation_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluation Id"
+          },
+          "mode": {
+            "enum": [
+              "reconstructed",
+              "prospective"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          },
+          "target_id": {
+            "enum": [
+              "downloads_next_30d_v1",
+              "downloads_trailing_28d_at_91d_v1"
+            ],
+            "title": "Target Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch_id",
+          "ecosystem",
+          "target_id",
+          "decision_at",
+          "mode",
+          "evaluation_id",
+          "synthetic"
+        ],
+        "title": "Cutoff",
+        "type": "object"
+      },
+      "Cutoffs": {
+        "additionalProperties": false,
+        "description": "Supported combinations only; no interpolation to another cutoff.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/Cutoff"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "Cutoffs",
+        "type": "object"
+      },
+      "DataHealth": {
+        "additionalProperties": false,
+        "description": "Public quality summary for the active published release.",
+        "properties": {
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceHealth"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "synthetic",
+          "sources"
+        ],
+        "title": "DataHealth",
+        "type": "object"
+      },
+      "Error": {
+        "additionalProperties": false,
+        "description": "Stable public failure code and safe user-facing description.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "Error",
+        "type": "object"
+      },
+      "Evaluation": {
+        "additionalProperties": false,
+        "description": "Immutable evaluation, with failed and inconclusive results preserved.",
+        "properties": {
+          "conclusion": {
+            "title": "Conclusion",
+            "type": "string"
+          },
+          "ecosystem": {
+            "enum": [
+              "npm",
+              "pypi"
+            ],
+            "title": "Ecosystem",
+            "type": "string"
+          },
+          "evaluation_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Evaluation Id",
+            "type": "string"
+          },
+          "exclusions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Exclusions",
+            "type": "array"
+          },
+          "interval_findings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Interval Findings",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/Metric"
+            },
+            "title": "Metrics",
+            "type": "array"
+          },
+          "missingness": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missingness",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "reconstructed",
+              "prospective"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "organization_count": {
+            "minimum": 0.0,
+            "title": "Organization Count",
+            "type": "integer"
+          },
+          "origin_count": {
+            "minimum": 0.0,
+            "title": "Origin Count",
+            "type": "integer"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/ReportLink"
+            },
+            "title": "Reports",
+            "type": "array"
+          },
+          "sample_count": {
+            "minimum": 0.0,
+            "title": "Sample Count",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "exploratory",
+              "inconclusive",
+              "rejected",
+              "confirmed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "target_id": {
+            "enum": [
+              "downloads_next_30d_v1",
+              "downloads_trailing_28d_at_91d_v1"
+            ],
+            "title": "Target Id",
+            "type": "string"
+          },
+          "test_window": {
+            "$ref": "#/components/schemas/Window"
+          }
+        },
+        "required": [
+          "evaluation_id",
+          "ecosystem",
+          "target_id",
+          "mode",
+          "status",
+          "test_window",
+          "origin_count",
+          "organization_count",
+          "sample_count",
+          "exclusions",
+          "missingness",
+          "metrics",
+          "interval_findings",
+          "conclusion",
+          "limitations",
+          "provenance",
+          "reports"
+        ],
+        "title": "Evaluation",
+        "type": "object"
+      },
+      "Evidence": {
+        "additionalProperties": false,
+        "description": "Persisted evidence whose availability is bounded by the decision cutoff.",
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "evidence_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "measurement",
+              "interpretation",
+              "limitation",
+              "mapping"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "observed_at": {
+            "format": "date-time",
+            "title": "Observed At",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "source",
+          "observed_at",
+          "available_at",
+          "kind",
+          "text"
+        ],
+        "title": "Evidence",
+        "type": "object"
+      },
+      "Exclusion": {
+        "additionalProperties": false,
+        "description": "A published ranking exclusion with its original reason codes.",
+        "properties": {
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "tool_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Tool Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_id",
+          "reasons"
+        ],
+        "title": "Exclusion",
+        "type": "object"
+      },
+      "Forecast": {
+        "additionalProperties": false,
+        "description": "One tool's saved aggregate prediction or explicit unavailable result.",
+        "properties": {
+          "availability": {
+            "enum": [
+              "available",
+              "unavailable"
+            ],
+            "title": "Availability",
+            "type": "string"
+          },
+          "baseline": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Baseline"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimate_kind": {
+            "enum": [
+              "conditional_median",
+              "log_space_point",
+              "baseline"
+            ],
+            "title": "Estimate Kind",
+            "type": "string"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "evidence_status": {
+            "enum": [
+              "exploratory",
+              "inconclusive",
+              "rejected",
+              "confirmed"
+            ],
+            "title": "Evidence Status",
+            "type": "string"
+          },
+          "forecast_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Forecast Id",
+            "type": "string"
+          },
+          "freshness": {
+            "$ref": "#/components/schemas/Freshness"
+          },
+          "interval": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Interval"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "model_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Model Id",
+            "type": "string"
+          },
+          "organization_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Organization Id",
+            "type": "string"
+          },
+          "package_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Package Id",
+            "type": "string"
+          },
+          "predicted_downloads": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Downloads"
+          },
+          "predicted_growth_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Predicted Growth Pct"
+          },
+          "ranking_eligible": {
+            "title": "Ranking Eligible",
+            "type": "boolean"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "reference_downloads": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Downloads"
+          },
+          "tool_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Tool Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "forecast_id",
+          "tool_id",
+          "organization_id",
+          "package_id",
+          "model_id",
+          "availability",
+          "reference_downloads",
+          "predicted_downloads",
+          "predicted_growth_pct",
+          "estimate_kind",
+          "ranking_eligible",
+          "reasons",
+          "interval",
+          "baseline",
+          "evidence_status",
+          "evidence",
+          "freshness"
+        ],
+        "title": "Forecast",
+        "type": "object"
+      },
+      "ForecastBatch": {
+        "additionalProperties": false,
+        "description": "Frozen prediction payload; shared identity/time apply to every result.",
+        "properties": {
+          "batch_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "contract_version": {
+            "const": "0.1.0",
+            "default": "0.1.0",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "decision_at": {
+            "format": "date-time",
+            "title": "Decision At",
+            "type": "string"
+          },
+          "ecosystem": {
+            "enum": [
+              "npm",
+              "pypi"
+            ],
+            "title": "Ecosystem",
+            "type": "string"
+          },
+          "evaluation_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluation Id"
+          },
+          "mode": {
+            "enum": [
+              "reconstructed",
+              "prospective"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "observation_window_end": {
+            "format": "date-time",
+            "title": "Observation Window End",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "reference_window": {
+            "$ref": "#/components/schemas/Window"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/Forecast"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "target_definition_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Target Definition Version",
+            "type": "string"
+          },
+          "target_id": {
+            "enum": [
+              "downloads_next_30d_v1",
+              "downloads_trailing_28d_at_91d_v1"
+            ],
+            "title": "Target Id",
+            "type": "string"
+          },
+          "target_window": {
+            "$ref": "#/components/schemas/Window"
+          }
+        },
+        "required": [
+          "batch_id",
+          "ecosystem",
+          "target_id",
+          "target_definition_version",
+          "decision_at",
+          "observation_window_end",
+          "reference_window",
+          "target_window",
+          "mode",
+          "provenance",
+          "results",
+          "evaluation_id"
+        ],
+        "title": "ForecastBatch",
+        "type": "object"
+      },
+      "Freshness": {
+        "additionalProperties": false,
+        "description": "Published quality assessment, independent of model validation status.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "completeness": {
+            "enum": [
+              "complete",
+              "partial",
+              "unavailable"
+            ],
+            "title": "Completeness",
+            "type": "string"
+          },
+          "reasons": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "stale": {
+            "title": "Stale",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "as_of",
+          "stale",
+          "completeness"
+        ],
+        "title": "Freshness",
+        "type": "object"
+      },
+      "Health": {
+        "additionalProperties": false,
+        "description": "Process or repository readiness, without sensitive configuration.",
+        "properties": {
+          "contract_version": {
+            "default": "0.1.0",
+            "title": "Contract Version",
+            "type": "string"
+          },
+          "reasons": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "ready",
+              "unavailable"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "Health",
+        "type": "object"
+      },
+      "History": {
+        "additionalProperties": false,
+        "description": "Frozen, batch-bounded observation history.",
+        "properties": {
+          "batch_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "dataset_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Dataset Version",
+            "type": "string"
+          },
+          "observation_window_end": {
+            "format": "date-time",
+            "title": "Observation Window End",
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/HistoryPoint"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "tool_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Tool Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "batch_id",
+          "tool_id",
+          "dataset_version",
+          "observation_window_end",
+          "points"
+        ],
+        "title": "History",
+        "type": "object"
+      },
+      "HistoryPoint": {
+        "additionalProperties": false,
+        "description": "One observed interval; missing counts remain null.",
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "completeness": {
+            "enum": [
+              "complete",
+              "missing",
+              "partial"
+            ],
+            "title": "Completeness",
+            "type": "string"
+          },
+          "downloads": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Downloads"
+          },
+          "revision_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Revision Id",
+            "type": "string"
+          },
+          "window": {
+            "$ref": "#/components/schemas/Window"
+          }
+        },
+        "required": [
+          "window",
+          "downloads",
+          "available_at",
+          "completeness",
+          "revision_id"
+        ],
+        "title": "HistoryPoint",
+        "type": "object"
+      },
+      "Interval": {
+        "additionalProperties": false,
+        "description": "An interval already approved by the model owner's serving gate.",
+        "properties": {
+          "calibration_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Calibration Id",
+            "type": "string"
+          },
+          "lower": {
+            "minimum": 0.0,
+            "title": "Lower",
+            "type": "number"
+          },
+          "method": {
+            "title": "Method",
+            "type": "string"
+          },
+          "nominal_coverage": {
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Nominal Coverage",
+            "type": "number"
+          },
+          "status": {
+            "const": "validated",
+            "title": "Status",
+            "type": "string"
+          },
+          "upper": {
+            "minimum": 0.0,
+            "title": "Upper",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lower",
+          "upper",
+          "nominal_coverage",
+          "method",
+          "calibration_id",
+          "status"
+        ],
+        "title": "Interval",
+        "type": "object"
+      },
+      "Metric": {
+        "additionalProperties": false,
+        "description": "Published comparison, including common-row and interval diagnostics.",
+        "properties": {
+          "common_rows_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Common Rows Id"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "lower_is_better": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lower Is Better"
+          },
+          "model_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Model Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "sample_count": {
+            "minimum": 0.0,
+            "title": "Sample Count",
+            "type": "integer"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "model_id",
+          "name",
+          "value",
+          "unit",
+          "lower_is_better",
+          "sample_count",
+          "common_rows_id",
+          "limitations"
+        ],
+        "title": "Metric",
+        "type": "object"
+      },
+      "Outcome": {
+        "additionalProperties": false,
+        "description": "Mature truth and saved errors, available only in a reveal response.",
+        "properties": {
+          "actual_downloads": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actual Downloads"
+          },
+          "baseline_absolute_error": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Baseline Absolute Error"
+          },
+          "model_absolute_error": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Absolute Error"
+          },
+          "realized_growth_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Realized Growth Pct"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "tool_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Tool Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_id",
+          "actual_downloads",
+          "realized_growth_pct",
+          "model_absolute_error",
+          "baseline_absolute_error",
+          "reasons"
+        ],
+        "title": "Outcome",
+        "type": "object"
+      },
+      "Provenance": {
+        "additionalProperties": false,
+        "description": "Public immutable version references, never storage locations or secrets.",
+        "properties": {
+          "catalog_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Catalog Version",
+            "type": "string"
+          },
+          "dataset_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Dataset Version",
+            "type": "string"
+          },
+          "evidence_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Evidence Version",
+            "type": "string"
+          },
+          "experiment_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Experiment Id",
+            "type": "string"
+          },
+          "feature_schema_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Feature Schema Version",
+            "type": "string"
+          },
+          "limitations": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "mapping_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Mapping Version",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "dataset_version",
+          "catalog_version",
+          "mapping_version",
+          "feature_schema_version",
+          "evidence_version",
+          "experiment_id",
+          "synthetic"
+        ],
+        "title": "Provenance",
+        "type": "object"
+      },
+      "Ranking": {
+        "additionalProperties": false,
+        "description": "Ordered representatives supplied by shared numerical policy.",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "tool_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Tool Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "tool_ids"
+        ],
+        "title": "Ranking",
+        "type": "object"
+      },
+      "Rankings": {
+        "additionalProperties": false,
+        "description": "Published ordering and comparators; the API never recomputes rankings.",
+        "properties": {
+          "baselines": {
+            "items": {
+              "$ref": "#/components/schemas/Ranking"
+            },
+            "title": "Baselines",
+            "type": "array"
+          },
+          "batch_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "exclusions": {
+            "items": {
+              "$ref": "#/components/schemas/Exclusion"
+            },
+            "title": "Exclusions",
+            "type": "array"
+          },
+          "policy_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "primary": {
+            "$ref": "#/components/schemas/Ranking"
+          },
+          "recommended_tool_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "maxItems": 5,
+            "title": "Recommended Tool Ids",
+            "type": "array"
+          },
+          "reveal_allowed": {
+            "title": "Reveal Allowed",
+            "type": "boolean"
+          },
+          "shortfall_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Shortfall Reason"
+          }
+        },
+        "required": [
+          "batch_id",
+          "policy_version",
+          "primary",
+          "recommended_tool_ids",
+          "baselines",
+          "exclusions",
+          "shortfall_reason",
+          "reveal_allowed"
+        ],
+        "title": "Rankings",
+        "type": "object"
+      },
+      "ReportLink": {
+        "additionalProperties": false,
+        "description": "Public immutable report link without signed storage credentials.",
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "url": {
+            "maxLength": 2048,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "url"
+        ],
+        "title": "ReportLink",
+        "type": "object"
+      },
+      "Reveal": {
+        "additionalProperties": false,
+        "description": "Separate mature outcomes and scores; never nested in a forecast DTO.",
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "batch_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Batch Id",
+            "type": "string"
+          },
+          "comparators": {
+            "items": {
+              "$ref": "#/components/schemas/Score"
+            },
+            "title": "Comparators",
+            "type": "array"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "outcome_vintage": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Outcome Vintage",
+            "type": "string"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/Outcome"
+            },
+            "title": "Outcomes",
+            "type": "array"
+          },
+          "selected_organization_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Selected Organization Ids",
+            "type": "array"
+          },
+          "selection_score": {
+            "$ref": "#/components/schemas/Score"
+          }
+        },
+        "required": [
+          "batch_id",
+          "outcome_vintage",
+          "available_at",
+          "selected_organization_ids",
+          "outcomes",
+          "selection_score",
+          "comparators",
+          "limitations"
+        ],
+        "title": "Reveal",
+        "type": "object"
+      },
+      "RevealRequest": {
+        "additionalProperties": false,
+        "description": "A bounded user selection; scores are delegated to the model owner.",
+        "properties": {
+          "organization_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "maxItems": 5,
+            "title": "Organization Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "organization_ids"
+        ],
+        "title": "RevealRequest",
+        "type": "object"
+      },
+      "Score": {
+        "additionalProperties": false,
+        "description": "Authoritative shortlist score with explicit undefined/insufficient states.",
+        "properties": {
+          "metric": {
+            "title": "Metric",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "organization_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Organization Ids",
+            "type": "array"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "name",
+          "metric",
+          "value",
+          "organization_ids",
+          "reason"
+        ],
+        "title": "Score",
+        "type": "object"
+      },
+      "SourceHealth": {
+        "additionalProperties": false,
+        "description": "Public source coverage; diagnostics contain no internal error strings.",
+        "properties": {
+          "connector_status": {
+            "enum": [
+              "ready",
+              "degraded",
+              "unavailable"
+            ],
+            "title": "Connector Status",
+            "type": "string"
+          },
+          "ecosystem": {
+            "anyOf": [
+              {
+                "enum": [
+                  "npm",
+                  "pypi"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ecosystem"
+          },
+          "freshness": {
+            "$ref": "#/components/schemas/Freshness"
+          },
+          "mapping_status": {
+            "title": "Mapping Status",
+            "type": "string"
+          },
+          "missing_partitions": {
+            "minimum": 0.0,
+            "title": "Missing Partitions",
+            "type": "integer"
+          },
+          "revisions": {
+            "minimum": 0.0,
+            "title": "Revisions",
+            "type": "integer"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source",
+          "ecosystem",
+          "freshness",
+          "missing_partitions",
+          "revisions",
+          "mapping_status",
+          "connector_status"
+        ],
+        "title": "SourceHealth",
+        "type": "object"
+      },
+      "Tool": {
+        "additionalProperties": false,
+        "description": "Verified tool-to-package and organization mapping in one ecosystem.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "ecosystem": {
+            "enum": [
+              "npm",
+              "pypi"
+            ],
+            "title": "Ecosystem",
+            "type": "string"
+          },
+          "mapping_evidence": {
+            "items": {
+              "$ref": "#/components/schemas/Evidence"
+            },
+            "title": "Mapping Evidence",
+            "type": "array"
+          },
+          "organization_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Organization Id",
+            "type": "string"
+          },
+          "organization_name": {
+            "title": "Organization Name",
+            "type": "string"
+          },
+          "package_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Package Id",
+            "type": "string"
+          },
+          "package_name": {
+            "title": "Package Name",
+            "type": "string"
+          },
+          "representative": {
+            "title": "Representative",
+            "type": "boolean"
+          },
+          "tool_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Tool Id",
+            "type": "string"
+          },
+          "tool_name": {
+            "title": "Tool Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "tool_id",
+          "tool_name",
+          "organization_id",
+          "organization_name",
+          "package_id",
+          "package_name",
+          "ecosystem",
+          "category",
+          "representative",
+          "mapping_evidence"
+        ],
+        "title": "Tool",
+        "type": "object"
+      },
+      "Window": {
+        "additionalProperties": false,
+        "description": "A UTC half-open measurement interval [start, end).",
+        "properties": {
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "Window",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "SignalShift",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/catalog": {
+      "get": {
+        "description": "Return verified identities, frozen to batch_id when provided.",
+        "operationId": "catalog",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ecosystem",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "npm",
+                    "pypi"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ecosystem"
+            }
+          },
+          {
+            "in": "query",
+            "name": "batch_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Batch Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Catalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Catalog"
+      }
+    },
+    "/api/v1/cutoffs": {
+      "get": {
+        "description": "Return only saved ecosystem/target/cutoff combinations.",
+        "operationId": "cutoffs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "ecosystem",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "npm",
+                    "pypi"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Ecosystem"
+            }
+          },
+          {
+            "in": "query",
+            "name": "target_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "downloads_next_30d_v1",
+                    "downloads_trailing_28d_at_91d_v1"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Cutoffs"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Cutoffs"
+      }
+    },
+    "/api/v1/data-health": {
+      "get": {
+        "description": "Return public source freshness and coverage diagnostics.",
+        "operationId": "data_health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataHealth"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Data Health"
+      }
+    },
+    "/api/v1/evaluations/{evaluation_id}": {
+      "get": {
+        "description": "Return the exact published evaluation, including failed challengers.",
+        "operationId": "evaluation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "evaluation_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Evaluation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Evaluation"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Evaluation"
+      }
+    },
+    "/api/v1/forecasts/{batch_id}": {
+      "get": {
+        "description": "Return the immutable forecast; this DTO cannot serialize future actuals.",
+        "operationId": "forecasts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ForecastBatch"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Forecasts"
+      }
+    },
+    "/api/v1/health/live": {
+      "get": {
+        "description": "Return process health; no repository or vendor access is performed.",
+        "operationId": "liveness",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Liveness"
+      }
+    },
+    "/api/v1/health/ready": {
+      "get": {
+        "description": "Return required repository readiness; use HTTP 503 when unavailable.",
+        "operationId": "readiness",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Readiness"
+      }
+    },
+    "/api/v1/rankings/{batch_id}": {
+      "get": {
+        "description": "Return saved policy ordering, exclusions and baseline comparisons.",
+        "operationId": "rankings",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rankings"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Rankings"
+      }
+    },
+    "/api/v1/replays/{batch_id}/reveal": {
+      "post": {
+        "description": "Return mature outcomes and authoritative scores for the exact selection.",
+        "operationId": "reveal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RevealRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Reveal"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Reveal"
+      }
+    },
+    "/api/v1/tools/{tool_id}/history": {
+      "get": {
+        "description": "Return bounded observations; reject an adapter leaking future data.",
+        "operationId": "history",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "tool_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Tool Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "batch_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Batch Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 365,
+              "maximum": 3660,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/History"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "History"
+      }
+    }
+  }
+}
