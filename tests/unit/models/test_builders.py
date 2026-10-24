@@ -6,9 +6,15 @@ from math import log1p
 import polars as pl
 import pytest
 
-from oxhack2026.features.builders import FeatureRequest, build_features, build_labels
+from oxhack2026.features.builders import (
+    FeatureRequest,
+    build_features,
+    build_labels,
+    request_grid,
+)
 from oxhack2026.features.definitions import TargetId, target_windows
 from oxhack2026.models.contracts import RowIdentity, TargetWindows, TimeWindow
+from oxhack2026.models.predict import BaselineKind, BaselineSpec, baseline_forecasts
 from oxhack2026.storage.contracts import ObservationSeries
 
 DECISION = datetime(2025, 1, 6, tzinfo=UTC)
@@ -287,3 +293,87 @@ def test_weekly_dispersion_uses_eleven_ordered_adjacent_changes() -> None:
     (row,) = build_features(source.lazy(), [request], "reconstructed")
 
     assert row.values["weekly_log_change_std_11"] == pytest.approx(expected)
+
+
+@pytest.mark.parametrize("kind", ["persistence", "weekday_seasonal", "damped_trend"])
+@pytest.mark.parametrize(
+    "target,days",
+    [("downloads_next_30d_v1", 30), ("downloads_trailing_28d_at_91d_v1", 28)],
+)
+def test_baseline_batch_handoff_matches_frozen_constant_history(
+    kind: BaselineKind, target: TargetId, days: int
+) -> None:
+    """All predeclared baselines yield immutable, outcome-free C2 batches."""
+    request = _request(target)
+    spec = BaselineSpec(
+        kind, f"model-{kind}", "experiment-v1", "batch-v1", "reconstructed"
+    )
+
+    (forecast,) = baseline_forecasts(_observations(request).lazy(), [request], spec)
+
+    assert forecast.reference_downloads == days * 100
+    assert forecast.predicted_downloads == pytest.approx(days * 100)
+    assert forecast.ranking_eligible is True
+    assert forecast.predicted_growth_pct == pytest.approx(0)
+    assert forecast.estimate_kind == "baseline"
+    assert forecast.interval is None
+    assert forecast.evidence_status == "exploratory"
+    assert "actual_downloads" not in forecast.model_dump()
+
+
+@pytest.mark.parametrize("value", [0, 1])
+def test_low_reference_baseline_retains_count_forecast_without_growth(
+    value: int,
+) -> None:
+    """Low reference is a ranking exclusion, not a missing count prediction."""
+    request = _request()
+    spec = BaselineSpec("persistence", "model", "experiment", "batch", "reconstructed")
+
+    (forecast,) = baseline_forecasts(
+        _observations(request, value=value).lazy(), [request], spec
+    )
+
+    assert forecast.forecast_status == "ready"
+    assert forecast.predicted_downloads == value * 30
+    assert forecast.ranking_eligible is False
+    assert forecast.predicted_growth_pct is None
+    assert "low_reference_count" in forecast.reason_codes
+
+
+def test_baseline_handoff_keeps_unavailable_tools_and_empty_batches() -> None:
+    """Missing history never removes a tool or becomes a synthetic zero forecast."""
+    request = _request()
+    spec = BaselineSpec("persistence", "model", "experiment", "batch", "reconstructed")
+    daily = _observations(request).slice(1).lazy()
+
+    (forecast,) = baseline_forecasts(daily, [request], spec)
+
+    assert forecast.predicted_downloads is None
+    assert forecast.reference_downloads is None
+    assert forecast.forecast_status == "unavailable"
+    assert "insufficient_history" in forecast.reason_codes
+    assert baseline_forecasts(daily, [], spec) == ()
+
+
+def test_baseline_batch_rejects_mixed_target_and_duplicate_feature_ids() -> None:
+    """A published batch cannot silently mix origins or overwrite repeated tools."""
+    request = _request()
+    spec = BaselineSpec("persistence", "model", "experiment", "batch", "reconstructed")
+    daily = _observations(request).lazy()
+
+    with pytest.raises(ValueError, match="one frozen"):
+        baseline_forecasts(
+            daily, [request, _request("downloads_trailing_28d_at_91d_v1")], spec
+        )
+    with pytest.raises(ValueError, match="unique"):
+        baseline_forecasts(daily, [request, request], spec)
+
+
+def test_request_grid_keeps_empty_schema_and_rejects_naive_label_cutoff() -> None:
+    """The reusable grid retains UTC types even before any feature requests exist."""
+    empty = request_grid([]).collect()
+
+    assert empty.height == 0
+    assert empty.schema["query_at"] == pl.Datetime("us", "UTC")
+    with pytest.raises(ValueError, match="UTC"):
+        request_grid([], datetime(2025, 1, 1))

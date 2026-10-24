@@ -26,9 +26,12 @@ Dev 3 reuses `evaluation.shortlists` and
 separate from immutable forecast payloads. CQR calculations are experimental
 until real chronological predictions and final evidence pass every serving gate.
 
-Pending: catalogue-resolved feature requests and artifact publication, a frozen
-verified npm dataset, real baseline handoff, learned experiments, full
-metrics/evidence, and model CLI.
+Catalogue resolution and callable baseline batch generation now consume C1
+identities. Contemporary historical cohorts require explicit opt-in and retain
+their retrospective/survivorship limitations.
+
+Pending: model artifact publication, a frozen verified npm dataset, real baseline
+handoff, learned experiments, full metrics/evidence, and model CLI.
 Synthetic fixtures establish software behavior only; no empirical performance,
 validated interval, real-data product completion, or cloud deployment is claimed.
 
