@@ -1,0 +1,827 @@
+{
+  "schema_version": "data-v1",
+  "catalog_version": "npm-initial-20261024-v1",
+  "mapping_version": "npm-mappings-20261024-v1",
+  "recorded_at": "2026-10-24T14:51:17.820764Z",
+  "cohort_kind": "contemporary_catalogue",
+  "synthetic": false,
+  "organizations": [
+    {
+      "organization_id": "langchain",
+      "family_id": "langchain",
+      "name": "LangChain",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "llamaindex",
+      "family_id": "llamaindex",
+      "name": "LlamaIndex.TS",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "pinecone",
+      "family_id": "pinecone",
+      "name": "Pinecone",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "qdrant",
+      "family_id": "qdrant",
+      "name": "Qdrant",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "weaviate",
+      "family_id": "weaviate",
+      "name": "Weaviate",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "e2b",
+      "family_id": "e2b",
+      "name": "E2B",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "firecrawl",
+      "family_id": "firecrawl",
+      "name": "Firecrawl",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "cohere",
+      "family_id": "cohere",
+      "name": "Cohere",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "groq",
+      "family_id": "groq",
+      "name": "Groq",
+      "kind": "company_backed"
+    },
+    {
+      "organization_id": "langfuse",
+      "family_id": "clickhouse",
+      "name": "Langfuse",
+      "kind": "company_backed"
+    }
+  ],
+  "tools": [
+    {
+      "tool_id": "langchain",
+      "organization_id": "langchain",
+      "name": "LangChain",
+      "category": "agents-orchestration",
+      "website_url": "https://www.langchain.com",
+      "inclusion_reason": "Official agent framework installation package.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "llamaindex",
+      "organization_id": "llamaindex",
+      "name": "LlamaIndex.TS",
+      "category": "retrieval-orchestration",
+      "website_url": "https://www.llamaindex.ai",
+      "inclusion_reason": "Retained inactive tool: official repository marks this JS framework deprecated; do not substitute its replacement or hide it based on current inactivity.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "pinecone",
+      "organization_id": "pinecone",
+      "name": "Pinecone",
+      "category": "vector-infrastructure",
+      "website_url": "https://www.pinecone.io",
+      "inclusion_reason": "Official vector database TypeScript client.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "qdrant",
+      "organization_id": "qdrant",
+      "name": "Qdrant",
+      "category": "vector-infrastructure",
+      "website_url": "https://qdrant.tech",
+      "inclusion_reason": "Official REST client chosen from installation instructions, not alongside its gRPC alternative.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "weaviate",
+      "organization_id": "weaviate",
+      "name": "Weaviate",
+      "category": "vector-infrastructure",
+      "website_url": "https://weaviate.io",
+      "inclusion_reason": "Current documented v3 server client; no splice from the older weaviate-ts-client.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "e2b",
+      "organization_id": "e2b",
+      "name": "E2B",
+      "category": "execution-infrastructure",
+      "website_url": "https://e2b.dev",
+      "inclusion_reason": "Official general sandbox SDK; specialized code-interpreter and desktop SDKs are not summed.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "firecrawl",
+      "organization_id": "firecrawl",
+      "name": "Firecrawl",
+      "category": "data-extraction",
+      "website_url": "https://firecrawl.dev",
+      "inclusion_reason": "Current documented npm installation; no splice from @mendable/firecrawl-js.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "cohere",
+      "organization_id": "cohere",
+      "name": "Cohere",
+      "category": "model-provider",
+      "website_url": "https://cohere.com",
+      "inclusion_reason": "Official model-provider TypeScript SDK.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "groq",
+      "organization_id": "groq",
+      "name": "Groq",
+      "category": "model-provider",
+      "website_url": "https://groq.com",
+      "inclusion_reason": "Official model-provider TypeScript SDK. Groq reports independent operation following its Nvidia technology licensing agreement.",
+      "earliest_eligibility_at": null
+    },
+    {
+      "tool_id": "langfuse",
+      "organization_id": "langfuse",
+      "name": "Langfuse",
+      "category": "evaluation-observability",
+      "website_url": "https://langfuse.com",
+      "inclusion_reason": "Current documented tracing SDK; no splice from deprecated langfuse v3. Organization family is ClickHouse following the announced acquisition.",
+      "earliest_eligibility_at": null
+    }
+  ],
+  "packages": [
+    {
+      "package_id": "langchain-npm",
+      "ecosystem": "npm",
+      "canonical_name": "langchain"
+    },
+    {
+      "package_id": "llamaindex-npm",
+      "ecosystem": "npm",
+      "canonical_name": "llamaindex"
+    },
+    {
+      "package_id": "pinecone-npm",
+      "ecosystem": "npm",
+      "canonical_name": "@pinecone-database/pinecone"
+    },
+    {
+      "package_id": "qdrant-npm",
+      "ecosystem": "npm",
+      "canonical_name": "@qdrant/js-client-rest"
+    },
+    {
+      "package_id": "weaviate-npm",
+      "ecosystem": "npm",
+      "canonical_name": "weaviate-client"
+    },
+    {
+      "package_id": "e2b-npm",
+      "ecosystem": "npm",
+      "canonical_name": "e2b"
+    },
+    {
+      "package_id": "firecrawl-npm",
+      "ecosystem": "npm",
+      "canonical_name": "firecrawl"
+    },
+    {
+      "package_id": "cohere-npm",
+      "ecosystem": "npm",
+      "canonical_name": "cohere-ai"
+    },
+    {
+      "package_id": "groq-npm",
+      "ecosystem": "npm",
+      "canonical_name": "groq-sdk"
+    },
+    {
+      "package_id": "langfuse-npm",
+      "ecosystem": "npm",
+      "canonical_name": "@langfuse/tracing"
+    }
+  ],
+  "repositories": [
+    {
+      "repository_id": 598342280,
+      "full_name": "langchain-ai/langchainjs"
+    },
+    {
+      "repository_id": 652967817,
+      "full_name": "run-llama/LlamaIndexTS"
+    },
+    {
+      "repository_id": 581637435,
+      "full_name": "pinecone-io/pinecone-ts-client"
+    },
+    {
+      "repository_id": 620724628,
+      "full_name": "qdrant/qdrant-js"
+    },
+    {
+      "repository_id": 611845660,
+      "full_name": "weaviate/typescript-client"
+    },
+    {
+      "repository_id": 609539715,
+      "full_name": "e2b-dev/E2B"
+    },
+    {
+      "repository_id": 787076358,
+      "full_name": "firecrawl/firecrawl"
+    },
+    {
+      "repository_id": 366414821,
+      "full_name": "cohere-ai/cohere-typescript"
+    },
+    {
+      "repository_id": 757880716,
+      "full_name": "groq/groq-typescript"
+    },
+    {
+      "repository_id": 661446582,
+      "full_name": "langfuse/langfuse-js"
+    }
+  ],
+  "evidence": [
+    {
+      "evidence_id": "langchain-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/langchain-ai/langchainjs/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.642657Z",
+      "checked_at": "2026-10-24T14:33:47.642657Z",
+      "assertion": "Official installation identifies langchain as the selected npm package.",
+      "source_sha256": "45cd7b5db9716c6b07be8a40cf37098fb9efe9d84756992812bb9c580f1cf5f7"
+    },
+    {
+      "evidence_id": "langchain-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/langchain-ai/langchainjs/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.642657Z",
+      "checked_at": "2026-10-24T14:33:47.642657Z",
+      "assertion": "Official repository langchain-ai/langchainjs has stable numeric ID 598342280.",
+      "source_sha256": "45cd7b5db9716c6b07be8a40cf37098fb9efe9d84756992812bb9c580f1cf5f7"
+    },
+    {
+      "evidence_id": "langchain-organization",
+      "kind": "organization",
+      "url": "https://github.com/langchain-ai/langchainjs/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.642657Z",
+      "checked_at": "2026-10-24T14:33:47.642657Z",
+      "assertion": "LangChain is the product associated with this official repository and https://www.langchain.com.",
+      "source_sha256": "45cd7b5db9716c6b07be8a40cf37098fb9efe9d84756992812bb9c580f1cf5f7"
+    },
+    {
+      "evidence_id": "langchain-category",
+      "kind": "category",
+      "url": "https://github.com/langchain-ai/langchainjs/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.642657Z",
+      "checked_at": "2026-10-24T14:33:47.642657Z",
+      "assertion": "Official product/SDK description supports category agents-orchestration.",
+      "source_sha256": "45cd7b5db9716c6b07be8a40cf37098fb9efe9d84756992812bb9c580f1cf5f7"
+    },
+    {
+      "evidence_id": "llamaindex-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/run-llama/LlamaIndexTS/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.637118Z",
+      "checked_at": "2026-10-24T14:33:47.637118Z",
+      "assertion": "Official installation identifies llamaindex as the selected npm package.",
+      "source_sha256": "bc7573f474c92f8e56d45aee9b219d87e62002e1643b604c57d401570ee5c5fc"
+    },
+    {
+      "evidence_id": "llamaindex-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/run-llama/LlamaIndexTS/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.637118Z",
+      "checked_at": "2026-10-24T14:33:47.637118Z",
+      "assertion": "Official repository run-llama/LlamaIndexTS has stable numeric ID 652967817.",
+      "source_sha256": "bc7573f474c92f8e56d45aee9b219d87e62002e1643b604c57d401570ee5c5fc"
+    },
+    {
+      "evidence_id": "llamaindex-organization",
+      "kind": "organization",
+      "url": "https://github.com/run-llama/LlamaIndexTS/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.637118Z",
+      "checked_at": "2026-10-24T14:33:47.637118Z",
+      "assertion": "LlamaIndex.TS is the product associated with this official repository and https://www.llamaindex.ai.",
+      "source_sha256": "bc7573f474c92f8e56d45aee9b219d87e62002e1643b604c57d401570ee5c5fc"
+    },
+    {
+      "evidence_id": "llamaindex-category",
+      "kind": "category",
+      "url": "https://github.com/run-llama/LlamaIndexTS/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.637118Z",
+      "checked_at": "2026-10-24T14:33:47.637118Z",
+      "assertion": "Official product/SDK description supports category retrieval-orchestration.",
+      "source_sha256": "bc7573f474c92f8e56d45aee9b219d87e62002e1643b604c57d401570ee5c5fc"
+    },
+    {
+      "evidence_id": "pinecone-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/pinecone-io/pinecone-ts-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.690904Z",
+      "checked_at": "2026-10-24T14:33:47.690904Z",
+      "assertion": "Official installation identifies @pinecone-database/pinecone as the selected npm package.",
+      "source_sha256": "5d8cb2afc8028f691cf44093bdb343f599513a271357e296fcd08b37f2279f22"
+    },
+    {
+      "evidence_id": "pinecone-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/pinecone-io/pinecone-ts-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.690904Z",
+      "checked_at": "2026-10-24T14:33:47.690904Z",
+      "assertion": "Official repository pinecone-io/pinecone-ts-client has stable numeric ID 581637435.",
+      "source_sha256": "5d8cb2afc8028f691cf44093bdb343f599513a271357e296fcd08b37f2279f22"
+    },
+    {
+      "evidence_id": "pinecone-organization",
+      "kind": "organization",
+      "url": "https://github.com/pinecone-io/pinecone-ts-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.690904Z",
+      "checked_at": "2026-10-24T14:33:47.690904Z",
+      "assertion": "Pinecone is the product associated with this official repository and https://www.pinecone.io.",
+      "source_sha256": "5d8cb2afc8028f691cf44093bdb343f599513a271357e296fcd08b37f2279f22"
+    },
+    {
+      "evidence_id": "pinecone-category",
+      "kind": "category",
+      "url": "https://github.com/pinecone-io/pinecone-ts-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:47.690904Z",
+      "checked_at": "2026-10-24T14:33:47.690904Z",
+      "assertion": "Official product/SDK description supports category vector-infrastructure.",
+      "source_sha256": "5d8cb2afc8028f691cf44093bdb343f599513a271357e296fcd08b37f2279f22"
+    },
+    {
+      "evidence_id": "qdrant-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/qdrant/qdrant-js/blob/master/README.md",
+      "available_at": "2026-10-24T14:33:48.508659Z",
+      "checked_at": "2026-10-24T14:33:48.508659Z",
+      "assertion": "Official installation identifies @qdrant/js-client-rest as the selected npm package.",
+      "source_sha256": "bed892528fb26f8093acad8c0386f25352364ca3c1d4170627dc573755aa889a"
+    },
+    {
+      "evidence_id": "qdrant-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/qdrant/qdrant-js/blob/master/README.md",
+      "available_at": "2026-10-24T14:33:48.508659Z",
+      "checked_at": "2026-10-24T14:33:48.508659Z",
+      "assertion": "Official repository qdrant/qdrant-js has stable numeric ID 620724628.",
+      "source_sha256": "bed892528fb26f8093acad8c0386f25352364ca3c1d4170627dc573755aa889a"
+    },
+    {
+      "evidence_id": "qdrant-organization",
+      "kind": "organization",
+      "url": "https://github.com/qdrant/qdrant-js/blob/master/README.md",
+      "available_at": "2026-10-24T14:33:48.508659Z",
+      "checked_at": "2026-10-24T14:33:48.508659Z",
+      "assertion": "Qdrant is the product associated with this official repository and https://qdrant.tech.",
+      "source_sha256": "bed892528fb26f8093acad8c0386f25352364ca3c1d4170627dc573755aa889a"
+    },
+    {
+      "evidence_id": "qdrant-category",
+      "kind": "category",
+      "url": "https://github.com/qdrant/qdrant-js/blob/master/README.md",
+      "available_at": "2026-10-24T14:33:48.508659Z",
+      "checked_at": "2026-10-24T14:33:48.508659Z",
+      "assertion": "Official product/SDK description supports category vector-infrastructure.",
+      "source_sha256": "bed892528fb26f8093acad8c0386f25352364ca3c1d4170627dc573755aa889a"
+    },
+    {
+      "evidence_id": "weaviate-official_installation",
+      "kind": "official_installation",
+      "url": "https://docs.weaviate.io/weaviate/client-libraries/typescript",
+      "available_at": "2026-10-24T14:51:17.820764Z",
+      "checked_at": "2026-10-24T14:51:17.820764Z",
+      "assertion": "Official installation identifies weaviate-client as the selected npm package.",
+      "source_sha256": "0d478dd4663df8931d9708357939f7d5e74e1a75fe409fe88cfbd48d5f0a23bd"
+    },
+    {
+      "evidence_id": "weaviate-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/weaviate/typescript-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.575860Z",
+      "checked_at": "2026-10-24T14:33:48.575860Z",
+      "assertion": "Official repository weaviate/typescript-client has stable numeric ID 611845660.",
+      "source_sha256": "4b7d84787b89b85bf21fb402eae4a87a46d66aacf035bf487a48505f73bc3627"
+    },
+    {
+      "evidence_id": "weaviate-organization",
+      "kind": "organization",
+      "url": "https://github.com/weaviate/typescript-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.575860Z",
+      "checked_at": "2026-10-24T14:33:48.575860Z",
+      "assertion": "Weaviate is the product associated with this official repository and https://weaviate.io.",
+      "source_sha256": "4b7d84787b89b85bf21fb402eae4a87a46d66aacf035bf487a48505f73bc3627"
+    },
+    {
+      "evidence_id": "weaviate-category",
+      "kind": "category",
+      "url": "https://github.com/weaviate/typescript-client/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.575860Z",
+      "checked_at": "2026-10-24T14:33:48.575860Z",
+      "assertion": "Official product/SDK description supports category vector-infrastructure.",
+      "source_sha256": "4b7d84787b89b85bf21fb402eae4a87a46d66aacf035bf487a48505f73bc3627"
+    },
+    {
+      "evidence_id": "e2b-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/e2b-dev/E2B/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.642598Z",
+      "checked_at": "2026-10-24T14:33:48.642598Z",
+      "assertion": "Official installation identifies e2b as the selected npm package.",
+      "source_sha256": "5951729113017efbe02952b197a3ad61d0014cfaba3e6b1aad37a25a5b97b0c2"
+    },
+    {
+      "evidence_id": "e2b-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/e2b-dev/E2B/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.642598Z",
+      "checked_at": "2026-10-24T14:33:48.642598Z",
+      "assertion": "Official repository e2b-dev/E2B has stable numeric ID 609539715.",
+      "source_sha256": "5951729113017efbe02952b197a3ad61d0014cfaba3e6b1aad37a25a5b97b0c2"
+    },
+    {
+      "evidence_id": "e2b-organization",
+      "kind": "organization",
+      "url": "https://github.com/e2b-dev/E2B/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.642598Z",
+      "checked_at": "2026-10-24T14:33:48.642598Z",
+      "assertion": "E2B is the product associated with this official repository and https://e2b.dev.",
+      "source_sha256": "5951729113017efbe02952b197a3ad61d0014cfaba3e6b1aad37a25a5b97b0c2"
+    },
+    {
+      "evidence_id": "e2b-category",
+      "kind": "category",
+      "url": "https://github.com/e2b-dev/E2B/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:48.642598Z",
+      "checked_at": "2026-10-24T14:33:48.642598Z",
+      "assertion": "Official product/SDK description supports category execution-infrastructure.",
+      "source_sha256": "5951729113017efbe02952b197a3ad61d0014cfaba3e6b1aad37a25a5b97b0c2"
+    },
+    {
+      "evidence_id": "firecrawl-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/firecrawl/firecrawl/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.380013Z",
+      "checked_at": "2026-10-24T14:33:49.380013Z",
+      "assertion": "Official installation identifies firecrawl as the selected npm package.",
+      "source_sha256": "13ac2f319b675696004dc004f4e32084d08f138151424499f7239d2b9f0d8a67"
+    },
+    {
+      "evidence_id": "firecrawl-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/firecrawl/firecrawl/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.380013Z",
+      "checked_at": "2026-10-24T14:33:49.380013Z",
+      "assertion": "Official repository firecrawl/firecrawl has stable numeric ID 787076358.",
+      "source_sha256": "13ac2f319b675696004dc004f4e32084d08f138151424499f7239d2b9f0d8a67"
+    },
+    {
+      "evidence_id": "firecrawl-organization",
+      "kind": "organization",
+      "url": "https://github.com/firecrawl/firecrawl/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.380013Z",
+      "checked_at": "2026-10-24T14:33:49.380013Z",
+      "assertion": "Firecrawl is the product associated with this official repository and https://firecrawl.dev.",
+      "source_sha256": "13ac2f319b675696004dc004f4e32084d08f138151424499f7239d2b9f0d8a67"
+    },
+    {
+      "evidence_id": "firecrawl-category",
+      "kind": "category",
+      "url": "https://github.com/firecrawl/firecrawl/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.380013Z",
+      "checked_at": "2026-10-24T14:33:49.380013Z",
+      "assertion": "Official product/SDK description supports category data-extraction.",
+      "source_sha256": "13ac2f319b675696004dc004f4e32084d08f138151424499f7239d2b9f0d8a67"
+    },
+    {
+      "evidence_id": "cohere-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/cohere-ai/cohere-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.642479Z",
+      "checked_at": "2026-10-24T14:33:49.642479Z",
+      "assertion": "Official installation identifies cohere-ai as the selected npm package.",
+      "source_sha256": "0ee22c3633f7309170494da3161622cb2f7fb183792195640203f198080fad1c"
+    },
+    {
+      "evidence_id": "cohere-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/cohere-ai/cohere-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.642479Z",
+      "checked_at": "2026-10-24T14:33:49.642479Z",
+      "assertion": "Official repository cohere-ai/cohere-typescript has stable numeric ID 366414821.",
+      "source_sha256": "0ee22c3633f7309170494da3161622cb2f7fb183792195640203f198080fad1c"
+    },
+    {
+      "evidence_id": "cohere-organization",
+      "kind": "organization",
+      "url": "https://github.com/cohere-ai/cohere-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.642479Z",
+      "checked_at": "2026-10-24T14:33:49.642479Z",
+      "assertion": "Cohere is the product associated with this official repository and https://cohere.com.",
+      "source_sha256": "0ee22c3633f7309170494da3161622cb2f7fb183792195640203f198080fad1c"
+    },
+    {
+      "evidence_id": "cohere-category",
+      "kind": "category",
+      "url": "https://github.com/cohere-ai/cohere-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.642479Z",
+      "checked_at": "2026-10-24T14:33:49.642479Z",
+      "assertion": "Official product/SDK description supports category model-provider.",
+      "source_sha256": "0ee22c3633f7309170494da3161622cb2f7fb183792195640203f198080fad1c"
+    },
+    {
+      "evidence_id": "groq-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/groq/groq-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.509050Z",
+      "checked_at": "2026-10-24T14:33:49.509050Z",
+      "assertion": "Official installation identifies groq-sdk as the selected npm package.",
+      "source_sha256": "c968776851e02855d8c872c08de08056611a46dd9bd997193c5b5ae01f51da40"
+    },
+    {
+      "evidence_id": "groq-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/groq/groq-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.509050Z",
+      "checked_at": "2026-10-24T14:33:49.509050Z",
+      "assertion": "Official repository groq/groq-typescript has stable numeric ID 757880716.",
+      "source_sha256": "c968776851e02855d8c872c08de08056611a46dd9bd997193c5b5ae01f51da40"
+    },
+    {
+      "evidence_id": "groq-organization",
+      "kind": "organization",
+      "url": "https://github.com/groq/groq-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.509050Z",
+      "checked_at": "2026-10-24T14:33:49.509050Z",
+      "assertion": "Groq is the product associated with this official repository and https://groq.com.",
+      "source_sha256": "c968776851e02855d8c872c08de08056611a46dd9bd997193c5b5ae01f51da40"
+    },
+    {
+      "evidence_id": "groq-category",
+      "kind": "category",
+      "url": "https://github.com/groq/groq-typescript/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:49.509050Z",
+      "checked_at": "2026-10-24T14:33:49.509050Z",
+      "assertion": "Official product/SDK description supports category model-provider.",
+      "source_sha256": "c968776851e02855d8c872c08de08056611a46dd9bd997193c5b5ae01f51da40"
+    },
+    {
+      "evidence_id": "groq-ownership",
+      "kind": "organization",
+      "url": "https://groq.com/newsroom/groq-and-nvidia-enter-non-exclusive-inference-technology-licensing-agreement-to-accelerate-ai-inference-at-global-scale",
+      "available_at": "2026-10-24T14:51:17.820764Z",
+      "checked_at": "2026-10-24T14:51:17.820764Z",
+      "assertion": "Groq reports independent operation after a non-exclusive Nvidia licensing agreement.",
+      "source_sha256": null
+    },
+    {
+      "evidence_id": "langfuse-official_installation",
+      "kind": "official_installation",
+      "url": "https://github.com/langfuse/langfuse-js/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:50.298895Z",
+      "checked_at": "2026-10-24T14:33:50.298895Z",
+      "assertion": "Official installation identifies @langfuse/tracing as the selected npm package.",
+      "source_sha256": "545c62585e731905bdde83d729e3efc6cf43b7c907d49bce332d33645a732c56"
+    },
+    {
+      "evidence_id": "langfuse-official_repository",
+      "kind": "official_repository",
+      "url": "https://github.com/langfuse/langfuse-js/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:50.298895Z",
+      "checked_at": "2026-10-24T14:33:50.298895Z",
+      "assertion": "Official repository langfuse/langfuse-js has stable numeric ID 661446582.",
+      "source_sha256": "545c62585e731905bdde83d729e3efc6cf43b7c907d49bce332d33645a732c56"
+    },
+    {
+      "evidence_id": "langfuse-organization",
+      "kind": "organization",
+      "url": "https://github.com/langfuse/langfuse-js/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:50.298895Z",
+      "checked_at": "2026-10-24T14:33:50.298895Z",
+      "assertion": "Langfuse is the product associated with this official repository and https://langfuse.com.",
+      "source_sha256": "545c62585e731905bdde83d729e3efc6cf43b7c907d49bce332d33645a732c56"
+    },
+    {
+      "evidence_id": "langfuse-category",
+      "kind": "category",
+      "url": "https://github.com/langfuse/langfuse-js/blob/main/README.md",
+      "available_at": "2026-10-24T14:33:50.298895Z",
+      "checked_at": "2026-10-24T14:33:50.298895Z",
+      "assertion": "Official product/SDK description supports category evaluation-observability.",
+      "source_sha256": "545c62585e731905bdde83d729e3efc6cf43b7c907d49bce332d33645a732c56"
+    },
+    {
+      "evidence_id": "langfuse-ownership",
+      "kind": "organization",
+      "url": "https://langfuse.com/blog/joining-clickhouse",
+      "available_at": "2026-10-24T14:51:17.820764Z",
+      "checked_at": "2026-10-24T14:51:17.820764Z",
+      "assertion": "Langfuse reports it has joined ClickHouse; family grouping is contemporary.",
+      "source_sha256": null
+    }
+  ],
+  "mappings": [
+    {
+      "mapping_id": "langchain-npm-v1",
+      "tool_id": "langchain",
+      "package_id": "langchain-npm",
+      "repository_id": 598342280,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "langchain-official_installation",
+        "langchain-official_repository",
+        "langchain-organization",
+        "langchain-category"
+      ]
+    },
+    {
+      "mapping_id": "llamaindex-npm-v1",
+      "tool_id": "llamaindex",
+      "package_id": "llamaindex-npm",
+      "repository_id": 652967817,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "llamaindex-official_installation",
+        "llamaindex-official_repository",
+        "llamaindex-organization",
+        "llamaindex-category"
+      ]
+    },
+    {
+      "mapping_id": "pinecone-npm-v1",
+      "tool_id": "pinecone",
+      "package_id": "pinecone-npm",
+      "repository_id": 581637435,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "pinecone-official_installation",
+        "pinecone-official_repository",
+        "pinecone-organization",
+        "pinecone-category"
+      ]
+    },
+    {
+      "mapping_id": "qdrant-npm-v1",
+      "tool_id": "qdrant",
+      "package_id": "qdrant-npm",
+      "repository_id": 620724628,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "qdrant-official_installation",
+        "qdrant-official_repository",
+        "qdrant-organization",
+        "qdrant-category"
+      ]
+    },
+    {
+      "mapping_id": "weaviate-npm-v1",
+      "tool_id": "weaviate",
+      "package_id": "weaviate-npm",
+      "repository_id": 611845660,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "weaviate-official_installation",
+        "weaviate-official_repository",
+        "weaviate-organization",
+        "weaviate-category"
+      ]
+    },
+    {
+      "mapping_id": "e2b-npm-v1",
+      "tool_id": "e2b",
+      "package_id": "e2b-npm",
+      "repository_id": 609539715,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "e2b-official_installation",
+        "e2b-official_repository",
+        "e2b-organization",
+        "e2b-category"
+      ]
+    },
+    {
+      "mapping_id": "firecrawl-npm-v1",
+      "tool_id": "firecrawl",
+      "package_id": "firecrawl-npm",
+      "repository_id": 787076358,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "firecrawl-official_installation",
+        "firecrawl-official_repository",
+        "firecrawl-organization",
+        "firecrawl-category"
+      ]
+    },
+    {
+      "mapping_id": "cohere-npm-v1",
+      "tool_id": "cohere",
+      "package_id": "cohere-npm",
+      "repository_id": 366414821,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "cohere-official_installation",
+        "cohere-official_repository",
+        "cohere-organization",
+        "cohere-category"
+      ]
+    },
+    {
+      "mapping_id": "groq-npm-v1",
+      "tool_id": "groq",
+      "package_id": "groq-npm",
+      "repository_id": 757880716,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "groq-official_installation",
+        "groq-official_repository",
+        "groq-organization",
+        "groq-category",
+        "groq-ownership"
+      ]
+    },
+    {
+      "mapping_id": "langfuse-npm-v1",
+      "tool_id": "langfuse",
+      "package_id": "langfuse-npm",
+      "repository_id": 661446582,
+      "valid_from": "2026-10-24T14:51:17.820764Z",
+      "valid_to": null,
+      "primary": true,
+      "organization_representative": true,
+      "verified": true,
+      "reviewer": "IvanTop082",
+      "evidence_ids": [
+        "langfuse-official_installation",
+        "langfuse-official_repository",
+        "langfuse-organization",
+        "langfuse-category",
+        "langfuse-ownership"
+      ]
+    }
+  ],
+  "limitations": [
+    "Contemporary catalogue reconstruction selected using official installation mappings, before inspecting held-out download growth. It is subject to survivorship and selection bias.",
+    "Evidence and organization families were inspected on 2026-10-24. Mapping validity starts at inspection, not a fabricated historic ownership date; historical replay must explicitly use retrospective catalogue membership.",
+    "Earliest historical tool eligibility is unknown. Vendor pre-release zeros do not establish historical availability; no historical discovery claim is supported.",
+    "Current-package migrations create separate histories; old and new packages are never spliced. LlamaIndex.TS is retained and explicitly marked deprecated.",
+    "Ten distinct organizations across six categories is an integration cohort, not the planned twenty-organization scouting catalogue."
+  ]
+}

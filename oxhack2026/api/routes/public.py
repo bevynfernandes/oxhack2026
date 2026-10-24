@@ -96,6 +96,12 @@ def catalog(
             and result.mapping_version == batch.provenance.mapping_version
             and result.synthetic == batch.provenance.synthetic
         )
+        if result.membership_basis == "contemporary_reconstruction":
+            _require(
+                batch.mode == "reconstructed"
+                and result.cohort_kind == "contemporary_catalogue"
+                and result.recorded_at is not None
+            )
         if batch.mode == "prospective":
             _require(
                 result.recorded_at is not None

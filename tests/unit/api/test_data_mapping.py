@@ -1,6 +1,6 @@
 """C1 public presentation preserves real verification and collection timestamps."""
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import orjson
@@ -109,6 +109,61 @@ def test_changed_mapping_is_not_substituted(
         map_catalog(catalog.model_copy(update={"mappings": (ended,)}), batch).tools
         == ()
     )
+
+
+def test_contemporary_membership_requires_explicit_opt_in(
+    catalog: CatalogSnapshot, batch: s.ForecastBatch
+) -> None:
+    """Current mappings remain empty at an old cutoff unless reconstruction opts in."""
+    mapping = catalog.mappings[0].model_copy(update={"valid_from": catalog.recorded_at})
+    current = catalog.model_copy(update={"mappings": (mapping,)})
+
+    strict = map_catalog(current, batch)
+    reconstructed = map_catalog(current, batch, allow_contemporary_reconstruction=True)
+
+    assert strict.tools == ()
+    assert strict.membership_basis == "decision_time"
+    assert len(reconstructed.tools) == 1
+    assert reconstructed.membership_basis == "contemporary_reconstruction"
+    assert reconstructed.tools[0].mapping_verification == "retrospective"
+    assert reconstructed.tools[0].mapping_evidence[0].observed_at == (
+        catalog.evidence[0].checked_at
+    )
+    assert reconstructed.recorded_at == catalog.recorded_at
+    assert reconstructed.limitations == catalog.limitations
+
+
+def test_contemporary_membership_preserves_effective_boundaries(
+    catalog: CatalogSnapshot, batch: s.ForecastBatch
+) -> None:
+    """Opt-in selection still excludes ended and not-yet-effective mappings."""
+    for change in (
+        {"valid_to": catalog.recorded_at},
+        {"valid_from": catalog.recorded_at + timedelta(microseconds=1)},
+    ):
+        mapping = catalog.mappings[0].model_copy(update=change)
+        current = catalog.model_copy(update={"mappings": (mapping,)})
+
+        result = map_catalog(current, batch, allow_contemporary_reconstruction=True)
+
+        assert result.tools == ()
+
+
+def test_contemporary_opt_in_rejects_other_modes_and_cohorts(
+    catalog: CatalogSnapshot, batch: s.ForecastBatch
+) -> None:
+    """Retrospective membership cannot relax prospective or historical cohort rules."""
+    historical = catalog.model_copy(update={"cohort_kind": "historical_eligibility"})
+    early = catalog.model_copy(update={"recorded_at": batch.decision_at})
+
+    with pytest.raises(ValueError, match="reconstructed contemporary"):
+        map_catalog(historical, batch, allow_contemporary_reconstruction=True)
+    with pytest.raises(ValueError, match="reconstructed contemporary"):
+        map_catalog(
+            early,
+            batch.model_copy(update={"mode": "prospective"}),
+            allow_contemporary_reconstruction=True,
+        )
 
 
 @pytest.mark.parametrize("state", ["complete", "zero", "missing", "partial", "vendor"])

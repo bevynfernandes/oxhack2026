@@ -39,6 +39,16 @@ development servers on those ports before running it. It deliberately refuses
 to reuse an unknown server. Outputs and screenshots are retained under a unique
 `tests/outputs/browser-*/` directory. CI uploads them for 14 days.
 
+To keep a running development session available, use separate browser-test ports:
+
+```bash
+SIGNALSHIFT_TEST_API_PORT=8011 SIGNALSHIFT_TEST_WEB_PORT=4184 npm run test:e2e
+```
+
+The test servers require distinct valid ports and refuse to reuse existing
+servers. `SIGNALSHIFT_API_ORIGIN` configures Vite's server-side proxy; the browser
+continues using same-origin `/api` requests. It defaults to localhost:8000.
+
 `npm run generate:types` regenerates TypeScript from `contracts/api/openapi.json`.
 Do not edit `src/api/schema.d.ts` or format it with another generator. Prettier
 ignores that file. The build fails on generated-type drift.
