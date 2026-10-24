@@ -1,0 +1,186 @@
+[
+  {
+    "schema_version": "company-assessments-v1",
+    "assessment_id": "alpha-synthetic-assessment",
+    "company_id": "alpha",
+    "family_id": "alpha",
+    "family_reason_codes": [],
+    "source_snapshot_id": "synthetic-companies-v1",
+    "policy_version": "synthetic-policy",
+    "as_of": "2025-02-01T00:00:00Z",
+    "first_recorded_at": "2025-02-01T00:00:01Z",
+    "mode": "reconstructed",
+    "outcomes": [
+      {
+        "outcome_id": "operating_growth_24m_v1",
+        "horizon_end": "2027-02-01T00:00:00Z",
+        "assessment_status": "evidence_only",
+        "summary": "Synthetic evidence assessment only.",
+        "statement_ids": [
+          "traction"
+        ],
+        "reason_codes": [],
+        "probability": null
+      },
+      {
+        "outcome_id": "commercial_viability_12m_v1",
+        "horizon_end": "2026-02-01T00:00:00Z",
+        "assessment_status": "unavailable",
+        "summary": "Synthetic evidence assessment only.",
+        "statement_ids": [
+          "gap"
+        ],
+        "reason_codes": [
+          "financial_data_missing"
+        ],
+        "probability": null
+      },
+      {
+        "outcome_id": "financing_or_acquisition_24m_v1",
+        "horizon_end": "2027-02-01T00:00:00Z",
+        "assessment_status": "evidence_only",
+        "summary": "Synthetic evidence assessment only.",
+        "statement_ids": [
+          "finance"
+        ],
+        "reason_codes": [],
+        "probability": null
+      }
+    ],
+    "statements": [
+      {
+        "statement_id": "traction",
+        "role": "observation",
+        "text": "Synthetic SDK activity; not a company outcome.",
+        "evidence_ids": [
+          "alpha-source"
+        ],
+        "metric_observation_ids": [
+          "alpha-sdk_downloads_30d_v1"
+        ],
+        "event_ids": [],
+        "missing_metric_ids": []
+      },
+      {
+        "statement_id": "finance",
+        "role": "observation",
+        "text": "Synthetic financing event; not commercial viability.",
+        "evidence_ids": [
+          "alpha-source"
+        ],
+        "metric_observation_ids": [],
+        "event_ids": [
+          "alpha-funding"
+        ],
+        "missing_metric_ids": []
+      },
+      {
+        "statement_id": "gap",
+        "role": "evidence_gap",
+        "text": "Synthetic cash-flow data unavailable.",
+        "evidence_ids": [],
+        "metric_observation_ids": [],
+        "event_ids": [],
+        "missing_metric_ids": [
+          "operating_cashflow_12m_usd_v1"
+        ]
+      }
+    ],
+    "synthetic": true,
+    "limitations": [
+      "Synthetic test fixture; not real evidence or predictions."
+    ]
+  },
+  {
+    "schema_version": "company-assessments-v1",
+    "assessment_id": "beta-synthetic-assessment",
+    "company_id": "beta",
+    "family_id": "beta",
+    "family_reason_codes": [],
+    "source_snapshot_id": "synthetic-companies-v1",
+    "policy_version": "synthetic-policy",
+    "as_of": "2025-02-01T00:00:00Z",
+    "first_recorded_at": "2025-02-01T00:00:01Z",
+    "mode": "reconstructed",
+    "outcomes": [
+      {
+        "outcome_id": "operating_growth_24m_v1",
+        "horizon_end": "2027-02-01T00:00:00Z",
+        "assessment_status": "evidence_only",
+        "summary": "Synthetic evidence assessment only.",
+        "statement_ids": [
+          "traction"
+        ],
+        "reason_codes": [],
+        "probability": null
+      },
+      {
+        "outcome_id": "commercial_viability_12m_v1",
+        "horizon_end": "2026-02-01T00:00:00Z",
+        "assessment_status": "unavailable",
+        "summary": "Synthetic evidence assessment only.",
+        "statement_ids": [
+          "gap"
+        ],
+        "reason_codes": [
+          "financial_data_missing"
+        ],
+        "probability": null
+      },
+      {
+        "outcome_id": "financing_or_acquisition_24m_v1",
+        "horizon_end": "2027-02-01T00:00:00Z",
+        "assessment_status": "evidence_only",
+        "summary": "Synthetic evidence assessment only.",
+        "statement_ids": [
+          "finance"
+        ],
+        "reason_codes": [],
+        "probability": null
+      }
+    ],
+    "statements": [
+      {
+        "statement_id": "traction",
+        "role": "observation",
+        "text": "Synthetic SDK activity; not a company outcome.",
+        "evidence_ids": [
+          "beta-source"
+        ],
+        "metric_observation_ids": [
+          "beta-sdk_downloads_30d_v1"
+        ],
+        "event_ids": [],
+        "missing_metric_ids": []
+      },
+      {
+        "statement_id": "finance",
+        "role": "observation",
+        "text": "Synthetic financing event; not commercial viability.",
+        "evidence_ids": [
+          "beta-source"
+        ],
+        "metric_observation_ids": [],
+        "event_ids": [
+          "beta-funding"
+        ],
+        "missing_metric_ids": []
+      },
+      {
+        "statement_id": "gap",
+        "role": "evidence_gap",
+        "text": "Synthetic cash-flow data unavailable.",
+        "evidence_ids": [],
+        "metric_observation_ids": [],
+        "event_ids": [],
+        "missing_metric_ids": [
+          "operating_cashflow_12m_usd_v1"
+        ]
+      }
+    ],
+    "synthetic": true,
+    "limitations": [
+      "Synthetic test fixture; not real evidence or predictions."
+    ]
+  }
+]

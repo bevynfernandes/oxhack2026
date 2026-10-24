@@ -7,10 +7,12 @@ from unittest.mock import patch
 
 import orjson
 import pytest
+from pydantic import TypeAdapter
 
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.catalog.schemas import CatalogSnapshot, TimeWindow
 from oxhack2026.ingest.npm import NpmCheckpoint, NpmRequest, normalize_range
+from oxhack2026.models.company_assessments import CompanyAssessment
 from oxhack2026.storage.build import CandidateConfig, write_candidate
 from oxhack2026.storage.contracts import ArtifactReference, ArtifactStore
 from oxhack2026.storage.datasets import DatasetBundle
@@ -104,3 +106,11 @@ def company_source() -> tuple["CompanySourceSnapshot", ArtifactStore]:
         (fixture_root / "company-source-raw.json").read_bytes(), "application/json"
     )
     return snapshot, artifacts
+
+
+@pytest.fixture
+def company_assessments() -> tuple["CompanyAssessment", ...]:
+    """Read saved synthetic C2 company assessments, without model/network execution."""
+    return TypeAdapter(tuple[CompanyAssessment, ...]).validate_json(
+        (Path(__file__).parent / "fixtures/data/company-assessments.json").read_bytes()
+    )

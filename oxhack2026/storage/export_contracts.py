@@ -7,6 +7,7 @@ import orjson
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.catalog.schemas import CatalogSnapshot, Contract
 from oxhack2026.storage.company import CompanySourceManifest
+from oxhack2026.storage.company_assessments import CompanyAssessmentManifest
 from oxhack2026.storage.contracts import (
     ArtifactReference,
     AvailabilityPolicy,
@@ -22,6 +23,7 @@ CONTRACTS: tuple[type[Contract], ...] = (
     CatalogSnapshot,
     CompanySourceSnapshot,
     CompanySourceManifest,
+    CompanyAssessmentManifest,
     ArtifactReference,
     AvailabilityPolicy,
     DatasetManifest,
