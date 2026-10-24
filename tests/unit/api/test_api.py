@@ -308,3 +308,22 @@ def test_contract_export_mocked_filesystem() -> None:
     assert destination.write_bytes.call_args.args[0].endswith(b"\n")
     destination.is_file.return_value = False
     assert export_contract(destination, check=True) is False
+
+
+def test_catalog_search(client: TestClient) -> None:
+    """Bounded text search filters verified catalogue metadata, not ranking policy."""
+    response = client.get("/api/v1/catalog?q=Company%208")
+    assert response.status_code == 200
+    assert [tool["tool_id"] for tool in response.json()["tools"]] == ["tool-8"]
+    assert client.get(f"/api/v1/catalog?q={'x' * 121}").status_code == 422
+
+
+def test_revalidate_invalid_adapter_instances(
+    client: TestClient, repository: Mock, bundle: FixtureBundle
+) -> None:
+    """A constructed/mutated model cannot bypass response-boundary validation."""
+    invalid = bundle.forecast.results[0].model_copy(update={"predicted_downloads": -1})
+    repository.forecast.return_value = bundle.forecast.model_copy(
+        update={"results": (invalid,)}
+    )
+    assert client.get(f"/api/v1/forecasts/{BATCH}").status_code == 503

@@ -280,7 +280,7 @@
               "exploratory",
               "inconclusive",
               "rejected",
-              "confirmed"
+              "validated"
             ],
             "title": "Status",
             "type": "string"
@@ -426,6 +426,18 @@
               }
             ]
           },
+          "data_age_hours": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Data Age Hours"
+          },
           "estimate_kind": {
             "enum": [
               "conditional_median",
@@ -447,9 +459,14 @@
               "exploratory",
               "inconclusive",
               "rejected",
-              "confirmed"
+              "validated"
             ],
             "title": "Evidence Status",
+            "type": "string"
+          },
+          "feature_row_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Feature Row Id",
             "type": "string"
           },
           "forecast_id": {
@@ -539,6 +556,7 @@
         },
         "required": [
           "forecast_id",
+          "feature_row_id",
           "tool_id",
           "organization_id",
           "package_id",
@@ -569,8 +587,8 @@
             "type": "string"
           },
           "contract_version": {
-            "const": "0.1.0",
-            "default": "0.1.0",
+            "const": "0.2.0",
+            "default": "0.2.0",
             "title": "Contract Version",
             "type": "string"
           },
@@ -703,7 +721,7 @@
         "description": "Process or repository readiness, without sensitive configuration.",
         "properties": {
           "contract_version": {
-            "default": "0.1.0",
+            "default": "0.2.0",
             "title": "Contract Version",
             "type": "string"
           },
@@ -1240,6 +1258,14 @@
             "title": "Selected Organization Ids",
             "type": "array"
           },
+          "selection_metrics": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Score"
+            },
+            "title": "Selection Metrics",
+            "type": "array"
+          },
           "selection_score": {
             "$ref": "#/components/schemas/Score"
           }
@@ -1281,6 +1307,40 @@
         "additionalProperties": false,
         "description": "Authoritative shortlist score with explicit undefined/insufficient states.",
         "properties": {
+          "candidate_universe_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Universe Id"
+          },
+          "complete_outcomes": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Complete Outcomes"
+          },
+          "headline_eligible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Headline Eligible"
+          },
           "metric": {
             "title": "Metric",
             "type": "string"
@@ -1488,7 +1548,7 @@
   },
   "info": {
     "title": "SignalShift",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "openapi": "3.1.0",
   "paths": {
@@ -1532,6 +1592,23 @@
                 }
               ],
               "title": "Batch Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
             }
           }
         ],
