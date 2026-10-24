@@ -1,14 +1,34 @@
 """Standalone, provenance-preserving research contracts, additive to v1."""
 
+import re
 from typing import Annotated, Literal, Self
+from urllib.parse import urlsplit
 
-from pydantic import Field, model_validator
+from pydantic import AfterValidator, Field, TypeAdapter, model_validator
 
 from oxhack2026.api.company_schemas import CompanyDetail
 from oxhack2026.api.research_schemas import Domain, JobState, ResearchRequest
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime, Window
 from oxhack2026.models.startup_outlook import StartupOutlook
 from oxhack2026.storage.contracts import ArtifactReference
+
+_PUBLIC_URL = TypeAdapter(PublicURL)
+
+
+def _event_url(value: str) -> str:
+    parsed = urlsplit(value)
+    if (
+        parsed.scheme == "https"
+        and parsed.netloc == "news.ycombinator.com"
+        and parsed.path == "/item"
+        and re.fullmatch(r"id=[1-9][0-9]*", parsed.query)
+        and not parsed.fragment
+    ):
+        return value
+    return _PUBLIC_URL.validate_python(value)
+
+
+EventURL = Annotated[str, Field(max_length=2048), AfterValidator(_event_url)]
 
 Provider = Literal[
     "website", "github", "npm", "hiring", "hn", "news", "sec", "companies_house"
@@ -164,7 +184,7 @@ class Event(DTO):
     event_id: Identifier
     kind: str
     title: str
-    url: PublicURL
+    url: EventURL
     published_at: str | None = None
     evidence_ids: tuple[Identifier, ...]
 
