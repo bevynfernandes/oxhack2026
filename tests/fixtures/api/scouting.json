@@ -196,7 +196,7 @@
     ]
   },
   "forecast": {
-    "contract_version": "0.2.0",
+    "contract_version": "0.3.0",
     "batch_id": "synthetic-npm-2025-01-06",
     "ecosystem": "npm",
     "target_id": "downloads_next_30d_v1",

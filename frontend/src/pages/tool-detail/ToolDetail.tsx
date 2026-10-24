@@ -162,6 +162,18 @@ export default function ToolDetail({
       </section>
       <section className="panel">
         <h2>Evidence and interpretation</h2>
+        {tool.mapping_verification === "retrospective" && (
+          <p className="notice">
+            This mapping was verified after the historical cutoff. It is
+            retrospective catalogue evidence, not information recorded before
+            the decision.
+          </p>
+        )}
+        <p>
+          Cohort: {catalog.cohort_kind?.replaceAll("_", " ")}. Catalogue
+          recorded {date(catalog.recorded_at ?? null)}.
+        </p>
+        <Reasons reasons={catalog.limitations ?? []} />
         <EvidenceList evidence={forecast.evidence} />
         <EvidenceList evidence={tool.mapping_evidence} />
       </section>

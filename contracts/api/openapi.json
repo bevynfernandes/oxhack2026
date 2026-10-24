@@ -32,10 +32,39 @@
             "title": "Catalog Version",
             "type": "string"
           },
+          "cohort_kind": {
+            "default": "contemporary_catalogue",
+            "enum": [
+              "contemporary_catalogue",
+              "historical_eligibility"
+            ],
+            "title": "Cohort Kind",
+            "type": "string"
+          },
+          "limitations": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
           "mapping_version": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
             "title": "Mapping Version",
             "type": "string"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
           },
           "synthetic": {
             "title": "Synthetic",
@@ -587,8 +616,8 @@
             "type": "string"
           },
           "contract_version": {
-            "const": "0.2.0",
-            "default": "0.2.0",
+            "const": "0.3.0",
+            "default": "0.3.0",
             "title": "Contract Version",
             "type": "string"
           },
@@ -682,9 +711,16 @@
         "description": "Published quality assessment, independent of model validation status.",
         "properties": {
           "as_of": {
-            "format": "date-time",
-            "title": "As Of",
-            "type": "string"
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "As Of"
           },
           "completeness": {
             "enum": [
@@ -721,7 +757,7 @@
         "description": "Process or repository readiness, without sensitive configuration.",
         "properties": {
           "contract_version": {
-            "default": "0.2.0",
+            "default": "0.3.0",
             "title": "Contract Version",
             "type": "string"
           },
@@ -1475,6 +1511,15 @@
             "title": "Mapping Evidence",
             "type": "array"
           },
+          "mapping_verification": {
+            "default": "before_cutoff",
+            "enum": [
+              "before_cutoff",
+              "retrospective"
+            ],
+            "title": "Mapping Verification",
+            "type": "string"
+          },
           "organization_id": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
             "title": "Organization Id",
@@ -1548,7 +1593,7 @@
   },
   "info": {
     "title": "SignalShift",
-    "version": "0.2.0"
+    "version": "0.3.0"
   },
   "openapi": "3.1.0",
   "paths": {

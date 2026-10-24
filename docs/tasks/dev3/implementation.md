@@ -6,7 +6,7 @@
 | D3-02 API/UI | Implemented against injected reads | Ten routes, unavailable startup, safe failures, contract drift checks |
 | D3-03 rankings/detail | Implemented | Exact batch selection, one representative per selection, baseline/exclusion states, bounded history |
 | D3-04 replay/evaluation | Implemented | Separate outcomes, immutable scorecards, shared scorer, explicit evidence limitations |
-| D3-05 real artifacts | Blocked upstream | No merged C1 repository or real published npm batch; GitHub issue #1 |
+| D3-05 real artifacts | Blocked upstream | Production reads and real published npm batch unavailable; GitHub issue #1 |
 | D3-06 evidence/health/accessibility | Implemented | Escaped evidence, source quality, keyboard/mobile/reduced motion, automated accessibility checks |
 | D3-07 deployment handoff | Documented | API factory/ports, static build/proxy, readiness, tests and prerequisites |
 | D3-07 demo/export/offline | Excluded | Explicit developer instruction |
@@ -23,3 +23,7 @@ explicit test composition loads fixture files. Dev 1 must supply and lifecycle-
 manage the production read repository; it must verify artifact/schema/checksum
 compatibility before returning ready. The final real-data gate is not waived by
 passing synthetic browser tests.
+
+C1 and C2 presentation mapping now use C3 0.3.0. Retrospective mapping inspection
+is labelled explicitly; per-tool outcome diagnostics delegate to Dev 2. The next
+checkpoint closes contract-mapping gaps without claiming real-data completion.

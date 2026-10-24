@@ -180,3 +180,45 @@ it("preserves a captured request when a selection changes during reveal", async 
   ).toHaveTextContent("Fixture Company 1");
   expect(screen.getByLabelText("Select Fixture Company 6")).toBeChecked();
 });
+
+it("labels retrospective mapping verification explicitly", async () => {
+  const previous = fetchMock.getMockImplementation()!;
+  fetchMock.mockImplementation(async (input, init) => {
+    const request = input as Request;
+    if (new URL(request.url).pathname.endsWith("/catalog")) {
+      const catalog = {
+        ...raw.catalog,
+        tools: raw.catalog.tools.map((tool) => ({
+          ...tool,
+          mapping_verification: "retrospective",
+        })),
+      };
+      return new Response(JSON.stringify(catalog), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+    return previous(input, init);
+  });
+  mount(`/batches/${batch}`);
+  expect(
+    await screen.findByText(/Some identities were verified retrospectively/),
+  ).toBeVisible();
+});
+
+it("does not invent a date for an unavailable source", async () => {
+  fetchMock.mockResolvedValue(
+    new Response(
+      JSON.stringify({
+        synthetic: true,
+        sources: raw.data_health.sources.map((source) => ({
+          ...source,
+          freshness: { ...source.freshness, as_of: null },
+        })),
+      }),
+      { status: 200, headers: { "Content-Type": "application/json" } },
+    ),
+  );
+  mount("/data-health");
+  expect(await screen.findByText(/Not recorded/)).toBeVisible();
+});

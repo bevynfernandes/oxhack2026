@@ -6,6 +6,7 @@ from datetime import datetime
 
 from oxhack2026.api import schemas as s
 from oxhack2026.api.repository import ImmatureOutcome
+from oxhack2026.evaluation.metrics import outcome_diagnostics
 from oxhack2026.evaluation.shortlists import rank_forecasts, score_shortlist
 from oxhack2026.features.definitions import SHORTLIST_SIZE
 from oxhack2026.models.contracts import ForecastResult, MatureOutcome, TimeWindow
@@ -141,4 +142,128 @@ def score_selection(
             ("Recall at five", score.recall_at_5),
             ("Regret", score.regret),
         )
+    )
+
+
+def map_outcomes(
+    rows: Sequence[ForecastResult],
+    outcomes: Sequence[MatureOutcome],
+    as_of: datetime,
+) -> tuple[s.Outcome, ...]:
+    """Present Dev 2's per-tool diagnostics without copying numerical formulas.
+
+    Args:
+        rows: Frozen forecast results for the exact replay batch.
+        outcomes: One published outcome vintage per forecast, when available.
+        as_of: Actual timezone-aware UTC reveal request time.
+    Returns:
+        Saved truth and shared-policy diagnostics; absent truth stays null.
+    Raises:
+        ImmatureOutcome: An outcome is not available at the request time.
+        ValueError: Outcome IDs/vintages are ambiguous or do not match forecasts.
+    """
+    TimeWindow.validate_utc(as_of)
+    indexed = {outcome.forecast_id: outcome for outcome in outcomes}
+    if len(indexed) != len(outcomes) or not indexed.keys() <= {
+        row.forecast_id for row in rows
+    }:
+        message = "Outcomes require one vintage per known forecast"
+        raise ValueError(message)
+    results: list[s.Outcome] = []
+    for row in rows:
+        outcome = indexed.get(row.forecast_id)
+        if outcome is None:
+            results.append(
+                s.Outcome(
+                    tool_id=row.identity.tool_id,
+                    actual_downloads=None,
+                    realized_growth_pct=None,
+                    model_absolute_error=None,
+                    baseline_absolute_error=None,
+                    reasons=("incomplete_outcome",),
+                )
+            )
+            continue
+        if outcome.label.available_at is None or outcome.label.available_at > as_of:
+            raise ImmatureOutcome
+        diagnostics = outcome_diagnostics(row, outcome, as_of)
+        results.append(
+            s.Outcome(
+                tool_id=row.identity.tool_id,
+                actual_downloads=diagnostics.actual_downloads,
+                realized_growth_pct=diagnostics.realized_growth_pct,
+                model_absolute_error=diagnostics.model_absolute_error,
+                baseline_absolute_error=diagnostics.baseline_absolute_error,
+                reasons=diagnostics.reason_codes,
+            )
+        )
+    return tuple(results)
+
+
+@dataclass(frozen=True)
+class ReplayPresentation:
+    """Published outcome vintage and comparator metadata for one replay.
+
+    Attributes:
+        scoring: Frozen candidate universe and actual request time.
+        outcome_vintage: Exact selected publication version, shared by its outcomes.
+        comparators: Saved model-owner comparator scores on the same universe.
+        limitations: Published research/coverage limitations, without added claims.
+    """
+
+    scoring: ScoringContext
+    outcome_vintage: str
+    comparators: tuple[s.Score, ...]
+    limitations: tuple[str, ...]
+
+
+def map_reveal(
+    rows: Sequence[ForecastResult],
+    outcomes: Sequence[MatureOutcome],
+    selection: s.RevealRequest,
+    presentation: ReplayPresentation,
+) -> s.Reveal:
+    """Assemble separate reveal truth and delegated scores for one frozen batch.
+
+    Args:
+        rows: Complete original forecast batch, never mutated by reveal.
+        outcomes: One selected complete publication vintage per available tool.
+        selection: Exact organization IDs captured at submission time.
+        presentation: Request-time scoring scope, comparator scores and limitations.
+    Returns:
+        C3 truth, per-tool diagnostics and all shared shortlist metrics.
+    Raises:
+        ImmatureOutcome: No batch/outcomes or an incomplete/late candidate universe.
+        ValueError: Mixed scope/vintage, invalid selections or mismatched comparators.
+    """
+    if not rows or not outcomes:
+        raise ImmatureOutcome
+    if any(
+        outcome.outcome_vintage != presentation.outcome_vintage for outcome in outcomes
+    ):
+        message = "Reveal outcomes must use the selected published vintage"
+        raise ValueError(message)
+    if any(
+        score.candidate_universe_id != presentation.scoring.candidate_universe_id
+        for score in presentation.comparators
+    ):
+        message = "Replay comparators must use the exact shared candidate universe"
+        raise ValueError(message)
+    scores = score_selection(rows, outcomes, selection, presentation.scoring)
+    diagnostics = map_outcomes(rows, outcomes, presentation.scoring.as_of)
+    available = tuple(
+        outcome.label.available_at
+        for outcome in outcomes
+        if outcome.label.available_at is not None
+    )
+    return s.Reveal(
+        batch_id=rows[0].batch_id,
+        outcome_vintage=presentation.outcome_vintage,
+        available_at=max(available),
+        selected_organization_ids=selection.organization_ids,
+        outcomes=diagnostics,
+        selection_score=scores[0],
+        selection_metrics=scores[1:],
+        comparators=presentation.comparators,
+        limitations=presentation.limitations,
     )
