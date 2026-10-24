@@ -1,5 +1,28 @@
 # Dev 1: Data, storage, platform, and integration
 
+## Active company-outlook checkpoints (2026-10-24)
+
+[PLAN.md](../PLAN.md) and [issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19)
+replace the download-only destination. Directory ownership remains unchanged.
+The numbered D1 tasks below are retained implementation history/reusable work;
+their old completion gates do not establish company-outlook completion.
+
+| Task | Current deliverable | Acceptance |
+| --- | --- | --- |
+| D1-O1 | Additive company identity/metric/event/evidence/source snapshot contracts | Dev 2/3 review; strict fixtures and provenance/unknown/time invariants |
+| D1-O2 | Real multi-family company evidence and dated mappings | Sources, gaps, raw hashes and independent bundle retrieval verified |
+| D1-O3 | Exact-version source and assessment publication/readers | Compatible C1/C2 artifacts, atomic publication and failure/rollback tests |
+| D1-O4 | Historical cohort source/discovery/follow-up ledger | Failed/inactive companies retained; missing labels visible; Dev 2 applies policy |
+| D1-O5 | Integrate real company list/profile/compare | Real multi-family API/browser flow with all three outcome sections |
+| D1-O6 | Bounded refresh and conditional deployment | No paid operation without verified access/credits; real operational checks |
+
+Finish #17's package-attribution fix. Hold additional download-only expansion.
+Implement [the source proposal](../docs/workstreams/dev1/STARTUP_OUTLOOK.md)
+after consumer review. Private commercial data and a representative historical
+labelled cohort are unresolved data-acquisition gates, not assumed inputs.
+
+## Retained download workstream reference
+
 **Branch:** `dev/data-platform`
 
 **Role:** Deliver trustworthy versioned observations and the platform used by

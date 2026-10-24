@@ -1,5 +1,29 @@
 # Dev 3: API, frontend, historical replay, and demo
 
+## Active company-outlook checkpoints (2026-10-24)
+
+[PLAN.md](../PLAN.md) and [issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19)
+replace the five-tool ranking destination. Directory ownership remains
+unchanged. The numbered D3 tasks below are reusable implementation history;
+old download pages and percentages do not establish revised-product completion.
+
+| Task | Current deliverable | Acceptance |
+| --- | --- | --- |
+| D3-O1 | Restrained visual system and company information architecture | Neutral surfaces, compact navigation/headings, one accent; accessible controls |
+| D3-O2 | Additive C3 company list/profile API and generated client types | Direct projection of reviewed C1/C2; evidence/unknown/probability states preserved |
+| D3-O3 | Searchable company table, profile and up-to-three comparison | Context, signal/risk, coverage, date, three outcomes, metrics and sources |
+| D3-O4 | Real source/assessment adapter | Exact immutable versions; no synthetic production fallback or future label exposure |
+| D3-O5 | Real company acceptance | Multiple metric families, meaningful comparison, browser/mobile/keyboard checks |
+
+The UI proposal and visual checkpoint are in
+[PR #21](https://github.com/bevynfernandes/oxhack2026/pull/21).
+Show exact cash-flow/growth target meanings rather than a binary success badge.
+Keep outcome truth separate from pre-outcome assessments. Do not compute model
+scores in the API/browser or substitute package forecasts. No new offline
+export/demo implementation is assigned by this revision.
+
+## Retained download workstream reference
+
 **Branch:** `dev/api-frontend`
 
 **Role:** Deliver the scout's complete workflow using immutable artifacts from

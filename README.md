@@ -1,13 +1,15 @@
 # SignalShift
 
-Project template for the developer-tool scouting application described in
-[PLAN.md](PLAN.md). The implementation plan remains the source of truth.
+Startup outlook from dated evidence about traction, commercial health, execution
+and financing. Search companies, inspect three separate outcome assessments and
+compare relevant peers. [PLAN.md](PLAN.md) defines the revised product;
+[issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19) coordinates it.
 
-**Status: contracts and API foundation.** C1 data types, C2 model types and C3
-read-only API routes are implemented with synthetic contract tests. Source
-ingestion, persistent repositories and real forecast datasets are not yet
-available. An unconfigured API reports unavailable data rather than invented
-results. See the workstream handoffs under `docs/workstreams/`.
+**Status: product transition.** The download-data, modelling and API work provides
+reusable infrastructure. Company-level source contracts, real multi-family
+assessments and the company workflow are the next checkpoints. No validated
+startup-success probability or complete historical company-label dataset is
+claimed. Missing production data stays unavailable rather than invented.
 
 ## Development setup
 
