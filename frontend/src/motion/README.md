@@ -70,3 +70,28 @@ This short smoke measurement is not a cross-device performance guarantee.
 Videos, frames and screenshots are retained in `tests/outputs/motion/before-valid`
 and `tests/outputs/motion/after`; traces and functional browser evidence are in
 `tests/outputs/motion-widgets-v2` and `tests/outputs/motion-real-replay`.
+
+## Page navigation
+
+`MotionPage` is the single main landmark around the router. Pass `pathname` as
+`routeKey`; query strings, hash changes, filters and polling do not replay it.
+A changed path moves the arriving page from 16px below with the default spatial
+spring and fades it with default effects. The header remains stationary. Initial
+loads are settled; rapid navigation retargets the current motion values. Content
+and API requests update immediately without keeping outgoing pages mounted.
+
+```tsx
+<MotionPage id="main" routeKey={pathname} tabIndex={0}>
+  <Routes>{/* Existing routes */}</Routes>
+</MotionPage>
+```
+
+Navigation resets the main scroll region and focuses it for keyboard/screen
+reader users. Keep scrollable main regions in the tab order (`tabIndex={0}`);
+non-scrolling workspace shells can use `-1`. Same-path updates retain input
+focus and state. Live reduced-motion changes settle both animation values.
+
+Page-transition unit/browser coverage includes back/forward, rapid navigation,
+mobile overflow, same-page updates and accessibility. Captures are retained in
+`tests/outputs/motion-pages-final`. Page support adds approximately 0.25 KB gzip
+to the production entry compared with the widget migration.

@@ -25,4 +25,8 @@ export function springPreset(preset: MotionPreset) {
     restSpeed: 0.01,
   };
 }
-export const motionGeometry = { pressedScale: 0.97, panelOffset: 24 } as const;
+export const motionGeometry = {
+  pressedScale: 0.97,
+  panelOffset: 24,
+  pageOffset: 16,
+} as const;
