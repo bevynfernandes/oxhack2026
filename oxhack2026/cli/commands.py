@@ -14,7 +14,9 @@ from oxhack2026.storage.publication import LocalDatasetStore
 
 logger = logging.getLogger(__name__)
 app = typer.Typer(
-    help="SignalShift data/platform administration.", no_args_is_help=True
+    help="SignalShift data/platform administration.",
+    no_args_is_help=True,
+    pretty_exceptions_show_locals=False,
 )
 data = typer.Typer(help="Validate, extract and publish immutable datasets.")
 app.add_typer(data, name="data")
@@ -86,3 +88,52 @@ def artifact_verify(root: Path, reference_path: Path) -> None:
     reference = ArtifactReference.model_validate_json(reference_path.read_bytes())
     FileArtifactStore(root).read(reference)
     typer.echo(reference.sha256)
+
+
+@data.command("company-build")
+def company_build(settings_path: Path, npm_root: Path, root: Path) -> None:
+    """Build a company source candidate from SETTINGS_PATH and existing NPM_ROOT."""
+    from oxhack2026.ingest.company_pipeline import (
+        CompanyBuildSettings,
+        build_company_source,
+    )
+
+    settings = CompanyBuildSettings.model_validate_json(settings_path.read_bytes())
+    snapshot = build_company_source(settings, npm_root, root)
+    typer.echo(f"{snapshot.snapshot_id}: {len(snapshot.companies)} companies")
+
+
+@data.command("company-publish")
+def company_publish(
+    root: Path, snapshot_id: str, expected_current: str | None = None
+) -> None:
+    """Verify and publish an exact company candidate with a conditional pointer."""
+    from oxhack2026.catalog.company import CompanySourceSnapshot
+    from oxhack2026.ingest.capture import CaptureRun
+    from oxhack2026.storage.company import LocalCompanyStore
+
+    identifier = CaptureRun(run_id=snapshot_id).run_id
+    snapshot = CompanySourceSnapshot.model_validate_json(
+        (root / "candidates" / f"{identifier}.json").read_bytes()
+    )
+    if snapshot.snapshot_id != identifier:
+        message = "Candidate filename and source identity disagree"
+        raise ValueError(message)
+    manifest = LocalCompanyStore(root).publish(snapshot, expected_current)
+    typer.echo(manifest.snapshot_id)
+
+
+@data.command("company-health")
+def company_health(root: Path, snapshot_id: str) -> None:
+    """Verify an exact source publication and summarize explicit coverage."""
+    from oxhack2026.storage.company import LocalCompanyStore
+
+    snapshot = LocalCompanyStore(root).snapshot(snapshot_id)
+    for company in snapshot.companies:
+        for coverage in snapshot.coverage(company.company_id):
+            typer.echo(
+                f"{company.company_id} {coverage.family}: "
+                f"{len(coverage.observed_metric_ids)}/"
+                f"{len(coverage.applicable_metric_ids)} observed; "
+                f"{len(coverage.stale_metric_ids)} stale"
+            )
