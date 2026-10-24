@@ -23,6 +23,7 @@ from oxhack2026.models.company_assessments import (
     CompanyAssessment,
     CompanyOutcomeAssessment,
 )
+from oxhack2026.storage.company_assessments import CompanyAssessmentPublication
 
 
 class CompanySource(DTO):
@@ -73,6 +74,7 @@ class CompanyPublication(DTO):
 
     schema_version: Literal["company-api-v1"] = "company-api-v1"
     source: CompanySnapshotMetadata
+    assessment: CompanyAssessmentPublication
     company_count: int
 
 

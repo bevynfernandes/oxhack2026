@@ -496,5 +496,30 @@
         "Synthetic contract fixture only."
       ]
     }
-  ]
+  ],
+  "publication": {
+    "schema_version": "company-assessment-publication-v1",
+    "publication_id": "synthetic-assessments-v1",
+    "source_snapshot_id": "synthetic-companies-v1",
+    "as_of": "2025-02-01T00:00:00Z",
+    "recorded_at": "2025-02-01T00:00:00Z",
+    "policy_version": "synthetic-company-evidence-v1",
+    "synthetic": true,
+    "company_ids": [
+      "alpha",
+      "beta"
+    ],
+    "source_manifest": {
+      "path": "objects/f4/f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+      "sha256": "f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+      "byte_size": 52,
+      "media_type": "application/json"
+    },
+    "assessments": {
+      "path": "objects/f4/f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+      "sha256": "f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+      "byte_size": 52,
+      "media_type": "application/json"
+    }
+  }
 }

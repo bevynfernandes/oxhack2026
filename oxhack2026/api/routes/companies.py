@@ -36,9 +36,9 @@ def company_snapshots(
 def companies(
     snapshot_id: Identifier, repo: CompanyRepository = company_dependency
 ) -> s.CompanyList:
-    """Read the full name-ordered company table for an exact publication."""
+    """Read an exact assessment publication ID, never a source-only alias."""
     result = repo.companies(snapshot_id)
-    if result.publication.source.snapshot_id != snapshot_id:
+    if result.publication.assessment.publication_id != snapshot_id:
         raise RepositoryUnavailable
     return result
 
@@ -56,10 +56,10 @@ def company(
     """Read a pre-outcome profile with public-safe sources and explicit unknowns."""
     result = repo.company(snapshot_id, company_id)
     if (
-        result.publication.source.snapshot_id != snapshot_id
+        result.publication.assessment.publication_id != snapshot_id
         or result.company.company_id != company_id
         or result.assessment.company_id != company_id
-        or result.assessment.source_snapshot_id != snapshot_id
+        or result.assessment.source_snapshot_id != result.publication.source.snapshot_id
     ):
         raise RepositoryUnavailable
     return result

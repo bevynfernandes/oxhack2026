@@ -11,17 +11,21 @@ from fastapi.testclient import TestClient
 
 from oxhack2026.api.app import create_app
 from oxhack2026.api.company_repository import (
-    CompanyAssessmentReader,
     PublishedCompanyRepository,
 )
 from oxhack2026.api.repository import RepositoryUnavailable
 from oxhack2026.catalog.company import CompanySourceSnapshot, DecimalValue
 from oxhack2026.models.company_assessments import CompanyAssessment
 from oxhack2026.storage.company import CompanySourceReader
+from oxhack2026.storage.company_assessments import (
+    CompanyAssessmentManifest,
+    CompanyAssessmentReader,
+)
 
 FIXTURE = Path(__file__).resolve().parents[2] / "fixtures/api/companies.json"
 SNAPSHOT = "synthetic-companies-v1"
-PREFIX = f"/api/v1/company-snapshots/{SNAPSHOT}/companies"
+PUBLICATION = "synthetic-assessments-v1"
+PREFIX = f"/api/v1/company-snapshots/{PUBLICATION}/companies"
 
 
 @pytest.fixture
@@ -35,14 +39,18 @@ def company_readers() -> tuple[Mock, Mock]:
     sources = create_autospec(CompanySourceReader, instance=True)
     models = create_autospec(CompanyAssessmentReader, instance=True)
     sources.snapshot.return_value = source
-    models.snapshot_ids.return_value = (SNAPSHOT,)
+    models.manifest.return_value = CompanyAssessmentManifest.model_validate(
+        payload["publication"]
+    )
     models.assessments.return_value = assessments
     return sources, models
 
 
 def _client(readers: tuple[Mock, Mock]) -> TestClient:
     return TestClient(
-        create_app(company_repository=PublishedCompanyRepository(*readers))
+        create_app(
+            company_repository=PublishedCompanyRepository(*readers, (PUBLICATION,))
+        )
     )
 
 
@@ -165,7 +173,7 @@ def test_exact_ids_and_unconfigured_routes_never_substitute_fixtures(
     """Unknown company/snapshot is 404; absent production composition is 503."""
     with _client(company_readers) as client:
         assert client.get(f"{PREFIX}/unknown").status_code == 404
-        assert client.get(PREFIX.replace(SNAPSHOT, "unknown")).status_code == 404
+        assert client.get(PREFIX.replace(PUBLICATION, "unknown")).status_code == 404
         assert client.get(f"{PREFIX}/bad%20id").status_code == 422
         assert client.get("/api/v1/cutoffs").status_code == 503
     with TestClient(create_app()) as client:
@@ -183,8 +191,9 @@ def test_storage_errors_are_redacted_and_empty_publications_are_not_ready(
         response = client.get(f"{PREFIX}/alpha")
     assert response.status_code == 503
     assert "secret" not in response.text + caplog.text
-    models.snapshot_ids.return_value = ()
-    with _client(company_readers) as client:
+    with TestClient(
+        create_app(company_repository=PublishedCompanyRepository(sources, models, ()))
+    ) as client:
         assert client.get("/api/v1/company-snapshots").json() == {"items": []}
         assert client.get("/api/v1/health/ready").status_code == 503
 
@@ -224,9 +233,95 @@ def test_decimal_projection_retains_precision(
 
 def test_duplicate_publication_ids_fail(company_readers: tuple[Mock, Mock]) -> None:
     """Enumeration cannot present conflicting duplicate publication choices."""
-    company_readers[1].snapshot_ids.return_value = (SNAPSHOT, SNAPSHOT)
     with pytest.raises(RepositoryUnavailable):
-        PublishedCompanyRepository(*company_readers).publications()
+        PublishedCompanyRepository(
+            *company_readers, (PUBLICATION, PUBLICATION)
+        ).publications()
+
+
+def test_policy_rollout_preserves_exact_publication_urls(
+    company_readers: tuple[Mock, Mock],
+) -> None:
+    """Two policies on one source retain independent URLs and explicit retirement."""
+    sources, models = company_readers
+    original_manifest = models.manifest.return_value
+    original_rows = models.assessments.return_value
+    replacement_id = "synthetic-assessments-v2"
+    replacement_rows = tuple(
+        row.model_copy(
+            update={
+                "assessment_id": f"{row.assessment_id}-v2",
+                "policy_version": "synthetic-company-evidence-v2",
+            }
+        )
+        for row in original_rows
+    )
+    manifests = {
+        PUBLICATION: original_manifest,
+        replacement_id: original_manifest.model_copy(
+            update={
+                "publication_id": replacement_id,
+                "policy_version": "synthetic-company-evidence-v2",
+            }
+        ),
+    }
+    models.manifest.side_effect = manifests.__getitem__
+    models.assessments.side_effect = {
+        PUBLICATION: original_rows,
+        replacement_id: replacement_rows,
+    }.__getitem__
+    with _client(company_readers) as client:
+        before = client.get(f"{PREFIX}/alpha").content
+    with TestClient(
+        create_app(
+            company_repository=PublishedCompanyRepository(
+                sources, models, (PUBLICATION, replacement_id)
+            )
+        )
+    ) as client:
+        choices = client.get("/api/v1/company-snapshots").json()["items"]
+        assert len(choices) == 2
+        assert client.get(f"{PREFIX}/alpha").content == before
+        replacement = client.get(
+            f"/api/v1/company-snapshots/{replacement_id}/companies/alpha"
+        ).json()
+        assert replacement["assessment"]["policy_version"].endswith("v2")
+        assert (
+            client.get(f"/api/v1/company-snapshots/{SNAPSHOT}/companies").status_code
+            == 404
+        )
+    with TestClient(
+        create_app(
+            company_repository=PublishedCompanyRepository(
+                sources, models, (replacement_id,)
+            )
+        )
+    ) as client:
+        assert client.get(f"{PREFIX}/alpha").status_code == 404
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("publication_id", "other"),
+        ("source_snapshot_id", "other"),
+        ("policy_version", "other"),
+        ("synthetic", False),
+        ("company_ids", ("alpha",)),
+        ("as_of", "2025-01-31T00:00:00Z"),
+        ("recorded_at", "2025-02-02T00:00:00Z"),
+    ],
+)
+def test_assessment_manifest_must_match_published_records(
+    company_readers: tuple[Mock, Mock], field: str, value: object
+) -> None:
+    """A valid-looking metadata record cannot relabel incompatible C1/C2 bytes."""
+    models = company_readers[1]
+    models.manifest.return_value = models.manifest.return_value.model_copy(
+        update={field: value}
+    )
+    with _client(company_readers) as client:
+        assert client.get(PREFIX).status_code == 503
 
 
 def test_restricted_derived_metrics_events_relationships_and_coverage_are_withheld(

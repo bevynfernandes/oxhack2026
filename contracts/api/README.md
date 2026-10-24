@@ -11,8 +11,13 @@
   effective family and redacted provenance. Comparison reuses these profiles.
 
 `PublishedCompanyRepository` composes `CompanySourceReader` with the lightweight
-`CompanyAssessmentReader` read port. The latter enumerates exact source IDs with
-complete published assessment sets and loads their C2 records. Construction has
+`storage.company_assessments.CompanyAssessmentReader` read port and an explicit
+tuple of assessment publication IDs. Route `snapshot_id` parameters and saved UI
+selections identify the **assessment publication**, never a source-only alias.
+Public metadata includes `assessment.publication_id`, its policy/recording time,
+and the separate `source.snapshot_id`. Two assessment policies may reference the
+same source while retaining distinct URLs. Removing a configured publication
+returns 404 for its saved URL; it never resolves to a replacement. Construction has
 no I/O. Reads validate company/source identity, dates, synthetic/family state,
 foreign keys and evidence support. API code never creates assessments or scores.
 Unknown IDs are 404; corrupt or incomplete publications are 503.

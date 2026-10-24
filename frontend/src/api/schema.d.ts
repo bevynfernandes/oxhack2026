@@ -53,7 +53,7 @@ export interface paths {
         };
         /**
          * Companies
-         * @description Read the full name-ordered company table for an exact publication.
+         * @description Read an exact assessment publication ID, never a source-only alias.
          */
         get: operations["companies"];
         put?: never;
@@ -444,6 +444,38 @@ export interface components {
             synthetic: boolean;
         };
         /**
+         * CompanyAssessmentPublication
+         * @description Public-safe batch metadata; recorded_at is the latest model recording time.
+         */
+        CompanyAssessmentPublication: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Company Ids */
+            company_ids: string[];
+            /** Policy Version */
+            policy_version: string;
+            /** Publication Id */
+            publication_id: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /**
+             * Schema Version
+             * @default company-assessment-publication-v1
+             * @constant
+             */
+            schema_version: "company-assessment-publication-v1";
+            /** Source Snapshot Id */
+            source_snapshot_id: string;
+            /** Synthetic */
+            synthetic: boolean;
+        };
+        /**
          * CompanyDetail
          * @description Pre-outcome profile; raw source paths and future labels are absent.
          */
@@ -628,6 +660,7 @@ export interface components {
          * @description An exact source snapshot with a complete published assessment set.
          */
         CompanyPublication: {
+            assessment: components["schemas"]["CompanyAssessmentPublication"];
             /** Company Count */
             company_count: number;
             /**

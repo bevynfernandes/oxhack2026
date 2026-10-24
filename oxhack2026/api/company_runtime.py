@@ -13,7 +13,6 @@ from oxhack2026.api.schemas import Identifier
 from oxhack2026.storage.company import LocalCompanyStore
 from oxhack2026.storage.company_assessments import (
     LocalCompanyAssessmentStore,
-    SourceScopedAssessmentReader,
 )
 
 logger = logging.getLogger(__name__)
@@ -48,8 +47,7 @@ def create_company_app() -> FastAPI:
     return create_app(
         company_repository=PublishedCompanyRepository(
             LocalCompanyStore(directory),
-            SourceScopedAssessmentReader(
-                LocalCompanyAssessmentStore(directory), publications
-            ),
+            LocalCompanyAssessmentStore(directory),
+            publications,
         )
     )
