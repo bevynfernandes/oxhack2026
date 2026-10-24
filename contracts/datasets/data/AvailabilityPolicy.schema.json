@@ -1,0 +1,56 @@
+{
+  "additionalProperties": false,
+  "description": "Versioned source availability assumptions, separate from vendor publication.",
+  "properties": {
+    "policy_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Policy Version",
+      "type": "string"
+    },
+    "source": {
+      "enum": [
+        "npm",
+        "pypi",
+        "github",
+        "hackernews"
+      ],
+      "title": "Source",
+      "type": "string"
+    },
+    "basis": {
+      "enum": [
+        "collected",
+        "vendor_published",
+        "assumed_lag"
+      ],
+      "title": "Basis",
+      "type": "string"
+    },
+    "assumed_lag_hours": {
+      "anyOf": [
+        {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Assumed Lag Hours"
+    },
+    "description": {
+      "title": "Description",
+      "type": "string"
+    }
+  },
+  "required": [
+    "policy_version",
+    "source",
+    "basis",
+    "assumed_lag_hours",
+    "description"
+  ],
+  "title": "AvailabilityPolicy",
+  "type": "object"
+}

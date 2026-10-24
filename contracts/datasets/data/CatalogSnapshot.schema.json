@@ -1,0 +1,410 @@
+{
+  "$defs": {
+    "MappingEvidence": {
+      "additionalProperties": false,
+      "description": "Official evidence; collection does not prove earlier historical eligibility.",
+      "properties": {
+        "evidence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "official_installation",
+            "official_repository",
+            "organization",
+            "category"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "url": {
+          "title": "Url",
+          "type": "string"
+        },
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "checked_at": {
+          "format": "date-time",
+          "title": "Checked At",
+          "type": "string"
+        },
+        "assertion": {
+          "title": "Assertion",
+          "type": "string"
+        },
+        "source_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Sha256"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "kind",
+        "url",
+        "available_at",
+        "checked_at",
+        "assertion"
+      ],
+      "title": "MappingEvidence",
+      "type": "object"
+    },
+    "Organization": {
+      "additionalProperties": false,
+      "description": "Company identity and family grouping, independent of product/package names.",
+      "properties": {
+        "organization_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Organization Id",
+          "type": "string"
+        },
+        "family_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Family Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "company_backed",
+            "community",
+            "reference_platform"
+          ],
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "organization_id",
+        "family_id",
+        "name",
+        "kind"
+      ],
+      "title": "Organization",
+      "type": "object"
+    },
+    "Package": {
+      "additionalProperties": false,
+      "description": "Canonical package identity; migrations create a new package record.",
+      "properties": {
+        "package_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "ecosystem": {
+          "enum": [
+            "npm",
+            "pypi"
+          ],
+          "title": "Ecosystem",
+          "type": "string"
+        },
+        "canonical_name": {
+          "maxLength": 214,
+          "minLength": 1,
+          "title": "Canonical Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "package_id",
+        "ecosystem",
+        "canonical_name"
+      ],
+      "title": "Package",
+      "type": "object"
+    },
+    "Repository": {
+      "additionalProperties": false,
+      "description": "Stable GitHub numeric identity and its name in this catalogue snapshot.",
+      "properties": {
+        "repository_id": {
+          "exclusiveMinimum": 0,
+          "title": "Repository Id",
+          "type": "integer"
+        },
+        "full_name": {
+          "pattern": "^[^/\\s]+/[^/\\s]+$",
+          "title": "Full Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "repository_id",
+        "full_name"
+      ],
+      "title": "Repository",
+      "type": "object"
+    },
+    "Tool": {
+      "additionalProperties": false,
+      "description": "A product belonging to an organization, with explicit cohort rationale.",
+      "properties": {
+        "tool_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "organization_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Organization Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "category": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Category",
+          "type": "string"
+        },
+        "website_url": {
+          "title": "Website Url",
+          "type": "string"
+        },
+        "inclusion_reason": {
+          "title": "Inclusion Reason",
+          "type": "string"
+        },
+        "earliest_eligibility_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Earliest Eligibility At"
+        }
+      },
+      "required": [
+        "tool_id",
+        "organization_id",
+        "name",
+        "category",
+        "website_url",
+        "inclusion_reason",
+        "earliest_eligibility_at"
+      ],
+      "title": "Tool",
+      "type": "object"
+    },
+    "ToolMapping": {
+      "additionalProperties": false,
+      "description": "Effective tool/package association and frozen organization representative.",
+      "properties": {
+        "mapping_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Mapping Id",
+          "type": "string"
+        },
+        "tool_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "package_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Package Id",
+          "type": "string"
+        },
+        "repository_id": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Repository Id"
+        },
+        "valid_from": {
+          "format": "date-time",
+          "title": "Valid From",
+          "type": "string"
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Valid To"
+        },
+        "primary": {
+          "title": "Primary",
+          "type": "boolean"
+        },
+        "organization_representative": {
+          "title": "Organization Representative",
+          "type": "boolean"
+        },
+        "verified": {
+          "title": "Verified",
+          "type": "boolean"
+        },
+        "reviewer": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Reviewer",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mapping_id",
+        "tool_id",
+        "package_id",
+        "repository_id",
+        "valid_from",
+        "valid_to",
+        "primary",
+        "organization_representative",
+        "verified",
+        "reviewer",
+        "evidence_ids"
+      ],
+      "title": "ToolMapping",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Frozen normalized identities and dated mappings for one cohort definition.",
+  "properties": {
+    "schema_version": {
+      "const": "data-v1",
+      "default": "data-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "catalog_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Catalog Version",
+      "type": "string"
+    },
+    "mapping_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Mapping Version",
+      "type": "string"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "cohort_kind": {
+      "enum": [
+        "contemporary_catalogue",
+        "historical_eligibility"
+      ],
+      "title": "Cohort Kind",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "organizations": {
+      "items": {
+        "$ref": "#/$defs/Organization"
+      },
+      "title": "Organizations",
+      "type": "array"
+    },
+    "tools": {
+      "items": {
+        "$ref": "#/$defs/Tool"
+      },
+      "title": "Tools",
+      "type": "array"
+    },
+    "packages": {
+      "items": {
+        "$ref": "#/$defs/Package"
+      },
+      "title": "Packages",
+      "type": "array"
+    },
+    "repositories": {
+      "items": {
+        "$ref": "#/$defs/Repository"
+      },
+      "title": "Repositories",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/MappingEvidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/ToolMapping"
+      },
+      "title": "Mappings",
+      "type": "array"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "catalog_version",
+    "mapping_version",
+    "recorded_at",
+    "cohort_kind",
+    "synthetic",
+    "organizations",
+    "tools",
+    "packages",
+    "repositories",
+    "evidence",
+    "mappings",
+    "limitations"
+  ],
+  "title": "CatalogSnapshot",
+  "type": "object"
+}

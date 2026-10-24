@@ -1,0 +1,79 @@
+{
+  "$defs": {
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "A nonempty half-open interval [start, end), always in UTC.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Read only the named frozen revision set; optional knowledge-time filters.",
+  "properties": {
+    "dataset_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "series_ids": {
+      "items": {
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+        "type": "string"
+      },
+      "title": "Series Ids",
+      "type": "array"
+    },
+    "window": {
+      "$ref": "#/$defs/TimeWindow"
+    },
+    "available_by": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Available By"
+    },
+    "collected_by": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Collected By"
+    }
+  },
+  "required": [
+    "dataset_version",
+    "series_ids",
+    "window"
+  ],
+  "title": "ObservationQuery",
+  "type": "object"
+}

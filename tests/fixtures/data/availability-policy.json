@@ -1,0 +1,7 @@
+{
+  "policy_version": "npm-lag48-v1",
+  "source": "npm",
+  "basis": "assumed_lag",
+  "assumed_lag_hours": 48,
+  "description": "Project assumption; no vendor publication timestamp is asserted."
+}

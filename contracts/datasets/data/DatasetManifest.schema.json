@@ -1,0 +1,325 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Hashed artifact relative to a configured bundle root, never a signed URL.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "byte_size": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Byte Size",
+          "type": "integer"
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/x-ndjson",
+            "application/vnd.apache.parquet",
+            "application/octet-stream"
+          ],
+          "title": "Media Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "byte_size",
+        "media_type"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "AvailabilityPolicy": {
+      "additionalProperties": false,
+      "description": "Versioned source availability assumptions, separate from vendor publication.",
+      "properties": {
+        "policy_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Policy Version",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "npm",
+            "pypi",
+            "github",
+            "hackernews"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "basis": {
+          "enum": [
+            "collected",
+            "vendor_published",
+            "assumed_lag"
+          ],
+          "title": "Basis",
+          "type": "string"
+        },
+        "assumed_lag_hours": {
+          "anyOf": [
+            {
+              "maximum": 9223372036854775807,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Assumed Lag Hours"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        }
+      },
+      "required": [
+        "policy_version",
+        "source",
+        "basis",
+        "assumed_lag_hours",
+        "description"
+      ],
+      "title": "AvailabilityPolicy",
+      "type": "object"
+    },
+    "ExtractionManifest": {
+      "additionalProperties": false,
+      "description": "Raw extraction identity, filter and result bounds for reproducible provenance.",
+      "properties": {
+        "extraction_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Extraction Id",
+          "type": "string"
+        },
+        "source": {
+          "enum": [
+            "npm",
+            "pypi",
+            "github",
+            "hackernews"
+          ],
+          "title": "Source",
+          "type": "string"
+        },
+        "catalog_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Catalog Version",
+          "type": "string"
+        },
+        "requested_window": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "retrieved_at": {
+          "format": "date-time",
+          "title": "Retrieved At",
+          "type": "string"
+        },
+        "extraction_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Extraction Version",
+          "type": "string"
+        },
+        "filter_version": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Filter Version",
+          "type": "string"
+        },
+        "configuration_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Configuration Sha256",
+          "type": "string"
+        },
+        "raw_artifacts": {
+          "items": {
+            "$ref": "#/$defs/ArtifactReference"
+          },
+          "title": "Raw Artifacts",
+          "type": "array"
+        },
+        "status": {
+          "enum": [
+            "complete",
+            "partial",
+            "failed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "limitations": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Limitations",
+          "type": "array"
+        }
+      },
+      "required": [
+        "extraction_id",
+        "source",
+        "catalog_version",
+        "requested_window",
+        "retrieved_at",
+        "extraction_version",
+        "filter_version",
+        "configuration_sha256",
+        "raw_artifacts",
+        "status",
+        "limitations"
+      ],
+      "title": "ExtractionManifest",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "A nonempty half-open interval [start, end), always in UTC.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Frozen observation revision set and its exact source/identity provenance.",
+  "properties": {
+    "schema_version": {
+      "const": "data-v1",
+      "default": "data-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "dataset_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "catalog_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Catalog Version",
+      "type": "string"
+    },
+    "mapping_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Mapping Version",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "code_revision": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Code Revision",
+      "type": "string"
+    },
+    "configuration_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Configuration Sha256",
+      "type": "string"
+    },
+    "catalog": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "series": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "observations": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "coverage": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "extraction_manifests": {
+      "items": {
+        "$ref": "#/$defs/ExtractionManifest"
+      },
+      "title": "Extraction Manifests",
+      "type": "array"
+    },
+    "availability_policies": {
+      "items": {
+        "$ref": "#/$defs/AvailabilityPolicy"
+      },
+      "title": "Availability Policies",
+      "type": "array"
+    },
+    "feature_definition_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Feature Definition Version",
+      "type": "string"
+    },
+    "target_definition_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Target Definition Version",
+      "type": "string"
+    },
+    "completeness": {
+      "enum": [
+        "complete",
+        "partial"
+      ],
+      "title": "Completeness",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "dataset_version",
+    "catalog_version",
+    "mapping_version",
+    "created_at",
+    "code_revision",
+    "configuration_sha256",
+    "catalog",
+    "series",
+    "observations",
+    "coverage",
+    "extraction_manifests",
+    "availability_policies",
+    "feature_definition_version",
+    "target_definition_version",
+    "completeness",
+    "synthetic",
+    "limitations"
+  ],
+  "title": "DatasetManifest",
+  "type": "object"
+}
