@@ -3,6 +3,7 @@ import BatchPicker from "./pages/rankings/BatchPicker";
 import BatchPage from "./pages/rankings/BatchPage";
 import EvaluationPage from "./pages/evaluation/EvaluationPage";
 import DataHealthPage from "./pages/data-health/DataHealthPage";
+import MethodologyPage from "./pages/methodology/MethodologyPage";
 
 /** Route the scouting workflow without bundling or silently loading test fixtures. */
 export default function App() {
@@ -16,8 +17,11 @@ export default function App() {
           SignalShift<span>Developer-tool scouting</span>
         </NavLink>
         <nav aria-label="Main navigation">
-          <NavLink to="/">Forecasts</NavLink>
+          <NavLink to="/" end>
+            Forecasts
+          </NavLink>
           <NavLink to="/data-health">Data health</NavLink>
+          <NavLink to="/methodology">Methodology</NavLink>
         </nav>
       </header>
       <main id="main" tabIndex={-1}>
@@ -33,6 +37,7 @@ export default function App() {
             element={<EvaluationPage />}
           />
           <Route path="/data-health" element={<DataHealthPage />} />
+          <Route path="/methodology" element={<MethodologyPage />} />
           <Route
             path="*"
             element={

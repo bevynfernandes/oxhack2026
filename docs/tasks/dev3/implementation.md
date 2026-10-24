@@ -14,6 +14,14 @@ restrained visual revision, company list/profile/compare, agreed additive C3
 contracts, production multi-family company reads and real browser acceptance.
 Unknown/private metrics and unvalidated outcome probabilities remain explicit.
 
+The neutral visual foundation shipped in #21. The additive `/methodology` page
+explains the three calendar-horizon outcomes, cash-flow self-sufficiency,
+evidence-only versus validated assessments, source timing and incomplete
+follow-up. It works without a published repository and makes no claim that a
+company prediction model is available. The company landing/profile/compare
+checkpoint still depends on the concrete C1 source and C2 assessment classes;
+#23 and #25 establish their specification and reader handoff.
+
 ## Reusable original checkpoints
 
 | Task | State | Evidence / dependency |

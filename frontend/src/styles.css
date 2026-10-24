@@ -67,6 +67,7 @@ input[type="checkbox"] {
 }
 .site-header {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
@@ -88,6 +89,7 @@ input[type="checkbox"] {
 }
 nav {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
 }
 nav a {
@@ -290,6 +292,22 @@ dt {
 dd {
   margin: 0.3rem 0;
   overflow-wrap: anywhere;
+}
+.methodology {
+  max-width: 850px;
+}
+.methodology > section {
+  border-top: 1px solid #dfe3e8;
+  padding: 1.5rem 0 0.5rem;
+}
+.methodology-definitions > div {
+  margin: 1rem 0;
+}
+.methodology-definitions dt {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #20242c;
+  text-transform: none;
 }
 .receipt {
   border-top: 1px solid #dfe3e8;
