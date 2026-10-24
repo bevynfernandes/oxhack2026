@@ -615,7 +615,12 @@ export default function CompanyDossier({
                 </h3>
                 <p className="pillar-description">{group.description}</p>
               </header>
-              <div className="pillar-measurements">
+              <div
+                className="pillar-measurements"
+                tabIndex={0}
+                role="region"
+                aria-label={`${group.name} measurements`}
+              >
                 {ids.length ? (
                   <dl>
                     {ids.slice(0, 3).map((id) => {

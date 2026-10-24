@@ -92,3 +92,14 @@ accessible description and disabled animation remain unchanged.
    under unique `tests/outputs/theme-*` directories.
 6. Open a PR only after the full suite and build pass. Record final evidence,
    asset sizes, modified files and remaining visual limits below.
+
+### Baseline findings
+
+- Existing 36 browser cases pass on integrated main.
+- The additional seven-screen, two-viewport audit found pre-existing keyboard
+  access gaps in three scrollable dossier measurement panels and the legacy
+  history table. Added labelled, keyboard-focusable scroll regions without
+  changing measurements, ordering or interaction handlers.
+- The unchanged light presentation now passes that complete surface audit.
+  Before captures are retained in `tests/outputs/theme-baseline-accessible`;
+  the original findings remain in `tests/outputs/theme-baseline-surfaces`.
