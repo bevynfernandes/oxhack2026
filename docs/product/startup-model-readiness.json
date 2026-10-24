@@ -1,7 +1,6 @@
 {
   "audited_at": "2026-10-24T22:54:40.605841+00:00",
   "deployment_decision": "No startup-success/survival probability or complete five-dimension business score from these data.",
-  "no_replacement_outcome_models_fitted": true,
   "public_datasets": [
     {
       "decision": "reject_as_fixed_horizon_outcome_training",
@@ -91,5 +90,14 @@
     "panel_sha256": "6e6c22cf7e9ce9bff37d09f4f8ce1b1397ff2816abe3b8ddedaf1565036dc927",
     "split": "train origins 2000-2005; validation 2008; test 2011; cross-partition acquisition families excluded"
   },
-  "status": "business_prediction_training_data_not_ready"
+  "status": "business_prediction_training_data_not_ready",
+  "no_replacement_startup_growth_survival_models_fitted": true,
+  "bankruptcy_research_experiment": {
+    "fitted_estimators": 4,
+    "selected": "histogram_gradient_boosting",
+    "evaluation": "docs/product/disclosure-bankruptcy-evaluation.json",
+    "eligible_for_serving": false,
+    "target": "Recorded next-calendar-year Chapter 7/11 filing in selected ECL reporting firms",
+    "reason": "This is a narrow public-issuer financial-risk experiment; source-history parity, asset eligibility and independent label/family review remain unresolved. It does not train five startup dimensions or Growth/Survival."
+  }
 }

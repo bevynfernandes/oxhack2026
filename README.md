@@ -47,8 +47,17 @@ and the earlier [source research](docs/tasks/dev2/public-model-research-20261024
 `compare-public`, and dated company-outcome experiments. The API loads a packaged, digest-verified baseline bundle and attaches
 experimental model status to saved profiles and new research reports. Complete
 matched npm windows receive an SDK-demand index; unsupported inputs abstain. The
-three company-outcome cards remain unavailable, and execution inference is
+Growth and Survival forecasts and the combined Overall index remain unavailable,
+and execution inference is
 withheld because its held-out benchmark is unreliable.
+
+A separate [dated bankruptcy experiment](docs/product/disclosure-bankruptcy-experiment.md)
+has fitted four scikit-learn classifiers on public ECL filing metadata and recorded
+bankruptcy events. Small gradient boosting won validation; test ROC AUC was 0.717
+on 660 issuers with 13 positive cases. This research model is not served: it needs
+verified source-history parity and independent label/population review. It does
+not replace the requested five business dimensions or private-startup forecasts.
+See [FINAL_DEMO.md](FINAL_DEMO.md) for verified demo claims and remaining work.
 
 ## Frontend and API
 

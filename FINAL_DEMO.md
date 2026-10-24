@@ -21,6 +21,16 @@ This file records verified claims and remaining work. It is not a completion sig
   default; Gemini interpretation remains an explicit opt-in.
 - Existing local ML models were actually fitted, but their targets are narrow
   proxies. They do not establish startup success or survival prediction.
+- A separate business-event experiment fitted three regularized logistic models
+  and one small boosted-tree classifier using the public ECL bankruptcy dates.
+  Validation selected boosting. On 660 held-out issuers it achieved ROC AUC 0.717
+  and average precision 0.0386 versus 0.00747 for prevalence. There were only 13
+  positive test issuers; probability-loss improvement was small. These results
+  concern next-year recorded Chapter 7/11 filings among selected public filers,
+  not private-startup growth, permanent closure, or complete financial health.
+  The experiment remains excluded from live scores pending source/history parity
+  and independent label/population review. See the
+  [experiment and reproducible results](docs/product/disclosure-bankruptcy-experiment.md).
 - Public websites, npm, HN and a Common Crawl domain index were accessible in
   retained probes. These checks do not prove coverage for nearly every business.
 - The main search now accepts names and URLs. A bundled, attributed Majestic

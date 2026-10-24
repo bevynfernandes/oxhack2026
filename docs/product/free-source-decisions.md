@@ -25,6 +25,7 @@ held-out outcome performance are demonstrated.
 | Kauffman Firm Survey / ONS | Survey or restricted research access | Methodology/reference only for this workflow | No demonstrated domain join and serving-feature match; do not train an arbitrary-company website model on inaccessible survey fields. |
 | FinEntity | Original annotated dataset already captured and fitted | Candidate narrow financial-news sentiment component | Does not label startup success. Existing held-out negative-class coverage is weak. Do not label its score business health or apply it to any discussion without evaluation. |
 | Majestic Million | Actual official CSV download succeeded; CC BY 3.0 | Offline, attributed domain-name candidates only, with explicit identity preview | Not a training source or business-health measure. Names must match a listed domain label; incomplete company/alias coverage remains explicit. |
+| ECL authors' public filing/label CSV | Actual 26.7 MB download; pinned hash verified | Research-only recorded bankruptcy target and annual-report metadata | Four classifiers genuinely fitted with issuer/time separation. Limited selected public-issuer population, 13 positive holdout issuers, incomplete matched filing history, no independent event/family audit. No private-startup or full financial-health inference. No paid Compustat values used. |
 
 Actual probe responses and SHA-256 hashes are retained locally in
 `tests/outputs/final-product-20261024/source-probes/manifest.json`.

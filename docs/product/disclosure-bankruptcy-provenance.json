@@ -1,0 +1,31 @@
+{
+  "verified_at": "2026-10-24T23:32:35.212330+00:00",
+  "source_url": "https://cloud.ilabt.imec.be/index.php/s/TFGZgF3EyS4jsz2/download",
+  "source_bytes": 26692348,
+  "source_sha256": "bde2184a88e3130e1dec7e06b2e04072c23adced0ef36f323e3bdd600a5d1608",
+  "prefit_plan_sha256": "f2b7eb06489b3bf2b3db1c21497146b8cdfcbb285f444b50222e1f4b21b083fc",
+  "plan_audit_path": "tests/outputs/business-data-followup-20261025/disclosure-panel-v2-audit.json",
+  "artifact_directory": "artifacts/disclosure-bankruptcy-20261025-v1",
+  "model_artifact_sha256": {
+    "logistic_c_0.01": "5538c090ce952592409142f09d94dd33154ab4a909feb007daac6db498a5eb70",
+    "logistic_c_0.1": "c91e08db75c1240969cccad7ad6dd96ed933a2077088d9e99479b76c8009e1cd",
+    "logistic_c_1.0": "1e74b5bb36cb0a65f6400cca5dc1db1ad7d6fd94e165039a5146f4cdf1a7517c",
+    "histogram_gradient_boosting": "dd5d4c48f6bdcdba8c0d95f2fe76b16806a2488b8b60effee172d109dfd23917"
+  },
+  "versions": {
+    "scikit-learn": "1.9.1",
+    "polars": "1.44.2",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0"
+  },
+  "postfit_change": "Validation Brier/log-loss added to the Boolean gate to match the frozen plan. Existing measured metrics satisfy it; no refit or split change.",
+  "model_training_code_at_fit": "Uncommitted disclosure_risk.py before the documented postfit gate correction; model parameters and features unchanged.",
+  "serving_eligible": false,
+  "prefit_plan_recovery": "Read disclosure-bankruptcy-experiment.md before the Actual fitted results heading, strip trailing newlines, append one newline; its SHA-256 matches the prefit audit.",
+  "panel_sha256": "2f00c198bdd68be36ad37379423c107f49c88fa7032ed79044f2747af82ff9b2",
+  "current_code_sha256": {
+    "oxhack2026/features/disclosure_timing.py": "f7ea53f65b5648e002c6d86e6e4b7dcdce1b71eb8845dd43d738722806b9d683",
+    "oxhack2026/models/disclosure_risk.py": "daaa2c59b26111fd8333285c9169eaa705630b4c6a6ef97b84b71faa751dfd87"
+  }
+}

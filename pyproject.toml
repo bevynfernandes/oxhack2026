@@ -32,7 +32,10 @@ storage = [
     "psycopg[binary]>=3,<4",
     "sqlalchemy>=2,<3",
 ]
-models = ["catboost>=1.2,<2", "numpy>=2,<3", "scikit-learn>=1.6,<2"]
+models = [
+    "catboost>=1.2,<2", "joblib>=1.4,<2", "numpy>=2,<3",
+    "scikit-learn>=1.6,<2", "threadpoolctl>=3,<4",
+]
 bigquery = ["google-cloud-bigquery>=3,<4"]
 explanations = [
     "google-genai>=1,<2",
