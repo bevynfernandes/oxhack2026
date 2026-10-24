@@ -82,17 +82,21 @@ def test_restricted_evidence_contents_and_urls_are_redacted(
     """Attachment contents and private object locations never cross the API."""
     sources, _ = company_readers
     payload = sources.snapshot.return_value.model_dump(mode="json")
-    payload["evidence"][0].update(
-        access="restricted", url=None, assertion="private attachment contents"
-    )
+    private_source = payload["evidence"][0] | {
+        "evidence_id": "alpha-private",
+        "access": "restricted",
+        "url": None,
+        "assertion": "private attachment contents",
+    }
+    payload["evidence"].append(private_source)
     sources.snapshot.return_value = CompanySourceSnapshot.model_validate(payload)
 
     with _client(company_readers) as client:
         response = client.get(f"{PREFIX}/alpha")
 
     assert response.status_code == 200
-    assert response.json()["evidence"][0]["assertion"] is None
-    assert response.json()["evidence"][0]["url"] is None
+    assert response.json()["evidence"][-1]["assertion"] is None
+    assert response.json()["evidence"][-1]["url"] is None
     assert "private attachment contents" not in response.text
     assert "raw_artifact" not in response.text
 
@@ -223,3 +227,141 @@ def test_duplicate_publication_ids_fail(company_readers: tuple[Mock, Mock]) -> N
     company_readers[1].snapshot_ids.return_value = (SNAPSHOT, SNAPSHOT)
     with pytest.raises(RepositoryUnavailable):
         PublishedCompanyRepository(*company_readers).publications()
+
+
+def test_restricted_derived_metrics_events_relationships_and_coverage_are_withheld(
+    company_readers: tuple[Mock, Mock],
+) -> None:
+    """Private facts cannot bypass source redaction through the normalized tables."""
+    sources, models = company_readers
+    payload = sources.snapshot.return_value.model_dump(mode="json")
+    payload["evidence"].append(
+        payload["evidence"][0]
+        | {
+            "evidence_id": "alpha-private",
+            "access": "restricted",
+            "url": None,
+            "assertion": "synthetic-private-attachment",
+        }
+    )
+    payload["metrics"][0].update(
+        value={"kind": "integer", "value": 987654321},
+        evidence_ids=["alpha-private"],
+        reason="synthetic-private-metric-reason",
+    )
+    payload["events"].append(
+        payload["events"][0]
+        | {
+            "event_id": "private-deal",
+            "description": "synthetic-private-deal-details",
+            "evidence_ids": ["alpha-private"],
+        }
+    )
+    payload["relationships"].append(
+        payload["relationships"][0]
+        | {
+            "relationship_id": "private-ownership",
+            "subject_id": "synthetic-private-parent",
+            "evidence_ids": ["alpha-private"],
+        }
+    )
+    sources.snapshot.return_value = CompanySourceSnapshot.model_validate(payload)
+    records = [row.model_dump(mode="json") for row in models.assessments.return_value]
+    records[0]["statements"][0].update(
+        role="evidence_gap",
+        evidence_ids=[],
+        missing_metric_ids=["sdk_downloads_30d_v1"],
+        text="SDK measurement is restricted.",
+    )
+    records[0]["outcomes"][0].update(assessment_status="unavailable")
+    models.assessments.return_value = tuple(
+        CompanyAssessment.model_validate(row) for row in records
+    )
+
+    with _client(company_readers) as client:
+        response = client.get(f"{PREFIX}/alpha")
+        listing = client.get(PREFIX)
+
+    assert response.status_code == listing.status_code == 200
+    assert "synthetic-private-" not in response.text + listing.text
+    assert "987654321" not in response.text + listing.text
+    detail = response.json()
+    assert detail["metrics"][0]["state"] == "restricted"
+    assert detail["metrics"][0]["value"] is None
+    assert detail["metrics"][0]["reason"].startswith("Restricted source")
+    assert len(detail["events"]) == 1
+    assert len(detail["relationships"]) == 1
+    assert detail["family"]["family_id"] == "alpha"
+    coverage = next(row for row in detail["coverage"] if row["family"] == "traction")
+    assert coverage["observed_metric_ids"] == []
+    assert coverage["applicable_metric_ids"] == []
+    assert coverage["restricted_metric_ids"] == ["sdk_downloads_30d_v1"]
+
+
+def test_only_restricted_family_evidence_remains_publicly_unresolved(
+    company_readers: tuple[Mock, Mock],
+) -> None:
+    """A private ownership mapping cannot disclose parent identity or resolve family."""
+    sources, models = company_readers
+    payload = sources.snapshot.return_value.model_dump(mode="json")
+    payload["evidence"].append(
+        payload["evidence"][0]
+        | {
+            "evidence_id": "alpha-private",
+            "access": "restricted",
+            "url": None,
+        }
+    )
+    payload["relationships"][0].update(
+        evidence_ids=["alpha-private"], subject_id="synthetic-private-parent"
+    )
+    sources.snapshot.return_value = CompanySourceSnapshot.model_validate(payload)
+    records = list(models.assessments.return_value)
+    records[0] = CompanyAssessment.model_validate(
+        records[0].model_dump()
+        | {
+            "family_id": None,
+            "family_reason_codes": ["family_not_established_at_cutoff"],
+        }
+    )
+    models.assessments.return_value = tuple(records)
+
+    with _client(company_readers) as client:
+        response = client.get(f"{PREFIX}/alpha")
+
+    assert response.status_code == 200
+    assert response.json()["family"]["family_id"] is None
+    assert response.json()["relationships"] == []
+    assert "synthetic-private-parent" not in response.text
+
+
+def test_stale_observed_metric_can_be_an_assessment_gap(
+    company_readers: tuple[Mock, Mock],
+) -> None:
+    """C2 usability and C1 observed state remain distinct in public responses."""
+    sources, models = company_readers
+    payload = sources.snapshot.return_value.model_dump(mode="json")
+    payload["definitions"][0]["maximum_age_days"] = 1
+    payload["metrics"][0]["window"]["end"] = "2025-01-30T00:00:00Z"
+    sources.snapshot.return_value = CompanySourceSnapshot.model_validate(payload)
+    records = [row.model_dump(mode="json") for row in models.assessments.return_value]
+    records[0]["statements"][0].update(
+        role="evidence_gap",
+        evidence_ids=[],
+        missing_metric_ids=["sdk_downloads_30d_v1"],
+        text="SDK measurement is stale.",
+    )
+    records[0]["outcomes"][0].update(assessment_status="unavailable")
+    models.assessments.return_value = tuple(
+        CompanyAssessment.model_validate(row) for row in records
+    )
+
+    with _client(company_readers) as client:
+        response = client.get(f"{PREFIX}/alpha")
+
+    assert response.status_code == 200
+    assert response.json()["metrics"][0]["state"] == "observed"
+    assert (
+        response.json()["assessment"]["outcomes"][0]["assessment_status"]
+        == "unavailable"
+    )

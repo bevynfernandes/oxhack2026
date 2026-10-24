@@ -298,87 +298,6 @@
         "title": "CompanyAssessment",
         "type": "object"
       },
-      "CompanyCoverage": {
-        "additionalProperties": false,
-        "description": "Frozen metric coverage by family; applicability excludes irrelevant metrics.",
-        "properties": {
-          "applicable_metric_ids": {
-            "items": {
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-              "type": "string"
-            },
-            "title": "Applicable Metric Ids",
-            "type": "array"
-          },
-          "company_id": {
-            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-            "title": "Company Id",
-            "type": "string"
-          },
-          "conflicting_metric_ids": {
-            "items": {
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-              "type": "string"
-            },
-            "title": "Conflicting Metric Ids",
-            "type": "array"
-          },
-          "family": {
-            "enum": [
-              "traction",
-              "commercial",
-              "execution",
-              "market_financing"
-            ],
-            "title": "Family",
-            "type": "string"
-          },
-          "inapplicable_metric_ids": {
-            "items": {
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-              "type": "string"
-            },
-            "title": "Inapplicable Metric Ids",
-            "type": "array"
-          },
-          "missing_metric_ids": {
-            "items": {
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-              "type": "string"
-            },
-            "title": "Missing Metric Ids",
-            "type": "array"
-          },
-          "observed_metric_ids": {
-            "items": {
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-              "type": "string"
-            },
-            "title": "Observed Metric Ids",
-            "type": "array"
-          },
-          "stale_metric_ids": {
-            "items": {
-              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
-              "type": "string"
-            },
-            "title": "Stale Metric Ids",
-            "type": "array"
-          }
-        },
-        "required": [
-          "company_id",
-          "family",
-          "applicable_metric_ids",
-          "observed_metric_ids",
-          "missing_metric_ids",
-          "conflicting_metric_ids",
-          "inapplicable_metric_ids",
-          "stale_metric_ids"
-        ],
-        "title": "CompanyCoverage",
-        "type": "object"
-      },
       "CompanyDetail": {
         "additionalProperties": false,
         "description": "Pre-outcome profile; raw source paths and future labels are absent.",
@@ -391,7 +310,7 @@
           },
           "coverage": {
             "items": {
-              "$ref": "#/components/schemas/CompanyCoverage"
+              "$ref": "#/components/schemas/PublicCompanyCoverage"
             },
             "title": "Coverage",
             "type": "array"
@@ -422,7 +341,7 @@
           },
           "metrics": {
             "items": {
-              "$ref": "#/components/schemas/CompanyMetricObservation"
+              "$ref": "#/components/schemas/CompanyMetric"
             },
             "title": "Metrics",
             "type": "array"
@@ -583,9 +502,9 @@
         "title": "CompanyList",
         "type": "object"
       },
-      "CompanyMetricObservation": {
+      "CompanyMetric": {
         "additionalProperties": false,
-        "description": "One selected metric vintage; missing/conflicting values cannot become zero.",
+        "description": "Source measurement with an explicit restricted state for withheld values.",
         "properties": {
           "available_at": {
             "format": "date-time",
@@ -635,8 +554,6 @@
           "reason": {
             "anyOf": [
               {
-                "maxLength": 4000,
-                "minLength": 1,
                 "type": "string"
               },
               {
@@ -646,26 +563,22 @@
             "title": "Reason"
           },
           "state": {
-            "enum": [
-              "observed",
-              "missing",
-              "not_applicable",
-              "conflicting"
-            ],
-            "title": "State",
-            "type": "string"
-          },
-          "supersedes_id": {
             "anyOf": [
               {
-                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "enum": [
+                  "observed",
+                  "missing",
+                  "not_applicable",
+                  "conflicting"
+                ],
                 "type": "string"
               },
               {
-                "type": "null"
+                "const": "restricted",
+                "type": "string"
               }
             ],
-            "title": "Supersedes Id"
+            "title": "State"
           },
           "value": {
             "anyOf": [
@@ -708,8 +621,6 @@
           }
         },
         "required": [
-          "available_at",
-          "collected_at",
           "observation_id",
           "company_id",
           "metric_id",
@@ -718,9 +629,11 @@
           "value",
           "state",
           "reason",
-          "evidence_ids"
+          "evidence_ids",
+          "available_at",
+          "collected_at"
         ],
-        "title": "CompanyMetricObservation",
+        "title": "CompanyMetric",
         "type": "object"
       },
       "CompanyOutcomeAssessment": {
@@ -1177,7 +1090,7 @@
           },
           "coverage": {
             "items": {
-              "$ref": "#/components/schemas/CompanyCoverage"
+              "$ref": "#/components/schemas/PublicCompanyCoverage"
             },
             "title": "Coverage",
             "type": "array"
@@ -2456,6 +2369,96 @@
           "synthetic"
         ],
         "title": "Provenance",
+        "type": "object"
+      },
+      "PublicCompanyCoverage": {
+        "additionalProperties": false,
+        "description": "Coverage counts public observations and withheld metrics separately.",
+        "properties": {
+          "applicable_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Applicable Metric Ids",
+            "type": "array"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "conflicting_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Conflicting Metric Ids",
+            "type": "array"
+          },
+          "family": {
+            "enum": [
+              "traction",
+              "commercial",
+              "execution",
+              "market_financing"
+            ],
+            "title": "Family",
+            "type": "string"
+          },
+          "inapplicable_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Inapplicable Metric Ids",
+            "type": "array"
+          },
+          "missing_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Missing Metric Ids",
+            "type": "array"
+          },
+          "observed_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Observed Metric Ids",
+            "type": "array"
+          },
+          "restricted_metric_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Restricted Metric Ids",
+            "type": "array"
+          },
+          "stale_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Stale Metric Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_id",
+          "family",
+          "applicable_metric_ids",
+          "observed_metric_ids",
+          "missing_metric_ids",
+          "conflicting_metric_ids",
+          "inapplicable_metric_ids",
+          "stale_metric_ids"
+        ],
+        "title": "PublicCompanyCoverage",
         "type": "object"
       },
       "Ranking": {

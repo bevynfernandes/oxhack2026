@@ -444,31 +444,6 @@ export interface components {
             synthetic: boolean;
         };
         /**
-         * CompanyCoverage
-         * @description Frozen metric coverage by family; applicability excludes irrelevant metrics.
-         */
-        CompanyCoverage: {
-            /** Applicable Metric Ids */
-            applicable_metric_ids: string[];
-            /** Company Id */
-            company_id: string;
-            /** Conflicting Metric Ids */
-            conflicting_metric_ids: string[];
-            /**
-             * Family
-             * @enum {string}
-             */
-            family: "traction" | "commercial" | "execution" | "market_financing";
-            /** Inapplicable Metric Ids */
-            inapplicable_metric_ids: string[];
-            /** Missing Metric Ids */
-            missing_metric_ids: string[];
-            /** Observed Metric Ids */
-            observed_metric_ids: string[];
-            /** Stale Metric Ids */
-            stale_metric_ids: string[];
-        };
-        /**
          * CompanyDetail
          * @description Pre-outcome profile; raw source paths and future labels are absent.
          */
@@ -476,7 +451,7 @@ export interface components {
             assessment: components["schemas"]["CompanyAssessment"];
             company: components["schemas"]["CompanyProfile"];
             /** Coverage */
-            coverage: components["schemas"]["CompanyCoverage"][];
+            coverage: components["schemas"]["PublicCompanyCoverage"][];
             /** Definitions */
             definitions: components["schemas"]["MetricDefinition"][];
             /** Events */
@@ -485,7 +460,7 @@ export interface components {
             evidence: components["schemas"]["CompanySource"][];
             family: components["schemas"]["FamilyResolution"];
             /** Metrics */
-            metrics: components["schemas"]["CompanyMetricObservation"][];
+            metrics: components["schemas"]["CompanyMetric"][];
             publication: components["schemas"]["CompanyPublication"];
             /** Relationships */
             relationships: components["schemas"]["CompanyRelationship"][];
@@ -543,10 +518,10 @@ export interface components {
             publication: components["schemas"]["CompanyPublication"];
         };
         /**
-         * CompanyMetricObservation
-         * @description One selected metric vintage; missing/conflicting values cannot become zero.
+         * CompanyMetric
+         * @description Source measurement with an explicit restricted state for withheld values.
          */
-        CompanyMetricObservation: {
+        CompanyMetric: {
             /**
              * Available At
              * Format: date-time
@@ -569,13 +544,8 @@ export interface components {
             observation_id: string;
             /** Reason */
             reason: string | null;
-            /**
-             * State
-             * @enum {string}
-             */
-            state: "observed" | "missing" | "not_applicable" | "conflicting";
-            /** Supersedes Id */
-            supersedes_id?: string | null;
+            /** State */
+            state: ("observed" | "missing" | "not_applicable" | "conflicting") | "restricted";
             /** Value */
             value: (components["schemas"]["IntegerValue"] | components["schemas"]["DecimalValue"] | components["schemas"]["BooleanValue"]) | null;
             window: components["schemas"]["TimeWindow"] | null;
@@ -799,7 +769,7 @@ export interface components {
             assessment_id: string;
             company: components["schemas"]["CompanyProfile"];
             /** Coverage */
-            coverage: components["schemas"]["CompanyCoverage"][];
+            coverage: components["schemas"]["PublicCompanyCoverage"][];
             /** Main Risk */
             main_risk: string | null;
             /** Outcomes */
@@ -1300,6 +1270,36 @@ export interface components {
             mapping_version: string;
             /** Synthetic */
             synthetic: boolean;
+        };
+        /**
+         * PublicCompanyCoverage
+         * @description Coverage counts public observations and withheld metrics separately.
+         */
+        PublicCompanyCoverage: {
+            /** Applicable Metric Ids */
+            applicable_metric_ids: string[];
+            /** Company Id */
+            company_id: string;
+            /** Conflicting Metric Ids */
+            conflicting_metric_ids: string[];
+            /**
+             * Family
+             * @enum {string}
+             */
+            family: "traction" | "commercial" | "execution" | "market_financing";
+            /** Inapplicable Metric Ids */
+            inapplicable_metric_ids: string[];
+            /** Missing Metric Ids */
+            missing_metric_ids: string[];
+            /** Observed Metric Ids */
+            observed_metric_ids: string[];
+            /**
+             * Restricted Metric Ids
+             * @default []
+             */
+            restricted_metric_ids: string[];
+            /** Stale Metric Ids */
+            stale_metric_ids: string[];
         };
         /**
          * Ranking

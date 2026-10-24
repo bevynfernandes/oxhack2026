@@ -5,11 +5,18 @@ from dataclasses import dataclass
 from typing import Protocol
 
 from oxhack2026.api import company_schemas as s
+from oxhack2026.api.company_mapping import (
+    public_coverage,
+    public_events,
+    public_metrics,
+    public_relationships,
+)
 from oxhack2026.api.repository import RepositoryUnavailable, ResourceNotFound
 from oxhack2026.api.schemas import Health
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.company_assessments import CompanyAssessment
 from oxhack2026.storage.company import CompanySourceReader, metadata, resolve_family
+from oxhack2026.storage.company_assessments import validate_company_assessments
 
 logger = logging.getLogger(__name__)
 
@@ -62,70 +69,27 @@ class _Publication:
         )
 
 
-def _validate_assessments(
+def _require_public_claims(
     source: CompanySourceSnapshot, assessments: tuple[CompanyAssessment, ...]
-) -> dict[str, CompanyAssessment]:
-    rows = {row.company_id: row for row in assessments}
-    if len(rows) != len(assessments) or rows.keys() != {
-        company.company_id for company in source.companies
-    }:
-        message = "Published assessments must cover each source company exactly once"
+) -> None:
+    public = {row.evidence_id for row in source.evidence if row.access == "public"}
+    if any(not set(row.evidence_ids) <= public for row in source.companies):
+        message = "Public company identity requires public supporting evidence"
         raise ValueError(message)
-    evidence = {row.evidence_id: row for row in source.evidence}
     metrics = {row.observation_id: row for row in source.metrics}
     events = {row.event_id: row for row in source.events}
-    missing = {
-        (row.company_id, row.metric_id)
-        for row in source.metrics
-        if row.state in {"missing", "conflicting"}
-    }
-    for assessment in rows.values():
-        family = resolve_family(source, assessment.company_id, source.as_of)
-        if (
-            assessment.source_snapshot_id != source.snapshot_id
-            or assessment.as_of != source.as_of
-            or assessment.synthetic != source.synthetic
-            or assessment.first_recorded_at < source.recorded_at
-            or assessment.family_id != family.family_id
-            or (
-                assessment.family_id is None
-                and set(assessment.family_reason_codes) != set(family.reason_codes)
-            )
-            or (assessment.mode == "prospective" and source.mode != "prospective")
-        ):
-            message = "Assessment and source publication identity/timing disagree"
-            raise ValueError(message)
+    for assessment in assessments:
         for statement in assessment.statements:
-            for keys, table in (
-                (statement.evidence_ids, evidence),
-                (statement.metric_observation_ids, metrics),
-                (statement.event_ids, events),
-            ):
-                if any(
-                    key not in table or table[key].company_id != assessment.company_id
-                    for key in keys
-                ):
-                    message = "Assessment cites unknown or cross-company source facts"
-                    raise ValueError(message)
-            if any(
-                (assessment.company_id, key) not in missing
-                for key in statement.missing_metric_ids
-            ):
-                message = "Assessment gap does not match missing source observations"
+            if statement.role == "evidence_gap":
+                continue
+            support = set(statement.evidence_ids)
+            for key in statement.metric_observation_ids:
+                support.update(metrics[key].evidence_ids)
+            for key in statement.event_ids:
+                support.update(events[key].evidence_ids)
+            if not support <= public:
+                message = "Public assessment facts cannot expose restricted sources"
                 raise ValueError(message)
-            cited = {
-                key
-                for observation_id in statement.metric_observation_ids
-                for key in metrics[observation_id].evidence_ids
-            } | {
-                key
-                for event_id in statement.event_ids
-                for key in events[event_id].evidence_ids
-            }
-            if not cited <= set(statement.evidence_ids):
-                message = "Assessment omits evidence supporting its cited facts"
-                raise ValueError(message)
-    return rows
 
 
 @dataclass(frozen=True)
@@ -155,7 +119,9 @@ class PublishedCompanyRepository:
                 CompanyAssessment.model_validate_json(row.model_dump_json())
                 for row in self.assessments.assessments(snapshot_id)
             )
-            return _Publication(source, _validate_assessments(source, assessments))
+            validate_company_assessments(source, assessments)
+            _require_public_claims(source, assessments)
+            return _Publication(source, {row.company_id: row for row in assessments})
         except (KeyError, OSError, ValueError) as error:
             logger.error(  # noqa: TRY400 - upstream error details may contain secrets
                 "Company publication failed integrity or storage checks"
@@ -218,7 +184,7 @@ class PublishedCompanyRepository:
                     outcomes=assessment.outcomes,
                     supporting_signal=signal,
                     main_risk=risk,
-                    coverage=publication.source.coverage(company.company_id),
+                    coverage=public_coverage(publication.source, company.company_id),
                 )
             )
         return s.CompanyList(publication=publication.public, items=tuple(rows))
@@ -234,16 +200,16 @@ class PublishedCompanyRepository:
             publication=publication.public,
             company=companies[company_id],
             assessment=publication.assessments[company_id],
-            family=resolve_family(source, company_id, source.as_of),
+            family=resolve_family(source, company_id, source.as_of, public_only=True),
             definitions=source.definitions,
-            metrics=tuple(
-                row for row in source.metrics if row.company_id == company_id
-            ),
-            events=tuple(row for row in source.events if row.company_id == company_id),
+            metrics=public_metrics(source, company_id),
+            events=public_events(source, company_id),
             relationships=tuple(
-                row for row in source.relationships if row.company_id == company_id
+                row
+                for row in public_relationships(source)
+                if row.company_id == company_id
             ),
-            coverage=source.coverage(company_id),
+            coverage=public_coverage(source, company_id),
             evidence=tuple(
                 s.public_source(row)
                 for row in source.evidence
