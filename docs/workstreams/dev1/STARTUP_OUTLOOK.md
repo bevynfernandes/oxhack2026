@@ -41,9 +41,24 @@ expected applicable definitions, observed/missing/conflicting counts, last succe
 and reasons by family. Exclude inapplicable metrics from denominators; freshness
 is computed at the assessment cutoff using versioned policy, not a moving clock.
 
-Reader proposal: `manifest(snapshot_id)`, `companies(snapshot_id)`,
-`company(snapshot_id, company_id)`, `metrics(snapshot_id, company_id)`,
-`events(snapshot_id, company_id)` and evidence lookup. All reads are exact-version;
+Reader proposal (including Dev 3's #23 review):
+
+- `snapshots()` enumerates published immutable IDs with as-of/recorded dates,
+  synthetic/reconstruction status and public-safe summaries; it does not guess a
+  latest snapshot or disclose artifact locations.
+- `manifest(snapshot_id)`, `companies(snapshot_id)` and
+  `company(snapshot_id, company_id)` resolve exact published identities.
+- `definitions(snapshot_id)` returns the metric definitions pinned by that
+  snapshot; `metrics(snapshot_id, company_id)` returns its observations.
+- `events(snapshot_id, company_id)`, `evidence(snapshot_id, evidence_id)`,
+  `relationships(snapshot_id, company_id)` and `coverage(snapshot_id, company_id)`
+  expose the corresponding frozen records, including the applicable-definition
+  set and explicit unknown/inapplicable/conflicting states.
+- `family_at(snapshot_id, company_id, assessment_at)` resolves dated family
+  membership from evidence in that snapshot, returning unknown/conflict when it
+  cannot be established. It never applies today's parent to older assessments.
+
+All reads are exact-version;
 selection for historical features additionally applies availability/collection
 policy and preserves the reconstruction label. A newer snapshot never repairs a
 historical query silently. Reuse atomic publication and integrity checks.
@@ -126,3 +141,15 @@ claims; adding selected famous shutdowns does not solve survivorship bias.
 - Integration of separately published Dev 2 assessments with Dev 3 company views.
 - Separate accounting for evidence-product completion, label coverage and model
   validation. Older download progress is not revised-product completion.
+
+## Concrete first profile candidate
+
+LangChain already has a verified npm/repository mapping in the current catalogue.
+Combine its dated SDK download windows, public `langchain-ai/langchainjs` release
+records (labelled SDK execution activity), and the company's
+[20 October 2025 financing announcement](https://www.langchain.com/blog/series-b).
+That primary announcement reports a $125 million raise; record it as a dated
+company-reported financing event, without asserting that it is the latest round
+or that funding establishes runway or profitability. Cash flow, retention and
+comparable paying-customer histories remain unknown without further evidence.
+This is a proposed real-source profile, not a normalized/published company bundle.
