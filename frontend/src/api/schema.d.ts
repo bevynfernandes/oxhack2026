@@ -24,6 +24,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/company-snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Company Snapshots
+         * @description Enumerate explicit verified company assessment publications.
+         */
+        get: operations["company_snapshots"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company-snapshots/{snapshot_id}/companies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Companies
+         * @description Read the full name-ordered company table for an exact publication.
+         */
+        get: operations["companies"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/company-snapshots/{snapshot_id}/companies/{company_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Company
+         * @description Read a pre-outcome profile with public-safe sources and explicit unknowns.
+         */
+        get: operations["company"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/cutoffs": {
         parameters: {
             query?: never;
@@ -209,6 +269,53 @@ export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
         /**
+         * AssessmentStatement
+         * @description A deterministic fact, risk or explicitly identified evidence gap.
+         *
+         *     Attributes:
+         *         statement_id: Immutable identifier within one assessment.
+         *         role: Observation, supported risk, or absence of applicable evidence.
+         *         text: Plain source-backed description, not an unvalidated likelihood.
+         *         evidence_ids: C1 evidence supporting a fact/risk; empty for a pure gap.
+         *         metric_observation_ids: Exact C1 observations used in the statement.
+         *         event_ids: Exact C1 events used in the statement.
+         *         missing_metric_ids: Definitions whose evidence is missing or conflicting.
+         *
+         *     Raises:
+         *         ValueError: A fact/risk lacks evidence, or a gap lacks its missing definition.
+         */
+        AssessmentStatement: {
+            /**
+             * Event Ids
+             * @default []
+             */
+            event_ids: string[];
+            /**
+             * Evidence Ids
+             * @default []
+             */
+            evidence_ids: string[];
+            /**
+             * Metric Observation Ids
+             * @default []
+             */
+            metric_observation_ids: string[];
+            /**
+             * Missing Metric Ids
+             * @default []
+             */
+            missing_metric_ids: string[];
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "observation" | "risk" | "evidence_gap";
+            /** Statement Id */
+            statement_id: string;
+            /** Text */
+            text: string;
+        };
+        /**
          * Baseline
          * @description A saved comparator forecast, without any future outcome values.
          */
@@ -217,6 +324,19 @@ export interface components {
             model_id: string;
             /** Predicted Downloads */
             predicted_downloads: number;
+        };
+        /**
+         * BooleanValue
+         * @description Explicit observed Boolean; absence is represented by observation state.
+         */
+        BooleanValue: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "boolean";
+            /** Value */
+            value: boolean;
         };
         /**
          * Catalog
@@ -250,6 +370,412 @@ export interface components {
             synthetic: boolean;
             /** Tools */
             tools: components["schemas"]["Tool"][];
+        };
+        /**
+         * CompanyAssessment
+         * @description Immutable company outlook without future labels or an invented success score.
+         *
+         *     Attributes:
+         *         schema_version: Evidence-assessment contract version.
+         *         assessment_id: Immutable assessment identity.
+         *         company_id: C1 company identity, reusing verified organization identity.
+         *         family_id: Effective family at as_of, or null for unresolved ownership.
+         *         family_reason_codes: Explicit reasons when ownership is unknown/conflicting.
+         *         source_snapshot_id: Exact verified C1 source publication consumed.
+         *         policy_version: Deterministic evidence interpretation policy.
+         *         as_of: UTC evidence/measurement cutoff for this assessment.
+         *         first_recorded_at: Actual time the immutable assessment was first recorded.
+         *         mode: Historical reconstruction or genuinely pre-cutoff prospective record.
+         *         outcomes: Exactly the three separate outcome sections, including unknowns.
+         *         statements: Source-linked facts, risks and missing-definition explanations.
+         *         synthetic: Must match the source publication; fixtures never become real data.
+         *         limitations: Publication/cohort restrictions retained for the consumer.
+         *
+         *     Raises:
+         *         ValueError: Sections, references, dates or prospective provenance conflict.
+         */
+        CompanyAssessment: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Assessment Id */
+            assessment_id: string;
+            /** Company Id */
+            company_id: string;
+            /** Family Id */
+            family_id: string | null;
+            /**
+             * Family Reason Codes
+             * @default []
+             */
+            family_reason_codes: string[];
+            /**
+             * First Recorded At
+             * Format: date-time
+             */
+            first_recorded_at: string;
+            /**
+             * Limitations
+             * @default []
+             */
+            limitations: string[];
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "reconstructed" | "prospective";
+            /** Outcomes */
+            outcomes: components["schemas"]["CompanyOutcomeAssessment"][];
+            /** Policy Version */
+            policy_version: string;
+            /**
+             * Schema Version
+             * @default company-assessments-v1
+             * @constant
+             */
+            schema_version: "company-assessments-v1";
+            /** Source Snapshot Id */
+            source_snapshot_id: string;
+            /** Statements */
+            statements: components["schemas"]["AssessmentStatement"][];
+            /** Synthetic */
+            synthetic: boolean;
+        };
+        /**
+         * CompanyDetail
+         * @description Pre-outcome profile; raw source paths and future labels are absent.
+         */
+        CompanyDetail: {
+            assessment: components["schemas"]["CompanyAssessment"];
+            company: components["schemas"]["CompanyProfile"];
+            /** Coverage */
+            coverage: components["schemas"]["PublicCompanyCoverage"][];
+            /** Definitions */
+            definitions: components["schemas"]["MetricDefinition"][];
+            /** Events */
+            events: components["schemas"]["CompanyEvent"][];
+            /** Evidence */
+            evidence: components["schemas"]["CompanySource"][];
+            family: components["schemas"]["FamilyResolution"];
+            /** Metrics */
+            metrics: components["schemas"]["CompanyMetric"][];
+            publication: components["schemas"]["CompanyPublication"];
+            /** Relationships */
+            relationships: components["schemas"]["CompanyRelationship"][];
+        };
+        /**
+         * CompanyEvent
+         * @description Dated reported occurrence; company shutdown differs from product retirement.
+         */
+        CompanyEvent: {
+            /**
+             * Available At
+             * Format: date-time
+             */
+            available_at: string;
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Company Id */
+            company_id: string;
+            /**
+             * Date Precision
+             * @enum {string}
+             */
+            date_precision: "day" | "unknown";
+            /** Description */
+            description: string;
+            /** Event Id */
+            event_id: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "funding" | "acquisition" | "company_shutdown" | "product_retirement" | "release" | "ownership_change";
+            /** Occurred On */
+            occurred_on: string | null;
+            /**
+             * Stage
+             * @enum {string}
+             */
+            stage: "announced" | "completed" | "reported";
+            /** Supersedes Id */
+            supersedes_id?: string | null;
+        };
+        /**
+         * CompanyList
+         * @description Name-ordered companies in one immutable publication.
+         */
+        CompanyList: {
+            /** Items */
+            items: components["schemas"]["CompanySummary"][];
+            publication: components["schemas"]["CompanyPublication"];
+        };
+        /**
+         * CompanyMetric
+         * @description Source measurement with an explicit restricted state for withheld values.
+         */
+        CompanyMetric: {
+            /**
+             * Available At
+             * Format: date-time
+             */
+            available_at: string;
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Company Id */
+            company_id: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Measured At */
+            measured_at: string | null;
+            /** Metric Id */
+            metric_id: string;
+            /** Observation Id */
+            observation_id: string;
+            /** Reason */
+            reason: string | null;
+            /** State */
+            state: ("observed" | "missing" | "not_applicable" | "conflicting") | "restricted";
+            /** Value */
+            value: (components["schemas"]["IntegerValue"] | components["schemas"]["DecimalValue"] | components["schemas"]["BooleanValue"]) | null;
+            window: components["schemas"]["TimeWindow"] | null;
+        };
+        /**
+         * CompanyOutcomeAssessment
+         * @description One prospective question explained from currently available evidence.
+         *
+         *     Attributes:
+         *         outcome_id: Separate versioned company outcome, never a composite score.
+         *         horizon_end: Exact calendar horizon derived from the assessment cutoff.
+         *         assessment_status: Evidence-only facts, or unavailable relevant evidence.
+         *         summary: Short explanation of facts/gaps without unsupported probability.
+         *         statement_ids: Supporting/risk/gap statements in the containing assessment.
+         *         reason_codes: Explicit limitations or reasons relevant evidence is absent.
+         *         probability: Always null in this evidence-only contract version. A later
+         *             validated prediction contract requires its own model/evaluation gate.
+         *
+         *     Raises:
+         *         ValueError: An unavailable outcome lacks reasons, or facts lack statements.
+         */
+        CompanyOutcomeAssessment: {
+            /**
+             * Assessment Status
+             * @enum {string}
+             */
+            assessment_status: "evidence_only" | "unavailable";
+            /**
+             * Horizon End
+             * Format: date-time
+             */
+            horizon_end: string;
+            /**
+             * Outcome Id
+             * @enum {string}
+             */
+            outcome_id: "operating_growth_24m_v1" | "commercial_viability_12m_v1" | "financing_or_acquisition_24m_v1";
+            /** Probability */
+            probability?: null;
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /**
+             * Statement Ids
+             * @default []
+             */
+            statement_ids: string[];
+            /** Summary */
+            summary: string;
+        };
+        /**
+         * CompanyProfile
+         * @description Snapshot-specific company identity/context; unknown context remains null.
+         */
+        CompanyProfile: {
+            /** Business Model */
+            business_model: string | null;
+            /** Company Id */
+            company_id: string;
+            /**
+             * Context As Of
+             * Format: date-time
+             */
+            context_as_of: string;
+            /** Display Name */
+            display_name: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Segment */
+            segment: string;
+            /** Stage */
+            stage: string | null;
+            /** Website Url */
+            website_url: string;
+        };
+        /**
+         * CompanyPublication
+         * @description An exact source snapshot with a complete published assessment set.
+         */
+        CompanyPublication: {
+            /** Company Count */
+            company_count: number;
+            /**
+             * Schema Version
+             * @default company-api-v1
+             * @constant
+             */
+            schema_version: "company-api-v1";
+            source: components["schemas"]["CompanySnapshotMetadata"];
+        };
+        /**
+         * CompanyPublications
+         * @description Explicit publication choices; an empty list never loads examples.
+         */
+        CompanyPublications: {
+            /** Items */
+            items: components["schemas"]["CompanyPublication"][];
+        };
+        /**
+         * CompanyRelationship
+         * @description Evidence-backed effective mapping, including explicit family membership.
+         *
+         *     Family targets are opaque grouping IDs, not an implicit current parent.
+         *     A self-family assertion needs evidence just like any other membership.
+         */
+        CompanyRelationship: {
+            /** Company Id */
+            company_id: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /** Relationship Id */
+            relationship_id: string;
+            /** Subject Id */
+            subject_id: string;
+            /**
+             * Subject Kind
+             * @enum {string}
+             */
+            subject_kind: "legal_entity" | "tool" | "package" | "repository" | "family";
+            /**
+             * Valid From
+             * Format: date-time
+             */
+            valid_from: string;
+            /** Valid To */
+            valid_to: string | null;
+        };
+        /**
+         * CompanySnapshotMetadata
+         * @description Immutable source publication identity and actual production provenance.
+         */
+        CompanySnapshotMetadata: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Code Revision */
+            code_revision: string;
+            /** Cohort Version */
+            cohort_version: string;
+            /** Configuration Sha256 */
+            configuration_sha256: string;
+            /** Limitations */
+            limitations: string[];
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "contemporary" | "historical_reconstruction" | "prospective";
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /**
+             * Schema Version
+             * @default company-source-v1
+             * @constant
+             */
+            schema_version: "company-source-v1";
+            /** Snapshot Id */
+            snapshot_id: string;
+            /** Synthetic */
+            synthetic: boolean;
+        };
+        /**
+         * CompanySource
+         * @description Public provenance without raw locations, locators or restricted contents.
+         */
+        CompanySource: {
+            /**
+             * Access
+             * @enum {string}
+             */
+            access: "public" | "restricted";
+            /** Assertion */
+            assertion: string | null;
+            /**
+             * Availability Basis
+             * @enum {string}
+             */
+            availability_basis: "dated_publication" | "first_observed";
+            /**
+             * Available At
+             * Format: date-time
+             */
+            available_at: string;
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Evidence Id */
+            evidence_id: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "registry_record" | "company_reported" | "platform_observed" | "user_supplied";
+            /** Provider */
+            provider: string;
+            /** Published At */
+            published_at: string | null;
+            /**
+             * Review State
+             * @enum {string}
+             */
+            review_state: "unreviewed" | "verified" | "disputed";
+            /** Url */
+            url: string | null;
+        };
+        /**
+         * CompanySummary
+         * @description Company context, separate outcomes and published evidence for a table row.
+         */
+        CompanySummary: {
+            /** Assessment Id */
+            assessment_id: string;
+            company: components["schemas"]["CompanyProfile"];
+            /** Coverage */
+            coverage: components["schemas"]["PublicCompanyCoverage"][];
+            /** Main Risk */
+            main_risk: string | null;
+            /** Outcomes */
+            outcomes: components["schemas"]["CompanyOutcomeAssessment"][];
+            /** Supporting Signal */
+            supporting_signal: string | null;
         };
         /**
          * Cutoff
@@ -300,6 +826,19 @@ export interface components {
             sources: components["schemas"]["SourceHealth"][];
             /** Synthetic */
             synthetic: boolean;
+        };
+        /**
+         * DecimalValue
+         * @description Exact finite decimal serialized as a string; binary floats are rejected.
+         */
+        DecimalValue: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "decimal";
+            /** Value */
+            value: string;
         };
         /**
          * Error
@@ -399,6 +938,25 @@ export interface components {
             reasons: string[];
             /** Tool Id */
             tool_id: string;
+        };
+        /**
+         * FamilyResolution
+         * @description Effective family at a cutoff, or explicit unresolved/conflicting ownership.
+         */
+        FamilyResolution: {
+            /**
+             * Assessment At
+             * Format: date-time
+             */
+            assessment_at: string;
+            /** Company Id */
+            company_id: string;
+            /** Family Id */
+            family_id: string | null;
+            /** Reason Codes */
+            reason_codes: string[];
+            /** Relationship Ids */
+            relationship_ids: string[];
         };
         /**
          * Forecast
@@ -580,6 +1138,19 @@ export interface components {
             window: components["schemas"]["Window"];
         };
         /**
+         * IntegerValue
+         * @description Exact count, excluding Boolean and coercible string/float inputs.
+         */
+        IntegerValue: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "integer";
+            /** Value */
+            value: number;
+        };
+        /**
          * Interval
          * @description An interval already approved by the model owner's serving gate.
          */
@@ -623,6 +1194,41 @@ export interface components {
             value: number | null;
         };
         /**
+         * MetricDefinition
+         * @description Versioned measurement meaning; source freshness is not predictive confidence.
+         */
+        MetricDefinition: {
+            /** Applicability */
+            applicability: string;
+            /** Currency */
+            currency?: string | null;
+            /** Definition */
+            definition: string;
+            /**
+             * Family
+             * @enum {string}
+             */
+            family: "traction" | "commercial" | "execution" | "market_financing";
+            /** Label */
+            label: string;
+            /** Maximum Age Days */
+            maximum_age_days: number;
+            /** Metric Id */
+            metric_id: string;
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "company" | "product" | "repository";
+            /** Unit */
+            unit: string;
+            /**
+             * Value Kind
+             * @enum {string}
+             */
+            value_kind: "integer" | "decimal" | "boolean";
+        };
+        /**
          * Outcome
          * @description Mature truth and saved errors, available only in a reveal response.
          */
@@ -664,6 +1270,36 @@ export interface components {
             mapping_version: string;
             /** Synthetic */
             synthetic: boolean;
+        };
+        /**
+         * PublicCompanyCoverage
+         * @description Coverage counts public observations and withheld metrics separately.
+         */
+        PublicCompanyCoverage: {
+            /** Applicable Metric Ids */
+            applicable_metric_ids: string[];
+            /** Company Id */
+            company_id: string;
+            /** Conflicting Metric Ids */
+            conflicting_metric_ids: string[];
+            /**
+             * Family
+             * @enum {string}
+             */
+            family: "traction" | "commercial" | "execution" | "market_financing";
+            /** Inapplicable Metric Ids */
+            inapplicable_metric_ids: string[];
+            /** Missing Metric Ids */
+            missing_metric_ids: string[];
+            /** Observed Metric Ids */
+            observed_metric_ids: string[];
+            /**
+             * Restricted Metric Ids
+             * @default []
+             */
+            restricted_metric_ids: string[];
+            /** Stale Metric Ids */
+            stale_metric_ids: string[];
         };
         /**
          * Ranking
@@ -788,6 +1424,22 @@ export interface components {
             source: string;
         };
         /**
+         * TimeWindow
+         * @description A nonempty half-open interval [start, end), always in UTC.
+         */
+        TimeWindow: {
+            /**
+             * End
+             * Format: date-time
+             */
+            end: string;
+            /**
+             * Start
+             * Format: date-time
+             */
+            start: string;
+        };
+        /**
          * Tool
          * @description Verified tool-to-package and organization mapping in one ecosystem.
          */
@@ -867,6 +1519,179 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Catalog"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    company_snapshots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyPublications"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    companies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyList"];
+                };
+            };
+            /** @description Not Found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+            /** @description Service Unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    company: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                snapshot_id: string;
+                company_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanyDetail"];
                 };
             };
             /** @description Not Found */

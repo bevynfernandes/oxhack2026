@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, Query, Response
 from fastapi.exceptions import RequestValidationError
 
 from oxhack2026.api import schemas as s
+from oxhack2026.api.company_repository import CompanyRepository
 from oxhack2026.api.repository import (
     ImmatureOutcome,
     PublishedRepository,
@@ -21,6 +22,14 @@ def get_repository() -> PublishedRepository:
 
 
 repo_dependency = Depends(get_repository)
+
+
+def get_readiness_repository() -> PublishedRepository | CompanyRepository:
+    """Raise RepositoryUnavailable until the factory selects its readiness adapter."""
+    raise RepositoryUnavailable
+
+
+readiness_dependency = Depends(get_readiness_repository)
 errors: dict[int | str, dict[str, object]] = {
     code: {"model": s.Error} for code in (404, 409, 422, 503)
 }
@@ -70,7 +79,8 @@ def liveness() -> s.Health:
     operation_id="readiness",
 )
 def readiness(
-    response: Response, repo: PublishedRepository = repo_dependency
+    response: Response,
+    repo: PublishedRepository | CompanyRepository = readiness_dependency,
 ) -> s.Health:
     """Return required repository readiness; use HTTP 503 when unavailable."""
     health = repo.readiness()
