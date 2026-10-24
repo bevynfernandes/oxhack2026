@@ -1,0 +1,103 @@
+# Research-job/report contract proposal for #46
+
+Status: proposed for agreement with Ivan and Daniyal before implementation.
+This is additive; existing v1 assessment IDs, routes and saved links keep their
+meaning. No model training or new target semantics are approved by this proposal.
+
+## First runnable slice
+
+Research a company already identified in an explicitly selected C1/C2 publication.
+The user confirms its displayed name/domain before starting. The server verifies
+that the submitted domain matches the saved company identity. Unmatched names or
+domains return `identity_confirmation_required`; they do not inherit another
+company's report. Arbitrary-domain entity resolution is a later bounded adapter,
+not an inference from an HN keyword match.
+
+Collect only bounded public-source evidence from fixed provider endpoints. First
+collector: up to 100 HN stories linking the exact confirmed domain in a declared
+30-day window. A multi-page result remains partial/unavailable rather than a
+complete count. No arbitrary user URL fetch, hosted AI call or model fitting.
+Existing published metrics are explicitly saved evidence, with original dates;
+they are not presented as newly researched facts. Unavailable groups stay visible.
+
+## Additive routes
+
+| Method and route | Meaning |
+| --- | --- |
+| `POST /api/v1/research-jobs` | Validate confirmed identity and enqueue a bounded refresh; return 202 and actual job state |
+| `GET /api/v1/research-jobs/{job_id}` | Poll durable state and per-source results; never trigger work |
+| `GET /api/v1/research-reports/{report_id}` | Read exact immutable report bytes; no vendor or inference calls |
+
+Request fields: `assessment_publication_id`, `company_id`, `domain`,
+`identity_confirmed: true`. The first slice uses the existing company selection
+to remove ambiguity; the UI may accept name/domain to find that saved identity.
+Only a worker performs collection. Missing worker/storage configuration returns
+503 instead of an artificial queued state. An operator controls bounded worker
+concurrency. Jobs survive restart; interrupted running jobs are explicitly
+recoverable/failed, never silently marked completed. Refresh creates a new ID.
+
+Job fields: `schema_version`, `job_id`, `state`, confirmed identity,
+`requested_at`, `started_at`, `finished_at`, `sources`, `report_id`, `reason_codes`.
+States: `queued`, `running`, `partial`, `completed`, `failed`.
+Per-source states: `pending`, `running`, `succeeded`, `partial`, `failed`.
+No guessed percent-complete or fabricated duration. A partial job has at least
+one useful traceable result and reports exactly what failed or was truncated.
+No source result means failed; successful saved-report lookup alone is not fresh
+research. Invalid identity is 409; unknown IDs 404; invalid inputs 422.
+
+## Immutable report
+
+Fields: `schema_version`, `report_id`, `job_id`, `company`, `researched_at`,
+`source_publication_id`, `assessment_publication_id`, `specialists`, `overall`,
+`data_version`, `model_version`, `limitations`.
+
+The source publication references exact C1 facts and raw capture hashes. The old
+assessment publication is labelled saved context, not recomputed after refresh.
+Report/public projections withhold raw object locations, restricted contents and
+private derived facts. Public evidence references retain actual availability and
+collection time; retrospective collection does not become historical knowledge.
+
+Exactly five specialist IDs, in display order:
+
+1. `adoption_retention`
+2. `attention_sentiment`
+3. `financial_health`
+4. `industry_competition`
+5. `team_execution`
+
+Dev 2 owns `oxhack2026.models.startup_outlook`; the backend imports that shared
+payload rather than introducing a competing model policy. The field names below
+are a proposal pending the exact published model payload.
+
+Each section carries `data_status`, `model_status`, `metric_ids`, `evidence_ids`,
+`prediction`, `reason_codes`, and sourced explanatory statements.
+`data_status`: `available`, `partial`, `insufficient_data`, `not_applicable`.
+`model_status`: `model_not_trained`, `validation_failed`, `validated`.
+These states are independent: observed data does not imply a trained model.
+
+Until Daniyal freezes feasible target/model contracts, `prediction` is null with
+`model_not_trained`. A later non-null prediction must name the target version,
+endpoint/horizon, fitted artifact, feature schema, training snapshot, split and
+validation versions. No placeholder number or compatibility alias for v1 targets.
+
+`overall` contains a null `value`, `model_status: model_not_trained`, and explicit
+reasons (`no_approved_trained_artifacts`, `utility_mapping_not_frozen`). Missing
+components are not zero and are not reweighted. No bubble score or success badge.
+Model/data versions remain independently nullable with reasons. Backtesting is
+unavailable until reproducible evaluation artifacts exist.
+
+## Acceptance for this slice
+
+- One real confirmed company is researched through the API and UI.
+- Job state comes from actual durable transitions, including partial/provider
+  failure and restart behavior; GET requests never run the collector.
+- Raw successful source bytes are retained in existing artifact storage, with
+  actual timestamps; source/report versions are immutable.
+- All five groups and independent data/model status render with null numerical
+  predictions/outlook. Existing v1 saved links still load the exact old bytes.
+- Mocked provider units cover identity mismatch, truncated results, exact domain
+  matching, source errors, recovery and privacy. Opt-in real API/browser checks
+  cover source inspection, mobile and keyboard behavior.
+
+Open agreement: approve the known-company first slice and exact field/state names,
+or supply a narrower alternative before either backend or UI implements them.

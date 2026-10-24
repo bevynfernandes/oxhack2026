@@ -1,0 +1,481 @@
+{
+  "schema_version": "startup-training-readiness-audit-v1",
+  "audit_date": "2026-10-24",
+  "owner": "Bevyn",
+  "issue": 46,
+  "parser_version": "bounded-domain-join-audit-v1",
+  "training_performed": false,
+  "overall_training_gate": "fail",
+  "raw_cache_directory": ".cache/startup-data-audit-bevyn-20261024",
+  "sources": [
+    {
+      "name": "form-d-2024q1.zip",
+      "url": "https://www.sec.gov/files/dera/data/form-d/2024q1_d.zip",
+      "status": 403,
+      "collected_at": "2026-10-24T16:49:14.775021+00:00",
+      "sha256": "f298ca23b476e2bafda8cd0664dfddf832b1a1382614f5a33e92381c9bc80c77",
+      "byte_size": 1924,
+      "location": null
+    },
+    {
+      "name": "yc-w20.json",
+      "url": "https://raw.githubusercontent.com/yc-oss/api/d7ecae893271b38e6f4d74ff550cd2488d9b7305/batches/winter-2020.json",
+      "status": 200,
+      "collected_at": "2026-10-24T16:49:15.039918+00:00",
+      "sha256": "513ee3fc200dad3f1c8077ba5bc2fd51002b09715266fadff33b4eff1e957825",
+      "byte_size": 381440,
+      "location": null
+    },
+    {
+      "name": "tranco-20240101.json",
+      "url": "https://tranco-list.eu/api/lists/date/20240101",
+      "status": 200,
+      "collected_at": "2026-10-24T16:49:14.929135+00:00",
+      "sha256": "ea93cb5ae953460a14c092ad41cbb6853a0d3371cacffca2c0d72d00baaa987d",
+      "byte_size": 419,
+      "location": null
+    },
+    {
+      "name": "posthog-story.md",
+      "url": "https://raw.githubusercontent.com/PostHog/posthog.com/master/contents/handbook/story.md",
+      "status": 200,
+      "collected_at": "2026-10-24T16:49:14.966049+00:00",
+      "sha256": "c309d07b6daa16ade7e9445c1357d016cf9ed32f823627632fff9970e9500e4f",
+      "byte_size": 17005,
+      "location": null
+    },
+    {
+      "name": "datree-readme.md",
+      "url": "https://raw.githubusercontent.com/datreeio/datree/main/README.md",
+      "status": 200,
+      "collected_at": "2026-10-24T16:49:15.074029+00:00",
+      "sha256": "ea9c0199135271da3752c43c1afffd2b84d5f7855ab2d39694f42b5d6c67202c",
+      "byte_size": 2788,
+      "location": null
+    },
+    {
+      "name": "tranco-V929N.csv",
+      "url": "https://tranco-list.eu/download/V929N/1000000",
+      "status": 200,
+      "collected_at": "2026-10-24T16:50:07.969549+00:00",
+      "sha256": "2d289cedda26ab7aa49c5f815b3ac184d942c20a3bbffa1baa237280c0b2afdb",
+      "byte_size": 22832396
+    },
+    {
+      "name": "tranco-20211231.json",
+      "url": "https://tranco-list.eu/api/lists/date/20211231",
+      "status": 200,
+      "collected_at": "2026-10-24T16:51:17.225741+00:00",
+      "sha256": "8fea68c6c80f1d00bdfd7e4339f851ea11d2c66c9336e850a317e596ce06b2b6",
+      "byte_size": 394
+    },
+    {
+      "name": "tranco-origin-20211231.csv",
+      "url": "https://tranco-list.eu/download/V7NN/1000000",
+      "status": 200,
+      "collected_at": "2026-10-24T16:51:23.262844+00:00",
+      "sha256": "4220446b3cab51346d7e41d617340b073102684545de435144c4172b9aa42ebf",
+      "byte_size": 23274012
+    },
+    {
+      "name": "sec-transferred-2024q1.zip",
+      "url": "https://www.sec.gov/files/structureddata/data/form-d-data-sets/2024q1_d.zip",
+      "status": 200,
+      "collected_at": "2026-10-24T16:43:25.451834+00:00",
+      "sha256": "c8101d66b5c1070f249c2b7a26500e48a1dd490e70b4b18bbcf5b836948ebe3e",
+      "byte_size": 3428140,
+      "transfer": "authenticated_private_draft_release_data-startup-audit-20261024-v1",
+      "external_sha256_verified": true
+    }
+  ],
+  "attention_captures": {
+    "count": 59,
+    "all_http_200": true,
+    "manifest_sha256": "ae173adeaaee3f66e322ccf4d04e6a914f0de33d56899e988b992acba857b9da",
+    "captured_at_min": "2026-10-24T16:50:23.669714+00:00",
+    "captured_at_max": "2026-10-24T16:50:30.871457+00:00"
+  },
+  "cohort": {
+    "source_commit": "d7ecae893271b38e6f4d74ff550cd2488d9b7305",
+    "discovered": 229,
+    "selected": 59,
+    "selection_rule": "industry == B2B AND (SaaS in tags OR subindustry in {B2B -> Analytics, B2B -> Productivity, B2B -> Engineering, Product and Design}); no status filter",
+    "approval": "provisional_contemporary_discovery_only",
+    "origin": "2022-01-01T00:00:00Z",
+    "historically_verified_domains": 0,
+    "historically_verified_legal_entities": 0,
+    "historically_verified_families": 0,
+    "status_counts": {
+      "Active": 26,
+      "Inactive": 19,
+      "Acquired": 14
+    },
+    "statuses_are_labels": false
+  },
+  "groups": [
+    {
+      "group_id": "adoption_retention",
+      "data_gate": "conditional",
+      "training_gate": "fail",
+      "sources": [
+        "tranco-origin-20211231.csv"
+      ],
+      "fields": [
+        {
+          "name": "tranco_rank",
+          "type": "int64|null",
+          "unit": "ordinal_domain_popularity",
+          "observation_window": [
+            "2021-12-02",
+            "2021-12-31"
+          ],
+          "first_available_at": "2021-12-31T22:00:02.685016",
+          "timestamp_timezone_status": "provider_metadata_timezone_unspecified",
+          "measurement_type": "reach_proxy_not_customers_or_retention"
+        }
+      ],
+      "matched": 11,
+      "unmatched": 48,
+      "blockers": [
+        "historical_domain_identity_unverified",
+        "no_customer_or_retention_panel",
+        "no_approved_growth_or_survival_labels"
+      ]
+    },
+    {
+      "group_id": "attention_sentiment",
+      "data_gate": "conditional",
+      "training_gate": "fail",
+      "sources": [
+        "attention-manifest.json"
+      ],
+      "fields": [
+        {
+          "name": "exact_domain_story_count",
+          "type": "uint32",
+          "unit": "matching_HN_story_links",
+          "observation_window": [
+            "2021-01-01T00:00:00Z",
+            "2022-01-01T00:00:00Z"
+          ],
+          "first_available_at": "story.created_at_i is publication claim; actual capture recorded separately",
+          "excluded_fields": [
+            "points",
+            "num_comments",
+            "current_author_profile"
+          ],
+          "measurement_type": "domain_link_attention_not_broad_sentiment"
+        }
+      ],
+      "query_complete": 59,
+      "nonzero": 12,
+      "zero_retrieved_matches": 47,
+      "blockers": [
+        "historical_domain_identity_unverified",
+        "no_independent_platform_coverage",
+        "edited_or_deleted_URL_survivorship",
+        "no_approved_endpoint_labels"
+      ]
+    },
+    {
+      "group_id": "financial_health",
+      "data_gate": "fail",
+      "training_gate": "fail",
+      "sources": [
+        "sec-transferred-2024q1.zip",
+        "posthog-story.md"
+      ],
+      "fields": [
+        {
+          "name": "ACCESSIONNUMBER",
+          "type": "string",
+          "unit": "filing_identifier"
+        },
+        {
+          "name": "CIK",
+          "type": "string",
+          "unit": "issuer_identifier"
+        },
+        {
+          "name": "ENTITYNAME",
+          "type": "string",
+          "unit": "legal_name"
+        },
+        {
+          "name": "FILING_DATE",
+          "type": "date",
+          "unit": "availability_day_not_sale_day"
+        },
+        {
+          "name": "ISAMENDMENT",
+          "type": "boolean",
+          "unit": "amendment_flag"
+        },
+        {
+          "name": "PREVIOUSACCESSIONNUMBER",
+          "type": "string|null",
+          "unit": "previous_filing_identifier"
+        },
+        {
+          "name": "TOTALAMOUNTSOLD",
+          "type": "decimal",
+          "unit": "USD_offering_total_not_cash_balance"
+        },
+        {
+          "name": "REVENUERANGE",
+          "type": "string|null",
+          "unit": "revenue_band_not_ARR"
+        }
+      ],
+      "field_status": "archive_headers_and_conservative_name_candidate_join_verified",
+      "matched": 0,
+      "unmatched": 59,
+      "blockers": [
+        "no_verified_CIK_domain_entity_matches",
+        "no_pre_origin_filing_join",
+        "no_comparable_cashflow_or_retention_panel"
+      ],
+      "candidate_company_matches": 0,
+      "without_name_candidate": 59,
+      "matching_status": "display_and_former_name_candidate_search_only_no_verified_legal_mapping",
+      "archive_statistics": {
+        "primary_nonfund_filing_rows": 5542,
+        "distinct_issuers": 4886,
+        "amendments": 1171,
+        "revenue_decline_to_disclose": 4435,
+        "no_revenues": 576
+      }
+    },
+    {
+      "group_id": "industry_competition",
+      "data_gate": "fail",
+      "training_gate": "fail",
+      "sources": [
+        "yc-w20.json"
+      ],
+      "fields": [],
+      "blockers": [
+        "no_audited_dated_sector_series",
+        "taxonomy_observed_today_not_historical",
+        "no_comparable_peer_panel",
+        "no_approved_endpoint_labels"
+      ]
+    },
+    {
+      "group_id": "team_execution",
+      "data_gate": "fail",
+      "training_gate": "fail",
+      "sources": [],
+      "fields": [],
+      "blockers": [
+        "no_historical_person_or_family_mapping",
+        "no_cohort_wide_execution_panel",
+        "current_bios_and_headcount_excluded",
+        "no_approved_endpoint_labels"
+      ]
+    }
+  ],
+  "coverage_by_current_stage": [
+    {
+      "stage": "Growth",
+      "companies": 15,
+      "rank_matched": 5,
+      "hn_nonzero": 5
+    },
+    {
+      "stage": "Early",
+      "companies": 44,
+      "rank_matched": 6,
+      "hn_nonzero": 7
+    }
+  ],
+  "coverage_by_current_sector": [
+    {
+      "sector": "B2B -> Analytics",
+      "companies": 6,
+      "rank_matched": 1,
+      "hn_nonzero": 3
+    },
+    {
+      "sector": "B2B -> Supply Chain and Logistics",
+      "companies": 4,
+      "rank_matched": 1,
+      "hn_nonzero": 0
+    },
+    {
+      "sector": "B2B -> Retail",
+      "companies": 4,
+      "rank_matched": 0,
+      "hn_nonzero": 0
+    },
+    {
+      "sector": "B2B -> Sales",
+      "companies": 3,
+      "rank_matched": 0,
+      "hn_nonzero": 0
+    },
+    {
+      "sector": "B2B -> Productivity",
+      "companies": 8,
+      "rank_matched": 2,
+      "hn_nonzero": 2
+    },
+    {
+      "sector": "B2B -> Engineering, Product and Design",
+      "companies": 19,
+      "rank_matched": 5,
+      "hn_nonzero": 4
+    },
+    {
+      "sector": "B2B -> Operations",
+      "companies": 5,
+      "rank_matched": 2,
+      "hn_nonzero": 1
+    },
+    {
+      "sector": "B2B -> Infrastructure",
+      "companies": 2,
+      "rank_matched": 0,
+      "hn_nonzero": 1
+    },
+    {
+      "sector": "B2B -> Marketing",
+      "companies": 1,
+      "rank_matched": 0,
+      "hn_nonzero": 0
+    },
+    {
+      "sector": "B2B -> Security",
+      "companies": 1,
+      "rank_matched": 0,
+      "hn_nonzero": 0
+    },
+    {
+      "sector": "B2B -> Human Resources",
+      "companies": 2,
+      "rank_matched": 0,
+      "hn_nonzero": 1
+    },
+    {
+      "sector": "B2B -> Finance and Accounting",
+      "companies": 2,
+      "rank_matched": 0,
+      "hn_nonzero": 0
+    },
+    {
+      "sector": "B2B",
+      "companies": 2,
+      "rank_matched": 0,
+      "hn_nonzero": 0
+    }
+  ],
+  "coverage_by_directory_status": [
+    {
+      "directory_status": "Acquired",
+      "companies": 14,
+      "rank_matched": 3,
+      "hn_nonzero": 3
+    },
+    {
+      "directory_status": "Active",
+      "companies": 26,
+      "rank_matched": 6,
+      "hn_nonzero": 7
+    },
+    {
+      "directory_status": "Inactive",
+      "companies": 19,
+      "rank_matched": 2,
+      "hn_nonzero": 2
+    }
+  ],
+  "coverage_by_vintage": {
+    "2022-01-01": {
+      "cohort_rows": 59,
+      "tranco_matches": 11,
+      "HN_nonzero": 12,
+      "approved_label_joins": 0
+    }
+  },
+  "coverage_by_adjudicated_outcome": null,
+  "labels": {
+    "new_growth_survival_financial_health_definitions": "awaiting_Dev2_data_approval",
+    "v1_semantics_unchanged": true,
+    "approved_positives": 0,
+    "approved_negatives": 0,
+    "censored": null,
+    "unknown_or_unadjudicated": 59,
+    "primary_closure_lead_outside_selected_cohort": "Datree primary README states July 2023 company closure; not automatically a label",
+    "cashflow_lead": "PostHog retrospective page does not establish ending-12-month operating cashflow or original availability"
+  },
+  "splits": {
+    "status": "not_frozen_no_eligible_historical_labels",
+    "train": {
+      "dates": null,
+      "approved_positive_count": 0,
+      "approved_negative_count": 0
+    },
+    "validation": {
+      "dates": null,
+      "approved_positive_count": 0,
+      "approved_negative_count": 0
+    },
+    "test": {
+      "dates": null,
+      "approved_positive_count": 0,
+      "approved_negative_count": 0
+    },
+    "held_out_accessed": false
+  },
+  "leakage_exclusions": [
+    "current_directory_status_as_label",
+    "current_taxonomy_stage_headcount_as_historical_features",
+    "current_HN_points_comments",
+    "post_origin_financing",
+    "current_domain_as_verified_historical_mapping",
+    "retrospective_claim_as_original_availability",
+    "missing_source_as_negative_label",
+    "funding_as_solvency",
+    "handpicked_failure_as_cohort_member"
+  ],
+  "local_artifacts": [
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/attention-manifest.json",
+      "sha256": "ae173adeaaee3f66e322ccf4d04e6a914f0de33d56899e988b992acba857b9da"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/joined-discovery-at-origin.parquet",
+      "sha256": "7fc84970f0bc832529871b00bbd22139f8a2a12f7f2728137788daaed2c0d8e7"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/inspected-joined-sample.json",
+      "sha256": "235cc4d06fad09c74d144324e5e437675cbd81c3a06f19e934c5c9b6753d8828"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/coverage-by-stage.json",
+      "sha256": "753393b86c08c29b8151649a976b204652e5d9919e88dea2627a1949586a6fe7"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/coverage-by-sector.json",
+      "sha256": "66a58940fb9ee5aad998d2444402e4ccb729311bb1794552aec50d795740ca11"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/coverage-by-directory_status.json",
+      "sha256": "861261626dfc9e1faaa7ac7531308cc894f699e07847e4851a18ba38aa3175a8"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/sec-match-summary.json",
+      "sha256": "9de9cacba054b8ff2f72d50a89f9171e0f5dfa60c24ed6aff20f65a8ec746506"
+    },
+    {
+      "path": ".cache/startup-data-audit-bevyn-20261024/sec-name-candidates-2024q1.parquet",
+      "sha256": "be66c3626a846864d25446557cb889dd118da07a61f5a4af356df26b755fcf0b"
+    }
+  ],
+  "reuse": {
+    "raw_third_party_data_committed": false,
+    "adoption_approved": false,
+    "reason": "source_specific_reuse_and_retention_review_required"
+  },
+  "recommendation": "Defer fitting; after data approval compare training-only prevalence and regularized logistic regression; no hosted inference or arbitrary rubric."
+}
