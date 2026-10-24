@@ -118,7 +118,7 @@ export default function MethodologyPage() {
           unobserved and conflicting follow-up remain explicit.
         </p>
         <p>
-          No reported funding round is not evidence that no round occurred. A
+          An absent funding announcement leaves the financing outcome unknown. A
           surviving-company sample cannot establish how well a model predicts
           startup failure. Evaluation needs dated follow-up and coverage of
           inactive companies as well as surviving peers.
