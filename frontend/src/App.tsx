@@ -7,6 +7,9 @@ import MethodologyPage from "./pages/methodology/MethodologyPage";
 import CompanyHomePage from "./pages/companies/CompanyHomePage";
 import CompanyListPage from "./pages/companies/CompanyListPage";
 import CompanyProfilePage from "./pages/companies/CompanyProfilePage";
+import StartResearchPage from "./pages/research/StartResearchPage";
+import ResearchJobPage from "./pages/research/ResearchJobPage";
+import ResearchReportPage from "./pages/research/ResearchReportPage";
 import ComparePage from "./pages/companies/ComparePage";
 
 /** Route the scouting workflow without bundling or silently loading test fixtures. */
@@ -31,6 +34,15 @@ export default function App() {
       <main id="main" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<CompanyHomePage />} />
+          <Route
+            path="/research/new/:snapshotId/:companyId"
+            element={<StartResearchPage />}
+          />
+          <Route path="/research/jobs/:jobId" element={<ResearchJobPage />} />
+          <Route
+            path="/research/reports/:reportId"
+            element={<ResearchReportPage />}
+          />
           <Route path="/explore" element={<CompanyListPage />} />
           <Route
             path="/companies/:snapshotId/:companyId"

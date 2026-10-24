@@ -17,13 +17,12 @@ export default function MethodologyPage() {
         </h2>
         <p>
           Saved analyses show evidence recorded at a fixed date. Opening one
-          does not collect new information. A fresh research report will
-          identify the company and website, show the actual research status, and
-          keep partial results and source failures visible.
+          does not collect new information. Research starts only after you
+          confirm a known company and its website. The research status page
+          keeps partial results and source failures visible.
         </p>
         <p>
-          The next report format focuses on Software/SaaS companies through five
-          areas:
+          Research reports organize Software/SaaS evidence through five areas:
         </p>
         <ul>
           <li>
@@ -50,9 +49,11 @@ export default function MethodologyPage() {
           zero score.
         </p>
         <p>
-          This report format is being developed. The saved analyses below retain
-          their existing outcome definitions; they are not renamed as survival
-          or overall success predictions.
+          New reports reserve Growth (24 months), Survival (24 months) and
+          Financial Health (12 months) forecasts. Target definitions and
+          training remain pending, so predictions are unavailable. Older reports
+          can omit these forecasts. The saved analyses below retain their
+          original definitions.
         </p>
       </section>
 

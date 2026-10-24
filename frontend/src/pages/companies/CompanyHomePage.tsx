@@ -66,8 +66,8 @@ export default function CompanyHomePage() {
           />
         </label>
         <p className="disclaimer">
-          Open an existing report below. This searches saved companies; it does
-          not start new research.
+          Choose a saved analysis or confirm a company to start research.
+          Searching alone does not collect data.
         </p>
         <QueryState
           pending={choices.isPending}
@@ -113,13 +113,27 @@ export default function CompanyHomePage() {
                         "Website not recorded"}
                     </small>
                   </div>
-                  <Link
-                    className="company-open"
-                    aria-label={`View saved analysis for ${company.display_name}`}
-                    to={`/companies/${encodeURIComponent(snapshot)}/${encodeURIComponent(company.company_id)}`}
-                  >
-                    View saved analysis <span aria-hidden="true">↗</span>
-                  </Link>
+                  <div className="company-result-actions">
+                    <Link
+                      to={
+                        "/research/new/" +
+                        encodeURIComponent(snapshot) +
+                        "/" +
+                        encodeURIComponent(company.company_id)
+                      }
+                      className="button"
+                      aria-label={"Research company " + company.display_name}
+                    >
+                      Research company
+                    </Link>
+                    <Link
+                      className="company-open"
+                      aria-label={`View saved analysis for ${company.display_name}`}
+                      to={`/companies/${encodeURIComponent(snapshot)}/${encodeURIComponent(company.company_id)}`}
+                    >
+                      View saved analysis <span aria-hidden="true">↗</span>
+                    </Link>
+                  </div>
                 </li>
               ))}
             </ul>

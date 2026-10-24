@@ -116,3 +116,22 @@ No offline export or demo server is included in this workstream.
 - Profiles retain the three existing outcomes and metric definitions. Publication metadata is expandable; dates and synthetic-data notices stay visible.
 - Visual references and collaborator guidance are in private issue #43: shadcn/ui components, Radix disclosure patterns, Motion accessibility/examples and Lucide icons. This pass uses native controls and CSS with no new dependencies.
 - Short entrance and hover transitions respect reduced-motion settings. No animated scores, implied live research or invented probabilities.
+
+### Prediction workspace (#55)
+
+- Search a known company, choose **Research company**, confirm its name/domain,
+  then submit explicitly. POST is never triggered by searching, navigation or a
+  retrying query. Research requires the opt-in local worker.
+- Routes: /research/new/:snapshotId/:companyId, /research/jobs/:jobId and
+  /research/reports/:reportId. Jobs poll only while queued/running; failed reads
+  offer a read retry and failed jobs require confirmation for a new write.
+- Reports render Startup Outlook, backend forecast lanes, five specialist drivers
+  and public sources. The native detail dialog supports focus containment, Escape
+  and arrow/Home/End tabs. No client scoring or invented model output.
+- Older reports without forecasts show a legacy notice. Fresh HN records and
+  saved measurements keep separate dates; partial counts stay unavailable.
+- Synthetic browser/unit fixture: tests/fixtures/api/research.json, generated
+  from the existing synthetic company fixture through the report/model builders.
+- Real replay browser test: set SIGNALSHIFT_RESEARCH_ENABLED=1 and
+  SIGNALSHIFT_REAL_REPORT_ID alongside the existing real-company test settings.
+  Only reads are exercised against the verified partial replay; no new collection.
