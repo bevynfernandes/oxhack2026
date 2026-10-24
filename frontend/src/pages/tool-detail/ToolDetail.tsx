@@ -131,7 +131,12 @@ export default function ToolDetail({
               <Suspense fallback={<p role="status">Loading chart…</p>}>
                 <HistoryChart points={history.data.points} />
               </Suspense>
-              <div className="table-scroll">
+              <div
+                className="table-scroll"
+                tabIndex={0}
+                role="region"
+                aria-label="Observed download history"
+              >
                 <table>
                   <caption>
                     Observed values (accessible chart alternative)
