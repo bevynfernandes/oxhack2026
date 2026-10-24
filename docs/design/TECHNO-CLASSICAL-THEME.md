@@ -9,23 +9,25 @@ backend/API contracts, generated types, functional components and test assertion
 remain intact. Existing stylesheets stay in place beneath an additive theme.
 
 The root `theme-techno-classical` class enables `src/theme/theme.css`. Removing
-that class restores the preceding presentation. Keep layout, responsive rules and
-Material 3 Expressive motion in their existing modules; no new animation engine,
+that class restores the preceding presentation. The theme owns its responsive presentation overrides; preserve the original
+layout underneath it and keep Material 3 Expressive motion in its existing module; no new animation engine,
 page timing, animated data or extra JavaScript dependency is introduced.
 
 ## Palette and hierarchy
 
 | Role                   | Token                  | Colour    |
 | ---------------------- | ---------------------- | --------- |
-| Canvas                 | `--theme-canvas`       | `#090f1b` |
-| Surface                | `--theme-surface`      | `#101a2a` |
-| Raised surface         | `--theme-raised`       | `#172438` |
-| Primary text           | `--theme-text`         | `#f1ecdf` |
-| Secondary text         | `--theme-muted`        | `#acb9cb` |
-| Technical rule         | `--theme-line`         | `#34445b` |
-| Input/control boundary | `--theme-control-line` | `#7185a2` |
-| Electric blue          | `--theme-accent`       | `#8bb5ff` |
-| Selected surface       | `--theme-selected`     | `#203655` |
+| Canvas                 | `--theme-canvas`       | `#0d0d24` |
+| Surface                | `--theme-surface`      | `#14142b` |
+| Raised surface         | `--theme-raised`       | `#202037` |
+| Primary text           | `--theme-text`         | `#f2f0e9` |
+| Secondary text         | `--theme-muted`        | `#b5b5c5` |
+| Technical rule         | `--theme-line`         | `#414154` |
+| Input/control boundary | `--theme-control-line` | `#7e7e99` |
+| Electric blue          | `--theme-accent`       | `#aaaaff` |
+| Cobalt action/frame    | `--theme-action`       | `#0000f2` |
+| Cobalt hover           | `--theme-action-hover` | `#3030ff` |
+| Selected surface       | `--theme-selected`     | `#29294c` |
 | Warning/evidence gap   | `--theme-warning`      | `#e8c58b` |
 | Error                  | `--theme-danger`       | `#ffb0a7` |
 | Confirmed source state | `--theme-positive`     | `#a7d1bf` |
@@ -36,21 +38,40 @@ Amber and red support existing explicit status labels. Thin rules separate
 measurement groups and distinguish controls from passive surfaces. Avoid glows,
 bright gradients, large shadows and decorative hover movement.
 
+## Reference and composition
+
+The revised theme follows the [Hermes Agent landing page](https://hermes-agent.nousresearch.com/),
+inspected visually and through computed styles on 2026-10-24. The reference uses
+near-black indigo (`rgb(13,13,36)`), cobalt (`rgb(0,0,242)`), a narrow perimeter
+frame, very light condensed headings, uppercase navigation and monochrome etched
+illustrations. The previous theme only recoloured the existing dashboard; this
+revision changes hierarchy, spacing and composition as well.
+
+- Home has a split editorial heading/illustration above a ruled company directory.
+  Company actions and search retain the existing handlers, pagination and content.
+- Domain research pairs its large heading with the same illustration; dossiers
+  use a compact identity masthead, separated statistics and square dimension panels.
+- Mobile uses smaller display sizes and a compact illustration. All main content
+  can scroll vertically; the explicit `minmax(0, 1fr)` shell column prevents
+  intrinsic content widths from putting controls outside the viewport.
+- Cobalt is used for filled actions and the frame. Text links use a lighter blue
+  to meet contrast on dark backgrounds; the exact saturated reference blue is
+  unsuitable for small text on those surfaces.
+
 ## Type and ornament
 
-- Keep bundled Plus Jakarta Sans for body text and controls, and JetBrains Mono
-  for timestamps, provenance, metadata and forecast-window tags.
-- Use a single locally served Latin Barlow Condensed semibold face for editorial
-  headings. Its small WOFF2 asset is licensed under SIL OFL 1.1; retain the licence
-  and source record beside it. Other scripts fall back to the existing body font.
-- Preserve responsive font sizes in dense dossier controls; do not turn table
-  cells, values or long evidence excerpts into condensed display text.
-- Add one original SVG of architectural arches and orbital construction lines.
-  It is a decorative CSS background on broad research headings, has no semantic
-  content, never sits beneath evidence text and is omitted on narrow screens.
-  No Hermes artwork, branding or third-party engraving is used.
-- A low-contrast static grid belongs on the canvas only. Evidence, tables and
-  forms use opaque surfaces so texture does not reduce reading contrast.
+- Keep bundled Plus Jakarta Sans for reading text and JetBrains Mono for timestamps,
+  provenance, metadata and forecast-window tags.
+- Use local Barlow Condensed 200 for large editorial headings and 600 for small
+  uppercase navigation/controls. Both are SIL OFL 1.1. The reference's proprietary
+  Rules fonts are not bundled; Barlow is the licensed condensed substitute.
+- Keep data cells, values and long evidence excerpts in their existing readable fonts.
+- `armillary.svg` is an original 6.67 KB geometric engraving with meridians, orbital
+  rings and a pedestal. `grain.svg` is a 331-byte static texture tile. Both are
+  decorative CSS backgrounds, excluded from forced-colour mode, with no animation.
+- Keep the earlier `observatory.svg` asset for the retained first-pass design.
+  No Hermes branding, artwork, font binaries or source code is copied.
+- Evidence, tables and forms retain opaque surfaces for readable contrast.
 
 ## Components and chronology
 
@@ -115,6 +136,9 @@ accessible description and disabled animation remain unchanged.
 | `frontend/src/main.tsx`                                      | Import the additive theme after existing layout/motion styles.                                                                                |
 | `frontend/src/theme/theme.css`                               | Palette/type tokens, shared surfaces, controls, evidence chronology, original ornament, forced-colour treatment and short-viewport scrolling. |
 | `frontend/src/theme/assets/barlow-condensed-latin-600.woff2` | Local 22,308-byte heading face; body/metadata fonts are reused.                                                                               |
+| `frontend/src/theme/assets/barlow-condensed-latin-200.woff2` | Local 14,616-byte extra-light display face; same OFL licence.                                                                                 |
+| `frontend/src/theme/assets/armillary.svg`                    | Original 6,665-byte etched orbital illustration.                                                                                              |
+| `frontend/src/theme/assets/grain.svg`                        | Original 331-byte static texture tile.                                                                                                        |
 | `frontend/src/theme/assets/OFL.txt`                          | Font licence retained with the asset.                                                                                                         |
 | `frontend/src/theme/assets/NOTICE.md`                        | Asset provenance and attribution.                                                                                                             |
 | `frontend/src/theme/assets/observatory.svg`                  | Original 755-byte decorative line engraving.                                                                                                  |
@@ -122,13 +146,13 @@ accessible description and disabled animation remain unchanged.
 | `frontend/src/pages/research/CompanyDossier.tsx`             | Label/focus scrollable measurements; attach styling classes to existing events/timestamps.                                                    |
 | `frontend/src/pages/tool-detail/ToolDetail.tsx`              | Label/focus the existing scrollable history table.                                                                                            |
 | `frontend/tests/e2e/theme.spec.ts`                           | Seven-screen desktop/mobile screenshots, axe audits, keyboard scroll/focus, short viewport, forced colours and rollback coverage.             |
-| `frontend/tests/unit/theme.test.ts`                          | Sixteen actual-token contrast checks for text and control boundaries.                                                                         |
+| `frontend/tests/unit/theme.test.ts`                          | Eighteen actual-token contrast checks for text and control boundaries.                                                                        |
 | `frontend/tests/real-company/research.spec.ts`               | Assert Escape finishes closing the drawer before the settled-state accessibility audit; retain all original assertions.                       |
 
 The existing `styles.css`, `workspace.css`, motion library, routes, dependency
 manifests, backend, API contracts and generated types are unchanged.
 
-### Validation evidence
+### Initial theme validation evidence
 
 - Baseline: 36 existing browser cases pass. The additional surface audit passes
   after the two keyboard-accessibility fixes described above.
@@ -192,7 +216,7 @@ not exercised; the checks cover Chromium, 200% text-size and zoom-equivalent CSS
 viewport reflow. These are verification limits, not claims of cross-browser
 pixel identity.
 
-### Final result
+### Initial theme result
 
 - 59 frontend unit tests pass, including all 16 token contrast checks.
 - All 52 default browser tests pass on the final implementation.
@@ -202,3 +226,61 @@ pixel identity.
   pass. Existing CSS/layout/motion and all protected backend/API paths are intact.
 - The side-by-side desktop comparison is retained at
   `tests/outputs/theme/comparison-desktop.png`.
+
+## Reference-led revision — 2026-10-24
+
+### Changed files in this revision
+
+- `frontend/src/theme/theme.css`: reference-matched indigo/cobalt palette, blue
+  frame, lighter editorial typography, split home/research compositions, ruled
+  dossier layout, compact laptop/phone overrides and intrinsic-width safeguards.
+- `frontend/src/theme/assets/barlow-condensed-latin-200.woff2`: local extra-light face.
+- `frontend/src/theme/assets/armillary.svg`: original decorative engraving.
+- `frontend/src/theme/assets/grain.svg`: static low-opacity texture.
+- `frontend/src/theme/assets/NOTICE.md`: additional asset provenance and licence record.
+- `frontend/tests/e2e/theme.spec.ts`: assert main-region horizontal overflow as
+  well as document overflow; update the explicit canvas colour assertion.
+- `frontend/tests/unit/theme.test.ts`: add contrast checks for white text on
+  cobalt action and hover surfaces, preserving all previous contrast thresholds.
+- `docs/design/TECHNO-CLASSICAL-THEME.md`: revised specification and verification record.
+
+### Regression findings and fixes
+
+- The perimeter frame exposed an implicit grid minimum that could push mobile
+  controls outside the main region. An explicit shrinking grid column fixes it;
+  the stronger main-region check now catches the problem independently of the
+  document-width check. Native long-option snapshot selects can also shrink.
+- Larger dossier typography initially violated the existing no-scroll overview
+  contract. Compact height breakpoints restore that contract at 1440×900,
+  1366×768, 1280×720, 390×844 and 375×667 without changing the original test.
+- Pagination remains in view on short phones. At 720×450 zoom-equivalent reflow,
+  vertical scrolling keeps the ledger reachable instead of compressing evidence.
+- No existing functional assertion, axe rule, motion test or contrast threshold
+  is removed or relaxed. No backend/API/generated-type/component logic changes
+  are part of this revision.
+
+### Evidence and size
+
+- 61 unit tests pass, including 18 contrast checks.
+- All 52 default browser tests pass on the final revision, including desktop/mobile
+  screenshot and axe checks, one-screen dossier geometry and shared motion regressions.
+- Formatting, canonical generated types, TypeScript and production build pass.
+- Three real publication/dimension/immutable-report cases pass with collection
+  disabled; captures and report are in `tests/outputs/hermes-real-final`.
+- Live production Qdrant inspection verifies dimension expansion, tab changes,
+  Escape and focus restoration. No collection jobs are submitted.
+- Before captures remain in `tests/outputs/theme-final`; revised screenshots,
+  axe audits and motion captures are in `tests/outputs/hermes-final`.
+- Side-by-side home/domain/dossier comparison:
+  `tests/outputs/theme/reference-comparison.html`.
+- Earlier failed audit outputs are retained in `hermes-surfaces`,
+  `hermes-surfaces-v2` and `hermes-full`; the focused dossier correction passes
+  in `hermes-dossier-fit`. Command logs are in `tests/outputs/theme/hermes-*.log`.
+- Compared with the previous theme, CSS gzip changes from 16.02 KB to 17.10 KB;
+  entry JS stays approximately 170.80 KB and lazy chart JS stays 172.07 KB.
+  Added assets: 14.62 KB local font, 6.67 KB SVG (1.65 KB gzip) and 331-byte
+  grain tile. No package dependencies or remote application asset requests.
+- The existing large-chunk build warning remains. The earlier Chromium-only
+  verification limits and native-control/non-Latin fallback differences apply.
+  This follows the reference's visual language, using an OFL font substitute and
+  original artwork rather than claiming identical branded pixels.
