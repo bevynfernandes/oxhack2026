@@ -538,6 +538,21 @@ test("standalone discovery confirms redirected identity, retains partial results
   await expect(
     page.getByRole("heading", { name: "Synthetic standalone", exact: true }),
   ).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  expect(
+    await page.locator(".pillar-card").evaluateAll((cards) =>
+      cards.every((card) => {
+        const bounds = card.getBoundingClientRect();
+        const footer = card.querySelector("footer")!.getBoundingClientRect();
+        const measurements = card
+          .querySelector(".pillar-measurements")!
+          .getBoundingClientRect();
+        return (
+          footer.bottom <= bounds.bottom && measurements.bottom <= footer.top
+        );
+      }),
+    ),
+  ).toBe(true);
   await expect(
     page.getByRole("button", { name: "Saved assessment", exact: true }),
   ).toHaveCount(0);
