@@ -24,7 +24,6 @@ def test_valid_company_composition(
         "foreign_metric",
         "foreign_evidence",
         "unknown_definition",
-        "observed_as_missing",
         "omitted_support",
         "wrong_snapshot",
         "wrong_cutoff",
@@ -57,17 +56,16 @@ def test_rejects_incompatible_composition(
         payload["statements"][0]["evidence_ids"] = ("beta-source",)
     elif change == "unknown_definition":
         payload["statements"][2]["missing_metric_ids"] = ("unknown",)
-    elif change == "observed_as_missing":
-        payload["statements"][2]["missing_metric_ids"] = ("sdk_downloads_30d_v1",)
     elif change == "omitted_support":
-        payload["statements"][0]["role"] = "evidence_gap"
-        payload["statements"][0]["missing_metric_ids"] = (
-            "operating_cashflow_12m_usd_v1",
+        from oxhack2026.catalog.company import SourceEvidence
+
+        extra = SourceEvidence.model_validate(
+            source.evidence[0].model_dump() | {"evidence_id": "different-support"}
         )
-        payload["statements"][0]["evidence_ids"] = ()
-        payload["outcomes"][0].update(
-            assessment_status="unavailable", reason_codes=("gap",)
+        source = CompanySourceSnapshot.model_validate(
+            source.model_dump() | {"evidence": (*source.evidence, extra)}
         )
+        payload["statements"][0]["evidence_ids"] = ("different-support",)
     elif change == "wrong_cutoff":
         from oxhack2026.features.company_outcomes import company_horizon_end
 
@@ -97,3 +95,39 @@ def test_requires_complete_unique_company_set(
         validate_company_assessments(
             company_source[0], (company_assessments[0], duplicate)
         )
+
+
+@pytest.mark.parametrize("reason", ["stale", "restricted", "unreviewed"])
+def test_observed_source_can_be_a_public_assessment_gap(
+    company_source: tuple[CompanySourceSnapshot, ArtifactStore],
+    company_assessments: tuple[CompanyAssessment, ...],
+    reason: str,
+) -> None:
+    """Storage validates references; C2 decides public usability."""
+    payload = company_source[0].model_dump()
+    if reason == "stale":
+        payload["definitions"][0]["maximum_age_days"] = 1
+    else:
+        # The first evidence supports the alpha family as well as its metrics.
+        payload["evidence"][0][
+            "access" if reason == "restricted" else "review_state"
+        ] = "restricted" if reason == "restricted" else "unreviewed"
+        if reason == "restricted":
+            payload["evidence"][0]["url"] = None
+    source = CompanySourceSnapshot.model_validate(payload)
+    assessment = company_assessments[0].model_dump()
+    assessment["statements"][0].update(
+        role="evidence_gap",
+        evidence_ids=(),
+        missing_metric_ids=("sdk_downloads_30d_v1",),
+    )
+    assessment["outcomes"][0].update(
+        assessment_status="unavailable", reason_codes=("no_usable_public_evidence",)
+    )
+    if reason != "stale":
+        assessment.update(
+            family_id=None,
+            family_reason_codes=("family_not_established_at_cutoff",),
+        )
+    changed = CompanyAssessment.model_validate(assessment)
+    validate_company_assessments(source, (changed, company_assessments[1]))

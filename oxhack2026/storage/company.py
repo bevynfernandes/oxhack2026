@@ -101,7 +101,11 @@ def metadata(snapshot: CompanySnapshotMetadata) -> CompanySnapshotMetadata:
 
 
 def resolve_family(
-    snapshot: CompanySourceSnapshot, company_id: str, assessment_at: UtcInstant
+    snapshot: CompanySourceSnapshot,
+    company_id: str,
+    assessment_at: UtcInstant,
+    *,
+    public_only: bool = False,
 ) -> FamilyResolution:
     """Resolve dated membership, returning explicit unknown/conflict reasons.
 
@@ -109,6 +113,7 @@ def resolve_family(
         snapshot: Validated immutable source tables.
         company_id: Exact company in the snapshot.
         assessment_at: UTC cutoff no later than the snapshot cutoff.
+        public_only: Exclude restricted evidence for public assessments/projection.
     Returns:
         Effective family or an unresolved result with reason codes.
     Raises:
@@ -134,6 +139,7 @@ def resolve_family(
         and all(
             sources[key].available_at <= assessment_at
             and sources[key].review_state == "verified"
+            and (not public_only or sources[key].access == "public")
             and (
                 snapshot.mode == "historical_reconstruction"
                 or sources[key].collected_at <= assessment_at

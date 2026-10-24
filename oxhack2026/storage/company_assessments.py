@@ -79,17 +79,13 @@ def _validate_statement_links(
         for row in source.events
         if row.company_id == assessment.company_id
     }
-    missing = {
-        row.metric_id
-        for row in metrics.values()
-        if row.state in {"missing", "conflicting"}
-    }
+    definitions = {row.metric_id for row in source.definitions}
     for statement in assessment.statements:
         if (
             not set(statement.evidence_ids) <= evidence.keys()
             or not set(statement.metric_observation_ids) <= metrics.keys()
             or not set(statement.event_ids) <= events.keys()
-            or not set(statement.missing_metric_ids) <= missing
+            or not set(statement.missing_metric_ids) <= definitions
         ):
             message = (
                 "Assessment statement has unknown or cross-company source references"
@@ -104,7 +100,9 @@ def _validate_statement_links(
             for event_id in statement.event_ids
             for key in events[event_id].evidence_ids
         }
-        if not support <= set(statement.evidence_ids):
+        if statement.role != "evidence_gap" and not support <= set(
+            statement.evidence_ids
+        ):
             message = "Assessment statement omits evidence supporting referenced facts"
             raise ValueError(message)
         if any(
@@ -155,7 +153,9 @@ def validate_company_assessments(
         if assessment.mode == "prospective" and source.mode != "prospective":
             message = "Prospective assessments require prospective source provenance"
             raise ValueError(message)
-        family = resolve_family(source, assessment.company_id, assessment.as_of)
+        family = resolve_family(
+            source, assessment.company_id, assessment.as_of, public_only=True
+        )
         if assessment.family_id != family.family_id or not set(
             family.reason_codes
         ) <= set(assessment.family_reason_codes):
