@@ -1,5 +1,12 @@
 # Dev 2 handoff
 
+Current product priority: [#19](https://github.com/bevynfernandes/oxhack2026/issues/19)
+replaces download-only scouting with a multi-metric company outlook and all three
+user-selected outcomes. The initial outcome/label/evaluation proposal is in
+`docs/tasks/dev2/company-outcome-policy.md`; exact definitions await owner review.
+Existing download checkpoints below remain a traction subsystem. Their passing
+tests do not demonstrate startup-success prediction.
+
 Owner: numerical policy, features, models, evaluation, and evidence. Ivan owns
 Dev 1 data/platform; Bevyn owns Dev 3 API/frontend. Follow `PLAN.md` and the
 workstream boundaries in `plans/README.md`.
