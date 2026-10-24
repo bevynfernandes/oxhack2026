@@ -290,6 +290,34 @@ def test_query_preserves_both_knowledge_filters() -> None:
     assert query.collected_by < _observation().first_collected_at
 
 
+@pytest.mark.parametrize(
+    ("source", "kind", "ecosystem", "unit"),
+    [
+        ("npm", "package", "npm", "downloads"),
+        ("pypi", "package", "pypi", "downloads"),
+        ("github", "repository", None, "events"),
+        ("hackernews", "domain", None, "mentions"),
+    ],
+)
+def test_series_units_match_source(
+    source: str, kind: str, ecosystem: str | None, unit: str
+) -> None:
+    """Counts from a source cannot silently change their measurement unit."""
+    payload = {
+        "series_id": "synthetic-series",
+        "source": source,
+        "entity_kind": kind,
+        "entity_id": "synthetic-entity",
+        "ecosystem": ecosystem,
+        "metric": "daily-count",
+        "unit": unit,
+    }
+    assert ObservationSeries.model_validate(payload).unit == unit
+    for wrong_unit in {"downloads", "events", "mentions"} - {unit}:
+        with pytest.raises(ValidationError, match="unit must match"):
+            ObservationSeries.model_validate(payload | {"unit": wrong_unit})
+
+
 def test_schema_drift_and_export() -> None:
     """Schemas match authoritative models and export uses deterministic bytes."""
     for contract in CONTRACTS:
