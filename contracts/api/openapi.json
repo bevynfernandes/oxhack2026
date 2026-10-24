@@ -1375,6 +1375,118 @@
         "title": "CompanyRelationship",
         "type": "object"
       },
+      "CompanySearchCandidate": {
+        "additionalProperties": false,
+        "description": "A possible website, never proof of legal identity or company ownership.\n\nAttributes:\n    name: Source result title or supplied domain.\n    domain: Normalized public candidate hostname.\n    website: HTTPS homepage used by the existing identity-preview workflow.\n    source: User-supplied URL or a candidate from a published domain directory.",
+        "properties": {
+          "domain": {
+            "maxLength": 253,
+            "minLength": 4,
+            "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+            "title": "Domain",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "input",
+              "public_directory"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "website": {
+            "maxLength": 2048,
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "domain",
+          "website",
+          "source"
+        ],
+        "title": "CompanySearchCandidate",
+        "type": "object"
+      },
+      "CompanySearchRequest": {
+        "additionalProperties": false,
+        "description": "Company name or URL query; discovery candidates still require confirmation.\n\nAttributes:\n    query: Bounded user input, searched locally when it is a company name.",
+        "properties": {
+          "query": {
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "CompanySearchRequest",
+        "type": "object"
+      },
+      "CompanySearchResult": {
+        "additionalProperties": false,
+        "description": "Bounded discovery results, including provider failures and ambiguity.\n\nAttributes:\n    query: The original trimmed user query.\n    candidates: Possible websites; the user chooses before identity preview.\n    reason_codes: Source limitations and required confirmation.\n    source_url: Public directory documentation, when a snapshot was searched.\n    source_attribution: Publisher and license for the directory snapshot.",
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CompanySearchCandidate"
+            },
+            "maxItems": 5,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "source_attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Attribution"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "query",
+          "candidates"
+        ],
+        "title": "CompanySearchResult",
+        "type": "object"
+      },
       "CompanySnapshotMetadata": {
         "additionalProperties": false,
         "description": "Immutable source publication identity and actual production provenance.",
@@ -6857,6 +6969,45 @@
           }
         },
         "summary": "History"
+      }
+    },
+    "/api/v2/company-search": {
+      "post": {
+        "description": "Find candidate websites by name or URL; no research job starts here.\n\nArgs:\n    request: Bounded name or URL query.\n    service: Configured source-safe research service.\nReturns:\n    Source-linked candidate domains and explicit discovery limitations.\nRaises:\n    HTTPException: Input is invalid or the configured service is unavailable.",
+        "operationId": "research_v2_company_search",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanySearchResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Companies"
       }
     },
     "/api/v2/research-capabilities": {

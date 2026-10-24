@@ -367,7 +367,7 @@ def test_capabilities_do_not_import_collection_or_interpretation(
     monkeypatch.setenv("GEMINI_API_KEY", "")
     service = V2Service(V2Store(tmp_path))
     capability = service.mapping_capability()
-    assert capability.mode == "rules_gemini"
+    assert capability.mode == "rules"
     assert capability.enabled is False
     assert capability.gemini_available is False
 

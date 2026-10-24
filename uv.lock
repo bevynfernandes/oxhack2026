@@ -1220,6 +1220,7 @@ research = [
     { name = "beautifulsoup4" },
     { name = "lxml" },
     { name = "playwright" },
+    { name = "tld" },
     { name = "trafilatura" },
 ]
 storage = [
@@ -1265,6 +1266,7 @@ requires-dist = [
     { name = "python-dotenv", marker = "extra == 'explanations'", specifier = ">=1,<2" },
     { name = "scikit-learn", marker = "extra == 'models'", specifier = ">=1.6,<2" },
     { name = "sqlalchemy", marker = "extra == 'storage'", specifier = ">=2,<3" },
+    { name = "tld", marker = "extra == 'research'", specifier = ">=0.13,<1" },
     { name = "trafilatura", marker = "extra == 'research'", specifier = ">=2.0,<3" },
     { name = "typer", marker = "extra == 'cli'", specifier = ">=0.16,<1" },
     { name = "uvicorn", marker = "extra == 'api'", specifier = ">=0.34,<1" },

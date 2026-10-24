@@ -4,7 +4,13 @@ import re
 from typing import Annotated, Literal, Self
 from urllib.parse import urlsplit
 
-from pydantic import AfterValidator, Field, TypeAdapter, model_validator
+from pydantic import (
+    AfterValidator,
+    Field,
+    StringConstraints,
+    TypeAdapter,
+    model_validator,
+)
 
 from oxhack2026.api.company_schemas import CompanyDetail
 from oxhack2026.api.evidence_mapping_schemas import (
@@ -64,6 +70,52 @@ class DiscoveryRequest(DTO):
             message = "Saved context requires both exact identifiers"
             raise ValueError(message)
         return self
+
+
+class CompanySearchRequest(DTO):
+    """Company name or URL query; discovery candidates still require confirmation.
+
+    Attributes:
+        query: Bounded user input, searched locally when it is a company name.
+    """
+
+    query: Annotated[
+        str, StringConstraints(min_length=2, max_length=200, strip_whitespace=True)
+    ]
+
+
+class CompanySearchCandidate(DTO):
+    """A possible website, never proof of legal identity or company ownership.
+
+    Attributes:
+        name: Source result title or supplied domain.
+        domain: Normalized public candidate hostname.
+        website: HTTPS homepage used by the existing identity-preview workflow.
+        source: User-supplied URL or a candidate from a published domain directory.
+    """
+
+    name: Annotated[str, Field(min_length=1, max_length=300)]
+    domain: Domain
+    website: PublicURL
+    source: Literal["input", "public_directory"]
+
+
+class CompanySearchResult(DTO):
+    """Bounded discovery results, including provider failures and ambiguity.
+
+    Attributes:
+        query: The original trimmed user query.
+        candidates: Possible websites; the user chooses before identity preview.
+        reason_codes: Source limitations and required confirmation.
+        source_url: Public directory documentation, when a snapshot was searched.
+        source_attribution: Publisher and license for the directory snapshot.
+    """
+
+    query: str
+    candidates: Annotated[tuple[CompanySearchCandidate, ...], Field(max_length=5)]
+    reason_codes: tuple[str, ...] = ()
+    source_url: PublicURL | None = None
+    source_attribution: str | None = None
 
 
 class Capture(DTO):

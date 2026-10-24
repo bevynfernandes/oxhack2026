@@ -110,6 +110,12 @@ outputs out of version control.
 
 Standalone startup research is available through the additive v2 backend. See the
 [local worker setup, API sequence and evidence semantics](docs/tasks/dev3/research-v2.md).
+The main company search accepts names and HTTPS websites. Name candidates come
+from a bundled, attributed public domain directory and require identity preview;
+names absent from the directory need an exact website. See
+[current source/model limits](docs/product/free-source-decisions.md) and
+[demo evidence and remaining work](FINAL_DEMO.md). Deterministic evidence mapping
+is the default; Gemini interpretation is optional.
 It requires an explicit writable research root and opt-in collection worker; saved
 company publications are optional. The existing frontend needs the corresponding
 v2 domain-confirmation and multi-source presentation work before exposing this flow.

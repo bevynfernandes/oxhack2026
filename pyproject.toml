@@ -46,6 +46,7 @@ research = [
     "lxml>=6,<7",
     "playwright>=1.55,<2",
     "trafilatura>=2.0,<3",
+    "tld>=0.13,<1",
 ]
 
 [dependency-groups]

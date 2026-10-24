@@ -953,6 +953,17 @@ button.secondary:hover {
   gap: 13px;
   border-color: #edf1f6;
 }
+.home-directory .company-results.company-candidates li {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.company-candidates strong {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .home-directory .company-results.company-candidates li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .home-directory .company-monogram {
   width: 40px;
   height: 40px;

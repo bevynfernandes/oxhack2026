@@ -1,22 +1,43 @@
 import { MotionButton, MotionInput, MotionLink as Link } from "../../motion";
-import { useQuery, useQueries } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueries } from "@tanstack/react-query";
 import { useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { companyDomain, matchesCompanySearch } from "./identity";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
+import { previewCompany, searchCompanies } from "../research/client";
 
 const PAGE_SIZE = 2;
 
 /** Start with one company; open an exact saved publication without simulating research. */
 export default function CompanyHomePage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const legacySelection = new URLSearchParams(location.search).has("snapshot");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
+  const preview = useMutation({
+    retry: false,
+    mutationFn: previewCompany,
+    onSuccess: (identity) =>
+      navigate("/research/identities/" + identity.identity_id),
+  });
+  const lookup = useMutation({
+    retry: false,
+    mutationFn: searchCompanies,
+    onSuccess: (result) => {
+      if (
+        result.candidates.length === 1 &&
+        result.candidates[0].source === "input"
+      )
+        preview.mutate(result.candidates[0].website);
+    },
+  });
+  const searching = lookup.isPending || preview.isPending;
   const choices = useQuery({
     queryKey: ["company-publications"],
     queryFn: async () => unwrap(await api.GET("/api/v1/company-snapshots")),
+    retry: false,
   });
   const publications = choices.data?.items ?? [];
   const companyQueries = useQueries({
@@ -54,39 +75,109 @@ export default function CompanyHomePage() {
           <p className="eyebrow">SOFTWARE & SAAS RESEARCH</p>
           <h1>Company research workspace</h1>
           <p>
-            Select a company to inspect its outlook, fundamentals and source
-            evidence.
+            Research a company by name or website, then inspect its outlook,
+            fundamentals and source evidence.
           </p>
         </div>
         <span className="directory-status">
           <span className="status-dot" />
-          Saved company directory
+          Public company research
         </span>
       </header>
       <div className="home-terminal-grid">
         <section className="home-directory" aria-labelledby="choose-company">
           <div className="home-directory-heading">
-            <h2 id="choose-company">Select a company</h2>
+            <h2 id="choose-company">Research a company</h2>
             <span>NAME / DOMAIN</span>
           </div>
-          <label className="terminal-search">
-            Search companies
-            <MotionInput
-              type="search"
-              placeholder="Company name or website domain"
-              value={search}
-              maxLength={253}
-              onChange={(event) => {
-                setSearch(event.target.value);
-                setPage(0);
-              }}
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (search.trim().length >= 2 && !searching)
+                lookup.mutate(search.trim());
+            }}
+          >
+            <label className="terminal-search">
+              Search companies
+              <MotionInput
+                type="search"
+                placeholder="Company name or website domain"
+                value={search}
+                maxLength={200}
+                disabled={searching}
+                onChange={(event) => {
+                  setSearch(event.target.value);
+                  setPage(0);
+                  lookup.reset();
+                  preview.reset();
+                }}
+              />
+            </label>
+            <MotionButton
+              type="submit"
+              disabled={search.trim().length < 2 || searching}
+            >
+              {searching ? "Finding company…" : "Research company"}
+            </MotionButton>
+          </form>
+          {(lookup.error || preview.error) && (
+            <p role="alert">{(lookup.error ?? preview.error)?.message}</p>
+          )}
+          {lookup.data && lookup.data.candidates[0]?.source !== "input" && (
+            <section aria-label="Company website candidates" aria-live="polite">
+              <p>
+                {lookup.data.candidates.length
+                  ? "Choose the correct website. Directory matches are candidates; check the identity preview before research."
+                  : "No reliable website match was found. Enter the company's exact website domain."}
+              </p>
+              {lookup.data.source_url && (
+                <p>
+                  <a
+                    href={lookup.data.source_url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {lookup.data.source_attribution}
+                  </a>
+                  . Names must match a listed domain; aliases and small
+                  businesses may require their exact website.
+                </p>
+              )}
+              <ul className="company-results company-candidates">
+                {lookup.data.candidates.map((candidate) => (
+                  <li key={candidate.domain}>
+                    <div>
+                      <strong>{candidate.domain}</strong>
+                      <p>{candidate.name}</p>
+                    </div>
+                    <MotionButton
+                      disabled={searching}
+                      onClick={() => preview.mutate(candidate.website)}
+                    >
+                      Inspect {candidate.domain}
+                    </MotionButton>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+          {choices.error ? (
+            <div>
+              <p role="status">
+                Saved company assessments are unavailable. You can still
+                research a company using the search above.
+              </p>
+              <MotionButton onClick={() => void choices.refetch()}>
+                Retry saved assessments
+              </MotionButton>
+            </div>
+          ) : (
+            <QueryState
+              pending={choices.isPending}
+              error={null}
+              retry={() => void choices.refetch()}
             />
-          </label>
-          <QueryState
-            pending={choices.isPending}
-            error={choices.error}
-            retry={() => void choices.refetch()}
-          />
+          )}
           {companyQueries.map((query, index) => (
             <QueryState
               key={publications[index].assessment.publication_id}

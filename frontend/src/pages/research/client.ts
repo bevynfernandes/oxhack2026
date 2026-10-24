@@ -51,6 +51,20 @@ export async function fetchIdentity(identityId: string) {
 export async function fetchCapabilities() {
   return researchResult(await api.GET("/api/v2/research-capabilities"));
 }
+
+/** Find candidate websites without guessing a company domain or starting research. */
+export async function searchCompanies(query: string) {
+  return researchResult(
+    await api.POST("/api/v2/company-search", { body: { query } }),
+  );
+}
+
+/** Preview one selected website before the existing explicit identity confirmation. */
+export async function previewCompany(domain: string) {
+  return researchResult(
+    await api.POST("/api/v2/research-identities", { body: { domain } }),
+  );
+}
 export async function confirmIdentity(identityId: string) {
   return researchResult(
     await api.POST("/api/v2/research-jobs", {

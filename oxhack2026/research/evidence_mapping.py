@@ -618,6 +618,8 @@ class MappingEngine:
                     if isinstance(error, MappingUnavailable)
                     else "gemini_invalid_or_unavailable"
                 )
+                if isinstance(error, (MappingUnavailable, ImportError)):
+                    break
                 continue
             for value in proposals:
                 try:

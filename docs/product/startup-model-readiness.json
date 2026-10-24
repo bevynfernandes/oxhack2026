@@ -1,0 +1,95 @@
+{
+  "audited_at": "2026-10-24T22:54:40.605841+00:00",
+  "deployment_decision": "No startup-success/survival probability or complete five-dimension business score from these data.",
+  "no_replacement_outcome_models_fitted": true,
+  "public_datasets": [
+    {
+      "decision": "reject_as_fixed_horizon_outcome_training",
+      "has_closure_date": false,
+      "has_exit_date": false,
+      "name": "66,368-company Crunchbase-derived flat file",
+      "reason": "Current status and lifetime funding totals do not establish pre-origin features and dated outcomes.",
+      "rows": 66368
+    },
+    {
+      "commit": "13b7bce45f0f5da544303a17fa1c6235a9cbb619",
+      "companies": 3566,
+      "decision": "adjudication_leads_only",
+      "name": "Startup Lifecycle Project v1.0.0",
+      "reason": "Current YC status is not a dated outcome; website death proxy can lag shutdown announcements by 20 months; limited independently documented closure sample."
+    },
+    {
+      "company_status_counts": [
+        {
+          "len": 1134,
+          "status": "ipo"
+        },
+        {
+          "len": 2584,
+          "status": "closed"
+        },
+        {
+          "len": 183441,
+          "status": "operating"
+        },
+        {
+          "len": 9394,
+          "status": "acquired"
+        }
+      ],
+      "decision": "reconstructed_research_only_not_training_ready",
+      "name": "Crunchbase 2013 Snapshot (Kaggle justinas/startup-investments)",
+      "reason": "Retrospective values lack verified original availability; frozen temporal/family-separated development sample has only one training closure and four training exits. Do not alter splits to manufacture successful fitting."
+    }
+  ],
+  "reconstructed_panel": {
+    "counts": [
+      {
+        "companies": 442,
+        "families": 58,
+        "partition": "excluded_family_overlap",
+        "recorded_closure_24m": 1,
+        "recorded_exit_24m": 178
+      },
+      {
+        "companies": 4664,
+        "families": 4497,
+        "partition": "excluded_time_gap",
+        "recorded_closure_24m": 151,
+        "recorded_exit_24m": 214
+      },
+      {
+        "companies": 2150,
+        "families": 2138,
+        "partition": "test",
+        "recorded_closure_24m": 107,
+        "recorded_exit_24m": 77
+      },
+      {
+        "companies": 328,
+        "families": 323,
+        "partition": "train",
+        "recorded_closure_24m": 1,
+        "recorded_exit_24m": 4
+      },
+      {
+        "companies": 1325,
+        "families": 1296,
+        "partition": "validation",
+        "recorded_closure_24m": 39,
+        "recorded_exit_24m": 65
+      }
+    ],
+    "feature_names": [
+      "age_years",
+      "log_early_funding_usd",
+      "early_round_count",
+      "unknown_amount_fraction",
+      "days_since_last_round"
+    ],
+    "origin": "12 months after first recorded funding",
+    "panel_sha256": "6e6c22cf7e9ce9bff37d09f4f8ce1b1397ff2816abe3b8ddedaf1565036dc927",
+    "split": "train origins 2000-2005; validation 2008; test 2011; cross-partition acquisition families excluded"
+  },
+  "status": "business_prediction_training_data_not_ready"
+}
