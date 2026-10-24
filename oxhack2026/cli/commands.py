@@ -137,3 +137,34 @@ def company_health(root: Path, snapshot_id: str) -> None:
                 f"{len(coverage.applicable_metric_ids)} observed; "
                 f"{len(coverage.stale_metric_ids)} stale"
             )
+
+
+@data.command("assessment-publish")
+def assessment_publish(
+    root: Path,
+    publication_id: str,
+    assessments_path: Path,
+    expected_current: str | None = None,
+) -> None:
+    """Validate a model-produced C2 array against ROOT and publish an exact batch."""
+    from pydantic import TypeAdapter
+
+    from oxhack2026.models.company_assessments import CompanyAssessment
+    from oxhack2026.storage.company_assessments import LocalCompanyAssessmentStore
+
+    records = TypeAdapter(tuple[CompanyAssessment, ...]).validate_json(
+        assessments_path.read_bytes()
+    )
+    manifest = LocalCompanyAssessmentStore(root).publish(
+        publication_id, records, expected_current
+    )
+    typer.echo(manifest.publication_id)
+
+
+@data.command("assessment-health")
+def assessment_health(root: Path, publication_id: str) -> None:
+    """Verify exact C2 records, manifest and all referenced C1 source bytes."""
+    from oxhack2026.storage.company_assessments import LocalCompanyAssessmentStore
+
+    records = LocalCompanyAssessmentStore(root).assessments(publication_id)
+    typer.echo(f"{publication_id}: {len(records)} verified company assessments")
