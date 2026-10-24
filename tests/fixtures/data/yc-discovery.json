@@ -1,0 +1,5 @@
+[
+  {"id": 1, "name": "Synthetic Active", "batch": "Winter 2020", "status": "Active", "url": "https://www.ycombinator.com/companies/synthetic-active"},
+  {"id": 2, "name": "Synthetic Inactive", "batch": "Winter 2020", "status": "Inactive", "url": "https://www.ycombinator.com/companies/synthetic-inactive"},
+  {"id": 3, "name": "Synthetic Acquired", "batch": "Winter 2020", "status": "Acquired", "url": "https://www.ycombinator.com/companies/synthetic-acquired"}
+]

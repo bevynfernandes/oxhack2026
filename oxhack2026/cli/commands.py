@@ -185,3 +185,16 @@ def company_restore(archive: Path, destination: Path, expected_sha256: str) -> N
 
     restore_company_store(archive, destination, expected_sha256)
     typer.echo("Company source and assessment publications verified and restored")
+
+
+@data.command("cohort-discover")
+def cohort_discover(settings_path: Path, root: Path) -> None:
+    """Retain a complete public batch as discovery with unresolved outcome follow-up."""
+    from oxhack2026.ingest.company_cohort import CohortDiscoverySettings, collect_cohort
+
+    settings = CohortDiscoverySettings.model_validate_json(settings_path.read_bytes())
+    ledger = collect_cohort(settings, root)
+    typer.echo(
+        f"{settings.cohort_version}: {len(ledger.companies)} companies; "
+        f"{len(ledger.followups)} unresolved outcome follow-ups"
+    )
