@@ -245,9 +245,9 @@ class CompanyEvent(EvidenceTiming):
         if (
             self.stage != "announced"
             and self.occurred_on is not None
-            and self.occurred_on > self.collected_at.date()
+            and self.occurred_on > self.available_at.date()
         ):
-            message = "A reported/completed event cannot occur after collection"
+            message = "A reported/completed event cannot occur after availability"
             raise ValueError(message)
         if self.supersedes_id == self.event_id:
             message = "An event cannot supersede itself"

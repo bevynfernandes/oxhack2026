@@ -181,3 +181,22 @@ def test_reader_methods_never_substitute_unknown_company(
         ):
             with pytest.raises(KeyError):
                 method("v1", "absent")
+
+
+@pytest.mark.parametrize("stage", ["completed", "reported"])
+def test_reconstruction_rejects_future_occurrence(
+    company_source: tuple[CompanySourceSnapshot, ArtifactStore], stage: str
+) -> None:
+    """Later collection cannot backdate knowledge of a completed/reported event."""
+    snapshot, _ = company_source
+    payload = snapshot.model_dump(mode="json")
+    payload.update(mode="historical_reconstruction", recorded_at="2025-02-03T00:00:00Z")
+    payload["events"][0].update(
+        stage=stage, occurred_on="2025-02-02", collected_at="2025-02-03T00:00:00Z"
+    )
+    with pytest.raises(ValidationError, match="after availability"):
+        CompanySourceSnapshot.model_validate(payload)
+    payload["events"][0]["occurred_on"] = "2025-02-01"
+    assert CompanySourceSnapshot.model_validate(payload).events[0].stage == stage
+    payload["events"][0].update(stage="announced", occurred_on="2025-02-02")
+    assert CompanySourceSnapshot.model_validate(payload).events[0].stage == "announced"
