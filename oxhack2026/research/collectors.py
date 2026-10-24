@@ -28,6 +28,22 @@ from oxhack2026.research.network import CollectionError, Fetcher, public_url
 logger = logging.getLogger(__name__)
 
 
+def _news_domain_matches(page: Page, domain: str) -> bool:
+    if any(
+        (urlsplit(url).hostname or "").removeprefix("www.") == domain
+        for url in page.links
+    ):
+        return True
+    return (
+        re.search(
+            rf"(?<![\w.-])(?:www\.)?{re.escape(domain)}(?![\w.-])",
+            page.text,
+            flags=re.IGNORECASE,
+        )
+        is not None
+    )
+
+
 @dataclass
 class Collector:
     """Accumulate successful records even if a later request fails.
@@ -347,7 +363,7 @@ class Collector:
                     event_id=f"hn-{identifier}",
                     kind="hn_exact_domain_story",
                     title=str(hit.get("title") or ""),
-                    url=f"https://news.ycombinator.com/item/{identifier}",
+                    url=f"https://news.ycombinator.com/item?id={identifier}",
                     published_at=datetime.fromtimestamp(published, UTC).isoformat(),
                     evidence_ids=(item.evidence_id,),
                 )
@@ -465,10 +481,7 @@ class Collector:
                 capture, content = self.fetcher.fetch(link)
                 page = parse_page(capture, content)
                 self.support.extend(page.evidence)
-                matched = self.identity.canonical_domain in page.text.lower() or any(
-                    urlsplit(url).hostname == self.identity.canonical_domain
-                    for url in page.links
-                )
+                matched = _news_domain_matches(page, self.identity.canonical_domain)
                 self.events.append(
                     Event(
                         event_id=uuid4().hex,
