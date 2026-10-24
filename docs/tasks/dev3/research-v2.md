@@ -148,9 +148,9 @@ company model payloads remain attached. Unknown definitions, rejected model
 proposals and bounded interpretation coverage have explicit reasons.
 
 Install the `research` and `explanations` extras for interpretation. The default
-`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` performs no model requests. Set
-`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini` to enable the optional interpreter,
-whose default is `gemini-3.8-live-extended-thinking`, using Google's Live API.
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini` enables the interpreter,
+using `gemini-3.8-live-extended-thinking` through Google's Live API. Set
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` explicitly to make no model requests.
 The adapter enables audio output and transcription, discards audio immediately,
 and receives data through an asynchronous, local-only evidence submission function.
 It waits for explicit `IDLE` rather than stopping on `turnComplete`.

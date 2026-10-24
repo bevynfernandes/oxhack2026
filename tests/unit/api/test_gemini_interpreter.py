@@ -12,7 +12,7 @@ from oxhack2026.explanations.gemini import GeminiInterpreter, MappingUnavailable
 
 
 def test_gemma_structured_text_and_usage(monkeypatch: pytest.MonkeyPatch) -> None:
-    """The shared default requests structured native text without audio or tools."""
+    """An explicit Gemma override requests native structured text without audio."""
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")
     monkeypatch.setenv("GEMINI_MODEL", "gemma-4-31b-it")
     monkeypatch.setattr(GeminiInterpreter, "_reserve", lambda self, tokens: None)
@@ -62,6 +62,16 @@ def test_explicit_model_override(monkeypatch: pytest.MonkeyPatch) -> None:
     """Contributors can explicitly select a different structured-text model."""
     monkeypatch.setenv("GEMINI_MODEL", "gemini-2.5-flash")
     assert GeminiInterpreter(0).model == "gemini-2.5-flash"
+
+
+def test_gemini_live_enabled_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    """New workers use Gemini Live without an additional mode or model setting."""
+    monkeypatch.delenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", raising=False)
+    monkeypatch.delenv("GEMINI_MODEL", raising=False)
+    assert config.mapping_mode() == "rules_gemini"
+    assert GeminiInterpreter(0).model == "gemini-3.8-live-extended-thinking"
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
+    assert config.mapping_mode() == "rules"
 
 
 def test_provider_error_sanitized(monkeypatch: pytest.MonkeyPatch) -> None:

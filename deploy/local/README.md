@@ -84,9 +84,9 @@ bundle. Restart the API after changing the bundle. Existing immutable reports ke
 their original contents.
 
 For evidence interpretation, install `--extra research --extra explanations` in
-addition to the API/data profile (the API image includes both). Enable
-`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini` for the shared Gemini Live default,
-or retain `rules` for deterministic mapping. A personal `GEMINI_API_KEY` overrides
+addition to the API/data profile (the API image includes both). Gemini Live
+interpretation is enabled by default. Set `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules`
+explicitly for deterministic mapping without model calls. A personal `GEMINI_API_KEY` overrides
 the private repository's backend default; an explicit empty environment value
 disables it. `GEMINI_MODEL` changes the model only by explicit configuration.
 To re-map existing reports without fetching sources, enable

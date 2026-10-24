@@ -39,6 +39,12 @@ from oxhack2026.research.v2_store import V2Store
 from oxhack2026.storage.artifacts import FileArtifactStore
 
 
+@pytest.fixture(autouse=True)
+def deterministic_mapping(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep capture-only regressions offline; interpreter tests inject their client."""
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
+
+
 def source_report(
     root: Path, html: str, url: str = "https://example.com/about"
 ) -> Report:

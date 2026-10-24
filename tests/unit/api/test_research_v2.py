@@ -325,9 +325,11 @@ def _service(tmp_path: Path) -> V2Service:
 
 def test_standalone_api_confirmation_progress_and_independent_failure(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Standalone research completes with fresh results despite independent
     provider failures."""
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
     service = _service(tmp_path)
     app = create_app()
     app.dependency_overrides[get_v2_service] = lambda: service
