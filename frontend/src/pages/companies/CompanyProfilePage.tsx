@@ -52,6 +52,7 @@ export default function CompanyProfilePage() {
       {profile && (
         <>
           <header className="page-heading">
+            <p className="eyebrow">SAVED ANALYSIS</p>
             <h1>{profile.company.display_name}</h1>
             <p>
               {profile.company.segment} ·{" "}
