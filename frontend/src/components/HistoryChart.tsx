@@ -20,6 +20,16 @@ export default function HistoryChart({
   const element = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!element.current || points.length === 0) return;
+    const styles = getComputedStyle(element.current);
+    const themed = styles.getPropertyValue("--theme-canvas").trim() !== "";
+    const colour = (token: string) => styles.getPropertyValue(token).trim();
+    const axisTheme = themed
+      ? {
+          axisLabel: { color: colour("--theme-muted") },
+          axisLine: { lineStyle: { color: colour("--theme-control-line") } },
+          splitLine: { lineStyle: { color: colour("--theme-line") } },
+        }
+      : {};
     const chart = init(element.current, undefined, { renderer: "svg" });
     chart.setOption({
       animation: false,
@@ -29,12 +39,23 @@ export default function HistoryChart({
           "Observed package downloads. Missing observations are gaps. Exact values follow in the history table.",
       },
       grid: { left: 64, right: 24, top: 24, bottom: 48 },
-      tooltip: { trigger: "axis", renderMode: "richText" },
+      tooltip: {
+        trigger: "axis",
+        renderMode: "richText",
+        ...(themed
+          ? {
+              backgroundColor: colour("--theme-raised"),
+              borderColor: colour("--theme-control-line"),
+              textStyle: { color: colour("--theme-text") },
+            }
+          : {}),
+      },
       xAxis: {
         type: "category",
+        ...axisTheme,
         data: points.map((point) => point.window.start.slice(0, 10)),
       },
-      yAxis: { type: "value", min: 0 },
+      yAxis: { type: "value", min: 0, ...axisTheme },
       series: [
         {
           type: "line",
@@ -42,7 +63,11 @@ export default function HistoryChart({
           connectNulls: false,
           symbol: "circle",
           symbolSize: 8,
-          lineStyle: { color: "#187153", width: 2 },
+          lineStyle: {
+            color: themed ? colour("--theme-accent") : "#187153",
+            width: 2,
+          },
+          ...(themed ? { itemStyle: { color: colour("--theme-accent") } } : {}),
         },
       ],
     });

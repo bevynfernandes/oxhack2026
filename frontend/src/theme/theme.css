@@ -391,3 +391,234 @@
     background-image: none;
   }
 }
+
+/* Directory, comparison, methodology and legacy research share the same palette. */
+.theme-techno-classical
+  :is(
+    .home-directory,
+    .home-fundamentals,
+    .company-search-panel,
+    .summary-grid,
+    .outcome-rows,
+    .statement-list li,
+    .workspace-drivers,
+    .research-source-list li,
+    .table-scroll table,
+    .comparison-table
+  ) {
+  color: var(--theme-text);
+  background: var(--theme-surface);
+  border-color: var(--theme-line);
+  border-radius: 4px;
+  box-shadow: none;
+}
+.theme-techno-classical
+  :is(
+    .home-terminal-heading h1,
+    .home-directory-heading h2,
+    .home-fundamentals h2,
+    .home-directory .company-results h3
+  ) {
+  font-family: var(--theme-display);
+  font-weight: 600;
+  letter-spacing: 0.015em;
+}
+.theme-techno-classical
+  :is(
+    .home-terminal-heading .eyebrow,
+    .home-terminal-heading p:last-child,
+    .directory-status,
+    .home-directory-heading > span,
+    .terminal-search,
+    .directory-count,
+    .home-directory .company-results p,
+    .directory-footer,
+    .home-fundamentals > p,
+    .home-fundamentals li,
+    .home-fundamentals li span,
+    .home-model-note,
+    .home-model-note strong,
+    .home-heading > p:last-child,
+    .home-secondary,
+    .research-guide span,
+    .research-guide p,
+    .home-footnote,
+    .company-results p,
+    .statement-list li > strong,
+    .batch-list p,
+    .summary-grid span,
+    thead th,
+    .workspace-date,
+    .workspace-outlook > p:not(.eyebrow),
+    .workspace-forecast h3 span,
+    .workspace-forecast p,
+    .driver-state
+  ) {
+  color: var(--theme-muted);
+}
+.theme-techno-classical .home-directory .company-results small {
+  color: var(--theme-accent);
+}
+.theme-techno-classical
+  :is(.home-directory .company-monogram, .company-monogram) {
+  color: var(--theme-text);
+  background: var(--theme-raised);
+  border-color: var(--theme-control-line);
+  border-radius: 3px;
+  font-family: var(--theme-display);
+}
+.theme-techno-classical :is(.terminal-search input, .home-search input) {
+  color: var(--theme-text);
+  background-color: var(--theme-canvas);
+  border-color: var(--theme-control-line);
+  border-radius: 3px;
+}
+.theme-techno-classical .home-fundamentals {
+  border-top-color: var(--theme-accent);
+}
+.theme-techno-classical
+  :is(
+    .home-fundamentals ol,
+    .home-model-note,
+    .home-directory .company-results li,
+    .company-results li,
+    .directory-footer,
+    .home-secondary,
+    .profile-sections,
+    .outcome-row,
+    .company-section,
+    .compare-selection,
+    .batch-list li,
+    th,
+    td,
+    .methodology > section,
+    .receipt,
+    .workspace-forecast,
+    .workspace-forecast + .workspace-forecast,
+    .workspace-driver + .workspace-driver
+  ) {
+  border-color: var(--theme-line);
+}
+.theme-techno-classical :is(thead, .comparison-table thead th) {
+  color: var(--theme-muted);
+  background: var(--theme-raised);
+}
+.theme-techno-classical tbody tr:hover {
+  background: var(--theme-raised);
+}
+.theme-techno-classical .comparison-table .outcome-rows {
+  background: transparent;
+}
+.theme-techno-classical :is(.company-open, .company-section > .coverage-list) {
+  color: var(--theme-text);
+  background: var(--theme-raised);
+  border-color: var(--theme-control-line);
+  border-radius: 3px;
+}
+.theme-techno-classical .company-open:hover {
+  background: var(--theme-selected);
+  border-color: var(--theme-accent);
+}
+.theme-techno-classical
+  :is(
+    .outcome-row strong,
+    .methodology-definitions dt,
+    .workspace-forecast .forecast-value
+  ) {
+  color: var(--theme-text);
+}
+.theme-techno-classical
+  :is(
+    .metadata dd,
+    .summary-grid strong,
+    .receipt,
+    .stat-value,
+    .research-metrics dd > strong
+  ) {
+  font-variant-numeric: tabular-nums;
+}
+.theme-techno-classical
+  :is(.metadata dt, .summary-grid span, caption, thead th) {
+  font-family: var(--theme-mono);
+  letter-spacing: 0.015em;
+}
+/* Existing dates and ordering remain intact; only the evidence presentation changes. */
+.theme-techno-classical .evidence-event {
+  position: relative;
+  border-left: 1px solid var(--theme-control-line);
+  padding-left: 20px;
+  margin-left: 4px;
+}
+.theme-techno-classical .evidence-event::before {
+  content: "";
+  position: absolute;
+  top: 1.25rem;
+  left: -4px;
+  width: 7px;
+  height: 7px;
+  background: var(--theme-accent);
+  outline: 3px solid var(--theme-surface);
+}
+.theme-techno-classical
+  :is(
+    .evidence-event h4,
+    .evidence-timestamp,
+    .dossier-sources small,
+    .research-metrics small
+  ) {
+  font-family: var(--theme-mono);
+  font-variant-numeric: tabular-nums;
+}
+.theme-techno-classical
+  :is(.source-list li, .dossier-sources li, .research-metrics > div) {
+  border-bottom: 1px solid var(--theme-line);
+}
+.theme-techno-classical blockquote {
+  margin-inline: 0;
+  padding: 0.75rem 1rem;
+  border-left: 2px solid var(--theme-control-line);
+  color: var(--theme-text);
+  background: var(--theme-canvas);
+}
+.theme-techno-classical .history-chart {
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-line);
+}
+.theme-techno-classical
+  :is(.table-scroll, .comparison-scroll, .pillar-measurements):focus-visible {
+  outline-offset: -3px;
+}
+@media (min-width: 801px) {
+  .theme-techno-classical .home-terminal-heading::after {
+    content: "";
+    width: 150px;
+    height: 82px;
+    flex: 0 0 150px;
+    background: url("./assets/observatory.svg") no-repeat center / contain;
+  }
+  .theme-techno-classical .home-terminal-heading .directory-status {
+    margin-left: auto;
+  }
+}
+@media (forced-colors: active) {
+  .theme-techno-classical .home-terminal-heading::after {
+    background-image: none;
+  }
+}
+
+/* A zoomed or short viewport must scroll instead of compressing evidence away. */
+@media (max-height: 600px) {
+  .theme-techno-classical .terminal-view > main {
+    overflow: auto;
+  }
+  .theme-techno-classical .company-dossier {
+    height: auto;
+    min-height: 650px;
+    flex-shrink: 0;
+  }
+  .theme-techno-classical .terminal-home {
+    max-height: none;
+    margin-block: 0;
+    flex-shrink: 0;
+  }
+}
