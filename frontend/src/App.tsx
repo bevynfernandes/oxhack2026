@@ -1,4 +1,5 @@
-import { NavLink, Route, Routes } from "react-router-dom";
+import { NavLink, Route, Routes, useLocation } from "react-router-dom";
+import Icon from "./components/WorkspaceIcon";
 import BatchPicker from "./pages/rankings/BatchPicker";
 import BatchPage from "./pages/rankings/BatchPage";
 import EvaluationPage from "./pages/evaluation/EvaluationPage";
@@ -14,15 +15,27 @@ import ComparePage from "./pages/companies/ComparePage";
 
 /** Route the scouting workflow without bundling or silently loading test fixtures. */
 export default function App() {
+  const { pathname } = useLocation();
+  const terminal =
+    pathname === "/" ||
+    pathname.startsWith("/companies/") ||
+    pathname.startsWith("/research/");
   return (
-    <>
+    <div className={`app-shell ${terminal ? "terminal-view" : ""}`}>
       <a className="skip-link" href="#main">
         Skip to content
       </a>
       <header className="site-header">
         <NavLink to="/" className="brand">
-          SignalShift<span>Startup outlook</span>
+          <span className="brand-symbol">
+            <Icon name="activity" />
+          </span>
+          <strong>SignalShift</strong>
+          <span className="terminal-tag">RESEARCH</span>
         </NavLink>
+        <div className="terminal-breadcrumb">
+          Company intelligence <span>/</span> Startup outlook
+        </div>
         <nav aria-label="Main navigation">
           <NavLink to="/" end>
             Companies
@@ -31,7 +44,7 @@ export default function App() {
           <NavLink to="/methodology">Methodology</NavLink>
         </nav>
       </header>
-      <main id="main" tabIndex={-1}>
+      <main id="main" tabIndex={terminal ? -1 : 0}>
         <Routes>
           <Route path="/" element={<CompanyHomePage />} />
           <Route
@@ -73,12 +86,15 @@ export default function App() {
         </Routes>
       </main>
       <footer>
-        Company outlooks describe published evidence and its limits. Package
-        activity alone does not establish company growth.{" "}
-        <NavLink to="/traction">Traction research</NavLink>
-        {" · "}
-        <NavLink to="/data-health">Data health</NavLink>
+        <span>
+          Evidence-backed research · Forecasts unavailable until validated
+        </span>
+        <div>
+          <NavLink to="/traction">Traction research</NavLink>
+          {" · "}
+          <NavLink to="/data-health">Data health</NavLink>
+        </div>
       </footer>
-    </>
+    </div>
   );
 }

@@ -8,21 +8,11 @@ from oxhack2026.api.research_schemas import (
 )
 from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.models.startup_outlook import (
-    SpecialistGroupId,
     SpecialistOutlook,
     StartupOutlook,
-    build_untrained_outlook,
+    build_company_outlook,
 )
 from oxhack2026.research.attention import AttentionCapture
-
-_METRIC_GROUPS: dict[str, SpecialistGroupId] = {
-    "npm_downloads_30d_v1": "adoption_retention",
-    "npm_downloads_previous_30d_v1": "adoption_retention",
-    "active_paying_customers_v1": "adoption_retention",
-    "github_stable_releases_90d_v1": "team_execution",
-    "revenue_12m_usd_v1": "financial_health",
-    "operating_cashflow_12m_usd_v1": "financial_health",
-}
 
 
 def build_report(
@@ -61,13 +51,7 @@ def build_report(
         source.model_dump()
         | {"snapshot_id": inventory_id, "as_of": cutoff, "recorded_at": cutoff}
     )
-    definitions = {row.metric_id for row in source.definitions}
-    mapping = {
-        key: value for key, value in _METRIC_GROUPS.items() if key in definitions
-    }
-    saved_outlook = build_untrained_outlook(
-        view, job.request.company_id, mapping, "research-metric-groups-v1"
-    )
+    saved_outlook = build_company_outlook(view, job.request.company_id)
     observation = captured.observation
     attention = SpecialistOutlook(
         group_id="attention_sentiment",

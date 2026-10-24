@@ -1,5 +1,10 @@
 # Startup prediction workspace reference
 
+**Superseded visual reference.** The user requested the original Stitch
+five-column layout and a viewport-sized overview. The running React implementation
+in `frontend/src/pages/research/CompanyDossier.tsx` is now authoritative. This HTML
+remains archived; do not use its scrolling row layout for further UI work.
+
 The user approved this hierarchy on 2026-10-24:
 
 1. Overall Startup Outlook.
@@ -15,9 +20,8 @@ logic. Northstar is an illustrative company on a reserved `.example` domain;
 all measurements and forecasts are explicitly unavailable. This is not a real
 research report or a replacement application.
 
-Ivan owns the React implementation. Port the hierarchy, spacing, restrained
-colors and detail interaction into existing components; consume generated API
-types rather than copying static copy/data or introducing another scoring policy.
+Consume generated API types rather than copying static copy/data or introducing
+another scoring policy.
 Preserve company search, explicit identity confirmation, actual research states,
 saved links, evidence dates and partial results. See the implementation criteria
 in [the alignment decision](../../docs/tasks/dev2/prediction-workspace-alignment.md).

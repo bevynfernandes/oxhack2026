@@ -59,8 +59,11 @@ test("company research searches, inspects sources and compares the same publishe
     .getByRole("link", { name: "Synthetic alpha", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Company outlook" }),
+    page.getByRole("heading", { name: "Overall outlook unavailable" }),
   ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Saved assessment", exact: true })
+    .click();
   await expect(
     page.getByRole("heading", { name: "Cash-flow self-sufficiency" }),
   ).toBeVisible();
@@ -68,10 +71,10 @@ test("company research searches, inspects sources and compares the same publishe
     page.getByText("Assessment unavailable", { exact: true }),
   ).toBeVisible();
   await page
-    .getByRole("link", { name: /Inspect \d+ supporting source/ })
+    .getByRole("button", { name: /Inspect \d+ supporting source/ })
     .first()
     .click();
-  await expect(page.locator("details#sources")).toHaveAttribute("open", "");
+  await expect(page.getByRole("dialog")).toBeVisible();
   await expect(
     page.getByRole("link", { name: "Original source (opens new tab)" }),
   ).toBeVisible();

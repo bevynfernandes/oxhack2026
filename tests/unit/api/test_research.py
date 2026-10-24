@@ -479,11 +479,7 @@ def test_saved_measurements_are_rechecked_for_staleness_at_report_cutoff(
     """A refresh never makes saved old measurements fresh merely by copying them."""
     source, saved = context
     captured = _capture({"hits": [], "nbHits": 0, "nbPages": 0})
-    with patch.dict(
-        "oxhack2026.research.report._METRIC_GROUPS",
-        {"sdk_downloads_30d_v1": "adoption_retention"},
-    ):
-        report = build_report(_job(), saved, source, captured)
+    report = build_report(_job(), saved, source, captured)
 
     adoption = report.outlook.specialists[0]
     assert adoption.data_status == "insufficient_data"

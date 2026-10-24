@@ -507,6 +507,16 @@
             "title": "Metrics",
             "type": "array"
           },
+          "outlook": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StartupOutlook"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "publication": {
             "$ref": "#/components/schemas/CompanyPublication"
           },
