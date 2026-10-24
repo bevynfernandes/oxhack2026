@@ -8,6 +8,7 @@ from unittest.mock import patch
 import orjson
 import pytest
 
+from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.catalog.schemas import CatalogSnapshot, TimeWindow
 from oxhack2026.ingest.npm import NpmCheckpoint, NpmRequest, normalize_range
 from oxhack2026.storage.build import CandidateConfig, write_candidate
@@ -89,3 +90,17 @@ def synthetic_bundle() -> tuple[DatasetBundle, ArtifactStore]:
             ),
         )
     return bundle, artifacts
+
+
+@pytest.fixture
+def company_source() -> tuple["CompanySourceSnapshot", ArtifactStore]:
+    """Load labelled synthetic company facts with a mocked raw artifact store."""
+    fixture_root = Path(__file__).parent / "fixtures/data"
+    snapshot = CompanySourceSnapshot.model_validate_json(
+        (fixture_root / "company-source.json").read_bytes()
+    )
+    artifacts = MemoryArtifacts()
+    artifacts.write(
+        (fixture_root / "company-source-raw.json").read_bytes(), "application/json"
+    )
+    return snapshot, artifacts

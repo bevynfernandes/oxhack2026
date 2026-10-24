@@ -1,0 +1,874 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Hashed artifact relative to a configured bundle root, never a signed URL.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "byte_size": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Byte Size",
+          "type": "integer"
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/x-ndjson",
+            "application/vnd.apache.parquet",
+            "application/octet-stream"
+          ],
+          "title": "Media Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "byte_size",
+        "media_type"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "BooleanValue": {
+      "additionalProperties": false,
+      "description": "Explicit observed Boolean; absence is represented by observation state.",
+      "properties": {
+        "kind": {
+          "const": "boolean",
+          "default": "boolean",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "BooleanValue",
+      "type": "object"
+    },
+    "CompanyEvent": {
+      "additionalProperties": false,
+      "description": "Dated reported occurrence; company shutdown differs from product retirement.",
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "event_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Event Id",
+          "type": "string"
+        },
+        "company_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "funding",
+            "acquisition",
+            "company_shutdown",
+            "product_retirement",
+            "release",
+            "ownership_change"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "announced",
+            "completed",
+            "reported"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "occurred_on": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Occurred On"
+        },
+        "date_precision": {
+          "enum": [
+            "day",
+            "unknown"
+          ],
+          "title": "Date Precision",
+          "type": "string"
+        },
+        "description": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "supersedes_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes Id"
+        }
+      },
+      "required": [
+        "available_at",
+        "collected_at",
+        "event_id",
+        "company_id",
+        "kind",
+        "stage",
+        "occurred_on",
+        "date_precision",
+        "description",
+        "evidence_ids"
+      ],
+      "title": "CompanyEvent",
+      "type": "object"
+    },
+    "CompanyMetricObservation": {
+      "additionalProperties": false,
+      "description": "One selected metric vintage; missing/conflicting values cannot become zero.",
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "observation_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Observation Id",
+          "type": "string"
+        },
+        "company_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "window": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/TimeWindow"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "measured_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Measured At"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "discriminator": {
+                "mapping": {
+                  "boolean": "#/$defs/BooleanValue",
+                  "decimal": "#/$defs/DecimalValue",
+                  "integer": "#/$defs/IntegerValue"
+                },
+                "propertyName": "kind"
+              },
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/IntegerValue"
+                },
+                {
+                  "$ref": "#/$defs/DecimalValue"
+                },
+                {
+                  "$ref": "#/$defs/BooleanValue"
+                }
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "state": {
+          "enum": [
+            "observed",
+            "missing",
+            "not_applicable",
+            "conflicting"
+          ],
+          "title": "State",
+          "type": "string"
+        },
+        "reason": {
+          "anyOf": [
+            {
+              "maxLength": 4000,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reason"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "supersedes_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes Id"
+        }
+      },
+      "required": [
+        "available_at",
+        "collected_at",
+        "observation_id",
+        "company_id",
+        "metric_id",
+        "window",
+        "measured_at",
+        "value",
+        "state",
+        "reason",
+        "evidence_ids"
+      ],
+      "title": "CompanyMetricObservation",
+      "type": "object"
+    },
+    "CompanyProfile": {
+      "additionalProperties": false,
+      "description": "Snapshot-specific company identity/context; unknown context remains null.",
+      "properties": {
+        "company_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "display_name": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Display Name",
+          "type": "string"
+        },
+        "website_url": {
+          "title": "Website Url",
+          "type": "string"
+        },
+        "segment": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Segment",
+          "type": "string"
+        },
+        "business_model": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Business Model"
+        },
+        "stage": {
+          "anyOf": [
+            {
+              "maxLength": 256,
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Stage"
+        },
+        "context_as_of": {
+          "format": "date-time",
+          "title": "Context As Of",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "company_id",
+        "display_name",
+        "website_url",
+        "segment",
+        "business_model",
+        "stage",
+        "context_as_of",
+        "evidence_ids"
+      ],
+      "title": "CompanyProfile",
+      "type": "object"
+    },
+    "CompanyRelationship": {
+      "additionalProperties": false,
+      "description": "Evidence-backed effective mapping, including explicit family membership.\n\nFamily targets are opaque grouping IDs, not an implicit current parent.\nA self-family assertion needs evidence just like any other membership.",
+      "properties": {
+        "relationship_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Relationship Id",
+          "type": "string"
+        },
+        "company_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "subject_kind": {
+          "enum": [
+            "legal_entity",
+            "tool",
+            "package",
+            "repository",
+            "family"
+          ],
+          "title": "Subject Kind",
+          "type": "string"
+        },
+        "subject_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Subject Id",
+          "type": "string"
+        },
+        "valid_from": {
+          "format": "date-time",
+          "title": "Valid From",
+          "type": "string"
+        },
+        "valid_to": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Valid To"
+        },
+        "evidence_ids": {
+          "items": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Evidence Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "relationship_id",
+        "company_id",
+        "subject_kind",
+        "subject_id",
+        "valid_from",
+        "valid_to",
+        "evidence_ids"
+      ],
+      "title": "CompanyRelationship",
+      "type": "object"
+    },
+    "DecimalValue": {
+      "additionalProperties": false,
+      "description": "Exact finite decimal serialized as a string; binary floats are rejected.",
+      "properties": {
+        "kind": {
+          "const": "decimal",
+          "default": "decimal",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "DecimalValue",
+      "type": "object"
+    },
+    "IntegerValue": {
+      "additionalProperties": false,
+      "description": "Exact count, excluding Boolean and coercible string/float inputs.",
+      "properties": {
+        "kind": {
+          "const": "integer",
+          "default": "integer",
+          "title": "Kind",
+          "type": "string"
+        },
+        "value": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value"
+      ],
+      "title": "IntegerValue",
+      "type": "object"
+    },
+    "MetricDefinition": {
+      "additionalProperties": false,
+      "description": "Versioned measurement meaning; source freshness is not predictive confidence.",
+      "properties": {
+        "metric_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "family": {
+          "enum": [
+            "traction",
+            "commercial",
+            "execution",
+            "market_financing"
+          ],
+          "title": "Family",
+          "type": "string"
+        },
+        "label": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "definition": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Definition",
+          "type": "string"
+        },
+        "unit": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value_kind": {
+          "enum": [
+            "integer",
+            "decimal",
+            "boolean"
+          ],
+          "title": "Value Kind",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "company",
+            "product",
+            "repository"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "applicability": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Applicability",
+          "type": "string"
+        },
+        "maximum_age_days": {
+          "exclusiveMinimum": 0,
+          "title": "Maximum Age Days",
+          "type": "integer"
+        },
+        "currency": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Z]{3}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currency"
+        }
+      },
+      "required": [
+        "metric_id",
+        "family",
+        "label",
+        "definition",
+        "unit",
+        "value_kind",
+        "scope",
+        "applicability",
+        "maximum_age_days"
+      ],
+      "title": "MetricDefinition",
+      "type": "object"
+    },
+    "SourceEvidence": {
+      "additionalProperties": false,
+      "description": "Captured source and bounded assertion, scoped to one company.\n\nRestricted attachments have no public URL. Review state describes verification\nof the asserted source fact, never probability of company success.",
+      "properties": {
+        "available_at": {
+          "format": "date-time",
+          "title": "Available At",
+          "type": "string"
+        },
+        "collected_at": {
+          "format": "date-time",
+          "title": "Collected At",
+          "type": "string"
+        },
+        "evidence_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "company_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Company Id",
+          "type": "string"
+        },
+        "provider": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+          "title": "Provider",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Url"
+        },
+        "access": {
+          "enum": [
+            "public",
+            "restricted"
+          ],
+          "title": "Access",
+          "type": "string"
+        },
+        "raw_artifact": {
+          "$ref": "#/$defs/ArtifactReference"
+        },
+        "locator": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "assertion": {
+          "maxLength": 4000,
+          "minLength": 1,
+          "title": "Assertion",
+          "type": "string"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Published At"
+        },
+        "availability_basis": {
+          "enum": [
+            "dated_publication",
+            "first_observed"
+          ],
+          "title": "Availability Basis",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "registry_record",
+            "company_reported",
+            "platform_observed",
+            "user_supplied"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "review_state": {
+          "enum": [
+            "unreviewed",
+            "verified",
+            "disputed"
+          ],
+          "title": "Review State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "available_at",
+        "collected_at",
+        "evidence_id",
+        "company_id",
+        "provider",
+        "url",
+        "access",
+        "raw_artifact",
+        "locator",
+        "assertion",
+        "published_at",
+        "availability_basis",
+        "kind",
+        "review_state"
+      ],
+      "title": "SourceEvidence",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "A nonempty half-open interval [start, end), always in UTC.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Normalized frozen tables; cross-table validation rejects misattribution.",
+  "properties": {
+    "schema_version": {
+      "const": "company-source-v1",
+      "default": "company-source-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "cohort_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Cohort Version",
+      "type": "string"
+    },
+    "code_revision": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Code Revision",
+      "type": "string"
+    },
+    "configuration_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Configuration Sha256",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "mode": {
+      "enum": [
+        "contemporary",
+        "historical_reconstruction",
+        "prospective"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "maxLength": 4000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "companies": {
+      "items": {
+        "$ref": "#/$defs/CompanyProfile"
+      },
+      "title": "Companies",
+      "type": "array"
+    },
+    "relationships": {
+      "items": {
+        "$ref": "#/$defs/CompanyRelationship"
+      },
+      "title": "Relationships",
+      "type": "array"
+    },
+    "definitions": {
+      "items": {
+        "$ref": "#/$defs/MetricDefinition"
+      },
+      "title": "Definitions",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/SourceEvidence"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/CompanyMetricObservation"
+      },
+      "title": "Metrics",
+      "type": "array"
+    },
+    "events": {
+      "items": {
+        "$ref": "#/$defs/CompanyEvent"
+      },
+      "title": "Events",
+      "type": "array"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "as_of",
+    "recorded_at",
+    "cohort_version",
+    "code_revision",
+    "configuration_sha256",
+    "synthetic",
+    "mode",
+    "limitations",
+    "companies",
+    "relationships",
+    "definitions",
+    "evidence",
+    "metrics",
+    "events"
+  ],
+  "title": "CompanySourceSnapshot",
+  "type": "object"
+}
