@@ -12,8 +12,9 @@ Merged checkpoints:
 - Whole-origin chronological evaluation protocol: #6.
 - Separate per-tool reveal diagnostics: #8.
 - Frozen-pair CQR calculations and empirical interval gates: #10.
-- C1 daily vintage selection is implemented in `features.snapshots`; feature
-  aggregation and label materialization follow separately.
+- C1 daily vintage selection is implemented in `features.snapshots` (#15).
+- `features.builders` provides download features and separate mature labels;
+  catalogue-resolved requests and real artifact publication remain separate.
 
 C1 is merged. The artifact-alignment checkpoint adopts C1's canonical reference
 class with required size/media type: `models-v2` feature/forecast manifests and
@@ -25,8 +26,9 @@ Dev 3 reuses `evaluation.shortlists` and
 separate from immutable forecast payloads. CQR calculations are experimental
 until real chronological predictions and final evidence pass every serving gate.
 
-Pending: C1-backed feature/label builders, a frozen verified npm dataset, real
-baseline handoff, learned experiments, full metrics/evidence, and model CLI.
+Pending: catalogue-resolved feature requests and artifact publication, a frozen
+verified npm dataset, real baseline handoff, learned experiments, full
+metrics/evidence, and model CLI.
 Synthetic fixtures establish software behavior only; no empirical performance,
 validated interval, real-data product completion, or cloud deployment is claimed.
 
