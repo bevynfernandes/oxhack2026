@@ -1,0 +1,123 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Hashed artifact relative to a configured bundle root, never a signed URL.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "byte_size": {
+          "maximum": 9223372036854775807,
+          "minimum": 0,
+          "title": "Byte Size",
+          "type": "integer"
+        },
+        "media_type": {
+          "enum": [
+            "application/json",
+            "application/x-ndjson",
+            "application/vnd.apache.parquet",
+            "application/octet-stream"
+          ],
+          "title": "Media Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256",
+        "byte_size",
+        "media_type"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Hash-pinned normalized source tables; no future labels or assessment policy.",
+  "properties": {
+    "schema_version": {
+      "const": "company-source-v1",
+      "default": "company-source-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "snapshot_id": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Snapshot Id",
+      "type": "string"
+    },
+    "as_of": {
+      "format": "date-time",
+      "title": "As Of",
+      "type": "string"
+    },
+    "recorded_at": {
+      "format": "date-time",
+      "title": "Recorded At",
+      "type": "string"
+    },
+    "cohort_version": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Cohort Version",
+      "type": "string"
+    },
+    "code_revision": {
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+      "title": "Code Revision",
+      "type": "string"
+    },
+    "configuration_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Configuration Sha256",
+      "type": "string"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "mode": {
+      "enum": [
+        "contemporary",
+        "historical_reconstruction",
+        "prospective"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "limitations": {
+      "items": {
+        "maxLength": 4000,
+        "minLength": 1,
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "content": {
+      "$ref": "#/$defs/ArtifactReference"
+    }
+  },
+  "required": [
+    "snapshot_id",
+    "as_of",
+    "recorded_at",
+    "cohort_version",
+    "code_revision",
+    "configuration_sha256",
+    "synthetic",
+    "mode",
+    "limitations",
+    "content"
+  ],
+  "title": "CompanySourceManifest",
+  "type": "object"
+}

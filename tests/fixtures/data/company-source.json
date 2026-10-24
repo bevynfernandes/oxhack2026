@@ -1,0 +1,302 @@
+{
+  "schema_version": "company-source-v1",
+  "snapshot_id": "synthetic-companies-v1",
+  "as_of": "2025-02-01T00:00:00Z",
+  "recorded_at": "2025-02-01T00:00:00Z",
+  "cohort_version": "synthetic-cohort-v1",
+  "code_revision": "synthetic-code",
+  "configuration_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "synthetic": true,
+  "mode": "contemporary",
+  "limitations": [
+    "Synthetic contract fixture; no real company evidence."
+  ],
+  "companies": [
+    {
+      "company_id": "alpha",
+      "display_name": "Synthetic alpha",
+      "website_url": "https://alpha.example",
+      "segment": "synthetic",
+      "business_model": null,
+      "stage": null,
+      "context_as_of": "2025-02-01T00:00:00Z",
+      "evidence_ids": [
+        "alpha-source"
+      ]
+    },
+    {
+      "company_id": "beta",
+      "display_name": "Synthetic beta",
+      "website_url": "https://beta.example",
+      "segment": "synthetic",
+      "business_model": null,
+      "stage": null,
+      "context_as_of": "2025-02-01T00:00:00Z",
+      "evidence_ids": [
+        "beta-source"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "relationship_id": "alpha-family",
+      "company_id": "alpha",
+      "subject_kind": "family",
+      "subject_id": "alpha",
+      "valid_from": "2025-02-01T00:00:00Z",
+      "valid_to": null,
+      "evidence_ids": [
+        "alpha-source"
+      ]
+    },
+    {
+      "relationship_id": "beta-family",
+      "company_id": "beta",
+      "subject_kind": "family",
+      "subject_id": "beta",
+      "valid_from": "2025-02-01T00:00:00Z",
+      "valid_to": null,
+      "evidence_ids": [
+        "beta-source"
+      ]
+    }
+  ],
+  "definitions": [
+    {
+      "metric_id": "sdk_downloads_30d_v1",
+      "family": "traction",
+      "label": "sdk_downloads_30d_v1",
+      "definition": "Synthetic test metric definition.",
+      "unit": "downloads",
+      "value_kind": "integer",
+      "scope": "product",
+      "applicability": "Synthetic companies only.",
+      "maximum_age_days": 10,
+      "currency": null
+    },
+    {
+      "metric_id": "sdk_releases_30d_v1",
+      "family": "execution",
+      "label": "sdk_releases_30d_v1",
+      "definition": "Synthetic test metric definition.",
+      "unit": "releases",
+      "value_kind": "integer",
+      "scope": "product",
+      "applicability": "Synthetic companies only.",
+      "maximum_age_days": 10,
+      "currency": null
+    },
+    {
+      "metric_id": "operating_cashflow_12m_usd_v1",
+      "family": "commercial",
+      "label": "operating_cashflow_12m_usd_v1",
+      "definition": "Synthetic test metric definition.",
+      "unit": "USD",
+      "value_kind": "decimal",
+      "scope": "company",
+      "applicability": "Synthetic companies only.",
+      "maximum_age_days": 10,
+      "currency": "USD"
+    }
+  ],
+  "evidence": [
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "evidence_id": "alpha-source",
+      "company_id": "alpha",
+      "provider": "synthetic",
+      "url": "https://alpha.example/evidence",
+      "access": "public",
+      "raw_artifact": {
+        "path": "objects/f4/f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+        "sha256": "f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+        "byte_size": 52,
+        "media_type": "application/json"
+      },
+      "locator": "synthetic fixture",
+      "assertion": "Synthetic evidence only.",
+      "published_at": null,
+      "availability_basis": "first_observed",
+      "kind": "platform_observed",
+      "review_state": "verified"
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "evidence_id": "beta-source",
+      "company_id": "beta",
+      "provider": "synthetic",
+      "url": "https://beta.example/evidence",
+      "access": "public",
+      "raw_artifact": {
+        "path": "objects/f4/f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+        "sha256": "f4df8920c008af31294a2efe00dfea9d30b9a59fe0eb62eaaded59ee30d61c61",
+        "byte_size": 52,
+        "media_type": "application/json"
+      },
+      "locator": "synthetic fixture",
+      "assertion": "Synthetic evidence only.",
+      "published_at": null,
+      "availability_basis": "first_observed",
+      "kind": "platform_observed",
+      "review_state": "verified"
+    }
+  ],
+  "metrics": [
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "observation_id": "alpha-sdk_downloads_30d_v1",
+      "company_id": "alpha",
+      "metric_id": "sdk_downloads_30d_v1",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-31T00:00:00Z"
+      },
+      "measured_at": null,
+      "value": {
+        "kind": "integer",
+        "value": 0
+      },
+      "state": "observed",
+      "reason": null,
+      "evidence_ids": [
+        "alpha-source"
+      ],
+      "supersedes_id": null
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "observation_id": "alpha-sdk_releases_30d_v1",
+      "company_id": "alpha",
+      "metric_id": "sdk_releases_30d_v1",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-31T00:00:00Z"
+      },
+      "measured_at": null,
+      "value": {
+        "kind": "integer",
+        "value": 0
+      },
+      "state": "observed",
+      "reason": null,
+      "evidence_ids": [
+        "alpha-source"
+      ],
+      "supersedes_id": null
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "observation_id": "alpha-operating_cashflow_12m_usd_v1",
+      "company_id": "alpha",
+      "metric_id": "operating_cashflow_12m_usd_v1",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-31T00:00:00Z"
+      },
+      "measured_at": null,
+      "value": null,
+      "state": "missing",
+      "reason": "No synthetic financial disclosure.",
+      "evidence_ids": [],
+      "supersedes_id": null
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "observation_id": "beta-sdk_downloads_30d_v1",
+      "company_id": "beta",
+      "metric_id": "sdk_downloads_30d_v1",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-31T00:00:00Z"
+      },
+      "measured_at": null,
+      "value": {
+        "kind": "integer",
+        "value": 12
+      },
+      "state": "observed",
+      "reason": null,
+      "evidence_ids": [
+        "beta-source"
+      ],
+      "supersedes_id": null
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "observation_id": "beta-sdk_releases_30d_v1",
+      "company_id": "beta",
+      "metric_id": "sdk_releases_30d_v1",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-31T00:00:00Z"
+      },
+      "measured_at": null,
+      "value": {
+        "kind": "integer",
+        "value": 12
+      },
+      "state": "observed",
+      "reason": null,
+      "evidence_ids": [
+        "beta-source"
+      ],
+      "supersedes_id": null
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "observation_id": "beta-operating_cashflow_12m_usd_v1",
+      "company_id": "beta",
+      "metric_id": "operating_cashflow_12m_usd_v1",
+      "window": {
+        "start": "2025-01-01T00:00:00Z",
+        "end": "2025-01-31T00:00:00Z"
+      },
+      "measured_at": null,
+      "value": null,
+      "state": "missing",
+      "reason": "No synthetic financial disclosure.",
+      "evidence_ids": [],
+      "supersedes_id": null
+    }
+  ],
+  "events": [
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "event_id": "alpha-funding",
+      "company_id": "alpha",
+      "kind": "funding",
+      "stage": "reported",
+      "occurred_on": "2025-01-15",
+      "date_precision": "day",
+      "description": "Synthetic company-reported financing event.",
+      "evidence_ids": [
+        "alpha-source"
+      ],
+      "supersedes_id": null
+    },
+    {
+      "available_at": "2025-02-01T00:00:00Z",
+      "collected_at": "2025-02-01T00:00:00Z",
+      "event_id": "beta-funding",
+      "company_id": "beta",
+      "kind": "funding",
+      "stage": "reported",
+      "occurred_on": "2025-01-15",
+      "date_precision": "day",
+      "description": "Synthetic company-reported financing event.",
+      "evidence_ids": [
+        "beta-source"
+      ],
+      "supersedes_id": null
+    }
+  ]
+}

@@ -4,7 +4,9 @@ from pathlib import Path
 
 import orjson
 
+from oxhack2026.catalog.company import CompanySourceSnapshot
 from oxhack2026.catalog.schemas import CatalogSnapshot, Contract
+from oxhack2026.storage.company import CompanySourceManifest
 from oxhack2026.storage.contracts import (
     ArtifactReference,
     AvailabilityPolicy,
@@ -18,6 +20,8 @@ from oxhack2026.storage.contracts import (
 
 CONTRACTS: tuple[type[Contract], ...] = (
     CatalogSnapshot,
+    CompanySourceSnapshot,
+    CompanySourceManifest,
     ArtifactReference,
     AvailabilityPolicy,
     DatasetManifest,
