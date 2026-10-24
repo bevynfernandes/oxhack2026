@@ -24,6 +24,7 @@ def test_valid_company_composition(
         "foreign_metric",
         "foreign_evidence",
         "unknown_definition",
+        "observed_as_missing",
         "omitted_support",
         "wrong_snapshot",
         "wrong_cutoff",
@@ -56,6 +57,8 @@ def test_rejects_incompatible_composition(
         payload["statements"][0]["evidence_ids"] = ("beta-source",)
     elif change == "unknown_definition":
         payload["statements"][2]["missing_metric_ids"] = ("unknown",)
+    elif change == "observed_as_missing":
+        payload["statements"][2]["missing_metric_ids"] = ("sdk_downloads_30d_v1",)
     elif change == "omitted_support":
         payload["statements"][0]["role"] = "evidence_gap"
         payload["statements"][0]["missing_metric_ids"] = (

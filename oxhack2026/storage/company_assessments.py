@@ -79,13 +79,17 @@ def _validate_statement_links(
         for row in source.events
         if row.company_id == assessment.company_id
     }
-    definitions = {row.metric_id for row in source.definitions}
+    missing = {
+        row.metric_id
+        for row in metrics.values()
+        if row.state in {"missing", "conflicting"}
+    }
     for statement in assessment.statements:
         if (
             not set(statement.evidence_ids) <= evidence.keys()
             or not set(statement.metric_observation_ids) <= metrics.keys()
             or not set(statement.event_ids) <= events.keys()
-            or not set(statement.missing_metric_ids) <= definitions
+            or not set(statement.missing_metric_ids) <= missing
         ):
             message = (
                 "Assessment statement has unknown or cross-company source references"
