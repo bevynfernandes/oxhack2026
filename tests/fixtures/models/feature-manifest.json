@@ -1,0 +1,21 @@
+{
+  "schema_version": "models-v1",
+  "dataset_version": "synthetic-dataset-v1",
+  "mapping_version": "synthetic-mapping-v1",
+  "feature_schema_version": "features-v1",
+  "availability_policy_version": "fixed-lag-48h-v1",
+  "code_revision": "synthetic-code",
+  "configuration_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "features": {
+    "path": "synthetic/fixture.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "labels": {
+    "path": "synthetic/fixture.json",
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "synthetic": true,
+  "limitations": [
+    "Synthetic contract fixtures; not research evidence."
+  ]
+}

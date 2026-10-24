@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Relative bundle path and SHA-256 digest; paths cannot escape the bundle.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Feature/label bundle binding source data, policies, code, and schemas.",
+  "properties": {
+    "schema_version": {
+      "const": "models-v1",
+      "default": "models-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "dataset_version": {
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "mapping_version": {
+      "title": "Mapping Version",
+      "type": "string"
+    },
+    "feature_schema_version": {
+      "title": "Feature Schema Version",
+      "type": "string"
+    },
+    "availability_policy_version": {
+      "title": "Availability Policy Version",
+      "type": "string"
+    },
+    "code_revision": {
+      "title": "Code Revision",
+      "type": "string"
+    },
+    "configuration_sha256": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Configuration Sha256",
+      "type": "string"
+    },
+    "features": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "labels": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "synthetic": {
+      "title": "Synthetic",
+      "type": "boolean"
+    },
+    "limitations": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "dataset_version",
+    "mapping_version",
+    "feature_schema_version",
+    "availability_policy_version",
+    "code_revision",
+    "configuration_sha256",
+    "features",
+    "labels",
+    "synthetic"
+  ],
+  "title": "FeatureManifest",
+  "type": "object"
+}

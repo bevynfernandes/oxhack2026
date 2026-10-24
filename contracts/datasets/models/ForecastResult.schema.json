@@ -1,0 +1,358 @@
+{
+  "$defs": {
+    "PredictionInterval": {
+      "additionalProperties": false,
+      "description": "Empirically validated aggregate band, never an invented daily trajectory.",
+      "properties": {
+        "interval_lower": {
+          "minimum": 0,
+          "title": "Interval Lower",
+          "type": "number"
+        },
+        "interval_upper": {
+          "minimum": 0,
+          "title": "Interval Upper",
+          "type": "number"
+        },
+        "nominal_coverage": {
+          "exclusiveMaximum": 1,
+          "exclusiveMinimum": 0,
+          "title": "Nominal Coverage",
+          "type": "number"
+        },
+        "interval_method": {
+          "title": "Interval Method",
+          "type": "string"
+        },
+        "calibration_id": {
+          "title": "Calibration Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "interval_lower",
+        "interval_upper",
+        "nominal_coverage",
+        "interval_method",
+        "calibration_id"
+      ],
+      "title": "PredictionInterval",
+      "type": "object"
+    },
+    "RowIdentity": {
+      "additionalProperties": false,
+      "description": "Frozen tool/package/company identity within one ecosystem and dataset.",
+      "properties": {
+        "tool_id": {
+          "minLength": 1,
+          "title": "Tool Id",
+          "type": "string"
+        },
+        "organization_id": {
+          "minLength": 1,
+          "title": "Organization Id",
+          "type": "string"
+        },
+        "package_id": {
+          "minLength": 1,
+          "title": "Package Id",
+          "type": "string"
+        },
+        "ecosystem": {
+          "enum": [
+            "npm",
+            "pypi"
+          ],
+          "title": "Ecosystem",
+          "type": "string"
+        },
+        "dataset_version": {
+          "minLength": 1,
+          "title": "Dataset Version",
+          "type": "string"
+        },
+        "mapping_version": {
+          "minLength": 1,
+          "title": "Mapping Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_id",
+        "organization_id",
+        "package_id",
+        "ecosystem",
+        "dataset_version",
+        "mapping_version"
+      ],
+      "title": "RowIdentity",
+      "type": "object"
+    },
+    "TargetWindows": {
+      "additionalProperties": false,
+      "description": "One decision's target definition, fixed observation anchor, and windows.",
+      "properties": {
+        "target_id": {
+          "enum": [
+            "downloads_next_30d_v1",
+            "downloads_trailing_28d_at_91d_v1"
+          ],
+          "title": "Target Id",
+          "type": "string"
+        },
+        "decision_at": {
+          "format": "date-time",
+          "title": "Decision At",
+          "type": "string"
+        },
+        "observation_window_end": {
+          "format": "date-time",
+          "title": "Observation Window End",
+          "type": "string"
+        },
+        "reference": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "target": {
+          "$ref": "#/$defs/TimeWindow"
+        },
+        "definition_version": {
+          "const": "targets-v1",
+          "default": "targets-v1",
+          "title": "Definition Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "target_id",
+        "decision_at",
+        "observation_window_end",
+        "reference",
+        "target"
+      ],
+      "title": "TargetWindows",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "Nonempty half-open measurement interval with timezone-aware UTC bounds.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Immutable pre-reveal prediction; this contract contains no realized outcome.",
+  "properties": {
+    "forecast_id": {
+      "title": "Forecast Id",
+      "type": "string"
+    },
+    "batch_id": {
+      "title": "Batch Id",
+      "type": "string"
+    },
+    "identity": {
+      "$ref": "#/$defs/RowIdentity"
+    },
+    "windows": {
+      "$ref": "#/$defs/TargetWindows"
+    },
+    "feature_row_id": {
+      "title": "Feature Row Id",
+      "type": "string"
+    },
+    "feature_schema_version": {
+      "title": "Feature Schema Version",
+      "type": "string"
+    },
+    "model_id": {
+      "title": "Model Id",
+      "type": "string"
+    },
+    "experiment_id": {
+      "title": "Experiment Id",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "reconstructed",
+        "prospective"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "evidence_status": {
+      "enum": [
+        "exploratory",
+        "validated",
+        "inconclusive",
+        "rejected"
+      ],
+      "title": "Evidence Status",
+      "type": "string"
+    },
+    "reference_downloads": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Reference Downloads"
+    },
+    "predicted_downloads": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Predicted Downloads"
+    },
+    "predicted_growth_pct": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Predicted Growth Pct"
+    },
+    "estimate_kind": {
+      "enum": [
+        "conditional_median",
+        "log_space_point",
+        "baseline"
+      ],
+      "title": "Estimate Kind",
+      "type": "string"
+    },
+    "interval": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/PredictionInterval"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "baseline_model_id": {
+      "title": "Baseline Model Id",
+      "type": "string"
+    },
+    "baseline_predicted_downloads": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseline Predicted Downloads"
+    },
+    "forecast_status": {
+      "enum": [
+        "ready",
+        "unavailable"
+      ],
+      "title": "Forecast Status",
+      "type": "string"
+    },
+    "ranking_eligible": {
+      "title": "Ranking Eligible",
+      "type": "boolean"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "enum": [
+          "insufficient_history",
+          "missing_source",
+          "low_reference_count",
+          "unverified_mapping",
+          "unvalidated_interval",
+          "immature_outcome"
+        ],
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "evidence_ids": {
+      "default": [],
+      "items": {
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "data_age_hours": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Data Age Hours"
+    },
+    "stale": {
+      "default": false,
+      "title": "Stale",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "forecast_id",
+    "batch_id",
+    "identity",
+    "windows",
+    "feature_row_id",
+    "feature_schema_version",
+    "model_id",
+    "experiment_id",
+    "mode",
+    "evidence_status",
+    "estimate_kind",
+    "baseline_model_id",
+    "forecast_status",
+    "ranking_eligible"
+  ],
+  "title": "ForecastResult",
+  "type": "object"
+}

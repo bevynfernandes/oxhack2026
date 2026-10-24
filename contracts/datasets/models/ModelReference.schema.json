@@ -1,0 +1,89 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Relative bundle path and SHA-256 digest; paths cannot escape the bundle.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Frozen model and optional paired calibrator, scoped to ecosystem/target.",
+  "properties": {
+    "model_id": {
+      "title": "Model Id",
+      "type": "string"
+    },
+    "experiment_id": {
+      "title": "Experiment Id",
+      "type": "string"
+    },
+    "ecosystem": {
+      "enum": [
+        "npm",
+        "pypi"
+      ],
+      "title": "Ecosystem",
+      "type": "string"
+    },
+    "target_id": {
+      "enum": [
+        "downloads_next_30d_v1",
+        "downloads_trailing_28d_at_91d_v1"
+      ],
+      "title": "Target Id",
+      "type": "string"
+    },
+    "model_artifact": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "calibration_id": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibration Id"
+    },
+    "calibration_artifact": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ArtifactReference"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "model_id",
+    "experiment_id",
+    "ecosystem",
+    "target_id",
+    "model_artifact"
+  ],
+  "title": "ModelReference",
+  "type": "object"
+}

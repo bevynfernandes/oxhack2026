@@ -1,0 +1,36 @@
+{
+  "additionalProperties": false,
+  "description": "Organization representative produced by the single shared ranking policy.",
+  "properties": {
+    "forecast_id": {
+      "title": "Forecast Id",
+      "type": "string"
+    },
+    "tool_id": {
+      "title": "Tool Id",
+      "type": "string"
+    },
+    "organization_id": {
+      "title": "Organization Id",
+      "type": "string"
+    },
+    "rank": {
+      "minimum": 1,
+      "title": "Rank",
+      "type": "integer"
+    },
+    "predicted_growth_pct": {
+      "title": "Predicted Growth Pct",
+      "type": "number"
+    }
+  },
+  "required": [
+    "forecast_id",
+    "tool_id",
+    "organization_id",
+    "rank",
+    "predicted_growth_pct"
+  ],
+  "title": "RankedCandidate",
+  "type": "object"
+}

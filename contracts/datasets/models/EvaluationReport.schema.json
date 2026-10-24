@@ -1,0 +1,323 @@
+{
+  "$defs": {
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "description": "Relative bundle path and SHA-256 digest; paths cannot escape the bundle.",
+      "properties": {
+        "path": {
+          "minLength": 1,
+          "title": "Path",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "sha256"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "CohortCounts": {
+      "additionalProperties": false,
+      "description": "Coverage and exclusions, kept separate from conditional model performance.",
+      "properties": {
+        "candidate_count": {
+          "minimum": 0,
+          "title": "Candidate Count",
+          "type": "integer"
+        },
+        "eligible_count": {
+          "minimum": 0,
+          "title": "Eligible Count",
+          "type": "integer"
+        },
+        "organization_count": {
+          "minimum": 0,
+          "title": "Organization Count",
+          "type": "integer"
+        },
+        "origin_count": {
+          "minimum": 0,
+          "title": "Origin Count",
+          "type": "integer"
+        },
+        "headline_origin_count": {
+          "minimum": 0,
+          "title": "Headline Origin Count",
+          "type": "integer"
+        },
+        "exclusions": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "Exclusions",
+          "type": "object"
+        }
+      },
+      "required": [
+        "candidate_count",
+        "eligible_count",
+        "organization_count",
+        "origin_count",
+        "headline_origin_count"
+      ],
+      "title": "CohortCounts",
+      "type": "object"
+    },
+    "MetricDefinition": {
+      "additionalProperties": false,
+      "description": "Versioned metric meaning, units, aggregation, and optimization direction.",
+      "properties": {
+        "metric_id": {
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "description": {
+          "title": "Description",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        },
+        "aggregation": {
+          "enum": [
+            "origin_macro",
+            "row_macro",
+            "subgroup"
+          ],
+          "title": "Aggregation",
+          "type": "string"
+        },
+        "direction": {
+          "enum": [
+            "maximize",
+            "minimize",
+            "diagnostic"
+          ],
+          "title": "Direction",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metric_id",
+        "description",
+        "unit",
+        "aggregation",
+        "direction"
+      ],
+      "title": "MetricDefinition",
+      "type": "object"
+    },
+    "MetricValue": {
+      "additionalProperties": false,
+      "description": "Metric on a named common candidate universe; undefined values remain null.",
+      "properties": {
+        "metric_id": {
+          "title": "Metric Id",
+          "type": "string"
+        },
+        "model_id": {
+          "title": "Model Id",
+          "type": "string"
+        },
+        "candidate_universe_id": {
+          "title": "Candidate Universe Id",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        },
+        "row_count": {
+          "minimum": 0,
+          "title": "Row Count",
+          "type": "integer"
+        },
+        "origin_count": {
+          "minimum": 0,
+          "title": "Origin Count",
+          "type": "integer"
+        },
+        "organization_count": {
+          "minimum": 0,
+          "title": "Organization Count",
+          "type": "integer"
+        },
+        "exclusion_reasons": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Exclusion Reasons",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metric_id",
+        "model_id",
+        "candidate_universe_id",
+        "value",
+        "row_count",
+        "origin_count",
+        "organization_count"
+      ],
+      "title": "MetricValue",
+      "type": "object"
+    },
+    "TimeWindow": {
+      "additionalProperties": false,
+      "description": "Nonempty half-open measurement interval with timezone-aware UTC bounds.",
+      "properties": {
+        "start": {
+          "format": "date-time",
+          "title": "Start",
+          "type": "string"
+        },
+        "end": {
+          "format": "date-time",
+          "title": "End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "start",
+        "end"
+      ],
+      "title": "TimeWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Result state with exact periods, frozen protocol, and reproducible files.",
+  "properties": {
+    "schema_version": {
+      "const": "evaluation-v1",
+      "default": "evaluation-v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "evaluation_id": {
+      "title": "Evaluation Id",
+      "type": "string"
+    },
+    "experiment_id": {
+      "title": "Experiment Id",
+      "type": "string"
+    },
+    "ecosystem": {
+      "enum": [
+        "npm",
+        "pypi"
+      ],
+      "title": "Ecosystem",
+      "type": "string"
+    },
+    "target_id": {
+      "enum": [
+        "downloads_next_30d_v1",
+        "downloads_trailing_28d_at_91d_v1"
+      ],
+      "title": "Target Id",
+      "type": "string"
+    },
+    "dataset_version": {
+      "title": "Dataset Version",
+      "type": "string"
+    },
+    "mapping_version": {
+      "title": "Mapping Version",
+      "type": "string"
+    },
+    "evidence_status": {
+      "enum": [
+        "exploratory",
+        "validated",
+        "inconclusive",
+        "rejected"
+      ],
+      "title": "Evidence Status",
+      "type": "string"
+    },
+    "serving_model_id": {
+      "title": "Serving Model Id",
+      "type": "string"
+    },
+    "fallback_model_id": {
+      "title": "Fallback Model Id",
+      "type": "string"
+    },
+    "period": {
+      "$ref": "#/$defs/TimeWindow"
+    },
+    "counts": {
+      "$ref": "#/$defs/CohortCounts"
+    },
+    "metrics": {
+      "items": {
+        "$ref": "#/$defs/MetricValue"
+      },
+      "title": "Metrics",
+      "type": "array"
+    },
+    "metric_definitions": {
+      "items": {
+        "$ref": "#/$defs/MetricDefinition"
+      },
+      "title": "Metric Definitions",
+      "type": "array"
+    },
+    "experiment_manifest": {
+      "$ref": "#/$defs/ArtifactReference"
+    },
+    "effective_block_count": {
+      "minimum": 0,
+      "title": "Effective Block Count",
+      "type": "integer"
+    },
+    "statistical_superiority": {
+      "default": false,
+      "title": "Statistical Superiority",
+      "type": "boolean"
+    },
+    "limitations": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "evaluation_id",
+    "experiment_id",
+    "ecosystem",
+    "target_id",
+    "dataset_version",
+    "mapping_version",
+    "evidence_status",
+    "serving_model_id",
+    "fallback_model_id",
+    "period",
+    "counts",
+    "metrics",
+    "metric_definitions",
+    "experiment_manifest",
+    "effective_block_count",
+    "limitations"
+  ],
+  "title": "EvaluationReport",
+  "type": "object"
+}
