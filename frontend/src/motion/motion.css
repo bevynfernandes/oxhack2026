@@ -1,0 +1,54 @@
+[data-motion-control] {
+  --motion-state-opacity: 0;
+  background-image: linear-gradient(
+    rgb(0 0 0 / var(--motion-state-opacity)),
+    rgb(0 0 0 / var(--motion-state-opacity))
+  );
+}
+[data-motion-control]:has(> .motion-indicator) {
+  position: relative;
+}
+.motion-indicator {
+  position: absolute;
+  pointer-events: none;
+  bottom: 0;
+  left: 6px;
+  right: 6px;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+}
+[data-motion-dialog]::backdrop {
+  opacity: var(--motion-backdrop-opacity, 1);
+}
+.motion-disclosure {
+  margin-block: 1rem;
+  padding: 0.75rem;
+  border: 1px solid #dce4dc;
+  border-radius: 8px;
+}
+button.motion-disclosure-trigger {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+  background-color: transparent;
+  border: 0;
+  padding: 0;
+  min-height: 32px;
+  font: inherit;
+  cursor: pointer;
+}
+.motion-chevron {
+  display: inline-block;
+  flex-shrink: 0;
+}
+.motion-disclosure-clip {
+  overflow: hidden;
+}
+.motion-disclosure-content {
+  display: flow-root;
+  padding-top: 0.5rem;
+}

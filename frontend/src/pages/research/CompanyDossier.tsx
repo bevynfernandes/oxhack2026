@@ -1,4 +1,9 @@
 import {
+  MotionButton,
+  MotionDialog,
+  type MotionDialogHandle,
+} from "../../motion";
+import {
   useEffect,
   useMemo,
   useRef,
@@ -140,7 +145,7 @@ export default function CompanyDossier({
   const synthetic = profile?.publication.source.synthetic ?? false;
   const [mobileGroup, setMobileGroup] = useState(0);
   const [panel, setPanel] = useState<Panel>({ kind: "driver", index: 0 });
-  const dialog = useRef<HTMLDialogElement>(null);
+  const dialog = useRef<MotionDialogHandle>(null);
   const opener = useRef<HTMLElement | null>(null);
   const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const location = useLocation();
@@ -420,10 +425,10 @@ export default function CompanyDossier({
             {standalone ? "Refresh research" : "Research company"}{" "}
             <Icon name="arrow" />
           </Link>
-          <button className="secondary" onClick={exportReport}>
+          <MotionButton className="secondary" onClick={exportReport}>
             <Icon name="file" />
             Export report
-          </button>
+          </MotionButton>
         </div>
       </header>
       {(synthetic || partial || (report && !outlook?.forecasts)) && (
@@ -434,9 +439,9 @@ export default function CompanyDossier({
               {standalone
                 ? "Partial source results: inspect provider coverage and limits."
                 : "Partial source results: attention count unavailable."}{" "}
-              <button onClick={() => open({ kind: "sources", index: 0 })}>
+              <MotionButton onClick={() => open({ kind: "sources", index: 0 })}>
                 View limitations
-              </button>
+              </MotionButton>
             </p>
           )}
           {report && !outlook?.forecasts && (
@@ -490,12 +495,12 @@ export default function CompanyDossier({
         <section className="dossier-stat">
           <div>
             <h3>
-              <button
+              <MotionButton
                 className="dossier-inline-action"
                 onClick={() => open({ kind: "sources", index: 0 })}
               >
                 Source inventory
-              </button>
+              </MotionButton>
             </h3>
             <div className="stat-value">
               {sources.length}
@@ -529,7 +534,7 @@ export default function CompanyDossier({
         aria-label="Overview dimensions"
       >
         {groups.map((group, index) => (
-          <button
+          <MotionButton
             key={group.id}
             title={group.name}
             aria-pressed={mobileGroup === index}
@@ -541,7 +546,7 @@ export default function CompanyDossier({
             <span>
               {["Adoption", "Attention", "Finance", "Industry", "Team"][index]}
             </span>
-          </button>
+          </MotionButton>
         ))}
       </div>
       <section className="dossier-pillars" aria-label="Fundamental drivers">
@@ -560,7 +565,7 @@ export default function CompanyDossier({
                   <span className="pillar-model">Untrained</span>
                 </div>
                 <h3>
-                  <button
+                  <MotionButton
                     className="pillar-expand"
                     aria-label={`Expand dimension: ${group.name}`}
                     aria-haspopup="dialog"
@@ -569,7 +574,7 @@ export default function CompanyDossier({
                   >
                     {group.name}
                     <Icon name="arrow" />
-                  </button>
+                  </MotionButton>
                 </h3>
                 <p className="pillar-description">{group.description}</p>
               </header>
@@ -627,14 +632,14 @@ export default function CompanyDossier({
                   <span className="status-dot" />
                   {row ? dataNames[row.data_status] : "Analysis not published"}
                 </span>
-                <button
+                <MotionButton
                   aria-label={`Inspect evidence: ${group.name}`}
                   aria-haspopup="dialog"
                   aria-controls="company-evidence-drawer"
                   onClick={() => open({ kind: "driver", index })}
                 >
                   Inspect evidence <Icon name="arrow" />
-                </button>
+                </MotionButton>
               </footer>
             </article>
           );
@@ -658,19 +663,19 @@ export default function CompanyDossier({
                 : "Saved publication"}
           </span>
         </div>
-        <button onClick={() => open({ kind: "sources", index: 0 })}>
+        <MotionButton onClick={() => open({ kind: "sources", index: 0 })}>
           Sources & limitations <Icon name="arrow" />
-        </button>
+        </MotionButton>
         {profile && (
-          <button
+          <MotionButton
             className="saved-assessment-action"
             onClick={() => open({ kind: "sources", index: 2 })}
           >
             Saved assessment
-          </button>
+          </MotionButton>
         )}
       </div>
-      <dialog
+      <MotionDialog
         className="driver-dialog dossier-drawer"
         id="company-evidence-drawer"
         ref={dialog}
@@ -691,14 +696,14 @@ export default function CompanyDossier({
                 : "Sources & limitations"}
             </h2>
           </div>
-          <button
+          <MotionButton
             className="secondary"
             autoFocus
             onClick={() => dialog.current?.close()}
             aria-label="Close"
           >
             <Icon name="close" />
-          </button>
+          </MotionButton>
         </header>
         <div
           role="tablist"
@@ -719,7 +724,7 @@ export default function CompanyDossier({
                 "Provenance",
               ]
           ).map((name, index) => (
-            <button
+            <MotionButton
               key={name}
               ref={(element) => {
                 tabRefs.current[index] = element;
@@ -732,7 +737,7 @@ export default function CompanyDossier({
               onClick={() => setPanel({ ...panel, index })}
             >
               {name}
-            </button>
+            </MotionButton>
           ))}
         </div>
         <div
@@ -767,12 +772,12 @@ export default function CompanyDossier({
               {standalone && (
                 <p>
                   Fresh evidence is not yet mapped to model dimensions.{" "}
-                  <button
+                  <MotionButton
                     className="secondary"
                     onClick={() => setPanel({ kind: "sources", index: 1 })}
                   >
                     Browse fresh measurements
-                  </button>
+                  </MotionButton>
                 </p>
               )}
               <h3>Observed evidence</h3>
@@ -872,13 +877,13 @@ export default function CompanyDossier({
                   <h4>{statement.role.replaceAll("_", " ")}</h4>
                   <p>{statement.text}</p>
                   {statement.evidence_ids.length > 0 && (
-                    <button
+                    <MotionButton
                       className="secondary"
                       onClick={() => setPanel({ kind: "sources", index: 0 })}
                     >
                       Inspect {statement.evidence_ids.length} supporting
                       source(s)
-                    </button>
+                    </MotionButton>
                   )}
                 </section>
               ))}
@@ -945,7 +950,7 @@ export default function CompanyDossier({
             </>
           )}
         </div>
-      </dialog>
+      </MotionDialog>
     </article>
   );
 }
