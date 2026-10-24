@@ -2037,7 +2037,15 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/Health"
+                    },
+                    {
+                      "$ref": "#/components/schemas/Error"
+                    }
+                  ],
+                  "title": "Response 503 Readiness"
                 }
               }
             },

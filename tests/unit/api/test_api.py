@@ -168,7 +168,16 @@ def test_unready_repository(client: TestClient, repository: Mock) -> None:
     repository.readiness.return_value = s.Health(
         status="unavailable", reasons=("missing_artifact",)
     )
-    assert client.get("/api/v1/health/ready").status_code == 503
+    response = client.get("/api/v1/health/ready")
+    assert response.status_code == 503
+    assert response.json()["status"] == "unavailable"
+    response_schema = create_app().openapi()["paths"]["/api/v1/health/ready"]["get"][
+        "responses"
+    ]["503"]["content"]["application/json"]["schema"]
+    assert {item["$ref"] for item in response_schema["anyOf"]} == {
+        "#/components/schemas/Health",
+        "#/components/schemas/Error",
+    }
 
 
 def test_history_future_boundary(

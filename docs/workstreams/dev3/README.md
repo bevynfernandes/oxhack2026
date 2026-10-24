@@ -53,8 +53,8 @@ Verification: `make check test`, `npm --prefix frontend run build` and
 
 ## Remaining integration gate
 
-Dev 1/2 have not yet published a real dataset, C1/C2 contracts or a repository
-implementation on main. D3-05 cannot pass with synthetic fixtures. Required:
+The model contracts and numerical policy are now merged. Dev 1 has not yet
+published C1, a real dataset or a repository implementation on main. D3-05 cannot pass with synthetic fixtures. Required:
 real npm catalog/observations, immutable batch/rankings/evidence/evaluation,
 mature outcomes, scorer, artifact hashes and portable retrieval instructions.
 The full no-vendor-call browser replay must be rerun against that composition.

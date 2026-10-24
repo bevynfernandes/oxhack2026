@@ -64,7 +64,11 @@ def liveness() -> s.Health:
     return s.Health(status="ready")
 
 
-@router.get("/api/v1/health/ready", responses=errors, operation_id="readiness")
+@router.get(
+    "/api/v1/health/ready",
+    responses={**errors, 503: {"model": s.Health | s.Error}},
+    operation_id="readiness",
+)
 def readiness(
     response: Response, repo: PublishedRepository = repo_dependency
 ) -> s.Health:

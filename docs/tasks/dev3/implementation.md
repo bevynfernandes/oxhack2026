@@ -15,8 +15,7 @@ No source extraction, cloud provisioning, numerical training or paid calls were
 performed. PLAN.md is unchanged. Synthetic values are never research evidence.
 
 PR #2 delivered the API checkpoint and merged after CI passed. Dev 3 consumed C2
-from PR #3 and the policy checkpoint from PR #4 through main. The frontend and
-C2 presentation adapters form the following Dev 3 checkpoint. Integration checks
+from PR #3 and the policy checkpoint from PR #4 through main. PR #7 delivers the frontend and C2 presentation adapters. Integration checks
 include the other developers' merged model/baseline tests.
 
 The unconfigured production factory always fails readiness/data reads. Only the

@@ -1187,7 +1187,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Health"] | components["schemas"]["Error"];
                 };
             };
         };
