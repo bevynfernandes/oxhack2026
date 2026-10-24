@@ -86,3 +86,14 @@ Five tall fixed-height columns and decorative charts are not required.
 The existing private Qdrant replay shared in #46 predates forecast metadata; use
 it for legacy compatibility. New report tests exercise the approved three lanes.
 Any new live run must retain its actual capture and cannot rewrite that replay.
+
+## Verification of this handoff
+
+Local checks: 640 Python tests, 17 frontend tests, three durable API integrations,
+Ruff, mypy, strict docs, generated types, build and formatting. The retained real
+Qdrant report also reads and serializes byte-identically without adding forecasts.
+Reference browser checks at 1440/768/390 pixels report no page overflow or axe
+violations. Dialog focus wrapping, arrow-key tabs, Escape/focus return and reduced
+motion pass; screenshots/results remain in `.cache/stitch-review/screenshots`.
+This verifies the reference and contract, not Ivan's pending app integration or
+model predictive performance.
