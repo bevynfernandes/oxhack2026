@@ -8,6 +8,29 @@ permissions:
   contents: read
 
 jobs:
+  api-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.13.0"
+          python-version: "3.12"
+          enable-cache: true
+      - run: uv sync --locked --no-dev --extra api --extra data
+      - name: Verify lightweight API composition imports
+        run: |
+          uv run --frozen --no-sync python - <<'PY'
+          import importlib.util
+          from oxhack2026.api.company_runtime import create_company_app
+          from oxhack2026.api.app import create_app
+          from oxhack2026.api.company_repository import PublishedCompanyRepository
+          from oxhack2026.storage.company_assessments import SourceScopedAssessmentReader
+          assert callable(create_company_app)
+          assert create_app().title == "SignalShift"
+          assert all(importlib.util.find_spec(name) is None for name in ("numpy", "sklearn", "catboost"))
+          PY
+
   python:
     runs-on: ubuntu-latest
     steps:

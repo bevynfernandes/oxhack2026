@@ -5,11 +5,12 @@ and financing. Search companies, inspect three separate outcome assessments and
 compare relevant peers. [PLAN.md](PLAN.md) defines the revised product;
 [issue #19](https://github.com/bevynfernandes/oxhack2026/issues/19) coordinates it.
 
-**Status: product transition.** The download-data, modelling and API work provides
-reusable infrastructure. Company-level source contracts, real multi-family
-assessments and the company workflow are the next checkpoints. No validated
-startup-success probability or complete historical company-label dataset is
-claimed. Missing production data stays unavailable rather than invented.
+**Status:** real company source/assessment publication and verified recovery are
+implemented. The initial Qdrant/Weaviate bundle includes dated public evidence and
+explicit commercial gaps. A separate 229-company public discovery cohort retains
+inactive/acquired companies without inventing historical labels. Company API/UI
+integration is tracked in [the acceptance audit](docs/workstreams/dev1/STATUS.md).
+No validated startup-success probabilities are claimed.
 
 ## Development setup
 
@@ -25,7 +26,7 @@ The development installation includes all locked extras for shared checks.
 Individual runtime environments can use narrower profiles, for example:
 
 ```bash
-uv sync --frozen --inexact --extra api --extra data --group docs
+uv sync --frozen --no-dev --extra api --extra data
 ```
 
 Extras reserve dependencies only; installing them does not implement features.
@@ -33,10 +34,11 @@ Notebook helpers are installed into the local virtual environment and are not
 project requirements. An exact `uv sync` can remove those helpers; rerun
 `make notebooks` or use `--inexact` when preserving them.
 
-The optional environment template is `.env.example`. Its empty credentials
-and configuration names are placeholders; no service reads them yet.
+The optional environment template is `.env.example`. See the
+[local runtime runbook](deploy/local/README.md) for explicit company publication
+selection. Optional provider credentials do not activate services.
 
-## Preview the frontend template
+## Frontend and API
 
 ```bash
 npm --prefix frontend run dev
@@ -44,7 +46,8 @@ npm --prefix frontend run dev
 
 See [frontend/README.md](frontend/README.md) for the frontend structure.
 See [the API handoff](docs/workstreams/dev3/README.md) for backend startup and
-repository wiring. There is no `signalshift` CLI entry point at this stage.
+repository wiring. Administrative data commands are available through
+`python -m oxhack2026 data --help`; no `signalshift` shell entry point is installed.
 
 ## Verification
 
@@ -59,29 +62,17 @@ no external services. CI installs all declared extras and runs shared checks.
 
 ## Layout
 
-```text
-oxhack2026/
-  catalog/       Identity and mapping templates
-  ingest/        npm, PyPI, GitHub, and HN adapter templates
-  storage/       Database, artifact, and publication templates
-  features/      Feature and label templates
-  models/        Baseline, training, prediction, and calibration templates
-  evaluation/    Split, metric, and experiment templates
-  api/           Future application, schemas, and routes
-  explanations/  Deterministic and Gemini templates
-  cli/           Future command entry points
-frontend/        Static React / TypeScript / Vite starter
-contracts/       Reserved API and dataset contracts
-configs/         Reserved non-secret configuration
-migrations/      Reserved database migrations
-data/            Catalogue documentation and ignored data directories
-artifacts/       Ignored generated model and dataset artifacts
-reports/         Ignored generated evaluation reports
-demo/            Reserved real-data replay exports
-tests/           Smoke checks and reserved unit/integration tests
-deploy/          Local, Tiger, and Vultr deployment notes
-docs/            Scaffold documentation and task handoff template
-```
+| Path | Responsibility |
+| --- | --- |
+| `oxhack2026/catalog`, `ingest`, `storage` | Source contracts, collection, publication and recovery |
+| `oxhack2026/features`, `models`, `evaluation`, `explanations` | Model contracts, evidence assessments and research evaluation |
+| `oxhack2026/api`, `frontend` | Public API and company workflow |
+| `oxhack2026/cli` | Administrative commands |
+| `contracts`, `configs`, `data/catalog` | Versioned schemas and nonsecret recipes/identity evidence |
+| `artifacts`, `reports`, `tests/outputs` | Ignored generated data and retained validation artifacts |
+| `deploy`, `docs/tasks` | Runtime/operations and reviewed handoffs |
+| `migrations` | Reserved; no PostgreSQL migration acceptance yet |
+
 
 ## Container template
 

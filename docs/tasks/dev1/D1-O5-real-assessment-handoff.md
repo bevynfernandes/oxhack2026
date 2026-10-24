@@ -24,5 +24,8 @@ Restore with `python -m oxhack2026 data company-restore ZIP NEW_ROOT SHA256`.
 Compose Dev 3's PublishedCompanyRepository with `LocalCompanyStore(NEW_ROOT)`
 and `SourceScopedAssessmentReader(LocalCompanyAssessmentStore(NEW_ROOT),
 ("company-assessments-vector-20261024-v1",))`. No latest-policy inference occurs.
-Source and assessment publication is complete; the real API/browser gate must
-also pass before D1-O5 is called complete.
+Source/assessment publication and real API acceptance are complete. Readiness,
+list, both profiles, three outcome sections, missing financials, privacy and 404
+checks pass in the API-only environment. Restarting the actual server reproduces
+identical response bytes. The final browser comparison gate remains Dev 3
+integration work.

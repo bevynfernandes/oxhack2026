@@ -1,22 +1,29 @@
-# SignalShift scaffold
+# SignalShift
 
-This repository contains the project template for SignalShift. Product behavior
-is not implemented. The repository-root `PLAN.md` defines the intended system;
-`AGENTS.md` defines implementation standards.
+Company outlooks from dated traction, execution, commercial and financing
+evidence. Three separate outcomes cover operating growth, cash-flow
+self-sufficiency, and financing/acquisition. The current product organizes
+verified evidence and explicit gaps; it does not serve validated probabilities.
 
-## Available now
+## Implemented data path
 
-- Python package namespaces and empty module templates.
-- Static React / TypeScript / Vite frontend.
-- Dependency manifests and lockfiles.
-- Formatting, type-checking, packaging, and scaffold import checks.
-- Development container and CI configuration.
+- Strict company source contracts, effective identities and raw provenance.
+- Resumable npm/GitHub/primary-announcement collection and frozen source coverage.
+- Immutable source/assessment publication with exact readers and atomic pointers.
+- Real two-company evidence/assessment bundle with verified backup and recovery.
+- Public 229-company discovery cohort retaining inactive/acquired records and
+  unresolved follow-up, plus primary closure evidence for Datree.
 
-## Development
+## Operations and status
 
-Run `make install notebooks frontend-install` from the repository root.
-Use `make check test build docs-test frontend-check` to verify the scaffold.
-The only browser preview is `npm --prefix frontend run dev`.
+- [Dev 1 acceptance audit](workstreams/dev1/STATUS.md).
+- [Company collection](tasks/dev1/D1-O2-company-collection.md).
+- [Public cohort discovery](tasks/dev1/D1-O4-public-cohort-discovery.md).
+- [Real assessment handoff](tasks/dev1/D1-O5-real-assessment-handoff.md).
+- [Recovery and bounded refresh](tasks/dev1/D1-O6-local-recovery.md).
 
-There are no API routes, data ingestion jobs, database migrations, model
-implementations, or deployed services yet.
+The repository-root PLAN.md defines team scope. Run `make install notebooks
+frontend-install` for development and `make check test build docs-test` for shared
+Python checks. Run data filesystem acceptance explicitly with
+`uv run --frozen --no-sync pytest tests/integration/data -m integration`.
+No cloud deployment or predictive calibration is established by these checks.
