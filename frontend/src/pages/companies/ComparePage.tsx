@@ -36,6 +36,13 @@ export default function ComparePage() {
     })),
   });
   const profiles = queries.flatMap((query) => (query.data ? [query.data] : []));
+  const measurements = profiles.map(
+    (profile) => new Map(profile.metrics.map((row) => [row.metric_id, row])),
+  );
+  const staleMetrics = profiles.map(
+    (profile) =>
+      new Set(profile.coverage.flatMap((row) => row.stale_metric_ids)),
+  );
   const complete =
     valid &&
     profiles.length === ids.length &&
@@ -167,12 +174,12 @@ export default function ComparePage() {
                         <small>{definition.metric_id}</small>
                       </details>
                     </th>
-                    {profiles.map((profile) => {
-                      const metric = profile.metrics.find(
-                        (row) => row.metric_id === definition.metric_id,
+                    {profiles.map((profile, index) => {
+                      const metric = measurements[index].get(
+                        definition.metric_id,
                       );
-                      const stale = profile.coverage.some((row) =>
-                        row.stale_metric_ids.includes(definition.metric_id),
+                      const stale = staleMetrics[index].has(
+                        definition.metric_id,
                       );
                       return (
                         <td key={profile.company.company_id}>
