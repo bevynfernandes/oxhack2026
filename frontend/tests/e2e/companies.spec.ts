@@ -2,14 +2,14 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 const snapshot = "synthetic-assessments-v1";
-const listUrl = `/?snapshot=${snapshot}`;
+const listUrl = `/explore?snapshot=${snapshot}`;
 
 test("company research searches, inspects sources and compares the same published profiles", async ({
   page,
 }, testInfo) => {
   const requests: string[] = [];
   page.on("request", (request) => requests.push(request.url()));
-  await page.goto("/");
+  await page.goto("/explore");
   await expect(
     page.getByRole("heading", { name: "Companies", exact: true }),
   ).toBeVisible();
@@ -100,7 +100,7 @@ test("company research searches, inspects sources and compares the same publishe
 test("company errors, unknown publications and invalid comparison selection are explicit", async ({
   page,
 }) => {
-  await page.goto("/?snapshot=unknown");
+  await page.goto("/explore?snapshot=unknown");
   await expect(page.getByRole("alert")).toContainText("not found");
   await expect(
     page.getByRole("link", { name: "Synthetic alpha", exact: true }),
@@ -115,7 +115,7 @@ test("company errors, unknown publications and invalid comparison selection are 
   await page.route("**/api/v1/company-snapshots", (route) =>
     route.fulfill({ status: 503, json: {} }),
   );
-  await page.goto("/");
+  await page.goto("/explore");
   await expect(page.getByRole("alert")).toContainText("unavailable");
   await expect(page.getByRole("button", { name: "Retry" })).toBeVisible();
 });
