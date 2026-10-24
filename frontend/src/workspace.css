@@ -548,7 +548,8 @@ button.secondary:hover {
   line-height: 1.5;
 }
 .pillar-measurements {
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  overflow: auto;
   border-top: 1px solid #edf1f6;
   padding-top: 12px;
   min-height: 0;
@@ -618,7 +619,7 @@ button.secondary:hover {
   color: #7d6638;
 }
 .pillar-model-note {
-  margin-top: auto;
+  flex-shrink: 0;
   padding-top: 20px;
   padding-bottom: 18px;
 }
