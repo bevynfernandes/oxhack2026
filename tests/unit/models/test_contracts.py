@@ -32,6 +32,7 @@ from oxhack2026.models.contracts import (
     TargetWindows,
     TimeWindow,
 )
+from oxhack2026.storage.contracts import ArtifactReference as DataArtifactReference
 
 FIXTURES = Path(__file__).resolve().parents[2] / "fixtures/models"
 SCHEMAS = Path(__file__).resolve().parents[3] / "contracts/datasets/models"
@@ -96,17 +97,48 @@ def test_schema_exports_do_not_drift(contract: type[Contract]) -> None:
 )
 def test_artifact_paths_cannot_escape_bundle(path: str) -> None:
     """Reject unsafe artifact paths before any filesystem read is attempted."""
-    with pytest.raises(ValidationError, match="bundle root"):
-        ArtifactReference(path=path, sha256="a" * 64)
+    with pytest.raises(ValidationError, match="relative path"):
+        ArtifactReference(
+            path=path,
+            sha256="a" * 64,
+            byte_size=0,
+            media_type="application/octet-stream",
+        )
 
 
 def test_artifact_digest_and_safe_path() -> None:
     """Accept a relative hashed artifact and reject malformed hashes."""
-    artifact = ArtifactReference(path="models/ridge.bin", sha256="a" * 64)
+    artifact = ArtifactReference(
+        path="models/ridge.bin",
+        sha256="a" * 64,
+        byte_size=0,
+        media_type="application/octet-stream",
+    )
 
     assert artifact.path == "models/ridge.bin"
     with pytest.raises(ValidationError):
-        ArtifactReference(path="models/ridge.bin", sha256="unknown")
+        ArtifactReference(
+            path="models/ridge.bin",
+            sha256="unknown",
+            byte_size=0,
+            media_type="application/octet-stream",
+        )
+
+
+def test_model_artifacts_use_canonical_data_reference() -> None:
+    """C1 persistence and C2 manifests use exactly the same reference type."""
+    assert ArtifactReference is DataArtifactReference
+
+
+@pytest.mark.parametrize("contract", [FeatureManifest, ForecastManifest])
+def test_legacy_manifest_version_is_rejected(contract: type[Contract]) -> None:
+    """The reference-shape migration must not silently reinterpret version 1."""
+    name = "feature-manifest" if contract is FeatureManifest else "forecast-manifest"
+    payload = orjson.loads((FIXTURES / f"{name}.json").read_bytes())
+    payload["schema_version"] = "models-v1"
+
+    with pytest.raises(ValidationError, match="models-v2"):
+        contract.model_validate(payload)
 
 
 @pytest.mark.parametrize("hour_offset", [None, 1, -1])

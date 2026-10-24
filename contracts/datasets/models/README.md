@@ -1,4 +1,11 @@
-# C2 numerical artifacts, version 1
+# C2 numerical artifacts
+
+Model/feature manifests use `models-v2`; evaluation reports use `evaluation-v2`.
+Version 2 adopts C1's canonical `storage.contracts.ArtifactReference`: required
+relative path, SHA-256, byte size, and media type. The model module re-exports
+that exact class; there is no second artifact validator. Version-1 manifests
+are rejected explicitly and must be regenerated from verified immutable bundles.
+No real version-1 model artifacts were published.
 
 Python sources: `oxhack2026/models/contracts.py` and
 `oxhack2026/evaluation/contracts.py`. These Pydantic types are independent of
@@ -34,7 +41,7 @@ must treat nested mappings as immutable and hash serialized published artifacts.
 | Evidence | `EvidenceItem` | Measured observations and cautious interpretations |
 | Numerical API | `RankedCandidate`, `ShortlistScore` | Shared ranking/scoring output types |
 
-All artifact paths are relative POSIX paths resolved by Dev 1's storage layer;
+All artifact paths are canonical relative POSIX paths resolved by Dev 1's storage;
 digests are lowercase SHA-256. The model/forecast ecosystem and target must
 agree. A prospective artifact cannot be first recorded after its decision.
 The producer must additionally check observation collection, mappings, model
@@ -51,8 +58,7 @@ manifest, evidence, and inconclusive-evaluation examples. Every example uses
 synthetic provenance. Placeholder paths/hashes are schema examples only and
 must not be loaded as real data or used in product demonstrations.
 
-C1 is not yet published at this checkpoint. Data types remain referenced by
-dataset/mapping/revision IDs rather than duplicating Dev 1's contracts. Exact
-Parquet/Arrow feature layouts will be frozen with the D2-02 builders after C1
-review. Any breaking field, target, or meaning change increments the contract
-version and regenerates schemas and labelled fixtures together.
+C1 is merged. Observation identities remain dataset/mapping/revision references,
+while artifact references use C1 directly. Exact Parquet/Arrow feature layouts
+will be frozen with the D2-02 builders. Breaking field, target, or meaning changes
+increment the version and regenerate schemas and labelled fixtures together.

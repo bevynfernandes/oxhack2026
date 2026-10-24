@@ -1,5 +1,5 @@
 {
-  "schema_version": "models-v1",
+  "schema_version": "models-v2",
   "batch_id": "synthetic-c2-v1",
   "windows": {
     "target_id": "downloads_next_30d_v1",
@@ -26,7 +26,9 @@
     "target_id": "downloads_next_30d_v1",
     "model_artifact": {
       "path": "synthetic/fixture.json",
-      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "byte_size": 0,
+      "media_type": "application/json"
     },
     "calibration_id": null,
     "calibration_artifact": null
@@ -35,11 +37,15 @@
   "first_recorded_at": "2026-10-24T00:00:00Z",
   "forecasts": {
     "path": "synthetic/fixture.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 0,
+    "media_type": "application/json"
   },
   "evidence": {
     "path": "synthetic/fixture.json",
-    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "byte_size": 0,
+    "media_type": "application/json"
   },
   "synthetic": true,
   "limitations": [
