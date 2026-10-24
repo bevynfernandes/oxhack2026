@@ -16,6 +16,7 @@ _HORIZON_MONTHS: dict[CompanyOutcomeId, int] = {
     "commercial_viability_12m_v1": 12,
     "financing_or_acquisition_24m_v1": 24,
 }
+COMPANY_OUTCOME_IDS = tuple(_HORIZON_MONTHS)
 
 
 def company_horizon_end(
