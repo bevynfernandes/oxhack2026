@@ -1,4 +1,5 @@
-# Shared components
+# Shared presentation
 
-Reserved for reusable interface components. Add a component when a product view
-needs it; the template contains no charts, selection controls, or metrics.
+Common formatting, safe source links, evidence/status states and provenance live
+in `Common.tsx`. `HistoryChart.tsx` is loaded on demand for observed data only and
+has an adjacent accessible table. Public numbers are never forecast in the UI.

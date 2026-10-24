@@ -334,7 +334,7 @@ export interface components {
              * Status
              * @enum {string}
              */
-            status: "exploratory" | "inconclusive" | "rejected" | "confirmed";
+            status: "exploratory" | "inconclusive" | "rejected" | "validated";
             /**
              * Target Id
              * @enum {string}
@@ -392,6 +392,8 @@ export interface components {
              */
             availability: "available" | "unavailable";
             baseline: components["schemas"]["Baseline"] | null;
+            /** Data Age Hours */
+            data_age_hours?: number | null;
             /**
              * Estimate Kind
              * @enum {string}
@@ -403,7 +405,9 @@ export interface components {
              * Evidence Status
              * @enum {string}
              */
-            evidence_status: "exploratory" | "inconclusive" | "rejected" | "confirmed";
+            evidence_status: "exploratory" | "inconclusive" | "rejected" | "validated";
+            /** Feature Row Id */
+            feature_row_id: string;
             /** Forecast Id */
             forecast_id: string;
             freshness: components["schemas"]["Freshness"];
@@ -436,10 +440,10 @@ export interface components {
             batch_id: string;
             /**
              * Contract Version
-             * @default 0.1.0
+             * @default 0.2.0
              * @constant
              */
-            contract_version: "0.1.0";
+            contract_version: "0.2.0";
             /**
              * Decision At
              * Format: date-time
@@ -505,7 +509,7 @@ export interface components {
         Health: {
             /**
              * Contract Version
-             * @default 0.1.0
+             * @default 0.2.0
              */
             contract_version: string;
             /**
@@ -708,6 +712,11 @@ export interface components {
             outcomes: components["schemas"]["Outcome"][];
             /** Selected Organization Ids */
             selected_organization_ids: string[];
+            /**
+             * Selection Metrics
+             * @default []
+             */
+            selection_metrics: components["schemas"]["Score"][];
             selection_score: components["schemas"]["Score"];
         };
         /**
@@ -723,6 +732,12 @@ export interface components {
          * @description Authoritative shortlist score with explicit undefined/insufficient states.
          */
         Score: {
+            /** Candidate Universe Id */
+            candidate_universe_id?: string | null;
+            /** Complete Outcomes */
+            complete_outcomes?: boolean | null;
+            /** Headline Eligible */
+            headline_eligible?: boolean | null;
             /** Metric */
             metric: string;
             /** Name */
@@ -815,6 +830,7 @@ export interface operations {
             query?: {
                 ecosystem?: ("npm" | "pypi") | null;
                 batch_id?: string | null;
+                q?: string | null;
             };
             header?: never;
             path?: never;
@@ -1171,7 +1187,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Error"];
+                    "application/json": components["schemas"]["Health"] | components["schemas"]["Error"];
                 };
             };
         };

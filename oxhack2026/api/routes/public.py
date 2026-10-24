@@ -8,6 +8,7 @@ from fastapi.exceptions import RequestValidationError
 
 from oxhack2026.api import schemas as s
 from oxhack2026.api.repository import (
+    ImmatureOutcome,
     PublishedRepository,
     RepositoryUnavailable,
     ResourceNotFound,
@@ -63,7 +64,11 @@ def liveness() -> s.Health:
     return s.Health(status="ready")
 
 
-@router.get("/api/v1/health/ready", responses=errors, operation_id="readiness")
+@router.get(
+    "/api/v1/health/ready",
+    responses={**errors, 503: {"model": s.Health | s.Error}},
+    operation_id="readiness",
+)
 def readiness(
     response: Response, repo: PublishedRepository = repo_dependency
 ) -> s.Health:
@@ -78,6 +83,7 @@ def readiness(
 def catalog(
     ecosystem: s.Ecosystem | None = None,
     batch_id: s.Identifier | None = None,
+    q: Annotated[str | None, Query(max_length=120)] = None,
     repo: PublishedRepository = repo_dependency,
 ) -> s.Catalog:
     """Return verified identities, frozen to batch_id when provided."""
@@ -96,6 +102,20 @@ def catalog(
                 for tool in result.tools
                 for evidence in tool.mapping_evidence
             )
+        )
+    if q:
+        search = q.casefold()
+        return result.model_copy(
+            update={
+                "tools": tuple(
+                    tool
+                    for tool in result.tools
+                    if search
+                    in " ".join(
+                        (tool.tool_name, tool.organization_name, tool.package_name)
+                    ).casefold()
+                )
+            }
         )
     return result
 
@@ -180,6 +200,8 @@ def reveal(
     selectable = {tools[key].organization_id for key in ranking.primary.tool_ids}
     if not set(selection.organization_ids).issubset(selectable):
         raise RequestValidationError([])
+    if not ranking.reveal_allowed:
+        raise ImmatureOutcome
     result = repo.reveal(batch_id, selection)
     _require(
         result.batch_id == batch_id
