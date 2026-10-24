@@ -1,0 +1,104 @@
+{
+  "target": "Human-annotated target-entity sentiment in English financial news",
+  "counts": {
+    "train": 699,
+    "validation": 102,
+    "test": 103
+  },
+  "entity_counts": {
+    "train": 393,
+    "validation": 74,
+    "test": 66
+  },
+  "class_counts": {
+    "train": {
+      "Positive": 165,
+      "Negative": 154,
+      "Neutral": 380
+    },
+    "validation": {
+      "Neutral": 68,
+      "Positive": 13,
+      "Negative": 21
+    },
+    "test": {
+      "Positive": 28,
+      "Negative": 11,
+      "Neutral": 64
+    }
+  },
+  "exclusions": {
+    "cross_partition_or_empty_article": 366,
+    "duplicate_article": 11
+  },
+  "selected_C": 10.0,
+  "vocabulary_size": 6551,
+  "limitations": [
+    "Human-labeled financial news, not HN comments or company health.",
+    "Entity strings are disjoint; ownership and aliases are not verified.",
+    "Mixed-partition articles are excluded; subset difficulty can differ.",
+    "Entity offsets and text are required; mention counts cannot give sentiment."
+  ],
+  "validation": {
+    "accuracy": 0.7549019607843137,
+    "balanced_accuracy": 0.525030525030525,
+    "macro_f1": 0.5446775446775447,
+    "log_loss": 0.6842517899869794,
+    "confusion_matrix": [
+      [
+        4,
+        13,
+        4
+      ],
+      [
+        0,
+        68,
+        0
+      ],
+      [
+        1,
+        7,
+        5
+      ]
+    ],
+    "class_order": [
+      "Negative",
+      "Neutral",
+      "Positive"
+    ],
+    "prior_accuracy": 0.6666666666666666,
+    "prior_macro_f1": 0.26666666666666666,
+    "prior_log_loss": 0.9017591638378974
+  },
+  "test": {
+    "accuracy": 0.7864077669902912,
+    "balanced_accuracy": 0.5541125541125541,
+    "macro_f1": 0.5766073766073766,
+    "log_loss": 0.611431280020063,
+    "confusion_matrix": [
+      [
+        1,
+        9,
+        1
+      ],
+      [
+        0,
+        64,
+        0
+      ],
+      [
+        1,
+        11,
+        16
+      ]
+    ],
+    "class_order": [
+      "Negative",
+      "Neutral",
+      "Positive"
+    ],
+    "prior_accuracy": 0.6213592233009708,
+    "prior_macro_f1": 0.25548902195608786,
+    "prior_log_loss": 0.9327195570894045
+  }
+}

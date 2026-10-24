@@ -136,6 +136,13 @@ export default function CompanyDossier({
     business_model: null,
   };
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
+  const dimensionModels =
+    standalone?.dimension_models ?? profile?.dimension_models;
+  const modelSections = useMemo(
+    () =>
+      new Map(dimensionModels?.dimensions.map((row) => [row.group_id, row])),
+    [dimensionModels],
+  );
   const cutoff = outlook?.as_of ?? profile?.publication.source.as_of;
   const synthetic = profile?.publication.source.synthetic ?? false;
   const [mobileGroup, setMobileGroup] = useState(0);
@@ -269,6 +276,8 @@ export default function CompanyDossier({
   const currentGroup = groups[panel.index];
   const section =
     panel.kind === "driver" ? sections.get(currentGroup.id) : undefined;
+  const dimensionModel =
+    panel.kind === "driver" ? modelSections.get(currentGroup.id) : undefined;
   const open = (next: Panel) => {
     opener.current =
       document.activeElement instanceof HTMLElement
@@ -412,7 +421,11 @@ export default function CompanyDossier({
           <div>
             <span className="micro-label">STARTUP OUTLOOK</span>
             <h2>Overall outlook unavailable</h2>
-            <small>Models not trained</small>
+            <small>
+              {dimensionModels
+                ? "Experimental dimensions available · outcome models pending"
+                : "Outcome models not trained"}
+            </small>
           </div>
         </div>
         <div className="dossier-actions">
@@ -520,7 +533,8 @@ export default function CompanyDossier({
         </h2>
         <p>Select a pillar to inspect measurements and model readiness</p>
         <span className="model-label">
-          <Icon name="shield" /> Local models · not trained
+          <Icon name="shield" /> Local models ·{" "}
+          {dimensionModels ? "trained, experimental" : "not connected"}
         </span>
       </div>
       <div
@@ -547,6 +561,7 @@ export default function CompanyDossier({
       <section className="dossier-pillars" aria-label="Fundamental drivers">
         {groups.map((group, index) => {
           const row = sections.get(group.id);
+          const model = modelSections.get(group.id);
           const ids = row?.metric_observation_ids ?? [];
           return (
             <article
@@ -557,7 +572,9 @@ export default function CompanyDossier({
               <header>
                 <div className="pillar-top">
                   <span>DIMENSION 0{index + 1}</span>
-                  <span className="pillar-model">Untrained</span>
+                  <span className="pillar-model">
+                    {model ? "Trained · experimental" : "Not connected"}
+                  </span>
                 </div>
                 <h3>
                   <button
@@ -617,8 +634,22 @@ export default function CompanyDossier({
               </div>
               <div className="pillar-model-note">
                 <span className="micro-label">SPECIALIST OUTLOOK</span>
-                <p>Prediction unavailable</p>
-                <small>Awaiting validated local model</small>
+                <p>
+                  {model?.score != null
+                    ? `SDK demand index: ${model.score.toFixed(1)} / 100`
+                    : "Dimension inference unavailable"}
+                </p>
+                <small>
+                  {model
+                    ? model.eligibility === "unreliable"
+                      ? "Withheld: unreliable validation"
+                      : model.eligibility === "not_applicable"
+                        ? "Outside training population"
+                        : model.eligibility === "eligible"
+                          ? "Experimental proxy, not success probability"
+                          : "Company inputs unavailable"
+                    : "No model bundle connected"}
+                </small>
               </div>
               <footer>
                 <span
@@ -747,21 +778,45 @@ export default function CompanyDossier({
               <div className="drawer-model-state">
                 <Icon name={currentGroup.icon} />
                 <div>
-                  <strong>Prediction unavailable</strong>
+                  <strong>
+                    {dimensionModel?.score != null
+                      ? `Experimental SDK demand index: ${dimensionModel.score.toFixed(1)} / 100`
+                      : "Dimension inference unavailable"}
+                  </strong>
                   <p>
                     Data:{" "}
                     {section ? dataNames[section.data_status] : "Not published"}{" "}
-                    · Model: not trained
+                    · Model:{" "}
+                    {dimensionModel ? "trained, experimental" : "not connected"}
                   </p>
                 </div>
               </div>
               <p>{currentGroup.description}</p>
+              {dimensionModel && (
+                <>
+                  <h3>Experimental model</h3>
+                  <p>{dimensionModel.architecture}</p>
+                  <p>Target: {dimensionModel.target}</p>
+                  <p>
+                    Inputs from source {dimensionModels?.source_snapshot_id} as
+                    of {date(dimensionModels?.as_of ?? null)}. The index is a
+                    percentile of training proxy outcomes, not a company-success
+                    probability.
+                  </p>
+                  <Reasons reasons={dimensionModel.reason_codes} />
+                  <ul>
+                    {dimensionModel.limitations.map((limitation) => (
+                      <li key={limitation}>{limitation}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
               <Reasons
                 reasons={
-                  section?.reason_codes ?? [
-                    "no_published_group_mapping",
-                    "model_not_trained",
-                  ]
+                  section?.reason_codes.filter(
+                    (reason) =>
+                      !dimensionModel || reason !== "model_not_trained",
+                  ) ?? ["no_published_group_mapping", "model_not_trained"]
                 }
               />
               {standalone && (
@@ -825,8 +880,9 @@ export default function CompanyDossier({
                 }
               />
               <p>
-                No trained prediction, confidence interval or backtest is
-                available.
+                Company-outcome predictions and confidence intervals remain
+                unavailable. Experimental dimensions have separate targets and
+                limitations.
               </p>
             </>
           ) : panel.index === 1 ? (

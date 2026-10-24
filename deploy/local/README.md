@@ -71,3 +71,14 @@ docker run --rm -p 8000:8000 \
 ```
 
 See the [v2 API, limits and provider configuration](../../docs/tasks/dev3/research-v2.md).
+
+## Experimental dimension models
+
+The packaged baseline bundle is verified when the API starts. Saved profiles and
+new v2 reports attach separate `dimension_models` metadata. Complete, matching npm
+windows support experimental SDK-demand inference. Other dimensions expose trained
+status with explicit input, population or quality restrictions; company-outcome
+forecasts remain null. No training libraries or pickle are needed for this path.
+`SIGNALSHIFT_DIMENSION_MODELS_ROOT` can select a different exact verified portable
+bundle. Restart the API after changing the bundle. Existing immutable reports keep
+their original contents.

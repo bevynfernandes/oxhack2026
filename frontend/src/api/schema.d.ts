@@ -862,6 +862,7 @@ export interface components {
             coverage: components["schemas"]["PublicCompanyCoverage"][];
             /** Definitions */
             definitions: components["schemas"]["MetricDefinition"][];
+            dimension_models?: components["schemas"]["CompanyDimensionModels"] | null;
             /** Events */
             events: components["schemas"]["CompanyEvent"][];
             /** Evidence */
@@ -873,6 +874,41 @@ export interface components {
             publication: components["schemas"]["CompanyPublication"];
             /** Relationships */
             relationships: components["schemas"]["CompanyRelationship"][];
+        };
+        /**
+         * CompanyDimensionModels
+         * @description Current experimental model overlay, separate from immutable assessments.
+         *
+         *     Attributes:
+         *         schema_version: Independent proxy-inference contract version.
+         *         company_id: Exact company evaluated from the selected source publication.
+         *         source_snapshot_id: Exact source whose inputs were consumed.
+         *         as_of: Measurement cutoff, not an assertion of historical model availability.
+         *         model_bundle_sha256: Exact training-run manifest used for this overlay.
+         *         dimensions: Five verified trained proxies, each with its own eligibility.
+         *     Raises:
+         *         ValueError: The five dimensions are absent, duplicated or out of order.
+         */
+        CompanyDimensionModels: {
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Company Id */
+            company_id: string;
+            /** Dimensions */
+            dimensions: components["schemas"]["DimensionModelView"][];
+            /** Model Bundle Sha256 */
+            model_bundle_sha256: string;
+            /**
+             * Schema Version
+             * @default experimental-dimensions-v1
+             * @constant
+             */
+            schema_version: "experimental-dimensions-v1";
+            /** Source Snapshot Id */
+            source_snapshot_id: string;
         };
         /**
          * CompanyEvent
@@ -1249,6 +1285,65 @@ export interface components {
             kind: "decimal";
             /** Value */
             value: string;
+        };
+        /**
+         * DimensionModelView
+         * @description A trained proxy's availability, company eligibility and optional index.
+         *
+         *     Attributes:
+         *         group_id: The dimension represented by this independent proxy model.
+         *         model_status: Actual verified weights exist; this is not outcome validation.
+         *         architecture: The portable baseline or validation-recommended comparator.
+         *         target: Plain-language target, distinct from the three company forecasts.
+         *         model_sha256: Exact fitted artifact digest, without local storage paths.
+         *         eligibility: Whether this company's inputs support experimental inference.
+         *         score: Training-outcome percentile, never a company-success probability.
+         *         predicted_value: Model output in the explicitly named transformed units.
+         *         prediction_unit: Units of the raw proxy prediction.
+         *         metric_observation_ids: Exact source inputs consumed by this inference.
+         *         reason_codes: Missingness, applicability and experimental-quality reasons.
+         *         limitations: Training population and quality restrictions.
+         *     Raises:
+         *         ValueError: An unavailable model carries a score or a prediction is partial.
+         */
+        DimensionModelView: {
+            /** Architecture */
+            architecture: string;
+            /**
+             * Eligibility
+             * @enum {string}
+             */
+            eligibility: "eligible" | "insufficient_data" | "not_applicable" | "unreliable";
+            /**
+             * Group Id
+             * @enum {string}
+             */
+            group_id: "adoption_retention" | "attention_sentiment" | "financial_health" | "industry_competition" | "team_execution";
+            /** Limitations */
+            limitations: string[];
+            /**
+             * Metric Observation Ids
+             * @default []
+             */
+            metric_observation_ids: string[];
+            /** Model Sha256 */
+            model_sha256: string;
+            /**
+             * Model Status
+             * @default experimental_trained
+             * @constant
+             */
+            model_status: "experimental_trained";
+            /** Predicted Value */
+            predicted_value?: number | null;
+            /** Prediction Unit */
+            prediction_unit?: string | null;
+            /** Reason Codes */
+            reason_codes: string[];
+            /** Score */
+            score?: number | null;
+            /** Target */
+            target: string;
         };
         /**
          * DiscoveryRequest
@@ -1997,6 +2092,7 @@ export interface components {
             captures: components["schemas"]["Capture"][];
             /** Claims */
             claims: components["schemas"]["Claim"][];
+            dimension_models?: components["schemas"]["CompanyDimensionModels"] | null;
             /** Events */
             events: components["schemas"]["Event"][];
             /** Evidence */
