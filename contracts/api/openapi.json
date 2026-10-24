@@ -1,6 +1,74 @@
 {
   "components": {
     "schemas": {
+      "AssessmentStatement": {
+        "additionalProperties": false,
+        "description": "A deterministic fact, risk or explicitly identified evidence gap.\n\nAttributes:\n    statement_id: Immutable identifier within one assessment.\n    role: Observation, supported risk, or absence of applicable evidence.\n    text: Plain source-backed description, not an unvalidated likelihood.\n    evidence_ids: C1 evidence supporting a fact/risk; empty for a pure gap.\n    metric_observation_ids: Exact C1 observations used in the statement.\n    event_ids: Exact C1 events used in the statement.\n    missing_metric_ids: Definitions whose evidence is missing or conflicting.\n\nRaises:\n    ValueError: A fact/risk lacks evidence, or a gap lacks its missing definition.",
+        "properties": {
+          "event_ids": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Event Ids",
+            "type": "array"
+          },
+          "evidence_ids": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "metric_observation_ids": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Metric Observation Ids",
+            "type": "array"
+          },
+          "missing_metric_ids": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Missing Metric Ids",
+            "type": "array"
+          },
+          "role": {
+            "enum": [
+              "observation",
+              "risk",
+              "evidence_gap"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "statement_id": {
+            "minLength": 1,
+            "title": "Statement Id",
+            "type": "string"
+          },
+          "text": {
+            "minLength": 1,
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "statement_id",
+          "role",
+          "text"
+        ],
+        "title": "AssessmentStatement",
+        "type": "object"
+      },
       "Baseline": {
         "additionalProperties": false,
         "description": "A saved comparator forecast, without any future outcome values.",
@@ -21,6 +89,27 @@
           "predicted_downloads"
         ],
         "title": "Baseline",
+        "type": "object"
+      },
+      "BooleanValue": {
+        "additionalProperties": false,
+        "description": "Explicit observed Boolean; absence is represented by observation state.",
+        "properties": {
+          "kind": {
+            "const": "boolean",
+            "default": "boolean",
+            "title": "Kind",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "BooleanValue",
         "type": "object"
       },
       "Catalog": {
@@ -94,6 +183,1044 @@
           "tools"
         ],
         "title": "Catalog",
+        "type": "object"
+      },
+      "CompanyAssessment": {
+        "additionalProperties": false,
+        "description": "Immutable company outlook without future labels or an invented success score.\n\nAttributes:\n    schema_version: Evidence-assessment contract version.\n    assessment_id: Immutable assessment identity.\n    company_id: C1 company identity, reusing verified organization identity.\n    family_id: Effective family at as_of, or null for unresolved ownership.\n    family_reason_codes: Explicit reasons when ownership is unknown/conflicting.\n    source_snapshot_id: Exact verified C1 source publication consumed.\n    policy_version: Deterministic evidence interpretation policy.\n    as_of: UTC evidence/measurement cutoff for this assessment.\n    first_recorded_at: Actual time the immutable assessment was first recorded.\n    mode: Historical reconstruction or genuinely pre-cutoff prospective record.\n    outcomes: Exactly the three separate outcome sections, including unknowns.\n    statements: Source-linked facts, risks and missing-definition explanations.\n    synthetic: Must match the source publication; fixtures never become real data.\n    limitations: Publication/cohort restrictions retained for the consumer.\n\nRaises:\n    ValueError: Sections, references, dates or prospective provenance conflict.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "assessment_id": {
+            "minLength": 1,
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "company_id": {
+            "minLength": 1,
+            "title": "Company Id",
+            "type": "string"
+          },
+          "family_id": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Id"
+          },
+          "family_reason_codes": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Family Reason Codes",
+            "type": "array"
+          },
+          "first_recorded_at": {
+            "format": "date-time",
+            "title": "First Recorded At",
+            "type": "string"
+          },
+          "limitations": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "reconstructed",
+              "prospective"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyOutcomeAssessment"
+            },
+            "title": "Outcomes",
+            "type": "array"
+          },
+          "policy_version": {
+            "minLength": 1,
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "company-assessments-v1",
+            "default": "company-assessments-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source_snapshot_id": {
+            "minLength": 1,
+            "title": "Source Snapshot Id",
+            "type": "string"
+          },
+          "statements": {
+            "items": {
+              "$ref": "#/components/schemas/AssessmentStatement"
+            },
+            "title": "Statements",
+            "type": "array"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "assessment_id",
+          "company_id",
+          "family_id",
+          "source_snapshot_id",
+          "policy_version",
+          "as_of",
+          "first_recorded_at",
+          "mode",
+          "outcomes",
+          "statements",
+          "synthetic"
+        ],
+        "title": "CompanyAssessment",
+        "type": "object"
+      },
+      "CompanyCoverage": {
+        "additionalProperties": false,
+        "description": "Frozen metric coverage by family; applicability excludes irrelevant metrics.",
+        "properties": {
+          "applicable_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Applicable Metric Ids",
+            "type": "array"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "conflicting_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Conflicting Metric Ids",
+            "type": "array"
+          },
+          "family": {
+            "enum": [
+              "traction",
+              "commercial",
+              "execution",
+              "market_financing"
+            ],
+            "title": "Family",
+            "type": "string"
+          },
+          "inapplicable_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Inapplicable Metric Ids",
+            "type": "array"
+          },
+          "missing_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Missing Metric Ids",
+            "type": "array"
+          },
+          "observed_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Observed Metric Ids",
+            "type": "array"
+          },
+          "stale_metric_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Stale Metric Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_id",
+          "family",
+          "applicable_metric_ids",
+          "observed_metric_ids",
+          "missing_metric_ids",
+          "conflicting_metric_ids",
+          "inapplicable_metric_ids",
+          "stale_metric_ids"
+        ],
+        "title": "CompanyCoverage",
+        "type": "object"
+      },
+      "CompanyDetail": {
+        "additionalProperties": false,
+        "description": "Pre-outcome profile; raw source paths and future labels are absent.",
+        "properties": {
+          "assessment": {
+            "$ref": "#/components/schemas/CompanyAssessment"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyProfile"
+          },
+          "coverage": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyCoverage"
+            },
+            "title": "Coverage",
+            "type": "array"
+          },
+          "definitions": {
+            "items": {
+              "$ref": "#/components/schemas/MetricDefinition"
+            },
+            "title": "Definitions",
+            "type": "array"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/CompanySource"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "family": {
+            "$ref": "#/components/schemas/FamilyResolution"
+          },
+          "metrics": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyMetricObservation"
+            },
+            "title": "Metrics",
+            "type": "array"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/CompanyPublication"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyRelationship"
+            },
+            "title": "Relationships",
+            "type": "array"
+          }
+        },
+        "required": [
+          "publication",
+          "company",
+          "assessment",
+          "family",
+          "definitions",
+          "metrics",
+          "events",
+          "relationships",
+          "coverage",
+          "evidence"
+        ],
+        "title": "CompanyDetail",
+        "type": "object"
+      },
+      "CompanyEvent": {
+        "additionalProperties": false,
+        "description": "Dated reported occurrence; company shutdown differs from product retirement.",
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "date_precision": {
+            "enum": [
+              "day",
+              "unknown"
+            ],
+            "title": "Date Precision",
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Description",
+            "type": "string"
+          },
+          "event_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "funding",
+              "acquisition",
+              "company_shutdown",
+              "product_retirement",
+              "release",
+              "ownership_change"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "occurred_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occurred On"
+          },
+          "stage": {
+            "enum": [
+              "announced",
+              "completed",
+              "reported"
+            ],
+            "title": "Stage",
+            "type": "string"
+          },
+          "supersedes_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes Id"
+          }
+        },
+        "required": [
+          "available_at",
+          "collected_at",
+          "event_id",
+          "company_id",
+          "kind",
+          "stage",
+          "occurred_on",
+          "date_precision",
+          "description",
+          "evidence_ids"
+        ],
+        "title": "CompanyEvent",
+        "type": "object"
+      },
+      "CompanyList": {
+        "additionalProperties": false,
+        "description": "Name-ordered companies in one immutable publication.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompanySummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/CompanyPublication"
+          }
+        },
+        "required": [
+          "publication",
+          "items"
+        ],
+        "title": "CompanyList",
+        "type": "object"
+      },
+      "CompanyMetricObservation": {
+        "additionalProperties": false,
+        "description": "One selected metric vintage; missing/conflicting values cannot become zero.",
+        "properties": {
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "measured_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measured At"
+          },
+          "metric_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Metric Id",
+            "type": "string"
+          },
+          "observation_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 4000,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "state": {
+            "enum": [
+              "observed",
+              "missing",
+              "not_applicable",
+              "conflicting"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "supersedes_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supersedes Id"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "discriminator": {
+                  "mapping": {
+                    "boolean": "#/components/schemas/BooleanValue",
+                    "decimal": "#/components/schemas/DecimalValue",
+                    "integer": "#/components/schemas/IntegerValue"
+                  },
+                  "propertyName": "kind"
+                },
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/IntegerValue"
+                  },
+                  {
+                    "$ref": "#/components/schemas/DecimalValue"
+                  },
+                  {
+                    "$ref": "#/components/schemas/BooleanValue"
+                  }
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TimeWindow"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "available_at",
+          "collected_at",
+          "observation_id",
+          "company_id",
+          "metric_id",
+          "window",
+          "measured_at",
+          "value",
+          "state",
+          "reason",
+          "evidence_ids"
+        ],
+        "title": "CompanyMetricObservation",
+        "type": "object"
+      },
+      "CompanyOutcomeAssessment": {
+        "additionalProperties": false,
+        "description": "One prospective question explained from currently available evidence.\n\nAttributes:\n    outcome_id: Separate versioned company outcome, never a composite score.\n    horizon_end: Exact calendar horizon derived from the assessment cutoff.\n    assessment_status: Evidence-only facts, or unavailable relevant evidence.\n    summary: Short explanation of facts/gaps without unsupported probability.\n    statement_ids: Supporting/risk/gap statements in the containing assessment.\n    reason_codes: Explicit limitations or reasons relevant evidence is absent.\n    probability: Always null in this evidence-only contract version. A later\n        validated prediction contract requires its own model/evaluation gate.\n\nRaises:\n    ValueError: An unavailable outcome lacks reasons, or facts lack statements.",
+        "properties": {
+          "assessment_status": {
+            "enum": [
+              "evidence_only",
+              "unavailable"
+            ],
+            "title": "Assessment Status",
+            "type": "string"
+          },
+          "horizon_end": {
+            "format": "date-time",
+            "title": "Horizon End",
+            "type": "string"
+          },
+          "outcome_id": {
+            "enum": [
+              "operating_growth_24m_v1",
+              "commercial_viability_12m_v1",
+              "financing_or_acquisition_24m_v1"
+            ],
+            "title": "Outcome Id",
+            "type": "string"
+          },
+          "probability": {
+            "title": "Probability",
+            "type": "null"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "statement_ids": {
+            "default": [],
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Statement Ids",
+            "type": "array"
+          },
+          "summary": {
+            "minLength": 1,
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome_id",
+          "horizon_end",
+          "assessment_status",
+          "summary"
+        ],
+        "title": "CompanyOutcomeAssessment",
+        "type": "object"
+      },
+      "CompanyProfile": {
+        "additionalProperties": false,
+        "description": "Snapshot-specific company identity/context; unknown context remains null.",
+        "properties": {
+          "business_model": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Business Model"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "context_as_of": {
+            "format": "date-time",
+            "title": "Context As Of",
+            "type": "string"
+          },
+          "display_name": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Display Name",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "segment": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Segment",
+            "type": "string"
+          },
+          "stage": {
+            "anyOf": [
+              {
+                "maxLength": 256,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Stage"
+          },
+          "website_url": {
+            "title": "Website Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "company_id",
+          "display_name",
+          "website_url",
+          "segment",
+          "business_model",
+          "stage",
+          "context_as_of",
+          "evidence_ids"
+        ],
+        "title": "CompanyProfile",
+        "type": "object"
+      },
+      "CompanyPublication": {
+        "additionalProperties": false,
+        "description": "An exact source snapshot with a complete published assessment set.",
+        "properties": {
+          "company_count": {
+            "title": "Company Count",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "company-api-v1",
+            "default": "company-api-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/CompanySnapshotMetadata"
+          }
+        },
+        "required": [
+          "source",
+          "company_count"
+        ],
+        "title": "CompanyPublication",
+        "type": "object"
+      },
+      "CompanyPublications": {
+        "additionalProperties": false,
+        "description": "Explicit publication choices; an empty list never loads examples.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyPublication"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "CompanyPublications",
+        "type": "object"
+      },
+      "CompanyRelationship": {
+        "additionalProperties": false,
+        "description": "Evidence-backed effective mapping, including explicit family membership.\n\nFamily targets are opaque grouping IDs, not an implicit current parent.\nA self-family assertion needs evidence just like any other membership.",
+        "properties": {
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "relationship_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "subject_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Subject Id",
+            "type": "string"
+          },
+          "subject_kind": {
+            "enum": [
+              "legal_entity",
+              "tool",
+              "package",
+              "repository",
+              "family"
+            ],
+            "title": "Subject Kind",
+            "type": "string"
+          },
+          "valid_from": {
+            "format": "date-time",
+            "title": "Valid From",
+            "type": "string"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Valid To"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "company_id",
+          "subject_kind",
+          "subject_id",
+          "valid_from",
+          "valid_to",
+          "evidence_ids"
+        ],
+        "title": "CompanyRelationship",
+        "type": "object"
+      },
+      "CompanySnapshotMetadata": {
+        "additionalProperties": false,
+        "description": "Immutable source publication identity and actual production provenance.",
+        "properties": {
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "code_revision": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Code Revision",
+            "type": "string"
+          },
+          "cohort_version": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Cohort Version",
+            "type": "string"
+          },
+          "configuration_sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Configuration Sha256",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "maxLength": 4000,
+              "minLength": 1,
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "mode": {
+            "enum": [
+              "contemporary",
+              "historical_reconstruction",
+              "prospective"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "company-source-v1",
+            "default": "company-source-v1",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "snapshot_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Snapshot Id",
+            "type": "string"
+          },
+          "synthetic": {
+            "title": "Synthetic",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "snapshot_id",
+          "as_of",
+          "recorded_at",
+          "cohort_version",
+          "code_revision",
+          "configuration_sha256",
+          "synthetic",
+          "mode",
+          "limitations"
+        ],
+        "title": "CompanySnapshotMetadata",
+        "type": "object"
+      },
+      "CompanySource": {
+        "additionalProperties": false,
+        "description": "Public provenance without raw locations, locators or restricted contents.",
+        "properties": {
+          "access": {
+            "enum": [
+              "public",
+              "restricted"
+            ],
+            "title": "Access",
+            "type": "string"
+          },
+          "assertion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assertion"
+          },
+          "availability_basis": {
+            "enum": [
+              "dated_publication",
+              "first_observed"
+            ],
+            "title": "Availability Basis",
+            "type": "string"
+          },
+          "available_at": {
+            "format": "date-time",
+            "title": "Available At",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "evidence_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "registry_record",
+              "company_reported",
+              "platform_observed",
+              "user_supplied"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "review_state": {
+            "enum": [
+              "unreviewed",
+              "verified",
+              "disputed"
+            ],
+            "title": "Review State",
+            "type": "string"
+          },
+          "url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Url"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "provider",
+          "access",
+          "url",
+          "assertion",
+          "published_at",
+          "available_at",
+          "collected_at",
+          "availability_basis",
+          "kind",
+          "review_state"
+        ],
+        "title": "CompanySource",
+        "type": "object"
+      },
+      "CompanySummary": {
+        "additionalProperties": false,
+        "description": "Company context, separate outcomes and published evidence for a table row.",
+        "properties": {
+          "assessment_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Assessment Id",
+            "type": "string"
+          },
+          "company": {
+            "$ref": "#/components/schemas/CompanyProfile"
+          },
+          "coverage": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyCoverage"
+            },
+            "title": "Coverage",
+            "type": "array"
+          },
+          "main_risk": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Main Risk"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/CompanyOutcomeAssessment"
+            },
+            "title": "Outcomes",
+            "type": "array"
+          },
+          "supporting_signal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Supporting Signal"
+          }
+        },
+        "required": [
+          "company",
+          "assessment_id",
+          "outcomes",
+          "supporting_signal",
+          "main_risk",
+          "coverage"
+        ],
+        "title": "CompanySummary",
         "type": "object"
       },
       "Cutoff": {
@@ -202,6 +1329,27 @@
           "sources"
         ],
         "title": "DataHealth",
+        "type": "object"
+      },
+      "DecimalValue": {
+        "additionalProperties": false,
+        "description": "Exact finite decimal serialized as a string; binary floats are rejected.",
+        "properties": {
+          "kind": {
+            "const": "decimal",
+            "default": "decimal",
+            "title": "Kind",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "DecimalValue",
         "type": "object"
       },
       "Error": {
@@ -440,6 +1588,59 @@
           "reasons"
         ],
         "title": "Exclusion",
+        "type": "object"
+      },
+      "FamilyResolution": {
+        "additionalProperties": false,
+        "description": "Effective family at a cutoff, or explicit unresolved/conflicting ownership.",
+        "properties": {
+          "assessment_at": {
+            "format": "date-time",
+            "title": "Assessment At",
+            "type": "string"
+          },
+          "company_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Company Id",
+            "type": "string"
+          },
+          "family_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Family Id"
+          },
+          "reason_codes": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "relationship_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Relationship Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "company_id",
+          "assessment_at",
+          "family_id",
+          "reason_codes",
+          "relationship_ids"
+        ],
+        "title": "FamilyResolution",
         "type": "object"
       },
       "Forecast": {
@@ -884,6 +2085,29 @@
         "title": "HistoryPoint",
         "type": "object"
       },
+      "IntegerValue": {
+        "additionalProperties": false,
+        "description": "Exact count, excluding Boolean and coercible string/float inputs.",
+        "properties": {
+          "kind": {
+            "const": "integer",
+            "default": "integer",
+            "title": "Kind",
+            "type": "string"
+          },
+          "value": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value"
+        ],
+        "title": "IntegerValue",
+        "type": "object"
+      },
       "Interval": {
         "additionalProperties": false,
         "description": "An interval already approved by the model owner's serving gate.",
@@ -1005,6 +2229,99 @@
           "limitations"
         ],
         "title": "Metric",
+        "type": "object"
+      },
+      "MetricDefinition": {
+        "additionalProperties": false,
+        "description": "Versioned measurement meaning; source freshness is not predictive confidence.",
+        "properties": {
+          "applicability": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Applicability",
+            "type": "string"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Z]{3}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "definition": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Definition",
+            "type": "string"
+          },
+          "family": {
+            "enum": [
+              "traction",
+              "commercial",
+              "execution",
+              "market_financing"
+            ],
+            "title": "Family",
+            "type": "string"
+          },
+          "label": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "maximum_age_days": {
+            "exclusiveMinimum": 0.0,
+            "title": "Maximum Age Days",
+            "type": "integer"
+          },
+          "metric_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Metric Id",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "company",
+              "product",
+              "repository"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "unit": {
+            "maxLength": 256,
+            "minLength": 1,
+            "title": "Unit",
+            "type": "string"
+          },
+          "value_kind": {
+            "enum": [
+              "integer",
+              "decimal",
+              "boolean"
+            ],
+            "title": "Value Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric_id",
+          "family",
+          "label",
+          "definition",
+          "unit",
+          "value_kind",
+          "scope",
+          "applicability",
+          "maximum_age_days"
+        ],
+        "title": "MetricDefinition",
         "type": "object"
       },
       "Outcome": {
@@ -1497,6 +2814,28 @@
         "title": "SourceHealth",
         "type": "object"
       },
+      "TimeWindow": {
+        "additionalProperties": false,
+        "description": "A nonempty half-open interval [start, end), always in UTC.",
+        "properties": {
+          "end": {
+            "format": "date-time",
+            "title": "End",
+            "type": "string"
+          },
+          "start": {
+            "format": "date-time",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ],
+        "title": "TimeWindow",
+        "type": "object"
+      },
       "Tool": {
         "additionalProperties": false,
         "description": "Verified tool-to-package and organization mapping in one ecosystem.",
@@ -1719,6 +3058,217 @@
           }
         },
         "summary": "Catalog"
+      }
+    },
+    "/api/v1/company-snapshots": {
+      "get": {
+        "description": "Enumerate explicit verified company assessment publications.",
+        "operationId": "company_snapshots",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyPublications"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Company Snapshots"
+      }
+    },
+    "/api/v1/company-snapshots/{snapshot_id}/companies": {
+      "get": {
+        "description": "Read the full name-ordered company table for an exact publication.",
+        "operationId": "companies",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Companies"
+      }
+    },
+    "/api/v1/company-snapshots/{snapshot_id}/companies/{company_id}": {
+      "get": {
+        "description": "Read a pre-outcome profile with public-safe sources and explicit unknowns.",
+        "operationId": "company",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "snapshot_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Snapshot Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "company_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Company Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanyDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "summary": "Company"
       }
     },
     "/api/v1/cutoffs": {
