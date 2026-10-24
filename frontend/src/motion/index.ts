@@ -13,3 +13,5 @@ export {
   MotionState,
 } from "./panels";
 export { MotionDialog, type MotionDialogHandle } from "./dialog";
+
+export { MotionPage } from "./page";

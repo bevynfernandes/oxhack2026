@@ -1,4 +1,5 @@
 import {
+  MotionPage,
   MotionSelection,
   MotionIndicator,
   MotionNavLink as NavLink,
@@ -61,7 +62,7 @@ export default function App() {
           </MotionSelection>
         </nav>
       </header>
-      <main id="main" tabIndex={terminal ? -1 : 0}>
+      <MotionPage routeKey={pathname} id="main" tabIndex={terminal ? -1 : 0}>
         <Routes>
           <Route path="/" element={<CompanyHomePage />} />
           <Route
@@ -121,7 +122,7 @@ export default function App() {
             }
           />
         </Routes>
-      </main>
+      </MotionPage>
       <footer>
         <span>
           Evidence-backed research · Forecasts unavailable until validated
