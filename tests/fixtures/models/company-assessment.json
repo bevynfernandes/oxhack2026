@@ -1,0 +1,64 @@
+{
+  "schema_version": "company-assessments-v1",
+  "assessment_id": "synthetic-company-assessment-v1",
+  "company_id": "synthetic-company",
+  "family_id": "synthetic-family",
+  "source_snapshot_id": "synthetic-company-source-v1",
+  "policy_version": "company-evidence-v1",
+  "as_of": "2026-10-24T12:00:00Z",
+  "first_recorded_at": "2026-10-24T13:00:00Z",
+  "mode": "reconstructed",
+  "synthetic": true,
+  "outcomes": [
+    {
+      "outcome_id": "operating_growth_24m_v1",
+      "horizon_end": "2028-10-24T12:00:00Z",
+      "assessment_status": "evidence_only",
+      "summary": "Package traction is observed; commercial growth is not established.",
+      "statement_ids": ["synthetic-traction", "synthetic-cashflow-gap"],
+      "reason_codes": ["no_validated_outcome_model"],
+      "probability": null
+    },
+    {
+      "outcome_id": "commercial_viability_12m_v1",
+      "horizon_end": "2027-10-24T12:00:00Z",
+      "assessment_status": "unavailable",
+      "summary": "Cash-flow self-sufficiency cannot be assessed from available evidence.",
+      "statement_ids": ["synthetic-cashflow-gap"],
+      "reason_codes": ["operating_cash_flow_unavailable"],
+      "probability": null
+    },
+    {
+      "outcome_id": "financing_or_acquisition_24m_v1",
+      "horizon_end": "2028-10-24T12:00:00Z",
+      "assessment_status": "evidence_only",
+      "summary": "A financing announcement is recorded; future financing is unknown.",
+      "statement_ids": ["synthetic-funding-announcement"],
+      "reason_codes": ["no_validated_outcome_model"],
+      "probability": null
+    }
+  ],
+  "statements": [
+    {
+      "statement_id": "synthetic-traction",
+      "role": "observation",
+      "text": "A complete package-download observation is available.",
+      "evidence_ids": ["synthetic-npm-response"],
+      "metric_observation_ids": ["synthetic-downloads-28d"]
+    },
+    {
+      "statement_id": "synthetic-cashflow-gap",
+      "role": "evidence_gap",
+      "text": "No comparable operating-cash-flow measurement is available.",
+      "missing_metric_ids": ["operating-cash-flow-12m-v1"]
+    },
+    {
+      "statement_id": "synthetic-funding-announcement",
+      "role": "observation",
+      "text": "The company announced financing; completion is not established.",
+      "evidence_ids": ["synthetic-primary-announcement"],
+      "event_ids": ["synthetic-announced-financing"]
+    }
+  ],
+  "limitations": ["SYNTHETIC: contract example only; not real company evidence."]
+}

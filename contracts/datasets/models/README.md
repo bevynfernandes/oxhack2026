@@ -1,5 +1,12 @@
 # C2 numerical artifacts
 
+Company evidence profiles use `company-assessments-v1` in
+`models/company_assessments.py`. `CompanyAssessment` contains all three outlook
+sections, source-linked statements and explicit unavailable evidence. Probabilities
+are null in this version, and future truth is excluded. A validated prediction
+publication is a later, separately evaluated interface; source-owned metrics and
+events are not copied into another raw-data contract.
+
 Company-outcome labels use the separate `company-labels-v1` contract in
 `models/company_contracts.py`. `CompanyOutcomeLabel` retains company/family and
 source-vintage identity, the exact calendar horizon, evaluation cutoff, explicit
