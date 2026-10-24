@@ -1,0 +1,167 @@
+{
+  "schema_version": "startup-label-audit-v1",
+  "audit_date": "2026-10-24",
+  "training_performed": false,
+  "approved_labels": 0,
+  "cohort_source_sha256": "513ee3fc200dad3f1c8077ba5bc2fd51002b09715266fadff33b4eff1e957825",
+  "selection": "First four Inactive entries, in pinned source order, within the predeclared 59-company discovery filter; selected before source inspection. This is a label-audit subset, not a representative training set.",
+  "decision_origin": "2022-01-01T00:00:00Z",
+  "proposed_survival_horizon_end": "2024-01-01T00:00:00Z",
+  "raw_cache_directory": ".cache/startup-data-audit/label-review",
+  "entries": [
+    {
+      "company_slug": "enveloop",
+      "directory_status_at_capture": "Inactive",
+      "historical_outcome_state": "unadjudicated",
+      "historical_outcome_value": null,
+      "closure_interval": null,
+      "reason_codes": [
+        "no_dated_primary_closure_evidence_in_inspected_sources",
+        "historical_identity_and_family_unverified",
+        "website_capture_failed_not_a_shutdown_label"
+      ],
+      "captures": [
+        {
+          "company": "Enveloop",
+          "slug": "enveloop",
+          "kind": "directory",
+          "requested_url": "https://www.ycombinator.com/companies/enveloop",
+          "captured_at": "2026-10-24T17:07:14.727433+00:00",
+          "closure_label": null,
+          "status": 200,
+          "final_url": "https://www.ycombinator.com/companies/enveloop",
+          "bytes": 119697,
+          "sha256": "864fc62ce81befeab13832e75a3c6f2abad5e2e7904dda729197059bf6426065",
+          "truncated": false,
+          "file": "enveloop-directory.html"
+        },
+        {
+          "company": "Enveloop",
+          "slug": "enveloop",
+          "kind": "website",
+          "requested_url": "https://www.enveloop.com",
+          "captured_at": "2026-10-24T17:07:15.706164+00:00",
+          "closure_label": null,
+          "error": "ConnectError"
+        }
+      ]
+    },
+    {
+      "company_slug": "quickcard",
+      "directory_status_at_capture": "Inactive",
+      "historical_outcome_state": "unadjudicated",
+      "historical_outcome_value": null,
+      "closure_interval": null,
+      "reason_codes": [
+        "no_dated_primary_closure_evidence_in_inspected_sources",
+        "historical_identity_and_family_unverified",
+        "website_capture_failed_not_a_shutdown_label"
+      ],
+      "captures": [
+        {
+          "company": "Quickcard",
+          "slug": "quickcard",
+          "kind": "directory",
+          "requested_url": "https://www.ycombinator.com/companies/quickcard",
+          "captured_at": "2026-10-24T17:07:16.334507+00:00",
+          "closure_label": null,
+          "status": 200,
+          "final_url": "https://www.ycombinator.com/companies/quickcard",
+          "bytes": 90248,
+          "sha256": "4e07b8d8e54be75f9970d7ba28217165e7c845143001d7e1596e20ea683ef54e",
+          "truncated": false,
+          "file": "quickcard-directory.html"
+        },
+        {
+          "company": "Quickcard",
+          "slug": "quickcard",
+          "kind": "website",
+          "requested_url": "https://quickcard.com",
+          "captured_at": "2026-10-24T17:07:16.640895+00:00",
+          "closure_label": null,
+          "error": "ConnectError"
+        }
+      ]
+    },
+    {
+      "company_slug": "orbiter",
+      "directory_status_at_capture": "Inactive",
+      "historical_outcome_state": "unadjudicated",
+      "historical_outcome_value": null,
+      "closure_interval": null,
+      "reason_codes": [
+        "no_dated_primary_closure_evidence_in_inspected_sources",
+        "historical_identity_and_family_unverified",
+        "current_domain_content_mismatch"
+      ],
+      "captures": [
+        {
+          "company": "Orbiter",
+          "slug": "orbiter",
+          "kind": "directory",
+          "requested_url": "https://www.ycombinator.com/companies/orbiter",
+          "captured_at": "2026-10-24T17:07:20.229838+00:00",
+          "closure_label": null,
+          "status": 200,
+          "final_url": "https://www.ycombinator.com/companies/orbiter",
+          "bytes": 110282,
+          "sha256": "5ae7a87e329a76df677d12239bcacdd9aef09d486f44628dd59526a130a07cb5",
+          "truncated": false,
+          "file": "orbiter-directory.html"
+        },
+        {
+          "company": "Orbiter",
+          "slug": "orbiter",
+          "kind": "website",
+          "requested_url": "https://www.getorbiter.com",
+          "captured_at": "2026-10-24T17:07:20.569443+00:00",
+          "closure_label": null,
+          "status": 200,
+          "final_url": "https://getorbiter.com/",
+          "bytes": 75401,
+          "sha256": "543dbde4b2cc63267eec41daae7621b9e352fe3fd82eca0f8c7686ca33ff4aee",
+          "truncated": false,
+          "file": "orbiter-website.html"
+        }
+      ]
+    },
+    {
+      "company_slug": "glisten-ai",
+      "directory_status_at_capture": "Inactive",
+      "historical_outcome_state": "unadjudicated",
+      "historical_outcome_value": null,
+      "closure_interval": null,
+      "reason_codes": [
+        "no_dated_primary_closure_evidence_in_inspected_sources",
+        "historical_identity_and_family_unverified",
+        "website_capture_failed_not_a_shutdown_label"
+      ],
+      "captures": [
+        {
+          "company": "Glisten AI",
+          "slug": "glisten-ai",
+          "kind": "directory",
+          "requested_url": "https://www.ycombinator.com/companies/glisten-ai",
+          "captured_at": "2026-10-24T17:07:22.417908+00:00",
+          "closure_label": null,
+          "status": 200,
+          "final_url": "https://www.ycombinator.com/companies/glisten-ai",
+          "bytes": 88124,
+          "sha256": "09723b13f80ef122d992b1d621c3a9f845b210979b17ca02fe5d70218ce35356",
+          "truncated": false,
+          "file": "glisten-ai-directory.html"
+        },
+        {
+          "company": "Glisten AI",
+          "slug": "glisten-ai",
+          "kind": "website",
+          "requested_url": "https://glisten.ai",
+          "captured_at": "2026-10-24T17:07:22.837604+00:00",
+          "closure_label": null,
+          "error": "ConnectError"
+        }
+      ]
+    }
+  ],
+  "limitation": "Bounded current-source inspection cannot prove no other dated closure evidence exists. Current pages do not establish historical domain control or endpoint operation."
+}
