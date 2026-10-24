@@ -54,6 +54,15 @@
             "title": "Mapping Version",
             "type": "string"
           },
+          "membership_basis": {
+            "default": "decision_time",
+            "enum": [
+              "decision_time",
+              "contemporary_reconstruction"
+            ],
+            "title": "Membership Basis",
+            "type": "string"
+          },
           "recorded_at": {
             "anyOf": [
               {
@@ -616,8 +625,8 @@
             "type": "string"
           },
           "contract_version": {
-            "const": "0.3.0",
-            "default": "0.3.0",
+            "const": "0.4.0",
+            "default": "0.4.0",
             "title": "Contract Version",
             "type": "string"
           },
@@ -757,7 +766,7 @@
         "description": "Process or repository readiness, without sensitive configuration.",
         "properties": {
           "contract_version": {
-            "default": "0.3.0",
+            "default": "0.4.0",
             "title": "Contract Version",
             "type": "string"
           },
@@ -1593,7 +1602,7 @@
   },
   "info": {
     "title": "SignalShift",
-    "version": "0.3.0"
+    "version": "0.4.0"
   },
   "openapi": "3.1.0",
   "paths": {

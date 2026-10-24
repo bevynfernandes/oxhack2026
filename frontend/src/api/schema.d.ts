@@ -238,6 +238,12 @@ export interface components {
             limitations: string[];
             /** Mapping Version */
             mapping_version: string;
+            /**
+             * Membership Basis
+             * @default decision_time
+             * @enum {string}
+             */
+            membership_basis: "decision_time" | "contemporary_reconstruction";
             /** Recorded At */
             recorded_at?: string | null;
             /** Synthetic */
@@ -453,10 +459,10 @@ export interface components {
             batch_id: string;
             /**
              * Contract Version
-             * @default 0.3.0
+             * @default 0.4.0
              * @constant
              */
-            contract_version: "0.3.0";
+            contract_version: "0.4.0";
             /**
              * Decision At
              * Format: date-time
@@ -519,7 +525,7 @@ export interface components {
         Health: {
             /**
              * Contract Version
-             * @default 0.3.0
+             * @default 0.4.0
              */
             contract_version: string;
             /**

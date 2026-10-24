@@ -360,3 +360,32 @@ def test_retrospective_catalogue_cannot_appear_prospective(
         update={"mode": "prospective"}
     )
     assert client.get(f"/api/v1/catalog?batch_id={BATCH}").status_code == 503
+
+
+def test_contemporary_membership_is_explicit_and_reconstruction_only(
+    client: TestClient, repository: Mock, bundle: FixtureBundle
+) -> None:
+    """Membership selection remains distinct from the actual evidence timestamps."""
+    catalog = bundle.catalog.model_copy(
+        update={
+            "membership_basis": "contemporary_reconstruction",
+            "recorded_at": datetime(2026, 1, 1, tzinfo=UTC),
+        }
+    )
+    repository.catalog.return_value = catalog
+    response = client.get(f"/api/v1/catalog?batch_id={BATCH}")
+    assert response.status_code == 200
+    assert response.json()["membership_basis"] == "contemporary_reconstruction"
+    for change in (
+        {"recorded_at": None},
+        {"cohort_kind": "historical_eligibility"},
+    ):
+        repository.catalog.return_value = catalog.model_copy(update=change)
+        assert client.get(f"/api/v1/catalog?batch_id={BATCH}").status_code == 503
+    repository.catalog.return_value = catalog.model_copy(
+        update={"recorded_at": bundle.forecast.decision_at}
+    )
+    repository.forecast.return_value = bundle.forecast.model_copy(
+        update={"mode": "prospective"}
+    )
+    assert client.get(f"/api/v1/catalog?batch_id={BATCH}").status_code == 503

@@ -13,7 +13,7 @@ from pydantic import (
     model_validator,
 )
 
-CONTRACT_VERSION = "0.3.0"
+CONTRACT_VERSION = "0.4.0"
 Identifier = Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$")]
 Ecosystem = Literal["npm", "pypi"]
 Target = Literal["downloads_next_30d_v1", "downloads_trailing_28d_at_91d_v1"]
@@ -133,6 +133,9 @@ class Catalog(DTO):
     cohort_kind: Literal["contemporary_catalogue", "historical_eligibility"] = (
         "contemporary_catalogue"
     )
+    membership_basis: Literal["decision_time", "contemporary_reconstruction"] = (
+        "decision_time"
+    )
     limitations: tuple[str, ...] = ()
 
 
@@ -225,7 +228,7 @@ class Forecast(DTO):
 class ForecastBatch(DTO):
     """Frozen prediction payload; shared identity/time apply to every result."""
 
-    contract_version: Literal["0.3.0"] = "0.3.0"
+    contract_version: Literal["0.4.0"] = "0.4.0"
     batch_id: Identifier
     ecosystem: Ecosystem
     target_id: Target
