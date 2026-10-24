@@ -13,7 +13,7 @@ DISCLOSURE_TIMING_FEATURES = (
     "missing_previous_report",
 )
 
-_ANNUAL_FORMS = ("10K", "10K405", "10KSB", "10KSB40", "10KT")
+ANNUAL_DISCLOSURE_FORMS = ("10K", "10K405", "10KSB", "10KSB40", "10KT")
 
 
 def _sec_filing_columns(payload: object) -> pl.DataFrame:
@@ -87,7 +87,7 @@ def sec_disclosure_timing(
         pages.append(_sec_filing_columns(supplied[name]))
     frame = (
         pl.concat(pages)
-        .filter(pl.col("form").str.replace_all("-", "").is_in(_ANNUAL_FORMS))
+        .filter(pl.col("form").str.replace_all("-", "").is_in(ANNUAL_DISCLOSURE_FORMS))
         .select(
             pl.lit(issuer_id).alias("issuer_id"),
             pl.col("filingDate").str.to_date().alias("filing_date"),

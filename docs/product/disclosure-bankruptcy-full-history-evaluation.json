@@ -1,0 +1,99 @@
+{
+  "schema_version": "disclosure-bankruptcy-experiment-v1",
+  "status": "research_models_trained",
+  "eligible_for_serving": false,
+  "target": "Recorded next-calendar-year Chapter 7/11 filing in the ECL cohort",
+  "source_sha256": "bde2184a88e3130e1dec7e06b2e04072c23adced0ef36f323e3bdd600a5d1608",
+  "features": [
+    "report_lag_days",
+    "previous_report_lag_days",
+    "days_since_previous_annual_filing",
+    "report_lag_change_days",
+    "missing_previous_report"
+  ],
+  "counts": {
+    "train": {
+      "rows": 22701,
+      "issuers": 3810,
+      "positive_issuers": 187,
+      "positive_rows": 188
+    },
+    "validation": {
+      "rows": 3694,
+      "issuers": 812,
+      "positive_issuers": 22,
+      "positive_rows": 22
+    },
+    "test": {
+      "rows": 2272,
+      "issuers": 689,
+      "positive_issuers": 14,
+      "positive_rows": 14
+    }
+  },
+  "training_prevalence": 0.008281573498964804,
+  "validation": {
+    "training_prevalence": {
+      "roc_auc": 0.5,
+      "average_precision": 0.005955603681645912,
+      "brier": 0.005925544602024157,
+      "log_loss": 0.036816039240683635
+    },
+    "logistic_c_0.01": {
+      "roc_auc": 0.6835883343236284,
+      "average_precision": 0.015799064059006027,
+      "brier": 0.006148373305062156,
+      "log_loss": 0.03672825991670656
+    },
+    "logistic_c_0.1": {
+      "roc_auc": 0.6856803327391563,
+      "average_precision": 0.015747285930934288,
+      "brier": 0.006338794163896115,
+      "log_loss": 0.03800838206644686
+    },
+    "logistic_c_1.0": {
+      "roc_auc": 0.6858288770053476,
+      "average_precision": 0.015702452791494785,
+      "brier": 0.006340857945623942,
+      "log_loss": 0.03863709307285864
+    },
+    "histogram_gradient_boosting": {
+      "roc_auc": 0.7141760744701923,
+      "average_precision": 0.02074688664996085,
+      "brier": 0.005925900619818307,
+      "log_loss": 0.03553720185192374
+    }
+  },
+  "selected_model": "histogram_gradient_boosting",
+  "test": {
+    "roc_auc": 0.6034100974313551,
+    "average_precision": 0.057960509822392266,
+    "brier": 0.005979331965660027,
+    "log_loss": 0.03545779989189533
+  },
+  "test_prevalence_baseline": {
+    "roc_auc": 0.5,
+    "average_precision": 0.006161971830985915,
+    "brier": 0.006128494645370951,
+    "log_loss": 0.037803594669507126
+  },
+  "test_ap_improvement_95pct_issuer_bootstrap": [
+    0.0000414969323669244,
+    0.21451641386272494
+  ],
+  "statistical_gate_passed": false,
+  "model_artifact_sha256": {
+    "logistic_c_0.01": "27a705bc18a8ff01b14b6679731c0f978ada0894be8e3e9ceccbac9022617f93",
+    "logistic_c_0.1": "28b4a878c670f0da667c774aabc1cb0a8c51c36e9b14c1935f06c0481b16c930",
+    "logistic_c_1.0": "ea3027314003657d2fd22d6a92efb534746be17f418e579959218aad9b8bb042",
+    "histogram_gradient_boosting": "32a2b2f206ec26ce1f6841ea58b3ecb77a6434c4e7d4c9dd271762029e41e039"
+  },
+  "limitations": [
+    "Selected US reporting firms, not private startups or all bankruptcies.",
+    "Recorded Chapter 11 is not permanent operating-business cessation.",
+    "Issuer identities are disjoint; historical corporate families unaudited.",
+    "Independent event audit and live source parity still required.",
+    "Only 14 positive test issuers; interval uncertainty remains material.",
+    "Disclosure timing is not a complete financial-health measurement."
+  ]
+}

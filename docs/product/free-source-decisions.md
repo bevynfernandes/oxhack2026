@@ -14,7 +14,7 @@ held-out outcome performance are demonstrated.
 | npm | Actual daily-count query returned HTTP 200 | Optional developer-product demand | Existing trained download model remains an auxiliary experiment. Drop it as a business adoption/retention score: downloads do not measure paid retention. Not applicable to most businesses. |
 | GitHub | Unauthenticated test returned 403 | Optional official repository evidence, with honest failure state | No required score dependency. Existing release-count model has unreliable held-out results and is not a team-quality model. |
 | Common Crawl | Actual domain index returned capture metadata | Candidate historical website evidence and identity | Index availability is not proof that required content, periods or numeric facts exist. Retrieve and inspect the original capture before using it in a backtest. |
-| SEC filings / Form D | Public; no operator user-agent configured in this checkout | Conditional issuer financial/financing evidence after exact identity matching | Financial statements can support covered-company models. Form D is financing context, not cash/runway. Latest restatements cannot be substituted for as-filed features. Public issuers are not representative private-startup training rows. |
+| SEC filings / Form D | Contact user-agent now configured locally; actual submissions and five company-facts downloads returned 200 | Conditional issuer financial/financing evidence after exact identity matching | Financial statements can support covered-company models. Form D is financing context, not cash/runway. Preserve accession-specific as-filed values. Public issuers are not representative private-startup training rows. |
 | Companies House | Free API key required; none configured | Conditional UK legal identity, filings and disclosed accounts | No universal revenue/cash-flow assumption. Legal dissolution requires continuity review before becoming a business-closure label. |
 | Gazette | Public notices, with jurisdiction and legal-entity matching | Candidate legal-event evidence | A notice alone does not adjudicate business continuity. No near-universal coverage or joined outcome panel has been established. |
 | GDELT | Probe returned HTTP 200 with an empty object | Optional discovery only; no required numerical score dependency | No usable articles returned in this probe. Do not equate transport success with complete news coverage. |
@@ -92,3 +92,24 @@ dated business outcomes is still missing. This is an unmet product requirement,
 not a reason to call the project complete. Public financial filers may support a
 narrower prediction population; arbitrary private-company search must retain
 evidence gaps until comparable public disclosures can be verified.
+
+## Latest implementation and data checks
+
+- The SEC collector now retains declared history pages up to eight, checks exact
+  response CIKs, and preserves registry facts on independent history failure.
+- A checksum-verified 1.24 GB public SEC metadata snapshot exposed real cadence
+  differences from the ECL matched subset. Four further models were trained on
+  full history; the later 2018–2021 holdout gave ROC AUC 0.603 and the frozen
+  validation-loss gate failed. Keep both runs and their limitations visible.
+- The 986,914-entity company metadata companion contains **zero** nonempty website
+  or investor-website fields. Drop it as a domain-to-CIK resolver; a matching name
+  alone cannot establish legal identity.
+- After configuring the contact, the official submissions API returned 200 and a
+  bounded original financial-statement archive request returned 206. Five real
+  company-facts responses, including three historical bankruptcy cases, returned
+  200. The actual production Fetcher retained Cloudflare and Salesforce payloads.
+  Salesforce needs 4.7 MB, so exact SEC company-facts endpoints now allow up to
+  16 MiB, with the existing 32 MiB job cap; ordinary responses remain at 4 MiB.
+- The user permits extrapolation. Distinguish an estimate from a measurement,
+  show assumptions/uncertainty, and retain missing facts. This does not establish
+  validation or make an unrelated proxy the requested business target.

@@ -93,11 +93,14 @@
   "status": "business_prediction_training_data_not_ready",
   "no_replacement_startup_growth_survival_models_fitted": true,
   "bankruptcy_research_experiment": {
-    "fitted_estimators": 4,
+    "fitted_estimators": 8,
     "selected": "histogram_gradient_boosting",
     "evaluation": "docs/product/disclosure-bankruptcy-evaluation.json",
     "eligible_for_serving": false,
     "target": "Recorded next-calendar-year Chapter 7/11 filing in selected ECL reporting firms",
-    "reason": "This is a narrow public-issuer financial-risk experiment; source-history parity, asset eligibility and independent label/family review remain unresolved. It does not train five startup dimensions or Growth/Survival."
-  }
+    "reason": "Complete SEC history repaired measured input mismatches. Four follow-up candidates were fitted with a later 2018-2021 test; selected boosting ROC AUC 0.603 and validation Brier gate failed. This remains a narrow public-issuer experiment, not five startup dimensions or Growth/Survival.",
+    "latest_evaluation": "docs/product/disclosure-bankruptcy-full-history-evaluation.json",
+    "latest_statistical_gate_passed": false
+  },
+  "extrapolation_preference": "User permits doing as much as available public sources support and extrapolating. Clearly identify estimates, assumptions, transfer limits and uncertainty; do not invent missing company facts or misstate validation."
 }

@@ -9,9 +9,49 @@ import polars as pl
 import pytest
 
 from oxhack2026.models.disclosure_risk import (
+    disclosure_bankruptcy_full_history_panel,
     disclosure_bankruptcy_panel,
     train_disclosure_risk,
 )
+
+
+@pytest.mark.parametrize("ambiguous", [False, True])
+def test_full_history_replaces_missing_prior_reports_and_preserves_frozen_test(
+    ambiguous: bool,
+) -> None:
+    """Metadata repairs omitted history; ambiguous origins cannot enter the panel."""
+    source = pl.DataFrame(
+        {
+            "cik": ["1.0"] * 2,
+            "filing_date": ["2017-02-01", "2019-02-01"],
+            "period_of_report": ["2016-12-31", "2018-12-31"],
+            "qualified": ["Yes"] * 2,
+            "can_label": ["True"] * 2,
+            "label": ["False"] * 2,
+            **{f"bankruptcy_date_{n}": [None] * 2 for n in (1, 2, 3)},
+        },
+        schema_overrides={f"bankruptcy_date_{n}": pl.String for n in (1, 2, 3)},
+    )
+    rows = [
+        {
+            "cik": "1",
+            "form": "10-K",
+            "filingDate": date(year, 2, 1),
+            "reportDate": date(year - 1, 12, 31),
+        }
+        for year in (2017, 2018, 2019)
+    ]
+    if ambiguous:
+        rows.append({**rows[-1], "reportDate": date(2018, 12, 30)})
+    panel = disclosure_bankruptcy_full_history_panel(source, pl.DataFrame(rows).lazy())
+    earlier = panel.filter(pl.col("filing_date").dt.year() == 2017)
+    assert earlier["partition"].to_list() == ["excluded"]
+    later = panel.filter(pl.col("filing_date").dt.year() == 2019)
+    if ambiguous:
+        assert later.is_empty()
+    else:
+        assert later["partition"].to_list() == ["test"]
+        assert later["days_since_previous_annual_filing"].to_list() == [365]
 
 
 def test_panel_uses_filing_date_and_retains_earlier_unqualified_history() -> None:

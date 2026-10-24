@@ -1,0 +1,62 @@
+{
+  "experiment_id": "disclosure-bankruptcy-full-history-20261025-v2",
+  "verified_at": "2026-10-24T23:46:06.783041+00:00",
+  "prefit": {
+    "status": "prefit_full_history_design",
+    "plan_sha256": "3d6481927a25292e0e08d861d23044f734fc7c0148dac53721d0619177ee632c",
+    "panel_sha256": "646f9698162f76d9f3c65ad0d2d35aa0af1263941258f91ad5a4b884eb796c6f",
+    "counts": [
+      {
+        "partition": "excluded",
+        "rows": 53673,
+        "issuers": 6853,
+        "positive_issuers": 376
+      },
+      {
+        "partition": "test",
+        "rows": 2272,
+        "issuers": 689,
+        "positive_issuers": 14
+      },
+      {
+        "partition": "train",
+        "rows": 22701,
+        "issuers": 3810,
+        "positive_issuers": 187
+      },
+      {
+        "partition": "validation",
+        "rows": 3694,
+        "issuers": 812,
+        "positive_issuers": 22
+      }
+    ]
+  },
+  "metadata_source_url": "https://github.com/iangow/sec_submissions_data/releases/tag/2026-09-30",
+  "metadata_source_sha256": "f2e3c041cb8eb2cb4b251e11eae25f61b5e18fab0bef34544b912611c0fd219e",
+  "label_source_sha256": "bde2184a88e3130e1dec7e06b2e04072c23adced0ef36f323e3bdd600a5d1608",
+  "source_license": "SEC metadata curated output CC BY 4.0; Ian D. Gow, 2026-09-30. ECL public authors label CSV; no Compustat financial values.",
+  "artifact_directory": "artifacts/disclosure-bankruptcy-full-history-20261025-v2",
+  "model_artifact_sha256": {
+    "logistic_c_0.01": "27a705bc18a8ff01b14b6679731c0f978ada0894be8e3e9ceccbac9022617f93",
+    "logistic_c_0.1": "28b4a878c670f0da667c774aabc1cb0a8c51c36e9b14c1935f06c0481b16c930",
+    "logistic_c_1.0": "ea3027314003657d2fd22d6a92efb534746be17f418e579959218aad9b8bb042",
+    "histogram_gradient_boosting": "32a2b2f206ec26ce1f6841ea58b3ecb77a6434c4e7d4c9dd271762029e41e039"
+  },
+  "versions": {
+    "scikit-learn": "1.9.1",
+    "polars": "1.44.2",
+    "numpy": "2.5.4",
+    "joblib": "1.6.0",
+    "threadpoolctl": "3.7.0"
+  },
+  "history_parity_script_sha256": "1064e5a3ff52ccbfd8cd57e87abc685f10351f375f10dd8bd7df0c55a9dfdb41",
+  "training_script_sha256": "d3fea60d504bd4e614e4a4ea9afcae15c31790f5efccd91e33a9e00a0fa1784f",
+  "statistical_gate_passed": false,
+  "eligible_for_serving": false,
+  "reason": "Validation Brier did not improve over prevalence; later holdout ROC AUC 0.603 and only 14 positive issuers. Keep failed result. No split or gate changes.",
+  "reusable_builder_input_equality_verified": true,
+  "reusable_builder_row_order_equality_verified": true,
+  "fit_implementation_commit": "fc158e4",
+  "reproduction_note": "The checked-in full-history builder exactly reproduces every fitted feature, target, partition and row order; verification did not refit the models."
+}

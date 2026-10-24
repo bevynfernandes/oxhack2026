@@ -119,9 +119,13 @@ The [ECL construction paper](https://aclanthology.org/2023.finnlp-2.2/) explains
 that unmatched EDGAR/Compustat records are discarded and asset eligibility affects
 labels. This creates selection and serving issues even without using vendor
 financial values: a missing matched record can change previous-report cadence;
-SEC metadata alone does not establish the authors' asset eligibility. The current
-live collector also captures only the root submissions response, not all older
-pages. Do not treat schema similarity as verified feature-value parity.
+SEC metadata alone does not establish the authors' asset eligibility. The live
+collector now follows all declared history pages up to a limit of eight, validates
+root/facts CIKs, and retains the pages before attempting financial facts. Too many,
+invalid or unavailable pages leave explicit incomplete history while preserving
+independent registry facts. Actual SEC access still needs the operator's contact
+user-agent; mocked pagination checks do not establish live availability. Do not
+treat schema similarity as verified feature-value parity.
 
 Preliminary event checks against the original SEC-hosted company disclosures
 corroborate [Perfumania's 2017-08-26 filing](https://www.sec.gov/Archives/edgar/data/880460/000088046017000028/exhibit991bkfiling.htm),
@@ -133,3 +137,45 @@ reinforcing why bankruptcy cannot be relabeled permanent operating failure.
 
 Release remains disabled. No five-dimension score, Growth/Survival forecast or
 Overall index has been manufactured from this experiment.
+
+## Follow-up: actual history parity and later evaluation
+
+The complete 1,235,685,023-byte SEC metadata mirror was downloaded and matched its
+published SHA-256. The retained [history comparison](disclosure-bankruptcy-history-parity.json)
+found 623 training, 59 validation and 15 test origins whose input features changed
+when all annual reports were used. Three of 82,343 eligible origins did not match;
+21 ambiguous issuer/dates were excluded from the metadata reconstruction. This
+confirms that sharing column names alone did not establish parity.
+
+The [frozen follow-up plan](disclosure-bankruptcy-full-history-plan.md) replaced
+the inputs with complete SEC history and reserved 2018–2021 as a later holdout.
+Four new estimators were actually fitted, with the same candidate set. The
+[new evaluation](disclosure-bankruptcy-full-history-evaluation.json) and
+[provenance](disclosure-bankruptcy-full-history-provenance.json) preserve this run.
+Boosting again won validation. On 689 held-out issuers / 2,272 origins, including
+14 positive issuers, test ROC AUC was 0.60341, AP 0.05796 versus 0.00616 prevalence,
+Brier 0.00597933 versus 0.00612849, and log loss 0.03545780 versus 0.03780359.
+
+**The frozen statistical gate failed.** Validation Brier was 0.00592590, slightly
+worse than 0.00592554 prevalence; later ROC AUC was also weaker than the earlier
+experiment. The AP-improvement bootstrap interval was very wide. Do not change
+the gate, retry another holdout or advertise the first run as the final model.
+The complete-history calculation now matches the live adapter's conventions,
+but actual live field/value reconstruction, population eligibility and useful
+financial predictors still need work. The user's permission to extrapolate
+permits clearly labeled estimates; it does not turn this failed gate into a pass.
+
+The reusable builder was checked against every fitted follow-up input, target and
+partition and reproduced them exactly. To reproduce the follow-up in a fresh
+directory, use the pinned label CSV and SEC release file:
+
+```sh
+LOKY_MAX_CPU_COUNT=1 uv run --frozen --no-sync python -m \
+  oxhack2026.models.disclosure_risk \
+  tests/outputs/business-data-followup-20261025/ecl-labels.csv \
+  artifacts/disclosure-bankruptcy-full-history-reproduction \
+  --sec-history \
+  tests/outputs/business-data-followup-20261025/sec-filings-20260930.parquet
+```
+
+The command verifies both source hashes before fitting and saves an input manifest.

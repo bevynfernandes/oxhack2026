@@ -52,12 +52,16 @@ and execution inference is
 withheld because its held-out benchmark is unreliable.
 
 A separate [dated bankruptcy experiment](docs/product/disclosure-bankruptcy-experiment.md)
-has fitted four scikit-learn classifiers on public ECL filing metadata and recorded
-bankruptcy events. Small gradient boosting won validation; test ROC AUC was 0.717
-on 660 issuers with 13 positive cases. This research model is not served: it needs
-verified source-history parity and independent label/population review. It does
+has fitted eight scikit-learn classifiers across an initial study and a follow-up
+using complete SEC history. The later holdout gave ROC AUC 0.603 on 689 issuers
+with 14 positive cases and failed the frozen validation-loss gate. This research
+model is not served; independent label/population review is also outstanding. It does
 not replace the requested five business dimensions or private-startup forecasts.
 See [FINAL_DEMO.md](FINAL_DEMO.md) for verified demo claims and remaining work.
+
+For local public-filings collection, configure `SEC_USER_AGENT` with your app and
+contact in the ignored `.env`, then launch with `uv run --env-file .env ...`.
+The API reads explicit process settings; it does not load that file implicitly.
 
 ## Frontend and API
 

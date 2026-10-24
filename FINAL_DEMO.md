@@ -31,6 +31,12 @@ This file records verified claims and remaining work. It is not a completion sig
   The experiment remains excluded from live scores pending source/history parity
   and independent label/population review. See the
   [experiment and reproducible results](docs/product/disclosure-bankruptcy-experiment.md).
+- A follow-up fixed a measured SEC-history mismatch, fitted four further models
+  and tested on later 2018–2021 origins. ROC AUC fell to 0.603 on 689 issuers with
+  14 positive cases. The frozen validation-loss gate failed. Retain that result;
+  do not present the earlier 0.717 figure as the final model's performance.
+  Estimates may be extrapolated under the user's chosen compromise, with their
+  assumptions and uncertainty shown. Missing company facts stay missing.
 - Public websites, npm, HN and a Common Crawl domain index were accessible in
   retained probes. These checks do not prove coverage for nearly every business.
 - The main search now accepts names and URLs. A bundled, attributed Majestic
@@ -71,12 +77,18 @@ To read that report with the local worker disabled:
 ```sh
 SIGNALSHIFT_RESEARCH_ROOT=tests/outputs/final-product-20261024/browser-live \
 SIGNALSHIFT_RESEARCH_ENABLED=0 \
-uv run --no-sync uvicorn oxhack2026.api.company_runtime:create_company_app --factory
+uv run --env-file .env --no-sync uvicorn \
+  oxhack2026.api.company_runtime:create_company_app --factory
 ```
 
 Use the normal frontend development server and open
 `/research/v2/reports/b0ca044f57f743b7baba63b023c4b441`.
 This local report store is ignored by Git; do not expect it on another checkout.
+The local SEC contact is in the ignored `.env`; `uv run --env-file .env` loads it
+without committing it or putting it in the command text. A five-issuer official
+SEC financial-data pilot succeeded, including historical bankrupt issuers.
+The production Fetcher also retained real Cloudflare and Salesforce financial
+responses. Extraction and financial-model training from these facts remain next.
 
 Do not demonstrate an SDK-download percentile as a business success score. Do not
 claim universal private-company financial data, validated probabilities, or a

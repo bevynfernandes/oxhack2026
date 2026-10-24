@@ -25,11 +25,13 @@ from sklearn.preprocessing import StandardScaler  # type: ignore[import-untyped]
 from threadpoolctl import threadpool_limits  # type: ignore[import-untyped]
 
 from oxhack2026.features.disclosure_timing import (
+    ANNUAL_DISCLOSURE_FORMS,
     DISCLOSURE_TIMING_FEATURES,
     disclosure_timing_frame,
 )
 
 SOURCE_SHA256 = "bde2184a88e3130e1dec7e06b2e04072c23adced0ef36f323e3bdd600a5d1608"
+SEC_HISTORY_SHA256 = "f2e3c041cb8eb2cb4b251e11eae25f61b5e18fab0bef34544b912611c0fd219e"
 FloatArray = npt.NDArray[np.float64]
 IntArray = npt.NDArray[np.int64]
 
@@ -147,6 +149,74 @@ def _metrics(truth: IntArray, probability: FloatArray) -> dict[str, float]:
         "brier": float(brier_score_loss(truth, probability)),
         "log_loss": float(log_loss(truth, probability, labels=[0, 1])),
     }
+
+
+def disclosure_bankruptcy_full_history_panel(
+    source: pl.DataFrame, metadata: pl.LazyFrame
+) -> pl.DataFrame:
+    """Rebuild the frozen follow-up using complete SEC annual-report metadata.
+
+    Args:
+        source: Pinned ECL CSV read with String columns, as in the first experiment.
+        metadata: Pinned SEC submissions table with cik, form, filingDate/reportDate.
+    Returns:
+        Matched, unambiguous company origins with the shared causal features and
+        the frozen 2018-2021 follow-up test. Earlier test origins remain excluded.
+        Invalid metadata and unmatched origins are excluded, never filled as zero.
+    Raises:
+        ValueError: No usable annual filing history exists in the source.
+        polars.exceptions.PolarsError: Required metadata columns or dates are invalid.
+    """
+    panel = disclosure_bankruptcy_panel(source)
+    issuer_ids = panel["issuer_id"].unique().to_list()
+    if metadata.collect_schema()["cik"] == pl.String:
+        metadata = metadata.with_columns(pl.col("cik").str.zfill(10))
+    identifiers = (
+        [int(issuer) for issuer in issuer_ids]
+        if metadata.collect_schema()["cik"].is_integer()
+        else issuer_ids
+    )
+    history = (
+        metadata.filter(
+            pl.col("cik").is_in(identifiers)
+            & pl.col("form").str.replace_all("-", "").is_in(ANNUAL_DISCLOSURE_FORMS)
+        )
+        .select(
+            pl.col("cik").cast(pl.String).str.zfill(10).alias("issuer_id"),
+            pl.col("filingDate").cast(pl.Date).alias("filing_date"),
+            pl.col("reportDate").cast(pl.Date).alias("period_end"),
+        )
+        .collect()
+        .drop_nulls()
+        .filter(pl.col("filing_date") >= pl.col("period_end"))
+        .unique()
+    )
+    conflicting = (
+        history.group_by("issuer_id", "filing_date")
+        .agg(pl.col("period_end").n_unique().alias("periods"))
+        .filter(pl.col("periods") > 1)
+        .select("issuer_id", "filing_date")
+    )
+    history = history.join(conflicting, on=["issuer_id", "filing_date"], how="anti")
+    return (
+        panel.drop(DISCLOSURE_TIMING_FEATURES)
+        .join(
+            disclosure_timing_frame(history),
+            on=["issuer_id", "filing_date", "period_end"],
+        )
+        .with_columns(
+            pl.when(
+                pl.col("bucket").is_in([8, 9])
+                & pl.col("filing_date").dt.year().is_between(2018, 2021)
+            )
+            .then(pl.lit("test"))
+            .when(pl.col("partition") == "test")
+            .then(pl.lit("excluded"))
+            .otherwise(pl.col("partition"))
+            .alias("partition")
+        )
+        .sort("issuer_id", "filing_date")
+    )
 
 
 def _precision_interval(
@@ -341,12 +411,32 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("source", type=Path)
     parser.add_argument("output", type=Path)
+    parser.add_argument("--sec-history", type=Path)
     arguments = parser.parse_args()
     with arguments.source.open("rb") as stream:
         if hashlib.file_digest(stream, "sha256").hexdigest() != SOURCE_SHA256:
             message = "Use the pinned ECL source or explicitly version a new experiment"
             raise ValueError(message)
     data = pl.read_csv(arguments.source, infer_schema_length=0)
-    train_disclosure_risk(
-        disclosure_bankruptcy_panel(data), arguments.output, SOURCE_SHA256
+    if arguments.sec_history is not None:
+        with arguments.sec_history.open("rb") as stream:
+            if hashlib.file_digest(stream, "sha256").hexdigest() != SEC_HISTORY_SHA256:
+                message = "Use the pinned SEC history or version a new experiment"
+                raise ValueError(message)
+        panel = disclosure_bankruptcy_full_history_panel(
+            data, pl.scan_parquet(arguments.sec_history)
+        )
+    else:
+        panel = disclosure_bankruptcy_panel(data)
+    train_disclosure_risk(panel, arguments.output, SOURCE_SHA256)
+    (arguments.output / "input-manifest.json").write_bytes(
+        orjson.dumps(
+            {
+                "label_source_sha256": SOURCE_SHA256,
+                "sec_history_sha256": (
+                    SEC_HISTORY_SHA256 if arguments.sec_history is not None else None
+                ),
+            },
+            option=orjson.OPT_INDENT_2,
+        )
     )

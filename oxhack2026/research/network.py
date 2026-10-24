@@ -3,6 +3,7 @@
 import http.client
 import ipaddress
 import logging
+import re
 import socket
 import ssl
 import threading
@@ -116,10 +117,20 @@ def public_addresses(host: str, timeout: float = 5) -> tuple[str, ...]:
     return addresses
 
 
+def _response_byte_limit(url: str) -> int:
+    parsed = urlsplit(url)
+    if parsed.hostname == "data.sec.gov" and re.fullmatch(
+        r"/api/xbrl/companyfacts/CIK[0-9]{10}\.json", parsed.path
+    ):
+        return 16777216
+    return 4194304
+
+
 def _read_response(
     response: http.client.HTTPResponse,
     connection: http.client.HTTPSConnection,
     deadline: float,
+    byte_limit: int,
 ) -> bytes:
     chunks = bytearray()
     while True:
@@ -128,11 +139,11 @@ def _read_response(
             raise BudgetExceeded("collection_deadline")
         if connection.sock is not None:
             connection.sock.settimeout(min(15, remaining))
-        chunk = response.read1(min(65536, 4194305 - len(chunks)))
+        chunk = response.read1(min(65536, byte_limit + 1 - len(chunks)))
         if not chunk:
             return bytes(chunks)
         chunks.extend(chunk)
-        if len(chunks) > 4194304:
+        if len(chunks) > byte_limit:
             raise BudgetExceeded("response_size_limit")
 
 
@@ -186,7 +197,9 @@ class PinnedTransport(httpx.BaseTransport):
             deadline = float(
                 request.extensions.get("research_deadline", time.monotonic() + 15)
             )
-            content = _read_response(response, connection, deadline)
+            content = _read_response(
+                response, connection, deadline, _response_byte_limit(str(request.url))
+            )
             if response.getheader("Content-Encoding", "identity").lower() != "identity":
                 raise CollectionError("unexpected_compressed_response")
             # Set-Cookie is intentionally discarded at the transport boundary.
@@ -259,6 +272,9 @@ class Fetcher:
         quotas: Shared process-wide provider limits.
         transport: Injected transport for deterministic tests; direct TLS by default.
         deadline: Monotonic deadline for this job.
+
+    Ordinary responses are bounded to 4 MiB; exact SEC company-facts endpoints
+    may return up to 16 MiB. The shared 32 MiB job capture limit still applies.
     """
 
     artifacts: FileArtifactStore
@@ -273,9 +289,10 @@ class Fetcher:
         self, response: httpx.Response, original: str, safe: str
     ) -> tuple[Capture, bytes]:
         chunks = bytearray()
+        byte_limit = _response_byte_limit(original)
         for chunk in response.iter_bytes():
             chunks.extend(chunk)
-            if len(chunks) > 4194304:
+            if len(chunks) > byte_limit:
                 raise BudgetExceeded("response_size_limit")
             if self.byte_count + len(chunks) > 33554432:
                 raise BudgetExceeded("capture_size_limit")

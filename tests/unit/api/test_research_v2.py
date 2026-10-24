@@ -185,6 +185,47 @@ def test_limits_and_deadline(tmp_path: Path) -> None:
         fetcher.fetch("https://example.com/")
 
 
+@pytest.mark.parametrize(
+    ("url", "allowed"),
+    [
+        ("https://data.sec.gov/api/xbrl/companyfacts/CIK0001108524.json", True),
+        ("https://data.sec.gov/submissions/CIK0001108524.json", False),
+        (
+            "https://data.sec.gov.evil.example/api/xbrl/companyfacts/CIK0001108524.json",
+            False,
+        ),
+        ("https://data.sec.gov/api/xbrl/companyfacts/CIKwrong.json", False),
+    ],
+)
+def test_larger_sec_facts_responses_keep_other_source_and_job_limits(
+    tmp_path: Path, url: str, allowed: bool
+) -> None:
+    """A real-sized company-facts response gets a scoped limit, never unlimited I/O."""
+    fetcher = _fetcher(
+        tmp_path,
+        httpx.MockTransport(lambda _: httpx.Response(200, content=b"x" * 4194305)),
+    )
+    if not allowed:
+        with pytest.raises(BudgetExceeded, match="response_size"):
+            fetcher.fetch(url)
+        return
+    capture, _ = fetcher.fetch(url)
+    assert capture.artifact.byte_size == 4194305
+    fetcher.byte_count = 33554432
+    with pytest.raises(BudgetExceeded, match="capture_size"):
+        fetcher.fetch(url)
+
+
+def test_sec_facts_response_limit_remains_bounded(tmp_path: Path) -> None:
+    """Even the larger SEC response allowance ends at sixteen MiB."""
+    fetcher = _fetcher(
+        tmp_path,
+        httpx.MockTransport(lambda _: httpx.Response(200, content=b"x" * 16777217)),
+    )
+    with pytest.raises(BudgetExceeded, match="response_size"):
+        fetcher.fetch("https://data.sec.gov/api/xbrl/companyfacts/CIK0001108524.json")
+
+
 def _identity() -> Identity:
     return Identity(
         identity_id="identity",
@@ -618,6 +659,7 @@ def test_reviewed_registry_mapping(
             lambda _: httpx.Response(
                 200,
                 json={
+                    "cik": 123,
                     "name": "Example Legal",
                     "company_status": "active",
                     "accounts": {"period_end": "2025-12-31"},
@@ -636,6 +678,99 @@ def test_reviewed_registry_mapping(
     assert len(result.captures) == 3
     assert any("2025-12-31" in claim.text for claim in result.claims)
     assert all(claim.attribution == "registry" for claim in result.claims)
+
+
+@pytest.mark.parametrize(
+    "failure",
+    [
+        "none",
+        "foreign_page",
+        "missing_page",
+        "malformed_page",
+        "oversized_manifest",
+        "wrong_cik",
+    ],
+)
+def test_sec_history_retains_pages_and_rejects_incomplete_model_inputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, failure: str
+) -> None:
+    """Pagination stays on the verified CIK and a failed page preserves other facts."""
+    from unittest.mock import mock_open
+
+    import orjson
+
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS", "reviewed.json")
+    monkeypatch.setenv("SEC_USER_AGENT", "Fixture research@example.invalid")
+    mapping = [
+        {
+            "domain": "example.com",
+            "jurisdiction": "US",
+            "reviewed": True,
+            "evidence_url": "https://example.com/legal",
+            "cik": "123",
+        }
+    ]
+    name = "CIK0000000123-submissions-001.json"
+    references = [{"name": name}]
+    if failure == "foreign_page":
+        references = [{"name": "https://other.example/private.json"}]
+    elif failure == "oversized_manifest":
+        references = [
+            {"name": f"CIK0000000123-submissions-{n:03}.json"} for n in range(9)
+        ]
+    recent = {
+        "form": ["10-K"],
+        "filingDate": ["2025-02-01"],
+        "reportDate": ["2024-12-31"],
+    }
+    history = {
+        "form": ["10-K"],
+        "filingDate": ["2024-02-01"],
+        "reportDate": ["2023-12-31"],
+    }
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "example.com":
+            return httpx.Response(200, text="Example legal identity")
+        if request.url.path.endswith(f"/{name}"):
+            if failure == "malformed_page":
+                return httpx.Response(200, text="not JSON")
+            return httpx.Response(
+                503 if failure == "missing_page" else 200, json=history
+            )
+        if "companyfacts" in request.url.path:
+            return httpx.Response(200, json={"cik": 123, "name": "Example Legal"})
+        return httpx.Response(
+            200,
+            json={
+                "cik": 124 if failure == "wrong_cik" else 123,
+                "name": "Example Legal",
+                "filings": {"recent": recent, "files": references},
+            },
+        )
+
+    fetcher = _fetcher(tmp_path, httpx.MockTransport(respond))
+    with patch(
+        "oxhack2026.research.registry.open",
+        mock_open(read_data=orjson.dumps(mapping)),
+        create=True,
+    ):
+        result = Collector(
+            fetcher, _identity(), SourceState(provider="sec", name="SEC")
+        ).collect()
+    assert result.state == "partial"
+    assert not result.observations
+    if failure == "none":
+        assert "sec_annual_timing_inputs_validated" in result.reason_codes
+        assert len(result.captures) == 4
+    else:
+        assert "sec_annual_timing_inputs_validated" not in result.reason_codes
+    if failure == "wrong_cik":
+        assert "sec_cik_mismatch" in result.reason_codes
+        assert not result.claims
+    else:
+        assert any("Example Legal" in claim.text for claim in result.claims)
+    assert all("other.example" not in capture.url for capture in result.captures)
 
 
 def test_xml_entity_declarations_blocked(tmp_path: Path) -> None:
