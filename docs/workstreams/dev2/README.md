@@ -2,8 +2,8 @@
 
 Current product priority: [#19](https://github.com/bevynfernandes/oxhack2026/issues/19)
 replaces download-only scouting with a multi-metric company outlook and all three
-user-selected outcomes. The initial outcome/label/evaluation proposal is in
-`docs/tasks/dev2/company-outcome-policy.md`; exact definitions await owner review.
+user-selected outcomes. `PLAN.md` and the Dev 2 role plan define the active scope;
+`docs/tasks/dev2/company-outcome-policy.md` explains the label policy.
 Existing download checkpoints below remain a traction subsystem. Their passing
 tests do not demonstrate startup-success prediction.
 
@@ -11,7 +11,16 @@ Owner: numerical policy, features, models, evaluation, and evidence. Ivan owns
 Dev 1 data/platform; Bevyn owns Dev 3 API/frontend. Follow `PLAN.md` and the
 workstream boundaries in `plans/README.md`.
 
-Merged checkpoints:
+Company checkpoints:
+
+- Calendar horizons and separate maturity/unknown-label contracts: #24.
+- Three-section evidence-only assessment contracts and schema: #26.
+- Outcome-specific chronological label selection and family exclusions: #29.
+- The deterministic builder consumes actual C1 classes and has been run against
+  the real two-company source publication. See
+  `docs/tasks/dev2/company-evidence-builder.md` for policy and handoff details.
+
+Earlier traction checkpoints:
 
 - C2 contracts and synthetic fixtures: PR #3.
 - Shared target windows, frozen organization ranking, and shortlist scores: #4.
@@ -37,8 +46,10 @@ Catalogue resolution and callable baseline batch generation now consume C1
 identities. Contemporary historical cohorts require explicit opt-in and retain
 their retrospective/survivorship limitations.
 
-Pending: model artifact publication, a frozen verified npm dataset, real baseline
-handoff, learned experiments, full metrics/evidence, and model CLI.
+Pending: company assessment publication/application integration, representative
+historical cohort and mature labels, learned outcome experiments, calibrated
+evaluation and the probability-serving gate. Dev 1 has published real npm and
+company source bundles; these are evidence inputs, not success-label cohorts.
 Synthetic fixtures establish software behavior only; no empirical performance,
 validated interval, real-data product completion, or cloud deployment is claimed.
 
