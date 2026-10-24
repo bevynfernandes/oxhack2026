@@ -23,6 +23,7 @@ from oxhack2026.api.routes.public import (
     router,
 )
 from oxhack2026.api.routes.research import router as research_router
+from oxhack2026.api.routes.research_v2 import router as research_v2_router
 from oxhack2026.research.service import IdentityConfirmationRequired
 
 logger = logging.getLogger(__name__)
@@ -101,6 +102,7 @@ def create_app(
     """
     app = FastAPI(title="SignalShift", version=s.CONTRACT_VERSION)
     app.include_router(research_router)
+    app.include_router(research_v2_router)
     if repository is not None:
         app.dependency_overrides[get_repository] = lambda: repository
         app.dependency_overrides[get_readiness_repository] = lambda: repository

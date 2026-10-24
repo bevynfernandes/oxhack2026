@@ -1,6 +1,46 @@
 {
   "components": {
     "schemas": {
+      "ArtifactReference": {
+        "additionalProperties": false,
+        "description": "Hashed artifact relative to a configured bundle root, never a signed URL.",
+        "properties": {
+          "byte_size": {
+            "maximum": 9.223372036854776e+18,
+            "minimum": 0.0,
+            "title": "Byte Size",
+            "type": "integer"
+          },
+          "media_type": {
+            "enum": [
+              "application/json",
+              "application/x-ndjson",
+              "application/vnd.apache.parquet",
+              "application/octet-stream"
+            ],
+            "title": "Media Type",
+            "type": "string"
+          },
+          "path": {
+            "minLength": 1,
+            "title": "Path",
+            "type": "string"
+          },
+          "sha256": {
+            "pattern": "^[0-9a-f]{64}$",
+            "title": "Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "path",
+          "sha256",
+          "byte_size",
+          "media_type"
+        ],
+        "title": "ArtifactReference",
+        "type": "object"
+      },
       "AssessmentStatement": {
         "additionalProperties": false,
         "description": "A deterministic fact, risk or explicitly identified evidence gap.\n\nAttributes:\n    statement_id: Immutable identifier within one assessment.\n    role: Observation, supported risk, or absence of applicable evidence.\n    text: Plain source-backed description, not an unvalidated likelihood.\n    evidence_ids: C1 evidence supporting a fact/risk; empty for a pure gap.\n    metric_observation_ids: Exact C1 observations used in the statement.\n    event_ids: Exact C1 events used in the statement.\n    missing_metric_ids: Definitions whose evidence is missing or conflicting.\n\nRaises:\n    ValueError: A fact/risk lacks evidence, or a gap lacks its missing definition.",
@@ -213,6 +253,144 @@
         "title": "BooleanValue",
         "type": "object"
       },
+      "Capabilities": {
+        "additionalProperties": false,
+        "description": "Independent storage, worker and browser availability.",
+        "properties": {
+          "active_jobs": {
+            "default": 2,
+            "title": "Active Jobs",
+            "type": "integer"
+          },
+          "browser_available": {
+            "title": "Browser Available",
+            "type": "boolean"
+          },
+          "capture_bytes": {
+            "default": 33554432,
+            "title": "Capture Bytes",
+            "type": "integer"
+          },
+          "collection_enabled": {
+            "title": "Collection Enabled",
+            "type": "boolean"
+          },
+          "deadline_seconds": {
+            "default": 300,
+            "title": "Deadline Seconds",
+            "type": "integer"
+          },
+          "network_operations": {
+            "default": 8,
+            "title": "Network Operations",
+            "type": "integer"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/ProviderCapability"
+            },
+            "title": "Providers",
+            "type": "array"
+          },
+          "queued_jobs": {
+            "default": 8,
+            "title": "Queued Jobs",
+            "type": "integer"
+          },
+          "request_budget": {
+            "default": 120,
+            "title": "Request Budget",
+            "type": "integer"
+          },
+          "response_bytes": {
+            "default": 4194304,
+            "title": "Response Bytes",
+            "type": "integer"
+          },
+          "schema_version": {
+            "const": "research-capabilities-v2",
+            "default": "research-capabilities-v2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "storage_available": {
+            "title": "Storage Available",
+            "type": "boolean"
+          },
+          "worker_available": {
+            "title": "Worker Available",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "storage_available",
+          "collection_enabled",
+          "worker_available",
+          "browser_available",
+          "providers"
+        ],
+        "title": "Capabilities",
+        "type": "object"
+      },
+      "Capture": {
+        "additionalProperties": false,
+        "description": "Integrity-checked raw response; URLs omit query data and credentials.",
+        "properties": {
+          "artifact": {
+            "$ref": "#/components/schemas/ArtifactReference"
+          },
+          "capture_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Capture Id",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "content_type": {
+            "title": "Content Type",
+            "type": "string"
+          },
+          "final_url": {
+            "maxLength": 2048,
+            "title": "Final Url",
+            "type": "string"
+          },
+          "parser_version": {
+            "const": "research-extract-v2",
+            "default": "research-extract-v2",
+            "title": "Parser Version",
+            "type": "string"
+          },
+          "rendered": {
+            "default": false,
+            "title": "Rendered",
+            "type": "boolean"
+          },
+          "status_code": {
+            "title": "Status Code",
+            "type": "integer"
+          },
+          "url": {
+            "maxLength": 2048,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "capture_id",
+          "url",
+          "final_url",
+          "status_code",
+          "collected_at",
+          "artifact",
+          "content_type"
+        ],
+        "title": "Capture",
+        "type": "object"
+      },
       "Catalog": {
         "additionalProperties": false,
         "description": "Versioned catalogue; batch reads use the batch's frozen mapping.",
@@ -284,6 +462,71 @@
           "tools"
         ],
         "title": "Catalog",
+        "type": "object"
+      },
+      "Claim": {
+        "additionalProperties": false,
+        "description": "Attributed statement, not a normalized financial metric.",
+        "properties": {
+          "attribution": {
+            "enum": [
+              "company_reported",
+              "registry",
+              "coverage_candidate"
+            ],
+            "title": "Attribution",
+            "type": "string"
+          },
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "claim_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Claim Id",
+            "type": "string"
+          },
+          "conflicts_with": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Conflicts With",
+            "type": "array"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "published_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published On"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "claim_id",
+          "text",
+          "category",
+          "attribution",
+          "evidence_ids"
+        ],
+        "title": "Claim",
         "type": "object"
       },
       "CompanyAssessment": {
@@ -1440,6 +1683,47 @@
         "title": "DecimalValue",
         "type": "object"
       },
+      "DiscoveryRequest": {
+        "additionalProperties": false,
+        "description": "Domain input and optional exact saved context; no collection confirmation.",
+        "properties": {
+          "assessment_publication_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessment Publication Id"
+          },
+          "company_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Company Id"
+          },
+          "domain": {
+            "maxLength": 2048,
+            "minLength": 4,
+            "title": "Domain",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "title": "DiscoveryRequest",
+        "type": "object"
+      },
       "Error": {
         "additionalProperties": false,
         "description": "Stable public failure code and safe user-facing description.",
@@ -1591,6 +1875,58 @@
           "reports"
         ],
         "title": "Evaluation",
+        "type": "object"
+      },
+      "Event": {
+        "additionalProperties": false,
+        "description": "Dated retrieved record; occurrence does not establish business outcomes.",
+        "properties": {
+          "event_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Event Id",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "published_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Published At"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "maxLength": 2048,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "event_id",
+          "kind",
+          "title",
+          "url",
+          "evidence_ids"
+        ],
+        "title": "Event",
         "type": "object"
       },
       "Evidence": {
@@ -2050,6 +2386,19 @@
         "title": "Freshness",
         "type": "object"
       },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
       "Health": {
         "additionalProperties": false,
         "description": "Process or repository readiness, without sensitive configuration.",
@@ -2173,6 +2522,127 @@
         "title": "HistoryPoint",
         "type": "object"
       },
+      "Identity": {
+        "additionalProperties": false,
+        "description": "Discovered brand identity; never establishes legal or account ownership.",
+        "properties": {
+          "canonical_domain": {
+            "maxLength": 253,
+            "minLength": 4,
+            "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+            "title": "Canonical Domain",
+            "type": "string"
+          },
+          "captures": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Capture"
+            },
+            "title": "Captures",
+            "type": "array"
+          },
+          "company_name": {
+            "title": "Company Name",
+            "type": "string"
+          },
+          "conflicts": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Conflicts",
+            "type": "array"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ResearchEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "identity_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Identity Id",
+            "type": "string"
+          },
+          "limitations": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "official_links": {
+            "default": [],
+            "items": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "title": "Official Links",
+            "type": "array"
+          },
+          "request": {
+            "$ref": "#/components/schemas/DiscoveryRequest"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "requested_domain": {
+            "maxLength": 253,
+            "minLength": 4,
+            "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+            "title": "Requested Domain",
+            "type": "string"
+          },
+          "saved_context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CompanyDetail"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "state": {
+            "enum": [
+              "queued",
+              "running",
+              "ready",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identity_id",
+          "request",
+          "state",
+          "requested_at",
+          "requested_domain",
+          "canonical_domain",
+          "company_name"
+        ],
+        "title": "Identity",
+        "type": "object"
+      },
       "IntegerValue": {
         "additionalProperties": false,
         "description": "Exact count, excluding Boolean and coercible string/float inputs.",
@@ -2240,6 +2710,126 @@
           "status"
         ],
         "title": "Interval",
+        "type": "object"
+      },
+      "Job": {
+        "additionalProperties": false,
+        "description": "Durable multi-source work; complete collector checkpoints survive recovery.",
+        "properties": {
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "identity_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Identity Id",
+            "type": "string"
+          },
+          "job_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "title": "Requested At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "research-job-v2",
+            "default": "research-job-v2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceState"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "default": "queued",
+            "enum": [
+              "queued",
+              "running",
+              "partial",
+              "completed",
+              "failed"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "job_id",
+          "identity_id",
+          "requested_at",
+          "sources"
+        ],
+        "title": "Job",
+        "type": "object"
+      },
+      "JobRequest": {
+        "additionalProperties": false,
+        "description": "Explicit confirmation of the exact preview, including any redirect conflicts.",
+        "properties": {
+          "identity_confirmed": {
+            "const": true,
+            "title": "Identity Confirmed",
+            "type": "boolean"
+          },
+          "identity_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Identity Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "identity_id",
+          "identity_confirmed"
+        ],
+        "title": "JobRequest",
         "type": "object"
       },
       "Metric": {
@@ -2410,6 +3000,104 @@
           "maximum_age_days"
         ],
         "title": "MetricDefinition",
+        "type": "object"
+      },
+      "Observation": {
+        "additionalProperties": false,
+        "description": "Measured proxy or explicit gap; measurement time differs from collection.",
+        "properties": {
+          "applicability": {
+            "default": "applicable",
+            "enum": [
+              "applicable",
+              "unknown",
+              "not_applicable"
+            ],
+            "title": "Applicability",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "metric_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Metric Id",
+            "type": "string"
+          },
+          "missing_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Missing Reason"
+          },
+          "observation_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Observation Id",
+            "type": "string"
+          },
+          "origin": {
+            "default": "fresh",
+            "enum": [
+              "fresh",
+              "saved"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "window": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Window"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "observation_id",
+          "metric_id",
+          "definition",
+          "unit",
+          "collected_at"
+        ],
+        "title": "Observation",
         "type": "object"
       },
       "Outcome": {
@@ -2608,6 +3296,47 @@
         "title": "Provenance",
         "type": "object"
       },
+      "ProviderCapability": {
+        "additionalProperties": false,
+        "description": "Configuration-only provider availability; never probes a vendor.",
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "provider": {
+            "enum": [
+              "website",
+              "github",
+              "npm",
+              "hiring",
+              "hn",
+              "news",
+              "sec",
+              "companies_house"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "provider",
+          "available"
+        ],
+        "title": "ProviderCapability",
+        "type": "object"
+      },
       "PublicCompanyCoverage": {
         "additionalProperties": false,
         "description": "Coverage counts public observations and withheld metrics separately.",
@@ -2791,6 +3520,104 @@
         "title": "Rankings",
         "type": "object"
       },
+      "Report": {
+        "additionalProperties": false,
+        "description": "Immutable standalone report with raw artifact lineage and null forecasts.",
+        "properties": {
+          "captures": {
+            "items": {
+              "$ref": "#/components/schemas/Capture"
+            },
+            "title": "Captures",
+            "type": "array"
+          },
+          "claims": {
+            "items": {
+              "$ref": "#/components/schemas/Claim"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "evidence": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "identity": {
+            "$ref": "#/components/schemas/Identity"
+          },
+          "job_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Job Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "observations": {
+            "items": {
+              "$ref": "#/components/schemas/Observation"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "outlook": {
+            "$ref": "#/components/schemas/StartupOutlook"
+          },
+          "report_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Report Id",
+            "type": "string"
+          },
+          "researched_at": {
+            "format": "date-time",
+            "title": "Researched At",
+            "type": "string"
+          },
+          "schema_version": {
+            "const": "research-report-v2",
+            "default": "research-report-v2",
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/SourceState"
+            },
+            "title": "Sources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "report_id",
+          "job_id",
+          "researched_at",
+          "identity",
+          "sources",
+          "observations",
+          "claims",
+          "events",
+          "evidence",
+          "captures",
+          "outlook",
+          "limitations"
+        ],
+        "title": "Report",
+        "type": "object"
+      },
       "ReportLink": {
         "additionalProperties": false,
         "description": "Public immutable report link without signed storage credentials.",
@@ -2810,6 +3637,51 @@
           "url"
         ],
         "title": "ReportLink",
+        "type": "object"
+      },
+      "ResearchEvidence": {
+        "additionalProperties": false,
+        "description": "Public excerpt and deterministic extraction location in a retained capture.",
+        "properties": {
+          "capture_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Capture Id",
+            "type": "string"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "evidence_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Evidence Id",
+            "type": "string"
+          },
+          "excerpt": {
+            "maxLength": 4000,
+            "title": "Excerpt",
+            "type": "string"
+          },
+          "location": {
+            "title": "Location",
+            "type": "string"
+          },
+          "url": {
+            "maxLength": 2048,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "evidence_id",
+          "capture_id",
+          "url",
+          "excerpt",
+          "location",
+          "collected_at"
+        ],
+        "title": "ResearchEvidence",
         "type": "object"
       },
       "ResearchInventory": {
@@ -3364,6 +4236,130 @@
         "title": "SourceHealth",
         "type": "object"
       },
+      "SourceState": {
+        "additionalProperties": false,
+        "description": "One collector checkpoint, including skipped and interrupted work.",
+        "properties": {
+          "captures": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Capture"
+            },
+            "title": "Captures",
+            "type": "array"
+          },
+          "claims": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Claim"
+            },
+            "title": "Claims",
+            "type": "array"
+          },
+          "events": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "evidence": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ResearchEvidence"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "finished_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finished At"
+          },
+          "links": {
+            "default": [],
+            "items": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "observations": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/Observation"
+            },
+            "title": "Observations",
+            "type": "array"
+          },
+          "provider": {
+            "enum": [
+              "website",
+              "github",
+              "npm",
+              "hiring",
+              "hn",
+              "news",
+              "sec",
+              "companies_house"
+            ],
+            "title": "Provider",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Started At"
+          },
+          "state": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "partial",
+              "failed",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "name"
+        ],
+        "title": "SourceState",
+        "type": "object"
+      },
       "SpecialistOutlook": {
         "additionalProperties": false,
         "description": "One group's source coverage, independent of its untrained model status.\n\nAttributes:\n    group_id: Fundamental metric group, not a success target.\n    data_status: Available means some usable observations, not training-ready.\n    metric_observation_ids: All assigned source observations, including gaps.\n    usable_metric_observation_ids: Fresh verified public observations only.\n    evidence_ids: Supporting evidence for usable observations only.\n    reason_codes: Data limitations and the absent-model reason.\n    model_status: Explicitly untrained; this version never serves forecasts.\n    prediction: Always null until a separately gated serving contract exists.\n\nRaises:\n    ValueError: References repeat, usable references are absent, or coverage\n        contradicts availability. Numerical forecasts are rejected.",
@@ -3639,6 +4635,46 @@
           "mapping_evidence"
         ],
         "title": "Tool",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
         "type": "object"
       },
       "Window": {
@@ -4839,6 +5875,226 @@
           }
         },
         "summary": "History"
+      }
+    },
+    "/api/v2/research-capabilities": {
+      "get": {
+        "description": "Read configured worker, browser and provider availability without vendor\nrequests.",
+        "operationId": "research_v2_capabilities",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Capabilities"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Capabilities"
+      }
+    },
+    "/api/v2/research-identities": {
+      "post": {
+        "description": "Queue bounded identity discovery; collection requires a subsequent\nconfirmation.",
+        "operationId": "research_v2_discover",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiscoveryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Discover"
+      }
+    },
+    "/api/v2/research-identities/{identity_id}": {
+      "get": {
+        "description": "Read exact identity status, redirect conflicts, evidence and optional saved\ncontext.",
+        "operationId": "research_v2_identity",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "identity_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Identity Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Identity"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Identity"
+      }
+    },
+    "/api/v2/research-jobs": {
+      "post": {
+        "description": "Confirm the preview and coalesce active work; terminal refreshes create new\nreports.",
+        "operationId": "research_v2_start",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start"
+      }
+    },
+    "/api/v2/research-jobs/{job_id}": {
+      "get": {
+        "description": "Read durable per-source progress; never enqueue or restart work.",
+        "operationId": "research_v2_job",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Job"
+      }
+    },
+    "/api/v2/research-reports/{report_id}": {
+      "get": {
+        "description": "Read the immutable report and verify all capture hashes without source\nfetching.",
+        "operationId": "research_v2_report",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "report_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Report Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Report"
       }
     }
   }
