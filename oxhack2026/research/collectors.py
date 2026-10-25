@@ -122,9 +122,48 @@ class Collector:
         capture, content = render(self.fetcher, capture.final_url)
         return parse_page(capture, content)
 
+    def _sdk_documentation(self) -> None:
+        domain = self.identity.canonical_domain
+        links = set(self.identity.official_links)
+        visited: set[str] = set()
+        for _ in range(2):
+            pages = sorted(
+                (
+                    link
+                    for link in links - visited
+                    if (urlsplit(link).hostname or "") in {domain, f"docs.{domain}"}
+                    and re.search(r"/docs?/|/developers?/", urlsplit(link).path)
+                    and re.search(
+                        r"librar|sdk|quickstart|getting-started", urlsplit(link).path
+                    )
+                ),
+                key=lambda link: (
+                    not re.search(r"librar|sdk", urlsplit(link).path),
+                    len(link),
+                    link,
+                ),
+            )
+            if not pages:
+                break
+            link = pages[0]
+            visited.add(link)
+            try:
+                capture, content = self.fetcher.fetch(link)
+                if urlsplit(capture.final_url).hostname != urlsplit(link).hostname:
+                    self.reasons.append("sdk_documentation_unconfirmed_redirect")
+                    continue
+                page = self._website_page(capture, content)
+                self.support.extend(page.evidence[:1])
+                links.update(page.links)
+                self.links.update(page.links)
+            except CollectionError as error:
+                logger.error("SDK documentation unavailable: %s", str(error))  # noqa: TRY400
+                self.reasons.append(f"sdk_documentation_{error}")
+
     def website(self) -> None:
         """Crawl twenty relevant company pages at depth two plus linked
         feeds/sitemap."""
+        self._sdk_documentation()
         domain = self.identity.canonical_domain
         queue = deque([(f"https://{domain}/", 0), (f"https://{domain}/sitemap.xml", 1)])
         seen: set[str] = set()
@@ -180,6 +219,12 @@ class Collector:
     def github(self) -> None:
         """Read metadata and stable releases only for repositories linked by
         official pages."""
+        organizations = {
+            urlsplit(link).path.strip("/").casefold()
+            for link in self.identity.official_links
+            if urlsplit(link).hostname == "github.com"
+            and re.fullmatch(r"/[A-Za-z0-9_.-]+/?", urlsplit(link).path)
+        }
         repositories = sorted(
             {
                 "/".join(urlsplit(link).path.strip("/").split("/")[:2])
@@ -187,6 +232,11 @@ class Collector:
                 if urlsplit(link).hostname == "github.com"
                 and re.fullmatch(
                     r"/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?", urlsplit(link).path
+                )
+                and (
+                    not organizations
+                    or urlsplit(link).path.strip("/").split("/")[0].casefold()
+                    in organizations
                 )
             }
         )

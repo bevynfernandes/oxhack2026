@@ -176,3 +176,35 @@ def test_fresh_research_adapter_requires_matching_complete_windows() -> None:
     assert result.adoption[1] == ("current", "previous")
     current.missing_reason = "incomplete_daily_window"
     assert _dimension_inputs(job, outlook).adoption[0] is None
+    current.missing_reason = None
+    second_previous = Mock(
+        metric_id=previous.metric_id,
+        value=5000,
+        unit="downloads",
+        window=previous.window,
+        evidence_ids=("second",),
+        missing_reason=None,
+        observation_id="second_previous",
+    )
+    second_current = Mock(
+        metric_id=current.metric_id,
+        value=6000,
+        unit="downloads",
+        window=current.window,
+        evidence_ids=("second",),
+        missing_reason=None,
+        observation_id="second_current",
+    )
+    source = job.sources[0]
+    source.observations = (*source.observations, second_previous, second_current)
+    source.evidence = (
+        *source.evidence,
+        Mock(
+            evidence_id="second",
+            url="https://api.npmjs.org/downloads/range/2026-08-25:2026-10-23/other-sdk",
+        ),
+    )
+    assert _dimension_inputs(job, outlook).adoption[1] == (
+        "second_current",
+        "second_previous",
+    )
