@@ -7,6 +7,7 @@ from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
+from decimal import Decimal
 from hashlib import sha256
 from pathlib import Path
 from typing import Literal
@@ -22,12 +23,19 @@ from oxhack2026.api.evidence_mapping_schemas import (
     MappingBundle,
     MappingDisposition,
     MappingProgress,
+    NumericalContext,
     QuoteAnchor,
     SubjectKind,
 )
 from oxhack2026.api.research_analysis import InterpretationStatistics, ResearchAnalysis
 from oxhack2026.api.research_configuration import ResearchSettings
-from oxhack2026.api.research_v2_schemas import Capture, Claim, Report, ResearchEvidence
+from oxhack2026.api.research_v2_schemas import (
+    Capture,
+    Claim,
+    Observation,
+    Report,
+    ResearchEvidence,
+)
 from oxhack2026.explanations.config import mapping_mode as mapping_mode
 from oxhack2026.explanations.gemini import (
     LIVE_BATCH_LIMIT,
@@ -99,6 +107,20 @@ class ClaimCandidate:
 
 def _identifier(*values: str) -> str:
     return sha256("\x00".join(values).encode()).hexdigest()
+
+
+def _observation_quantity(row: Observation) -> NumericalContext | None:
+    """Retain supported measured units and periods for cited synthesis."""
+    if row.value is None or row.unit not in {"count", "downloads", "USD"}:
+        return None
+    return NumericalContext(
+        value_decimal=format(Decimal(str(row.value)), "f"),
+        unit="currency" if row.unit == "USD" else "count",
+        currency="USD" if row.unit == "USD" else None,
+        measurement_start=row.window.start.date() if row.window else None,
+        measurement_end=row.window.end.date() if row.window else None,
+        qualifier="exact",
+    )
 
 
 def _subject(text: str, document: EvidenceDocument, company: str) -> SubjectKind:
@@ -209,6 +231,8 @@ class MappingEngine:
     interpreter: GeminiInterpreter | None = None
     cache_policy: Literal["reuse", "bypass"] = "reuse"
     deadline: float | None = None
+    prior_requests: int = 0
+    prior_input: int = 0
     _extended: bool = False
     _statistics: InterpretationStatistics | None = None
     _artifacts: list[ArtifactReference] = field(default_factory=list)
@@ -254,8 +278,24 @@ class MappingEngine:
             },
         )
         candidates: list[tuple[EvidenceDocument, DocumentBlock]] = []
+        excluded = {
+            candidate.capture_id
+            for source in report.sources
+            if source.discovery
+            for candidate in source.discovery.candidates
+            if candidate.state != "matched" and candidate.capture_id
+        }
         for capture in report.captures:
             content = store.read(capture.artifact)
+            if capture.capture_id in excluded:
+                work.dispositions.append(
+                    MappingDisposition(
+                        candidate_id=capture.capture_id,
+                        state="unmapped",
+                        reason="unverified_search_candidate",
+                    )
+                )
+                continue
             if time.monotonic() >= deadline:
                 self._reasons.append("mapping_deadline")
                 break
@@ -358,13 +398,16 @@ class MappingEngine:
                 self._extract_with_reserve(
                     report, candidates, work, interpreter, started
                 )
+                self._sync_statistics(interpreter)
                 self._set_statistics(stage="synthesizing")
                 self._progress(
                     started, self._statistics.batches if self._statistics else 0
                 )
                 analysis = synthesize(
                     work.records,
-                    lambda prompt: self._response(prompt, interpreter, AnalysisBatch),
+                    lambda prompt: self._bounded_response(
+                        prompt, interpreter, AnalysisBatch
+                    ),
                 )
                 self._reasons.extend(analysis.reason_codes)
             else:
@@ -388,9 +431,16 @@ class MappingEngine:
             interpreter.max_requests,
             interpreter.max_input,
         )
+        thinking_level = interpreter.thinking_level
+        if interpreter.model.startswith("gemma-4-"):
+            interpreter.thinking_level = "minimal"
         remaining = max(0, deadline - time.monotonic())
-        interpreter.deadline -= min(120, remaining * 0.3)
-        interpreter.max_requests -= 1
+        interpreter.deadline -= (
+            min(90, remaining * 0.4)
+            if "-live" not in interpreter.model
+            else min(120, remaining * 0.3)
+        )
+        interpreter.max_requests -= min(2, requests)
         interpreter.max_input -= min(32_000, int(input_budget * 0.4))
         try:
             self._interpret_extended(report, candidates, work, interpreter, started)
@@ -398,6 +448,7 @@ class MappingEngine:
             interpreter.deadline = deadline
             interpreter.max_requests = requests
             interpreter.max_input = input_budget
+            interpreter.thinking_level = thinking_level
 
     def _interpreter(
         self, settings: ResearchSettings | None, deadline: float
@@ -407,9 +458,16 @@ class MappingEngine:
             if settings
             else GeminiInterpreter(deadline)
         )
+        interpreter.thinking_level = (
+            settings.thinking_level if settings and settings.thinking_level else "high"
+        )
         if settings:
-            interpreter.max_requests = settings.model_requests
-            interpreter.max_input = settings.input_reservation
+            interpreter.max_requests = max(
+                0, settings.model_requests - self.prior_requests
+            )
+            interpreter.max_input = max(
+                0, settings.input_reservation - self.prior_input
+            )
         return interpreter
 
     def _map_document(
@@ -468,6 +526,7 @@ class MappingEngine:
                 row.metric_id
             ):
                 eligible, reason = False, "unverified_provider_scope"
+            quantity = _observation_quantity(row)
             records.append(
                 MappedRecord(
                     mapping_id=_identifier("metric", row.observation_id),
@@ -488,6 +547,8 @@ class MappingEngine:
                     if row.evidence_ids
                     else None,
                     metric_eligible=eligible,
+                    exact_decimal=quantity.value_decimal if quantity else None,
+                    numerical_context=quantity,
                     reason_codes=(reason,),
                     qualifier="exact" if row.value is not None else "unknown",
                 )
@@ -709,14 +770,28 @@ class MappingEngine:
         interpreter: GeminiInterpreter,
         schema: type[BaseModel] | None = None,
     ) -> str:
+        from oxhack2026.explanations.gemini import proposal_schema
+
         version = (
-            "research-analysis-v1"
+            "research-analysis-v2"
             if schema
-            else "evidence-proposals-v2"
+            else "evidence-proposals-v3"
             if self._extended
             else "evidence-proposals-v1"
         )
-        return _identifier(prompt, interpreter.model, version)
+        compact = "-live" in interpreter.model or interpreter.model.startswith(
+            "gemma-4-"
+        )
+        fingerprint = orjson.dumps(
+            proposal_schema(compact=compact, output=schema), option=orjson.OPT_SORT_KEYS
+        ).decode()
+        return _identifier(
+            prompt,
+            interpreter.model,
+            version,
+            fingerprint,
+            getattr(interpreter, "thinking_level", "high"),
+        )
 
     def _interpret_extended(
         self,
@@ -733,7 +808,10 @@ class MappingEngine:
             )
         )
         chunks = evidence_chunks(
-            candidates, report.identity.company_name, "-live" in interpreter.model
+            candidates,
+            report.identity.company_name,
+            "-live" in interpreter.model or interpreter.model.startswith("gemma-4-"),
+            6 if interpreter.model.startswith("gemma-4-") else 24,
         )
         # Existing completed chunks are cheap to replay before spending on new work.
         chunks.sort(
@@ -761,7 +839,20 @@ class MappingEngine:
                 self._reasons.append("gemini_candidate_budget")
                 break
             if not self._interpret_chunk(report, chunk, work, interpreter):
-                break
+                self._sync_statistics(interpreter)
+                self._progress(
+                    started, self._statistics.batches if self._statistics else 0
+                )
+                if self._reasons[-1] in {
+                    "gemini_credentials_missing",
+                    "gemini_authentication_failed",
+                    "gemini_invalid_request",
+                    "gemini_model_unavailable",
+                    "gemini_token_or_call_budget",
+                    "gemini_deadline",
+                }:
+                    break
+                continue
             if self._statistics:
                 processed = self._statistics.processed + len(chunk.lookup)
                 self._set_statistics(
@@ -777,15 +868,30 @@ class MappingEngine:
     def _chunk_response(
         self, prompt: str, interpreter: GeminiInterpreter
     ) -> list[object]:
+        return _proposal_values(self._bounded_response(prompt, interpreter))
+
+    def _bounded_response(
+        self,
+        prompt: str,
+        interpreter: GeminiInterpreter,
+        schema: type[BaseModel] | None = None,
+    ) -> str:
         for attempt in range(2):
             try:
-                return _proposal_values(self._response(prompt, interpreter))
+                return self._response(prompt, interpreter, schema)
             except MappingUnavailable as error:
                 retryable = str(error) in {
                     "gemini_rate_limited",
                     "gemini_provider_unavailable",
+                    "gemini_provider_internal_error",
+                    "gemini_provider_bad_gateway",
+                    "gemini_provider_overloaded",
+                    "gemini_provider_timeout",
+                    "gemini_request_timeout",
+                    "gemini_connection_failed",
                     "gemini_live_provider_unavailable",
                     "gemini_invalid_output",
+                    "gemini_incomplete_response",
                 }
                 if (
                     attempt
@@ -873,7 +979,7 @@ class MappingEngine:
             )
         )
         batches: list[list[tuple[EvidenceDocument, DocumentBlock]]] = []
-        live = "-live" in interpreter.model
+        live = "-live" in interpreter.model or interpreter.model.startswith("gemma-4-")
         candidate_limit = LIVE_BATCH_LIMIT if live else 120
         batch_bytes = 24_000 if live else 6500
         batch_limit = 1 if live else 6

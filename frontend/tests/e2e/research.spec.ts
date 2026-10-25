@@ -20,7 +20,11 @@ test("prediction workspace exposes three outcomes, five drivers and accessible e
     page.getByRole("heading", { name: "Overall outlook unavailable" }),
   ).toBeVisible();
   await expect(page.getByText("24 months")).toHaveCount(2);
-  await expect(page.getByText("12 months")).toHaveCount(0);
+  await expect(page.getByText("12 months")).toHaveCount(1);
+  for (const name of ["Growth outlook", "Survival outlook", "Financial health"])
+    await expect(
+      page.getByRole("heading", { name, exact: true }),
+    ).toBeVisible();
   await expect(page.getByText(/Partial source results/)).toBeVisible();
   const downloadReady = page.waitForEvent("download");
   await page.getByRole("button", { name: "Export report" }).click();

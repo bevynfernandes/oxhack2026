@@ -100,10 +100,26 @@ export function SyntheticNotice({ synthetic }: { synthetic: boolean }) {
 }
 
 export function Reasons({ reasons }: { reasons: readonly string[] }) {
+  const descriptions: Record<string, string> = {
+    gemini_provider_internal_error:
+      "The model provider returned an internal error (HTTP 500).",
+    gemini_provider_bad_gateway:
+      "The model provider returned a gateway error (HTTP 502).",
+    gemini_provider_overloaded:
+      "The model provider is temporarily unavailable (HTTP 503).",
+    gemini_provider_timeout: "The model provider timed out (HTTP 504).",
+    gemini_request_timeout: "The model request exceeded its time limit.",
+    gemini_connection_failed:
+      "The server could not connect to the model provider.",
+    analysis_unsupported_statement:
+      "Some generated statements failed citation or evidence checks and were omitted. Validated findings are retained.",
+  };
   return reasons.length ? (
     <ul className="reasons">
       {reasons.map((reason, index) => (
-        <li key={`${index}-${reason}`}>{reason.replaceAll("_", " ")}</li>
+        <li key={`${index}-${reason}`}>
+          {descriptions[reason] ?? reason.replaceAll("_", " ")}
+        </li>
       ))}
     </ul>
   ) : null;

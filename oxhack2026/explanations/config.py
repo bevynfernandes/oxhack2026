@@ -6,7 +6,7 @@ from typing import Literal
 
 from dotenv import dotenv_values
 
-DEFAULT_MODEL = "gemini-3.8-live-extended-thinking"
+from oxhack2026.explanations.defaults import DEFAULT_MODEL as DEFAULT_MODEL
 
 
 def gemini_api_key() -> str:
