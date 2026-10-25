@@ -59,6 +59,8 @@ Company pages yield first-party statements and dated events. The crawler visits 
 most the selected profile's company-page allowance, at depth three, with sitemap
 and linked feed discovery. Official ordinary HTML paths are eligible regardless of
 language; family ranking balances commercial, company, updates, docs and careers.
+Linked docs, developers, careers, jobs, blog, newsroom and changelog subdomains
+are included within the same confirmed domain and collection limits.
 Login, account, search and asset paths are excluded.
 Financial prose stays an attributed claim with its excerpt and extraction location;
 it is not converted into fabricated numbers. All claims, including disagreements,
@@ -237,10 +239,11 @@ configuration fields and retain their original bytes.
 ### Source collection coverage
 
 The website frontier records visited and outstanding URLs, samples page families,
-and follows official documentation/careers links. Linked GitHub organisations can
+and follows linked public company subdomains. Linked GitHub organisations can
 supply public repositories; package manifests require reciprocal npm repository
 metadata. Explicit npm/pnpm/yarn/bun installation commands retain the quoted command
-as package-association evidence. Scoped Organization JSON-LD `sameAs` links retain
+as discovery evidence; ownership requires the separate verification above.
+Scoped Organization JSON-LD `sameAs` links retain
 their extraction location; an unrelated Organization's accounts are excluded. Hiring follows embedded public boards and deduplicates posting IDs.
 HN subdivides non-exhaustive time windows within its profile and stores unfinished
 pagination for continuation. News distinguishes matched articles and unverified
@@ -284,6 +287,13 @@ requests, cache hits, accepted/rejected proposals, deferred evidence and nullabl
 provider-reported token usage. Rule-only and historical reports cannot imply that
 Gemini ran.
 
+Installation commands and npm links are discovery candidates, including possible
+third-party dependencies. Download observations require an exact registry package
+name and either a reciprocal company homepage or the matching package manifest
+in an officially linked repository. Name similarity does not establish ownership.
+Continuation revalidates older npm observations lacking this association check;
+their original report bytes and captures remain unchanged.
+
 Completed reports expose findings with original quotations, subjects, attribution,
 public source links and collection dates. Continue spends another explicit budget
 on retained frontier/cursors and deferred interpretation; completed captures stay
@@ -291,6 +301,8 @@ available with their original dates. Refresh requires identity confirmation and
 collects new sources. Re-map reads retained captures only, with an explicit cache
 reuse/bypass choice. Every action creates a new immutable report, and failed reads
 or writes never silently resubmit research.
+Jobs that failed without producing a report offer identity confirmation for a new
+attempt; only useful completed/partial jobs expose continuation.
 
 The browser shares a twenty-second page deadline and twenty-request cap with its
 controlled network requests, so callbacks cannot outlive the page budget. Failed rendering

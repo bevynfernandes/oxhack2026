@@ -153,7 +153,7 @@ def _embedded_boards(content: bytes) -> dict[str, None]:
 def _package_commands(
     soup: BeautifulSoup, capture: Capture
 ) -> dict[str, ResearchEvidence]:
-    """Return package associations from explicit installation commands and quotes."""
+    """Retain installation candidates and quotes without establishing ownership."""
     packages: dict[str, ResearchEvidence] = {}
     for block in soup.select("pre, code"):
         code = block.get_text(" ", strip=True)

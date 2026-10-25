@@ -300,14 +300,15 @@ function StandaloneJobPage() {
           </p>
           <Reasons reasons={job.reason_codes} />
           <SourceProgress sources={job.sources} />
-          {!["queued", "running"].includes(job.state) && (
-            <ContinueControls
-              jobId={job.job_id}
-              sources={job.sources}
-              mapping={job.mapping}
-              settings={job.settings}
-            />
-          )}
+          {(job.state === "completed" || job.state === "partial") &&
+            job.report_id && (
+              <ContinueControls
+                jobId={job.job_id}
+                sources={job.sources}
+                mapping={job.mapping}
+                settings={job.settings}
+              />
+            )}
           {job.mapping && (
             <section aria-label="Evidence mapping progress">
               <h3>Evidence mapping: {job.mapping.state}</h3>

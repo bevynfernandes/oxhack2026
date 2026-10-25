@@ -40,7 +40,7 @@ from oxhack2026.api.research_v2_schemas import (
     SourceState,
 )
 from oxhack2026.models.dimension_serving import DimensionModelRegistry
-from oxhack2026.research.frontier import source_issue
+from oxhack2026.research.frontier import NPM_ASSOCIATION_VERIFIED, source_issue
 from oxhack2026.research.network import (
     CollectionError,
     FetchBudget,
@@ -531,7 +531,10 @@ class V2Service:
                 updates["details"] = details
                 if details.frontier or details.cursor:
                     updates.update(state="pending", started_at=None, finished_at=None)
-            if source.state in {"skipped", "failed"}:
+            if source.state in {"skipped", "failed"} or (
+                source.provider == "npm"
+                and NPM_ASSOCIATION_VERIFIED not in source.reason_codes
+            ):
                 updates.update(
                     state="pending", started_at=None, finished_at=None, reason_codes=()
                 )

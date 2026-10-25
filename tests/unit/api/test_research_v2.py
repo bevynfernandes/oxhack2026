@@ -343,7 +343,16 @@ def test_npm_adjacent_complete_windows(tmp_path: Path) -> None:
     ]
     fetcher = _fetcher(
         tmp_path,
-        httpx.MockTransport(lambda _: httpx.Response(200, json={"downloads": rows})),
+        httpx.MockTransport(
+            lambda request: httpx.Response(
+                200,
+                json=(
+                    {"name": "example", "homepage": "https://example.com"}
+                    if request.url.host == "registry.npmjs.org"
+                    else {"downloads": rows}
+                ),
+            )
+        ),
     )
     result = Collector(
         fetcher, _identity(), SourceState(provider="npm", name="npm")
@@ -556,9 +565,11 @@ def test_conflicting_npm_days_are_not_normalized(tmp_path: Path) -> None:
     """Conflicting daily records remain captured and never silently select a value."""
     day = str(datetime.now(UTC).date() - timedelta(days=1))
     transport = httpx.MockTransport(
-        lambda _: httpx.Response(
+        lambda request: httpx.Response(
             200,
-            json={
+            json={"name": "example", "homepage": "https://example.com"}
+            if request.url.host == "registry.npmjs.org"
+            else {
                 "downloads": [
                     {"day": day, "downloads": 1},
                     {"day": day, "downloads": 2},

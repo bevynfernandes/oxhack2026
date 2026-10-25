@@ -15,6 +15,31 @@ _FAMILIES = (
     ("product", r"product|platform|solution|feature"),
 )
 _ASSET = re.compile(r"\.(?:js|css|woff2?|png|jpe?g|svg|gif|mp4|zip|ico)$", re.I)
+NPM_ASSOCIATION_VERIFIED = "npm_company_association_validated"
+_OFFICIAL_PREFIXES = frozenset(
+    {
+        "docs",
+        "developers",
+        "careers",
+        "jobs",
+        "blog",
+        "newsroom",
+        "changelog",
+    }
+)
+
+
+def official_host(host: str, domain: str) -> bool:
+    """Recognize the confirmed host and linked public company content subdomains.
+
+    Args:
+        host: Normalized destination hostname with an optional www prefix removed.
+        domain: Explicitly confirmed company hostname.
+    Returns:
+        Whether collection may use this host; this establishes no legal identity.
+    """
+    prefix, _, parent = host.partition(".")
+    return host == domain or (parent == domain and prefix in _OFFICIAL_PREFIXES)
 
 
 def crawl_family(url: str) -> str:
@@ -36,13 +61,8 @@ def crawl_candidate(url: str, domain: str) -> bool:
     """
     parsed = urlsplit(url)
     host = (parsed.hostname or "").removeprefix("www.")
-    official = host == domain or host in {
-        f"docs.{domain}",
-        f"developers.{domain}",
-        f"careers.{domain}",
-    }
     return (
-        official
+        official_host(host, domain)
         and not _ASSET.search(parsed.path)
         and not re.match(
             r"/(?:login|signin|signup|account|auth|cart|checkout|search|calendar)(?:/|$)",
@@ -90,6 +110,10 @@ def source_issue(code: str) -> SourceIssue:
         "unverified_package_mapping": (
             "No verified public npm package was discovered.",
             "Package adoption is unavailable without an official association.",
+        ),
+        "unverified_package_ownership": (
+            "An npm link or installation command did not establish package ownership.",
+            "Verify the package's company homepage or reciprocal repository manifest.",
         ),
         "careers_page_without_structured_opening_count": (
             (

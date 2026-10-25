@@ -708,6 +708,7 @@ for (const width of [1440, 375]) {
           job_id: "progress",
           identity_id: standaloneIdentity.identity_id,
           state: "partial",
+          report_id: "standalone-report",
           sources: sourceStates.map((source) =>
             source.provider === "website"
               ? {
@@ -807,3 +808,53 @@ for (const width of [1440, 375]) {
     expect(submissions).toBe(1);
   });
 }
+
+test("fully failed research offers identity confirmation without an invalid continuation", async ({
+  page,
+}) => {
+  let continuationWrites = 0;
+  await page.route("**/api/v2/research-capabilities", (route) =>
+    route.fulfill({ json: capabilities }),
+  );
+  await page.route("**/api/v2/research-identities/*", (route) =>
+    route.fulfill({ json: standaloneIdentity }),
+  );
+  await page.route("**/api/v2/research-jobs/fully-failed", (route) =>
+    route.fulfill({
+      json: {
+        job_id: "fully-failed",
+        identity_id: standaloneIdentity.identity_id,
+        state: "failed",
+        report_id: null,
+        requested_at: "2026-10-25T01:00:00Z",
+        finished_at: "2026-10-25T01:01:00Z",
+        sources: sourceStates.map((source) => ({ ...source, state: "failed" })),
+        reason_codes: ["collection_deadline"],
+        mapping: { state: "failed", completed_batches: 0, reason_codes: [] },
+      },
+    }),
+  );
+  await page.route("**/api/v2/research-jobs/fully-failed/continue", (route) => {
+    continuationWrites++;
+    return route.fulfill({ status: 422, json: {} });
+  });
+  await page.goto("/research/v2/jobs/fully-failed");
+  await expect(
+    page.getByRole("heading", { name: "Research failed", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Continue research", exact: true }),
+  ).toHaveCount(0);
+  const retry = page.getByRole("link", {
+    name: "Review identity and confirm another attempt",
+  });
+  await expect(retry).toHaveAttribute(
+    "href",
+    `/research/identities/${standaloneIdentity.identity_id}`,
+  );
+  await retry.click();
+  await expect(
+    page.getByRole("button", { name: "Confirm and start research" }),
+  ).toBeDisabled();
+  expect(continuationWrites).toBe(0);
+});

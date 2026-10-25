@@ -34,7 +34,12 @@ from oxhack2026.api.research_v2_schemas import (
 from oxhack2026.api.schemas import Window
 from oxhack2026.models.financial_inference import CashFlowResearchEstimate
 from oxhack2026.research.extraction import Page, company_links, evidence, parse_page
-from oxhack2026.research.frontier import crawl_family, source_issue
+from oxhack2026.research.frontier import (
+    NPM_ASSOCIATION_VERIFIED,
+    crawl_family,
+    official_host,
+    source_issue,
+)
 from oxhack2026.research.network import CollectionError, Fetcher, public_url
 
 logger = logging.getLogger(__name__)
@@ -66,6 +71,18 @@ def _package_repository_matches(metadata: object, name: str, api_url: str) -> bo
     normalized = re.sub(r"^(?:git\+)?https://github\.com/|^git@github\.com:", "", url)
     normalized = normalized.removesuffix(".git").rstrip("/").casefold()
     return normalized == urlsplit(api_url).path.removeprefix("/repos/").casefold()
+
+
+def _package_homepage_matches(homepage: object, domain: str) -> bool:
+    """Verify a registry homepage points to the confirmed company's public host."""
+    if not isinstance(homepage, str):
+        return False
+    try:
+        host = (urlsplit(public_url(homepage)).hostname or "").removeprefix("www.")
+    except CollectionError:
+        logger.error("Invalid public package homepage metadata")  # noqa: TRY400
+        return False
+    return official_host(host, domain)
 
 
 @dataclass
@@ -102,14 +119,24 @@ class Collector:
     def __post_init__(self) -> None:
         """Restore successful source records when continuing a durable checkpoint."""
         self.support.extend(self.source.evidence)
-        self.observations.extend(self.source.observations)
+        if (
+            self.source.provider != "npm"
+            or NPM_ASSOCIATION_VERIFIED in self.source.reason_codes
+        ):
+            self.observations.extend(self.source.observations)
         self.claims.extend(self.source.claims)
         self.events.extend(self.source.events)
         self.links.update(self.source.links)
         if self.source.details:
             self.frontier = self.source.details.frontier
             self.visited.update(self.source.details.visited)
-            self.accounts.extend(self.source.details.accounts)
+            self.accounts.extend(
+                account
+                for account in self.source.details.accounts
+                if account.kind != "npm"
+                or self.source.provider == "github"
+                or NPM_ASSOCIATION_VERIFIED in self.source.reason_codes
+            )
             self.cursor = self.source.details.cursor
         resumed_limits = {"website_page_limit"} if self.frontier else set()
         if self.cursor:
@@ -275,12 +302,7 @@ class Collector:
             destination = (urlsplit(capture.final_url).hostname or "").removeprefix(
                 "www."
             )
-            if destination not in {
-                domain,
-                f"docs.{domain}",
-                f"developers.{domain}",
-                f"careers.{domain}",
-            }:
+            if not official_host(destination, domain):
                 self.reasons.append("unconfirmed_redirect_destination")
                 return None
             page = self._website_page(capture, content)
@@ -313,20 +335,18 @@ class Collector:
         )
 
     def _official_accounts(self, capture: Capture, page: Page) -> None:
-        """Retain official account links and quoted package installation commands."""
+        """Retain repository links; npm candidates require independent verification."""
         account_evidence = dict(page.account_evidence)
         for link in page.links:
             host = urlsplit(link).hostname
-            if host in {"github.com", "npmjs.com", "www.npmjs.com"}:
+            if host == "github.com":
                 item = account_evidence.get(link) or evidence(
                     capture, link, "link:href"
                 )
                 if link not in account_evidence:
                     self.support.append(item)
                 kind = (
-                    "npm"
-                    if host != "github.com"
-                    else "github_repo"
+                    "github_repo"
                     if len(urlsplit(link).path.strip("/").split("/")) >= 2
                     else "github_org"
                 )
@@ -618,15 +638,67 @@ class Collector:
         limit = {"fast": 2, "thorough": 6, "deep": 12}[self.limits.profile]
         remaining = list(packages)
         self._checkpoint_resources(remaining)
+        verified = 0
         for package in packages[:limit]:
-            self._npm_package(package)
+            if self._verified_package(package):
+                self._npm_package(package)
+                self.reasons.append(NPM_ASSOCIATION_VERIFIED)
+                verified += 1
+            else:
+                self.reasons.append("unverified_package_ownership")
             remaining.remove(package)
             self._checkpoint_resources(remaining)
+        if not verified:
+            raise CollectionError("unverified_package_mapping")
         if len(packages) > {"fast": 2, "thorough": 6, "deep": 12}[self.limits.profile]:
             self.reasons.append("npm_package_limit")
 
+    def _verified_package(self, package: str) -> bool:
+        """Require a reciprocal company homepage or verified repository manifest."""
+        metadata, registry = self.json(
+            f"https://registry.npmjs.org/{quote(package, safe='')}/latest"
+        )
+        if not isinstance(metadata, dict) or metadata.get("name") != package:
+            return False
+        if _package_homepage_matches(
+            metadata.get("homepage"), self.identity.canonical_domain
+        ):
+            self._association(
+                "npm", f"https://www.npmjs.com/package/{package}", registry
+            )
+            return True
+        for link in self.identity.official_links:
+            parsed = urlsplit(link)
+            if parsed.hostname != "github.com" or not re.fullmatch(
+                r"/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?", parsed.path
+            ):
+                continue
+            base = f"https://api.github.com/repos/{parsed.path.strip('/')}"
+            if not _package_repository_matches(metadata, package, base):
+                continue
+            token = os.environ.get("GITHUB_TOKEN", "")
+            manifest, _ = self.json(
+                f"{base}/contents/package.json",
+                {"Authorization": f"Bearer {token}"} if token else None,
+            )
+            if not isinstance(manifest, dict) or not isinstance(
+                manifest.get("content"), str
+            ):
+                continue
+            payload = orjson.loads(base64.b64decode(manifest["content"]))
+            if (
+                isinstance(payload, dict)
+                and payload.get("name") == package
+                and not payload.get("private")
+            ):
+                self._association(
+                    "npm", f"https://www.npmjs.com/package/{package}", registry
+                )
+                return True
+        return False
+
     def _npm_package(self, package: str) -> None:
-        """Retain adjacent complete daily windows for one explicitly linked package."""
+        """Retain adjacent complete windows for an independently verified package."""
         today = datetime.now(UTC).date()
         start, end = today - timedelta(days=65), today - timedelta(days=1)
         data, item = self.json(
