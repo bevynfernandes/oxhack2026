@@ -6,7 +6,10 @@ import time
 from collections import deque
 from dataclasses import dataclass, field
 from threading import BoundedSemaphore, Lock
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
+
+if TYPE_CHECKING:
+    from oxhack2026.explanations.gemini_live import LiveSession
 
 import httpx
 import orjson
@@ -94,8 +97,13 @@ class GeminiInterpreter:
     reserved_input: int = 0
     model_version: str | None = None
     reason_codes: list[str] = field(default_factory=list)
+    max_requests: int = 6
+    max_input: int = 60_000
+    usage_available: bool = False
+    _runner: asyncio.Runner | None = field(default=None, repr=False)
+    _session: "LiveSession | None" = field(default=None, repr=False)
 
-    def generate(self, prompt: str) -> str:
+    def generate(self, prompt: str, schema: type[BaseModel] | None = None) -> str:
         """Return schema-constrained JSON; callers must verify every interpretation.
 
         Args:
@@ -110,7 +118,14 @@ class GeminiInterpreter:
             raise MappingUnavailable("gemini_credentials_missing")
         # UTF-8 bytes conservatively bound text tokenization, including Unicode.
         upper_bound = len(prompt.encode()) + 2048
-        if self.attempts >= 6 or self.reserved_input + upper_bound > 60_000:
+        if self._session:
+            upper_bound += self._session.context_size(
+                proposal_schema(compact=True, output=schema)
+            )
+        if (
+            self.attempts >= self.max_requests
+            or self.reserved_input + upper_bound > self.max_input
+        ):
             raise MappingUnavailable("gemini_token_or_call_budget")
         remaining = self.deadline - time.monotonic()
         if remaining <= 0 or not _SLOTS.acquire(timeout=max(0, remaining)):
@@ -120,7 +135,7 @@ class GeminiInterpreter:
             self.attempts += 1
             self.reserved_input += upper_bound
             if "-live" in self.model:
-                return self._live(key, prompt)
+                return self._live(key, prompt, schema)
             from google import genai
             from google.genai import errors, types
 
@@ -167,6 +182,7 @@ class GeminiInterpreter:
             self.model_version = response.model_version
             usage = response.usage_metadata
             if usage:
+                self.usage_available = True
                 self.input_tokens += usage.prompt_token_count or 0
                 self.output_tokens += (usage.candidates_token_count or 0) + (
                     usage.thoughts_token_count or 0
@@ -177,27 +193,49 @@ class GeminiInterpreter:
         finally:
             _SLOTS.release()
 
-    def _live(self, key: str, prompt: str) -> str:
+    def open_session(self) -> None:
+        """Prepare one bounded Live session; no network access occurs until generate."""
+        if "-live" in self.model and self._runner is None:
+            from oxhack2026.explanations.gemini_live import LiveSession
+
+            self._runner = asyncio.Runner()
+            self._session = LiveSession(gemini_api_key(), self.model)
+
+    def close_session(self) -> None:
+        """Close interpreter-owned Live resources after success or failure."""
+        if self._runner:
+            try:
+                if self._session:
+                    self._runner.run(self._session.close())
+            finally:
+                self._runner.close()
+                self._runner, self._session = None, None
+
+    def _live(
+        self, key: str, prompt: str, schema: type[BaseModel] | None = None
+    ) -> str:
         from websockets.exceptions import WebSocketException
 
         from oxhack2026.explanations.gemini_live import LiveProtocolError, generate_live
 
         try:
-            result = asyncio.run(
-                generate_live(
-                    key,
-                    self.model,
-                    prompt,
-                    proposal_schema(compact=True),
-                    max(0.001, self.deadline - time.monotonic() - 0.25),
+            payload_schema = proposal_schema(compact=True, output=schema)
+            remaining = max(0.001, self.deadline - time.monotonic())
+            if self._runner and self._session:
+                result = self._runner.run(
+                    self._session.generate(prompt, payload_schema, remaining)
                 )
-            )
+            else:
+                result = asyncio.run(
+                    generate_live(key, self.model, prompt, payload_schema, remaining)
+                )
         except LiveProtocolError as error:
             raise MappingUnavailable(str(error)) from error
         except (WebSocketException, OSError, TimeoutError, ValueError) as error:
             raise MappingUnavailable("gemini_live_provider_unavailable") from error
         if result.reason_code:
             self.reason_codes.append(result.reason_code)
+        self.usage_available = result.usage_available
         self.input_tokens += result.input_tokens
         self.output_tokens += result.output_tokens
         return result.response
@@ -205,16 +243,25 @@ class GeminiInterpreter:
     def _reserve(self, tokens: int) -> None:
         requests_limit = int(os.environ.get("SIGNALSHIFT_GEMINI_RPM", "10"))
         tokens_limit = int(os.environ.get("SIGNALSHIFT_GEMINI_TPM", "60000"))
-        with _QUOTA_LOCK:
-            now = time.monotonic()
-            while _RESERVATIONS and now - _RESERVATIONS[0][0] >= 60:
-                _RESERVATIONS.popleft()
-            if (
-                len(_RESERVATIONS) >= requests_limit
-                or sum(row[1] for row in _RESERVATIONS) + tokens > tokens_limit
-            ):
+        if tokens > tokens_limit:
+            raise MappingUnavailable("gemini_shared_quota")
+        while True:
+            with _QUOTA_LOCK:
+                now = time.monotonic()
+                while _RESERVATIONS and now - _RESERVATIONS[0][0] >= 60:
+                    _RESERVATIONS.popleft()
+                if (
+                    len(_RESERVATIONS) < requests_limit
+                    and sum(row[1] for row in _RESERVATIONS) + tokens <= tokens_limit
+                ):
+                    _RESERVATIONS.append((now, tokens))
+                    return
+                wait = (
+                    max(0.01, 60 - (now - _RESERVATIONS[0][0])) if _RESERVATIONS else 60
+                )
+            if time.monotonic() + wait >= self.deadline:
                 raise MappingUnavailable("gemini_shared_quota")
-            _RESERVATIONS.append((now, tokens))
+            time.sleep(min(wait, 1))
 
 
 def proposal_prompt(
@@ -254,7 +301,9 @@ def proposal_prompt(
     return instructions + orjson.dumps(blocks).decode()
 
 
-def proposal_schema(*, compact: bool = False) -> dict[str, object]:
+def proposal_schema(
+    *, compact: bool = False, output: type[BaseModel] | None = None
+) -> dict[str, object]:
     """Return Google's schema subset while retaining strict local validation.
 
     Args:
@@ -263,7 +312,9 @@ def proposal_schema(*, compact: bool = False) -> dict[str, object]:
         Inline schema without unsupported Pydantic metadata or reference fields.
         Extra provider fields are still rejected by EvidenceProposal locally.
     """
-    schema = (ClassificationBatch if compact else ProposalBatch).model_json_schema()
+    schema = (
+        output or (ClassificationBatch if compact else ProposalBatch)
+    ).model_json_schema()
     definitions = schema.get("$defs", {})
 
     def inline(value: object) -> object:

@@ -241,3 +241,20 @@ to forty pages; scanned/encrypted documents remain explicit unsupported sources.
 Independent provider workers share atomic request/byte budgets and process-wide
 quotas. Collector execution and coverage are separate in `SourceState.details`;
 validation metadata is informational, while incomplete coverage remains visible.
+
+### Gemini interpretation and cited analysis
+
+Profiled jobs use stable per-document chunks, replaying successful cached chunks
+before spending their remaining model budget on new work. This permits an explicit
+continuation to advance beyond an earlier interpretation limit. Gemini reviews
+important rule-mapped evidence as well as unclassified text, then submits cited
+findings. Local validation rejects unsupported quotes, subjects, citations,
+quantities and forecasts. The final model request is reserved for synthesis.
+
+`mapping.statistics` separates processed/deferred evidence, accepted/rejected
+proposals, cached batches and actual provider requests. Unreported provider usage
+is null. `mapping.analysis` distinguishes unavailable synthesis from completed
+findings. Rule-only mode never presents deterministic output as Gemini analysis.
+Live connections reuse bounded turns, rotate on schema/context changes, discard
+audio and thoughts, and wait for explicit IDLE. Failed chunks do not become
+successful cache entries; model calls honour shared quotas and job deadlines.

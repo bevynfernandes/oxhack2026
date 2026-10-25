@@ -251,3 +251,43 @@ def test_live_connection_loss_retains_only_received_submissions(
 
     assert result.response == '{"proposals":[]}'
     assert result.reason_code == "gemini_live_background_interrupted"
+
+
+def test_reuses_live_connection_for_independent_turns(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Multiple bounded turns share setup and wait for a separate IDLE each time."""
+    from oxhack2026.explanations.gemini_live import LiveSession
+
+    socket = FakeSocket(
+        [
+            {"setupComplete": {}},
+            {
+                "serverContent": {
+                    "modelTurn": {"parts": [{"text": '{"proposals":[]}'}]},
+                    "interactionStatus": "IDLE",
+                }
+            },
+            {
+                "serverContent": {
+                    "modelTurn": {"parts": [{"text": '{"proposals":[]}'}]},
+                    "interactionStatus": "IDLE",
+                }
+            },
+        ]
+    )
+    connector = Mock(return_value=socket)
+    monkeypatch.setattr(gemini_live, "connect", connector)
+
+    async def run() -> None:
+        session = LiveSession("test-key", DEFAULT_MODEL)
+        try:
+            await session.generate("first source", proposal_schema(), 2)
+            await session.generate("second source", proposal_schema(), 2)
+        finally:
+            await session.close()
+
+    asyncio.run(run())
+    assert connector.call_count == 1
+    assert sum("setup" in value for value in socket.sent) == 1
+    assert sum("clientContent" in value for value in socket.sent) == 2

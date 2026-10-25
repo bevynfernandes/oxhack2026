@@ -6,6 +6,7 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
+from oxhack2026.api.research_analysis import InterpretationStatistics, ResearchAnalysis
 from oxhack2026.api.research_configuration import ResearchSettings
 from oxhack2026.api.schemas import DTO, Identifier, UTCDateTime
 from oxhack2026.models.startup_outlook import SPECIALIST_GROUP_IDS, SpecialistGroupId
@@ -123,6 +124,9 @@ class DimensionCoverage(DTO):
 class MappingProgress(DTO):
     """Durable mapping progress, independent of collection sources."""
 
+    statistics: InterpretationStatistics | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
     state: MappingState = "pending"
     started_at: UTCDateTime | None = None
     finished_at: UTCDateTime | None = None
@@ -147,7 +151,15 @@ class MappingProgress(DTO):
 class MappingBundle(DTO):
     """Immutable mapping provenance and its exact supporting artifacts."""
 
-    schema_version: Literal["evidence-mapping-v1"] = "evidence-mapping-v1"
+    schema_version: Literal["evidence-mapping-v1", "evidence-mapping-v2"] = (
+        "evidence-mapping-v1"
+    )
+    statistics: InterpretationStatistics | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    analysis: ResearchAnalysis | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
     policy_version: Literal["public-evidence-mapping-v1"] = "public-evidence-mapping-v1"
     parser_version: Literal["evidence-document-v1", "evidence-document-v2"] = (
         "evidence-document-v2"
@@ -166,7 +178,7 @@ class MappingBundle(DTO):
     model_version: str | None = None
     input_tokens: int = Field(default=0, ge=0)
     output_tokens: int = Field(default=0, ge=0)
-    generation_attempts: int = Field(default=0, ge=0, le=6)
+    generation_attempts: int = Field(default=0, ge=0, le=24)
     reason_codes: tuple[str, ...] = ()
 
     @model_validator(mode="after")
@@ -175,6 +187,12 @@ class MappingBundle(DTO):
             message = "Mapping requires all five ordered dimensions"
             raise ValueError(message)
         identifiers = {row.mapping_id for row in self.records}
+        if self.analysis and any(
+            not set(statement.mapping_ids) <= identifiers
+            for statement in self.analysis.statements
+        ):
+            message = "Analysis cites an absent mapped record"
+            raise ValueError(message)
         if len(identifiers) != len(self.records):
             message = "Mapping identifiers must be unique"
             raise ValueError(message)

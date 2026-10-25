@@ -1,6 +1,7 @@
 """Source-grounded mapping regressions; no real model or network requests."""
 
 import sys
+import time
 from concurrent.futures import Executor
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -669,3 +670,47 @@ def test_mapping_only_recovery_never_enqueues_collection(tmp_path: Path) -> None
     assert store.job(job.job_id).reason_codes == (
         "collection_disabled_during_recovery",
     )
+
+
+def test_profiled_chunks_advance_with_cached_checkpoints(tmp_path: Path) -> None:
+    """Multiple page chunks replay completed work and spend calls on deferred blocks."""
+    from pydantic import BaseModel
+
+    from oxhack2026.api.research_configuration import profile_settings
+
+    report = source_report(
+        tmp_path,
+        "<main>"
+        + "".join(
+            (
+                f"<p>Example provides useful software for independent developers "
+                f"in region {index}.</p>"
+            )
+            for index in range(160)
+        )
+        + "</main>",
+    )
+    report = report.model_copy(update={"settings": profile_settings("fast")})
+    client = Mock(spec=GeminiInterpreter)
+    client.model = "test-live-model"
+    client.model_version = None
+    client.reason_codes = []
+    client.input_tokens = client.output_tokens = client.attempts = 0
+    client.deadline = time.monotonic() + 60
+
+    def generate(prompt: str, schema: type[BaseModel] | None = None) -> str:
+        client.attempts += 1
+        return '{"proposals":[]}'
+
+    client.generate.side_effect = generate
+    first = MappingEngine(tmp_path, interpreter=client).map(report)
+    assert first.mapping and first.mapping.statistics
+    assert first.mapping.statistics.batches > 1
+    assert first.mapping.statistics.deferred > 0
+    processed = first.mapping.statistics.processed
+    client.attempts = 0
+    second = MappingEngine(tmp_path, interpreter=client).map(report)
+    assert second.mapping and second.mapping.statistics
+    assert second.mapping.statistics.cached_batches > 1
+    assert second.mapping.statistics.processed > processed
+    assert second.mapping.statistics.provider_requests <= 6
