@@ -133,7 +133,9 @@ from a bundled, attributed public domain directory and require identity preview;
 names absent from the directory need an exact website. See
 [current source/model limits](docs/product/free-source-decisions.md) and
 [demo evidence and remaining work](FINAL_DEMO.md). Evidence mapping combines
-deterministic rules with Gemini interpretation by default. Set
+deterministic rules with native `gemma-4-31b-it` interpretation by default.
+Google Search discovery collects candidate pages separately from cited analysis;
+set `SIGNALSHIFT_RESEARCH_GOOGLE_SEARCH=0` to disable discovery. Set
 `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` to disable model requests.
 It requires an explicit writable research root and opt-in collection worker; saved
 company publications are optional. The frontend supports domain confirmation,

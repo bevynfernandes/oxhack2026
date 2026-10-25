@@ -4824,7 +4824,8 @@
               "hn",
               "news",
               "sec",
-              "companies_house"
+              "companies_house",
+              "google_search"
             ],
             "title": "Provider",
             "type": "string"
@@ -5659,6 +5660,17 @@
             "title": "Deadline Seconds",
             "type": "integer"
           },
+          "google_search_enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Google Search Enabled"
+          },
           "input_reservation": {
             "default": 180000,
             "minimum": 1.0,
@@ -5675,7 +5687,7 @@
             "type": "string"
           },
           "model": {
-            "default": "gemini-3.8-live-extended-thinking",
+            "default": "gemma-4-31b-it",
             "title": "Model",
             "type": "string"
           },
@@ -5701,6 +5713,21 @@
             "minimum": 1.0,
             "title": "Requests",
             "type": "integer"
+          },
+          "thinking_level": {
+            "anyOf": [
+              {
+                "enum": [
+                  "minimal",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thinking Level"
           }
         },
         "title": "ResearchSettings",
@@ -5921,6 +5948,187 @@
           "reason"
         ],
         "title": "Score",
+        "type": "object"
+      },
+      "SearchCandidate": {
+        "additionalProperties": false,
+        "description": "A discovery link; only matched captured pages can support findings.",
+        "properties": {
+          "capture_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capture Id"
+          },
+          "final_url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Final Url"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "state": {
+            "default": "pending",
+            "enum": [
+              "pending",
+              "matched",
+              "unmatched",
+              "blocked",
+              "already_collected"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "maxLength": 2000,
+            "title": "Title",
+            "type": "string"
+          },
+          "url": {
+            "maxLength": 2048,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "SearchCandidate",
+        "type": "object"
+      },
+      "SearchDiscovery": {
+        "additionalProperties": false,
+        "description": "Provider metadata, distinct from evidence extracted from original pages.",
+        "properties": {
+          "artifact": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ArtifactReference"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "candidates": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SearchCandidate"
+            },
+            "maxItems": 100,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "collected_at": {
+            "format": "date-time",
+            "title": "Collected At",
+            "type": "string"
+          },
+          "input_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Tokens"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
+          "output_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Tokens"
+          },
+          "queries": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 64,
+            "title": "Queries",
+            "type": "array"
+          },
+          "requests": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Requests",
+            "type": "integer"
+          },
+          "reserved_input": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Reserved Input",
+            "type": "integer"
+          },
+          "run_id": {
+            "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+            "title": "Run Id",
+            "type": "string"
+          },
+          "search_suggestions": {
+            "anyOf": [
+              {
+                "maxLength": 32768,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Search Suggestions"
+          }
+        },
+        "required": [
+          "run_id",
+          "model",
+          "collected_at"
+        ],
+        "title": "SearchDiscovery",
         "type": "object"
       },
       "SourceDetails": {
@@ -6184,6 +6392,16 @@
               }
             ]
           },
+          "discovery": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SearchDiscovery"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "events": {
             "default": [],
             "items": {
@@ -6242,7 +6460,8 @@
               "hn",
               "news",
               "sec",
-              "companies_house"
+              "companies_house",
+              "google_search"
             ],
             "title": "Provider",
             "type": "string"

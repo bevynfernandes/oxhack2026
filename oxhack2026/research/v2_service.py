@@ -62,6 +62,7 @@ _NAMES = {
     "news": "GDELT news",
     "sec": "SEC disclosures",
     "companies_house": "Companies House",
+    "google_search": "Google Search discovery",
 }
 
 
@@ -131,6 +132,7 @@ class V2Service:
             from oxhack2026.research.browser import browser_available
 
             browser = browser_available()
+        mapping = self.mapping_capability()
         providers = tuple(
             ProviderCapability(
                 provider=provider,
@@ -151,6 +153,23 @@ class V2Service:
             )
             for provider in PROVIDERS
         )
+        providers = tuple(
+            capability.model_copy(
+                update={
+                    "available": mapping.gemini_available
+                    and bool(self._settings("thorough").google_search_enabled),
+                    "reason": (
+                        None
+                        if mapping.gemini_available
+                        and self._settings("thorough").google_search_enabled
+                        else "Requires enabled Search and configured native text API"
+                    ),
+                }
+            )
+            if capability.provider == "google_search"
+            else capability
+            for capability in providers
+        )
         return Capabilities(
             profiles=tuple(
                 self._settings(name) for name in ("fast", "thorough", "deep")
@@ -162,11 +181,11 @@ class V2Service:
             worker_available=self.executor is not None,
             browser_available=browser,
             providers=providers,
-            mapping=self.mapping_capability(),
+            mapping=mapping,
         )
 
     def mapping_capability(self) -> MappingCapability:
-        """Read mapping configuration and optional SDK presence without API calls."""
+        """Read credentials and optional SDK presence without vendor requests."""
         from oxhack2026.explanations.config import (
             DEFAULT_MODEL,
             gemini_api_key,
@@ -282,6 +301,11 @@ class V2Service:
             update={
                 "model": os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL,
                 "mapping_mode": mapping_mode(),
+                "thinking_level": "high",
+                "google_search_enabled": (
+                    os.environ.get("SIGNALSHIFT_RESEARCH_GOOGLE_SEARCH", "1") == "1"
+                    and mapping_mode() == "rules_gemini"
+                ),
             }
         )
 
@@ -541,6 +565,13 @@ class V2Service:
             if updates.get("state") == "pending" and details:
                 updates["details"] = details.model_copy(update={"execution": "pending"})
             states.append(source.model_copy(update=updates))
+        if not any(source.provider == "google_search" for source in states):
+            states.append(
+                SourceState(
+                    provider="google_search",
+                    name=_NAMES["google_search"],
+                )
+            )
         return tuple(states)
 
     def _finish(self, job: Job, identity: Identity) -> None:
@@ -606,9 +637,21 @@ class V2Service:
                 - (datetime.now(UTC) - job.started_at).total_seconds()
             )
             deadline = time.monotonic() + max(0, remaining)
-        result = MappingEngine(self.store.root, checkpoint, deadline=deadline).map(
-            report
+        discovery = next(
+            (
+                source.discovery
+                for source in job.sources
+                if source.discovery and source.discovery.run_id == job_id
+            ),
+            None,
         )
+        result = MappingEngine(
+            self.store.root,
+            checkpoint,
+            deadline=deadline,
+            prior_requests=discovery.requests if discovery else 0,
+            prior_input=discovery.reserved_input if discovery else 0,
+        ).map(report)
         current = self.store.job(job_id)
         checkpoint(
             MappingProgress(
@@ -719,7 +762,15 @@ class V2Service:
                 }
             )
             report = MappingEngine(
-                self.store.root, checkpoint, cache_policy=job.cache_policy
+                self.store.root,
+                checkpoint,
+                cache_policy=job.cache_policy,
+                deadline=time.monotonic()
+                + max(
+                    0,
+                    (job.settings.deadline_seconds if job.settings else 300)
+                    - (datetime.now(UTC) - started).total_seconds(),
+                ),
             ).map(source, job.source_report_id)
             self.store.publish(report)
             current = self.store.mapping_job(job_id)
@@ -832,6 +883,12 @@ class V2Service:
                 os.environ.get("SIGNALSHIFT_RESEARCH_BROWSER") == "1",
                 settings=settings,
                 checkpoint=checkpoint,
+                run_id=job_id,
+                known_urls=frozenset(
+                    capture.final_url
+                    for state in current.sources
+                    for capture in state.captures
+                ),
             )
             checkpoint(collector.collect())
 
