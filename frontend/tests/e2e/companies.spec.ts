@@ -59,8 +59,11 @@ test("company research searches, inspects sources and compares the same publishe
     .getByRole("link", { name: "Synthetic alpha", exact: true })
     .click();
   await expect(
-    page.getByRole("heading", { name: "Overall outlook unavailable" }),
+    page.getByRole("heading", { name: "What the evidence tells us" }),
   ).toBeVisible();
+  await expect(
+    page.getByText("Prediction unavailable", { exact: true }),
+  ).toHaveCount(3);
   await page
     .getByRole("button", { name: "Saved assessment", exact: true })
     .click();

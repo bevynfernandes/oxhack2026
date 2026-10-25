@@ -135,7 +135,14 @@ export function MotionDialog({
       onClose={(event) => {
         if (element.current?.open) return;
         phase.current = "closed";
-        if (opener.current?.isConnected) opener.current.focus();
+        const active = document.activeElement;
+        // Native close restores focus before its queued event. Respect a user's
+        // subsequent focus move instead of stealing their next keyboard action.
+        if (
+          opener.current?.isConnected &&
+          (active === document.body || element.current?.contains(active))
+        )
+          opener.current.focus();
         onClose?.(event);
       }}
     >
