@@ -6,7 +6,7 @@ import {
   MotionLink as Link,
 } from "../../motion";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
@@ -14,20 +14,24 @@ import { Coverage, PublicationNotice } from "./shared";
 
 /** Search a published company set and select up to three exact profiles. */
 export default function CompanyListPage() {
-  const [params, setParams] = useSearchParams();
+  const [urlParams, setParams] = useSearchParams();
+  const [params, setPendingParams] = useState(urlParams);
   const snapshot = params.get("snapshot") ?? "";
-  const urlSearch = (params.get("q") ?? "").slice(0, 120);
-  const [search, setSearch] = useState(urlSearch);
-  useEffect(() => setSearch(urlSearch), [urlSearch]);
+  const search = (params.get("q") ?? "").slice(0, 120);
   const segment = params.get("segment") ?? "";
   const stage = params.get("stage") ?? "";
   const coverage = params.get("coverage") ?? "";
-  const urlSelection = useMemo(
-    () => [...new Set(params.getAll("company"))],
-    [params],
-  );
-  const [selected, setSelected] = useState(urlSelection);
-  useEffect(() => setSelected(urlSelection), [urlSelection]);
+  const selected = [...new Set(params.getAll("company"))];
+  const pendingParams = useRef(params);
+  useLayoutEffect(() => {
+    pendingParams.current = urlParams;
+    setPendingParams(urlParams);
+  }, [urlParams]);
+  const updateParams = (next: URLSearchParams, replace = false) => {
+    pendingParams.current = next;
+    setPendingParams(next);
+    setParams(next, { replace });
+  };
   const choices = useQuery({
     queryKey: ["company-publications"],
     queryFn: async () => unwrap(await api.GET("/api/v1/company-snapshots")),
@@ -71,25 +75,24 @@ export default function CompanyListPage() {
     );
   });
   const setFilter = (name: string, value: string) => {
-    const next = new URLSearchParams(params);
+    const next = new URLSearchParams(pendingParams.current);
     if (value) next.set(name, value);
     else next.delete(name);
     if (name === "snapshot") {
-      setSelected([]);
       for (const key of ["company", "segment", "stage", "coverage", "q"])
         next.delete(key);
     }
-    setParams(next, { replace: name === "q" });
+    updateParams(next, name === "q");
   };
   const toggle = (id: string, checked: boolean) => {
-    const next = new URLSearchParams(params);
+    const next = new URLSearchParams(pendingParams.current);
+    const selection = [...new Set(next.getAll("company"))];
     next.delete("company");
     const ids = checked
-      ? [...selected, id]
-      : selected.filter((key) => key !== id);
-    setSelected(ids);
+      ? [...new Set([...selection, id])]
+      : selection.filter((key) => key !== id);
     ids.forEach((key) => next.append("company", key));
-    setParams(next);
+    updateParams(next);
   };
   const validSelection =
     selected.length >= 2 &&
@@ -163,10 +166,7 @@ export default function CompanyListPage() {
                 type="search"
                 maxLength={120}
                 value={search}
-                onChange={(event) => {
-                  setSearch(event.target.value);
-                  setFilter("q", event.target.value);
-                }}
+                onChange={(event) => setFilter("q", event.target.value)}
               />
             </label>
             <label>
@@ -234,10 +234,9 @@ export default function CompanyListPage() {
               <MotionButton
                 className="secondary"
                 onClick={() => {
-                  const next = new URLSearchParams(params);
+                  const next = new URLSearchParams(pendingParams.current);
                   next.delete("company");
-                  setSelected([]);
-                  setParams(next);
+                  updateParams(next);
                 }}
               >
                 Clear selection
