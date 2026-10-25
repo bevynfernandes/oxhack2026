@@ -3,11 +3,15 @@
 import math
 import re
 from collections import defaultdict
+from collections.abc import Mapping
 from datetime import date
 
 import polars as pl
 
-from oxhack2026.features.disclosure_timing import ANNUAL_DISCLOSURE_FORMS
+from oxhack2026.features.disclosure_timing import (
+    ANNUAL_DISCLOSURE_FORMS,
+    sec_disclosure_timing,
+)
 
 ANNUAL_FINANCIAL_CONCEPTS = {
     "revenue": (
@@ -212,3 +216,71 @@ def sec_annual_financials(
         for metric in ANNUAL_FINANCIAL_CONCEPTS
     ]
     return pl.DataFrame(rows, schema=_OUTPUT_SCHEMA)
+
+
+def sec_annual_filing_metadata(
+    payload: object,
+    issuer_id: str,
+    as_of: date,
+    historical: Mapping[str, object] | None = None,
+) -> pl.DataFrame:
+    """Normalize retained live SEC metadata into the training parser's input schema.
+
+    Args:
+        payload: Root submissions JSON for the independently verified issuer.
+        issuer_id: Verified ten-digit CIK, not a name-match candidate.
+        as_of: Inclusive end-of-day cutoff shared with financial fact extraction.
+        historical: All additional pages declared by the submissions root, keyed
+            by exact filename. Missing pages reject the complete-history claim.
+    Returns:
+        Original annual accession/form strings and filing_date/period_end Date
+        fields, with exactly the schema consumed by sec_annual_financials.
+    Raises:
+        ValueError: Identity, history, arrays, accessions or dates are invalid.
+        TypeError: Root or historical metadata is not a JSON object.
+        polars.exceptions.PolarsError: Required dates cannot be parsed.
+    """
+    sec_disclosure_timing(payload, issuer_id, as_of, historical)
+    if not isinstance(payload, dict):
+        message = "SEC submissions metadata must be an object"
+        raise TypeError(message)
+    filings = payload["filings"]
+    pages = [filings["recent"]] + [
+        (historical or {})[reference["name"]] for reference in filings["files"]
+    ]
+    frames = []
+    columns = ("accessionNumber", "filingDate", "reportDate", "form")
+    for page in pages:
+        if not isinstance(page, dict):
+            message = "SEC filing page must be an object"
+            raise TypeError(message)
+        arrays = [page.get(column) for column in columns]
+        if (
+            any(
+                not isinstance(values, list)
+                or any(not isinstance(value, str) for value in values)
+                for values in arrays
+            )
+            or len({len(values) for values in arrays if isinstance(values, list)}) != 1
+        ):
+            message = (
+                "SEC financial metadata requires matching accession/date/form arrays"
+            )
+            raise ValueError(message)
+        frames.append(
+            pl.DataFrame(
+                dict(zip(columns, arrays, strict=True)),
+                schema=dict.fromkeys(columns, pl.String),
+            )
+        )
+    frame = (
+        pl.concat(frames)
+        .filter(pl.col("form").str.replace_all("-", "").is_in(ANNUAL_DISCLOSURE_FORMS))
+        .select(
+            pl.col("accessionNumber").cast(pl.String).alias("accession_number"),
+            pl.col("filingDate").str.to_date().alias("filing_date"),
+            pl.col("reportDate").str.to_date().alias("period_end"),
+            "form",
+        )
+    )
+    return _annual_filings(frame, as_of)

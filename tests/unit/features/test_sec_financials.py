@@ -6,7 +6,10 @@ from datetime import date
 import polars as pl
 import pytest
 
-from oxhack2026.features.sec_financials import sec_annual_financials
+from oxhack2026.features.sec_financials import (
+    sec_annual_filing_metadata,
+    sec_annual_financials,
+)
 
 _CIK = "0000001750"
 _ACCESSION = "0000001750-20-000001"
@@ -163,3 +166,63 @@ def test_invalid_identity_metadata_and_values_fail_explicitly(failure: str) -> N
         filings = filings.drop("form")
     with pytest.raises(ValueError):
         sec_annual_financials(payload, filings, issuer, date(2020, 2, 1))
+
+
+def test_live_metadata_and_training_input_produce_identical_financials() -> None:
+    """Live accession arrays reproduce the exact financial parser training schema."""
+    payload = {
+        "cik": 1750,
+        "filings": {
+            "recent": {
+                "accessionNumber": [_ACCESSION],
+                "filingDate": ["2020-02-01"],
+                "reportDate": ["2019-12-31"],
+                "form": ["10-K"],
+            },
+            "files": [],
+        },
+    }
+    metadata = sec_annual_filing_metadata(payload, _CIK, date(2020, 2, 1))
+    assert metadata.equals(_filings())
+    assert sec_annual_financials(
+        _payload([_fact()]), metadata, _CIK, date(2020, 2, 1)
+    ).equals(
+        sec_annual_financials(_payload([_fact()]), _filings(), _CIK, date(2020, 2, 1))
+    )
+
+
+def test_live_metadata_requires_complete_accession_arrays() -> None:
+    """Dates without accession identity cannot select original financial facts."""
+    payload = {
+        "cik": 1750,
+        "filings": {
+            "recent": {
+                "filingDate": ["2020-02-01"],
+                "reportDate": ["2019-12-31"],
+                "form": ["10-K"],
+            },
+            "files": [],
+        },
+    }
+    with pytest.raises(ValueError, match="accession"):
+        sec_annual_filing_metadata(payload, _CIK, date(2020, 2, 1))
+
+
+def test_live_metadata_includes_declared_historical_accessions() -> None:
+    """An empty recent page still yields financial history from the required page."""
+    name = "CIK0000001750-submissions-001.json"
+    recent = dict.fromkeys(("accessionNumber", "filingDate", "reportDate", "form"), [])
+    payload = {"cik": 1750, "filings": {"recent": recent, "files": [{"name": name}]}}
+    historical = {
+        name: {
+            "accessionNumber": [_ACCESSION],
+            "filingDate": ["2020-02-01"],
+            "reportDate": ["2019-12-31"],
+            "form": ["10-K"],
+        }
+    }
+    assert sec_annual_filing_metadata(
+        payload, _CIK, date(2020, 2, 1), historical
+    ).equals(_filings())
+    with pytest.raises(ValueError, match="incomplete"):
+        sec_annual_filing_metadata(payload, _CIK, date(2020, 2, 1))
