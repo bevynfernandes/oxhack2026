@@ -1,12 +1,15 @@
 """Portable research models for observable dimensions, never success probabilities."""
 
+import re
+import unicodedata
 from bisect import bisect_left, bisect_right
 from collections import Counter
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date
 from hashlib import sha256
-from math import fsum, isfinite
+from itertools import pairwise
+from math import exp, fsum, isfinite, log, sqrt
 from typing import Literal, Self
 
 from pydantic import Field, model_validator
@@ -466,30 +469,47 @@ def predict_entity_sentiment(
     Raises:
         ValueError: A context is empty.
     """
-    import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer  # type: ignore[import-untyped]
-
     if not contexts:
         return ()
     if any(not context.strip() for context in contexts):
         message = "Sentiment inference requires nonempty company-specific text"
         raise ValueError(message)
-    vectorizer = TfidfVectorizer(
-        ngram_range=(1, 2),
-        strip_accents="unicode",
-        sublinear_tf=True,
-        vocabulary=model.vocabulary,
-    )
-    vectorizer.idf_ = np.array(model.idf)
-    logits = vectorizer.transform(contexts) @ np.array(model.coefficients).T + np.array(
-        model.intercepts
-    )
-    logits -= logits.max(axis=1, keepdims=True)
-    probabilities = np.exp(logits)
-    probabilities /= probabilities.sum(axis=1, keepdims=True)
-    return tuple(
-        dict(zip(model.classes, row.tolist(), strict=True)) for row in probabilities
-    )
+    predictions = []
+    for context in contexts:
+        normalized = "".join(
+            character
+            for character in unicodedata.normalize("NFKD", context.lower())
+            if not unicodedata.combining(character)
+        )
+        tokens = re.findall(r"(?u)\b\w\w+\b", normalized)
+        counts = Counter(tokens)
+        counts.update(f"{left} {right}" for left, right in pairwise(tokens))
+        vector = {
+            index: (1 + log(count)) * model.idf[index]
+            for term, count in counts.items()
+            if (index := model.vocabulary.get(term)) is not None
+        }
+        norm = sqrt(fsum(value * value for value in vector.values())) or 1
+        logits = [
+            intercept
+            + fsum(weights[index] * value / norm for index, value in vector.items())
+            for weights, intercept in zip(
+                model.coefficients, model.intercepts, strict=True
+            )
+        ]
+        maximum = max(logits)
+        exponentials = [exp(value - maximum) for value in logits]
+        total = fsum(exponentials)
+        predictions.append(
+            dict(
+                zip(
+                    model.classes,
+                    (value / total for value in exponentials),
+                    strict=True,
+                )
+            )
+        )
+    return tuple(predictions)
 
 
 def partition_sentiment_articles(
@@ -563,7 +583,7 @@ def fit_entity_sentiment(
         ValueError: Offsets, contradictory annotations or partition support are invalid.
     """
     import numpy as np
-    from sklearn.feature_extraction.text import TfidfVectorizer
+    from sklearn.feature_extraction.text import TfidfVectorizer  # type: ignore[import-untyped]
     from sklearn.linear_model import LogisticRegression
     from sklearn.metrics import (
         accuracy_score,

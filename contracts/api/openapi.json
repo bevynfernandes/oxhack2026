@@ -2037,7 +2037,7 @@
       },
       "DimensionModelView": {
         "additionalProperties": false,
-        "description": "A trained proxy's availability, company eligibility and optional index.\n\nAttributes:\n    group_id: The dimension represented by this independent proxy model.\n    model_status: Actual verified weights exist; this is not outcome validation.\n    architecture: The portable baseline or validation-recommended comparator.\n    target: Plain-language target, distinct from the three company forecasts.\n    model_sha256: Exact fitted artifact digest, without local storage paths.\n    eligibility: Whether this company's inputs support experimental inference.\n    score: Training-outcome percentile, never a company-success probability.\n    predicted_value: Model output in the explicitly named transformed units.\n    prediction_unit: Units of the raw proxy prediction.\n    metric_observation_ids: Exact source inputs consumed by this inference.\n    reason_codes: Missingness, applicability and experimental-quality reasons.\n    limitations: Training population and quality restrictions.\nRaises:\n    ValueError: An unavailable model carries a score or a prediction is partial.",
+        "description": "A trained proxy's availability, company eligibility and optional index.\n\nAttributes:\n    group_id: The dimension represented by this independent proxy model.\n    model_status: Actual verified weights exist; this is not outcome validation.\n    architecture: The portable baseline or validation-recommended comparator.\n    target: Plain-language target, distinct from the three company forecasts.\n    model_sha256: Exact fitted artifact digest, without local storage paths.\n    eligibility: Whether this company's inputs support experimental inference.\n    score: Descriptive proxy percentile or text valence, never success probability.\n    predicted_value: Model output in the explicitly named transformed units.\n    prediction_unit: Units of the raw proxy prediction.\n    metric_observation_ids: Exact source inputs consumed by this inference.\n    evidence_ids: Exact text excerpts used for sentiment inference.\n    sample_size: Number of distinct source titles classified, when applicable.\n    reason_codes: Missingness, applicability and experimental-quality reasons.\n    limitations: Training population and quality restrictions.\nRaises:\n    ValueError: An unavailable model carries a score or a prediction is partial.",
         "properties": {
           "architecture": {
             "title": "Architecture",
@@ -2052,6 +2052,21 @@
             ],
             "title": "Eligibility",
             "type": "string"
+          },
+          "evidence_ids": {
+            "anyOf": [
+              {
+                "items": {
+                  "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Ids"
           },
           "group_id": {
             "enum": [
@@ -2120,6 +2135,18 @@
             },
             "title": "Reason Codes",
             "type": "array"
+          },
+          "sample_size": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sample Size"
           },
           "score": {
             "anyOf": [

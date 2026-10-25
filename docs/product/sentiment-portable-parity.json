@@ -1,0 +1,6 @@
+{
+  "scope": "Portable inference parity; not predictive accuracy or domain-transfer validation",
+  "model_sha256": "368b7635377b18483abc047320af79474a0e60ad6309149bfe8c558db8e0a6d9",
+  "contexts": 7,
+  "max_absolute_probability_error": 1.1102230246251565e-16
+}

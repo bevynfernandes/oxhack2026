@@ -212,8 +212,7 @@ def test_live_metadata_includes_declared_historical_accessions() -> None:
     """An empty recent page still yields financial history from the required page."""
     name = "CIK0000001750-submissions-001.json"
     recent: dict[str, list[str]] = {
-        column: []
-        for column in ("accessionNumber", "filingDate", "reportDate", "form")
+        column: [] for column in ("accessionNumber", "filingDate", "reportDate", "form")
     }
     payload = {"cik": 1750, "filings": {"recent": recent, "files": [{"name": name}]}}
     historical = {

@@ -85,8 +85,12 @@ it("does not present proxy experiments as trained business outcome models", () =
       <ResearchWorkspace report={attached} />
     </MemoryRouter>,
   );
-  expect(screen.getAllByText("Outcome model untrained")).toHaveLength(5);
-  expect(screen.queryByText("SDK demand index: 34.8 / 100")).toBeNull();
+  expect(screen.getAllByText("Outcome model untrained")).toHaveLength(4);
+  expect(screen.getByText("SDK component trained")).toBeVisible();
+  expect(screen.getByText("SDK demand index 34.8 / 100")).toBeVisible();
+  expect(
+    screen.getByText(/not customer retention or business success/),
+  ).toBeVisible();
   expect(screen.getAllByText("Prediction unavailable")).toHaveLength(2);
   expect(screen.getByText("Combined score unavailable")).toBeVisible();
   expect(screen.getByText(/outcome models pending/)).toBeVisible();

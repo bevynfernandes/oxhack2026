@@ -14,11 +14,40 @@ This file records verified claims and remaining work. It is not a completion sig
 
 ## Claims currently supported
 
+- The previously fitted FinEntity TF-IDF/logistic sentiment model now consumes
+  exact company-name spans in retained, exact-domain HN story titles. Its original
+  weights are unchanged; portable inference agrees with scikit-learn to floating
+  point precision. A fresh ElevenLabs HN probe retrieved four titles and only one
+  explicitly named ElevenLabs; that title produced **48.3/100 text valence**.
+  The report shows the one-title sample, exact quotation, canonical story link,
+  formula, source/model provenance and transfer warning. This is unvalidated
+  transfer from financial news, not representative public opinion or a business
+  forecast. Original held-out negative recall was only 1/11; do not demonstrate
+  this component as accurate risk screening. Missing entity spans abstain.
+  The source-replay report (fresh HN, retained other-source checkpoints) is
+  `/research/v2/reports/d8e831f150f7448880c0a2c635bb7562`. Desktop/mobile checks
+  passed; tracked sentiment audits under `docs/product` record the exact scope.
+
+- ElevenLabs now follows its linked official SDK documentation before collecting
+  npm inputs. A fresh run on the normal `localhost:5173` / API `8000` setup passed
+  in 61 seconds and displayed **SDK component trained** with an experimental
+  **SDK-demand index of 31.3/100**. The fitted Ridge model consumed one package's
+  complete adjacent 30-day windows; multiple packages are evaluated separately,
+  selecting the largest eligible current SDK rather than adding their counts.
+  This forecasts technical demand, not customers, retention or startup success.
+  Provider 403/429 responses remain explicit, and the fresh report rendered with
+  no browser errors or mobile horizontal overflow. Local report:
+  `/research/v2/reports/f8a93102a81a4d5e8746921de3c84bce`.
+  See `docs/product/elevenlabs-sdk-browser-audit.json` and
+  `docs/product/elevenlabs-sdk-model-audit.json`. Earlier immutable reports keep
+  their earlier missing-input results; use **Refresh research** for a fresh run.
+
 - The backend retains source artifacts, hashes and attributable evidence.
 - Main includes Gemini-assisted source mapping with independent quote validation.
   A real Qdrant mapping audit was partial; provider failures do not justify invented
-  measurements or successful mapping claims. Deterministic mapping is now the
-  default; Gemini interpretation remains an explicit opt-in.
+  measurements or successful mapping claims. Gemini interpretation runs alongside
+  deterministic mapping by default; `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules`
+  disables model requests.
 - Existing local ML models were actually fitted, but their targets are narrow
   proxies. They do not establish startup success or survival prediction.
 - A separate business-event experiment fitted three regularized logistic models

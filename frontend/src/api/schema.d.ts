@@ -1537,10 +1537,12 @@ export interface components {
          *         target: Plain-language target, distinct from the three company forecasts.
          *         model_sha256: Exact fitted artifact digest, without local storage paths.
          *         eligibility: Whether this company's inputs support experimental inference.
-         *         score: Training-outcome percentile, never a company-success probability.
+         *         score: Descriptive proxy percentile or text valence, never success probability.
          *         predicted_value: Model output in the explicitly named transformed units.
          *         prediction_unit: Units of the raw proxy prediction.
          *         metric_observation_ids: Exact source inputs consumed by this inference.
+         *         evidence_ids: Exact text excerpts used for sentiment inference.
+         *         sample_size: Number of distinct source titles classified, when applicable.
          *         reason_codes: Missingness, applicability and experimental-quality reasons.
          *         limitations: Training population and quality restrictions.
          *     Raises:
@@ -1554,6 +1556,8 @@ export interface components {
              * @enum {string}
              */
             eligibility: "eligible" | "insufficient_data" | "not_applicable" | "unreliable";
+            /** Evidence Ids */
+            evidence_ids?: string[] | null;
             /**
              * Group Id
              * @enum {string}
@@ -1580,6 +1584,8 @@ export interface components {
             prediction_unit?: string | null;
             /** Reason Codes */
             reason_codes: string[];
+            /** Sample Size */
+            sample_size?: number | null;
             /** Score */
             score?: number | null;
             /** Target */

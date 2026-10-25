@@ -1,0 +1,57 @@
+{
+  "npm_state": "partial",
+  "npm_reasons": [
+    "npm_package_limit"
+  ],
+  "measurements": [
+    {
+      "id": "bdfe132ef0d543b4a598c81c092bce24",
+      "metric": "npm_downloads_previous_30d",
+      "value": 3814873.0,
+      "definition": "Daily npm downloads for @elevenlabs/client; package adoption proxy, not users."
+    },
+    {
+      "id": "a49b6a4d75ab41c8800b258facd00718",
+      "metric": "npm_downloads_latest_30d",
+      "value": 3797126.0,
+      "definition": "Daily npm downloads for @elevenlabs/client; package adoption proxy, not users."
+    },
+    {
+      "id": "aab792cf06cb4485a9007826d7c41f60",
+      "metric": "npm_downloads_previous_30d",
+      "value": 3350658.0,
+      "definition": "Daily npm downloads for @elevenlabs/elevenlabs-js; package adoption proxy, not users."
+    },
+    {
+      "id": "36f08d92762e44d0bc1fd7b126839803",
+      "metric": "npm_downloads_latest_30d",
+      "value": 3319249.0,
+      "definition": "Daily npm downloads for @elevenlabs/elevenlabs-js; package adoption proxy, not users."
+    }
+  ],
+  "adoption": {
+    "group_id": "adoption_retention",
+    "model_status": "experimental_trained",
+    "architecture": "Ridge regression",
+    "target": "SDK download growth over the next 30 days, not customer retention",
+    "model_sha256": "17136f1c4cf54e3a9e87bc9d1250047c4ddfe6c87a558ce12e0a07565f62c9a0",
+    "eligibility": "eligible",
+    "score": 31.29032258064516,
+    "predicted_value": -0.00832341290114788,
+    "prediction_unit": "log download growth",
+    "metric_observation_ids": [
+      "a49b6a4d75ab41c8800b258facd00718",
+      "bdfe132ef0d543b4a598c81c092bce24"
+    ],
+    "reason_codes": [
+      "experimental_sdk_proxy_only"
+    ],
+    "limitations": [
+      "Current commercial SDK cohort has survivor and developer-tool selection bias.",
+      "Reconstructed current API captures do not prove historical availability.",
+      "SDK activity is not paying-customer retention, revenue or company survival.",
+      "Public SDK projects; historical legal ownership families are unverified.",
+      "Experimental reconstructed benchmark; not a validated company-success forecast."
+    ]
+  }
+}

@@ -122,9 +122,48 @@ class Collector:
         capture, content = render(self.fetcher, capture.final_url)
         return parse_page(capture, content)
 
+    def _sdk_documentation(self) -> None:
+        domain = self.identity.canonical_domain
+        links = set(self.identity.official_links)
+        visited: set[str] = set()
+        for _ in range(2):
+            pages = sorted(
+                (
+                    link
+                    for link in links - visited
+                    if (urlsplit(link).hostname or "") in {domain, f"docs.{domain}"}
+                    and re.search(r"/docs?/|/developers?/", urlsplit(link).path)
+                    and re.search(
+                        r"librar|sdk|quickstart|getting-started", urlsplit(link).path
+                    )
+                ),
+                key=lambda link: (
+                    not re.search(r"librar|sdk", urlsplit(link).path),
+                    len(link),
+                    link,
+                ),
+            )
+            if not pages:
+                break
+            link = pages[0]
+            visited.add(link)
+            try:
+                capture, content = self.fetcher.fetch(link)
+                if urlsplit(capture.final_url).hostname != urlsplit(link).hostname:
+                    self.reasons.append("sdk_documentation_unconfirmed_redirect")
+                    continue
+                page = self._website_page(capture, content)
+                self.support.extend(page.evidence[:1])
+                links.update(page.links)
+                self.links.update(page.links)
+            except CollectionError as error:
+                logger.error("SDK documentation unavailable: %s", str(error))  # noqa: TRY400
+                self.reasons.append(f"sdk_documentation_{error}")
+
     def website(self) -> None:
         """Crawl twenty relevant company pages at depth two plus linked
         feeds/sitemap."""
+        self._sdk_documentation()
         domain = self.identity.canonical_domain
         queue = deque([(f"https://{domain}/", 0), (f"https://{domain}/sitemap.xml", 1)])
         seen: set[str] = set()
@@ -180,6 +219,12 @@ class Collector:
     def github(self) -> None:
         """Read metadata and stable releases only for repositories linked by
         official pages."""
+        organizations = {
+            urlsplit(link).path.strip("/").casefold()
+            for link in self.identity.official_links
+            if urlsplit(link).hostname == "github.com"
+            and re.fullmatch(r"/[A-Za-z0-9_.-]+/?", urlsplit(link).path)
+        }
         repositories = sorted(
             {
                 "/".join(urlsplit(link).path.strip("/").split("/")[:2])
@@ -187,6 +232,11 @@ class Collector:
                 if urlsplit(link).hostname == "github.com"
                 and re.fullmatch(
                     r"/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?", urlsplit(link).path
+                )
+                and (
+                    not organizations
+                    or urlsplit(link).path.strip("/").split("/")[0].casefold()
+                    in organizations
                 )
             }
         )
@@ -328,6 +378,15 @@ class Collector:
         if len(packages) > 2:
             self.reasons.append("npm_package_limit")
 
+    def _hn_title_evidence(
+        self, title: str, index: int, fallback: ResearchEvidence
+    ) -> ResearchEvidence:
+        if not title:
+            return fallback
+        item = evidence(self.fetcher.captures[-1], title, f"json:$.hits[{index}].title")
+        self.support.append(item)
+        return item
+
     def hn(self) -> None:
         """Retain paginated exact-domain records separately from an exhaustive-
         window count."""
@@ -358,7 +417,7 @@ class Collector:
             if not isinstance(data, dict) or not isinstance(data.get("hits"), list):
                 raise CollectionError("invalid_hn_response")
             exhaustive = exhaustive and data.get("exhaustiveNbHits") is True
-            for hit in data["hits"]:
+            for hit_index, hit in enumerate(data["hits"]):
                 if not isinstance(hit, dict):
                     continue
                 link = str(hit.get("url") or "")
@@ -374,13 +433,17 @@ class Collector:
                     or not int(start.timestamp()) <= published < int(end.timestamp())
                 ):
                     continue
+                title = str(hit.get("title") or "")
+                title_evidence = self._hn_title_evidence(title, hit_index, item)
                 records[identifier] = Event(
                     event_id=f"hn-{identifier}",
                     kind="hn_exact_domain_story",
-                    title=str(hit.get("title") or ""),
+                    title=title,
                     url=f"https://news.ycombinator.com/item?id={identifier}",
                     published_at=datetime.fromtimestamp(published, UTC).isoformat(),
-                    evidence_ids=(item.evidence_id,),
+                    evidence_ids=tuple(
+                        dict.fromkeys((item.evidence_id, title_evidence.evidence_id))
+                    ),
                 )
             pages = data.get("nbPages")
             if isinstance(pages, int) and page + 1 >= pages:

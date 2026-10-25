@@ -331,6 +331,18 @@ class Report(DTO):
                 message = "Cash-flow research requires retained SEC source evidence"
                 raise ValueError(message)
 
+    def _dimension_references(self, evidence: set[str]) -> None:
+        if self.dimension_models is None:
+            return
+        observations = {item.observation_id for item in self.observations}
+        for dimension in self.dimension_models.dimensions:
+            if (
+                not set(dimension.evidence_ids or ()) <= evidence
+                or not set(dimension.metric_observation_ids) <= observations
+            ):
+                message = "Dimension inference references absent inputs"
+                raise ValueError(message)
+
     @model_validator(mode="after")
     def _references(self) -> Self:
         captures = {item.capture_id for item in self.captures}
@@ -351,6 +363,7 @@ class Report(DTO):
                 message = "Result references absent evidence"
                 raise ValueError(message)
         self._cash_flow_references(evidence)
+        self._dimension_references(evidence)
         if len({item.observation_id for item in self.observations}) != len(
             self.observations
         ):
