@@ -423,3 +423,113 @@
   align-items: center;
   min-height: 44px;
 }
+
+.comparison-heading {
+  padding: 8px 0 0;
+  margin-block: 12px;
+}
+.comparison-heading p {
+  margin-block: 8px;
+}
+.comparison-context-note {
+  padding: 10px 14px;
+  font-size: 12px;
+}
+.comparison-heading h1 {
+  margin-block: 8px 12px;
+}
+.comparison-count {
+  font: 11px/1.6 var(--theme-mono, monospace);
+}
+.complete-comparison {
+  max-height: 78vh;
+  border-radius: 16px;
+  border: 1px solid var(--theme-control-line, #cbd5e1);
+  background: var(--theme-surface, white);
+}
+.complete-comparison table {
+  margin: 0;
+  width: 100%;
+  table-layout: fixed;
+}
+.complete-comparison caption {
+  padding: 16px 20px;
+  text-align: left;
+  font-size: 12px;
+}
+.complete-comparison th,
+.complete-comparison td {
+  padding: 20px 24px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--theme-line, #cbd5e1);
+  overflow-wrap: anywhere;
+}
+.complete-comparison th[scope="row"] {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  width: 25%;
+  font-size: 13px;
+  background: var(--theme-surface, white);
+}
+.complete-comparison thead th {
+  z-index: 2;
+  padding-block: 22px;
+  font: 500 24px/1.2 var(--theme-display, sans-serif);
+  border-bottom: 2px solid var(--theme-control-line, #cbd5e1);
+}
+.complete-comparison thead th:first-child {
+  left: 0;
+  z-index: 3;
+  font: 11px var(--theme-mono, monospace);
+}
+.complete-comparison td p {
+  font-size: 12px;
+  line-height: 1.7;
+}
+.complete-comparison small {
+  display: block;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--theme-muted, #586b82);
+  margin: 6px 0;
+}
+.complete-comparison .comparison-group th {
+  background: var(--theme-selected, #f1f5f9);
+  font: 600 12px/1.5 var(--theme-mono, monospace);
+  text-align: left;
+  padding-block: 14px;
+}
+.complete-comparison .comparison-group small {
+  font-weight: 400;
+}
+.comparison-score {
+  font: 500 42px/1.2 var(--theme-display, sans-serif);
+  color: var(--theme-accent, #1f6b50);
+}
+.comparison-score > span {
+  font: 11px var(--theme-mono, monospace);
+}
+.comparison-value {
+  display: block;
+  font: 600 22px/1.3 var(--theme-display, sans-serif);
+  margin-bottom: 10px;
+}
+.comparison-measurements {
+  border-top: 1px solid var(--theme-line, #cbd5e1);
+  margin-top: 24px;
+  padding-top: 12px;
+}
+.comparison-measurements dl > div {
+  padding-block: 12px;
+  border-bottom: 1px solid var(--theme-line, #cbd5e1);
+}
+@media (max-width: 700px) {
+  .complete-comparison th,
+  .complete-comparison td {
+    padding: 14px;
+  }
+  .complete-comparison th[scope="row"] {
+    width: 180px;
+  }
+}

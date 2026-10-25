@@ -136,9 +136,8 @@ export default function ResearchComparison() {
                   {row.gaps.join(", ") ||
                     "Inspect source-specific limitations."}
                 </p>
-                <MotionDisclosure
-                  summary={<>Measurements ({row.measurements.length})</>}
-                >
+                <section className="comparison-measurements">
+                  <h3>Measurements ({row.measurements.length})</h3>
                   <dl>
                     {row.measurements.map((metric) => (
                       <div key={metric.id}>
@@ -153,7 +152,7 @@ export default function ResearchComparison() {
                       </div>
                     ))}
                   </dl>
-                </MotionDisclosure>
+                </section>
                 <MotionDisclosure summary={<>Report limitations</>}>
                   <ul>
                     {row.limitations.map((limit, i) => (
