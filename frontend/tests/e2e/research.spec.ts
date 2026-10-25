@@ -466,7 +466,7 @@ test("directory research previews v2 with exact saved context before confirmatio
   expect(jobPosts).toEqual([]);
 });
 
-test("standalone discovery confirms redirected identity, retains partial results and explicitly refreshes", async ({
+test("homepage domain discovery bypasses unavailable name lookup, confirms redirected identity, retains partial results and explicitly refreshes", async ({
   page,
 }) => {
   let discoveries = 0,
@@ -516,10 +516,23 @@ test("standalone discovery confirms redirected identity, retains partial results
   await page.route("**/api/v2/research-reports/*", (route) =>
     route.fulfill({ json: standaloneReport }),
   );
-  await page.goto("/research/new");
-  await page.getByLabel("Company domain").fill("old.example");
-  await page.getByRole("button", { name: "Preview company" }).click();
-  await expect(page.getByRole("status")).toHaveText("Identity preview ready");
+  let nameLookups = 0;
+  await page.route("**/api/v2/company-search", (route) => {
+    nameLookups++;
+    return route.fulfill({ status: 404, json: {} });
+  });
+  await page.goto("/");
+  await page.getByLabel("Search companies").fill("old.example");
+  await expect(
+    page.getByRole("link", { name: /Open dossier for/ }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Research company", exact: true })
+    .click();
+  await expect(page).toHaveURL(/\/research\/identities\/identity-example$/);
+  await expect(
+    page.getByRole("status").filter({ hasText: "Identity preview ready" }),
+  ).toHaveText("Identity preview ready");
   await expect(page.getByText("new.example", { exact: true })).toBeVisible();
   const confirm = page.getByRole("button", {
     name: "Confirm and start research",
@@ -576,6 +589,7 @@ test("standalone discovery confirms redirected identity, retains partial results
   await expect(page).toHaveURL(/refreshed-job/);
   expect(starts).toBe(2);
   expect(discoveries).toBe(1);
+  expect(nameLookups).toBe(0);
 });
 
 test("standalone queue errors never retry POST and disabled collection stays readable", async ({

@@ -15,6 +15,9 @@ test("company homepage searches and opens a saved analysis with keyboard", async
     name: "Open dossier for Synthetic alpha",
   });
   await expect(analysis).toBeVisible();
+  await expect(analysis).toHaveCSS("display", /^(inline-)?flex$/);
+  await expect(analysis).toHaveCSS("align-items", "center");
+  await expect(analysis).toHaveCSS("justify-content", "center");
   await expect(
     page.getByRole("link", { name: "Open dossier for Synthetic beta" }),
   ).toHaveCount(0);
@@ -45,6 +48,22 @@ test("company homepage searches and opens a saved analysis with keyboard", async
   await expect(
     page.getByRole("heading", { name: "Overall outlook unavailable" }),
   ).toBeVisible();
+});
+
+test("unavailable name lookup explains how to research a website without a saved-link error", async ({
+  page,
+}) => {
+  await page.route("**/api/v2/company-search", (route) =>
+    route.fulfill({ status: 404, json: {} }),
+  );
+  await page.goto("/");
+  await page.getByLabel("Search companies").fill("Posthog");
+  await page
+    .getByRole("button", { name: "Research company", exact: true })
+    .click();
+  await expect(page.getByRole("alert")).toHaveText(
+    "Company-name lookup is unavailable. Enter the company’s exact website domain to research it directly.",
+  );
 });
 
 test("homepage honestly handles empty and failed publication lists", async ({

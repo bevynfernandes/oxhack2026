@@ -130,8 +130,14 @@ export default function CompanyHomePage() {
               className="terminal-search company-research-form"
               onSubmit={(event) => {
                 event.preventDefault();
-                if (search.trim().length >= 2 && !searching)
-                  lookup.mutate(search.trim());
+                const query = search.trim();
+                if (query.length < 2 || searching) return;
+                const host = companyDomain(
+                  query.includes("://") ? query : `https://${query}`,
+                );
+                // Exact websites use standalone discovery, independent of saved publications.
+                if (host?.includes(".")) preview.mutate(query);
+                else lookup.mutate(query);
               }}
             >
               <label htmlFor="company-domain-search">Search companies</label>
@@ -251,8 +257,9 @@ export default function CompanyHomePage() {
                 </p>
                 {rows.length === 0 && (
                   <p>
-                    No companies match your search. Try another company name or
-                    exact website domain.
+                    No companies match your search in saved research. Enter the
+                    company’s website and select Research company to research it
+                    for the first time.
                   </p>
                 )}
                 <ul className="company-results">

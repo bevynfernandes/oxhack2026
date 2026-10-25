@@ -679,6 +679,12 @@
 .theme-techno-classical button.motion-disclosure-trigger {
   font-family: inherit;
 }
+.theme-techno-classical .button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
 .theme-techno-classical .app-shell > main {
   min-width: 0;
   padding: 28px clamp(16px, 4vw, 64px);

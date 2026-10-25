@@ -16,9 +16,10 @@
   their own scroll containers and preserve source ordering.
 - Motion: retain the existing Material 3 Expressive library without changes.
   No additional animation engine, entrance effects or animated evidence.
-- Behaviour: preserve every handler, API call, confirmation, route, disclosure
-  and native dialog. Colours cannot imply an invented score or confidence level.
-- Scope: frontend presentation, visual regression coverage and this document.
+- Behaviour: preserve confirmation, routes, disclosures and native dialogs.
+  Explicit website inputs use existing identity discovery directly; company names
+  use candidate lookup. Colours cannot imply an invented score or confidence level.
+- Scope: frontend presentation, domain-entry wiring, regression coverage and this document.
   No backend, schema, generated types or dependency changes.
 
 ## Design guidance
@@ -76,7 +77,12 @@
 - `frontend/src/theme/theme.css`: shared palette, typography, panel geometry,
   search/result layout, touch targets and responsive presentation.
 - `frontend/src/pages/companies/CompanyHomePage.tsx`: form styling hook,
-  confirmation help text and the saved-research heading; handlers unchanged.
+  confirmation help text, saved-research heading and direct domain discovery.
+- `frontend/src/pages/research/client.ts`: actionable name-lookup 404 message.
+- `frontend/tests/unit/company-search.test.tsx`: direct domain/URL previews
+  bypass name lookup while ambiguous names still require selection.
+- `frontend/tests/e2e/research.spec.ts`: homepage-to-report flow without a
+  name-search endpoint or saved company; retain confirmation and refresh checks.
 - `frontend/tests/unit/theme.test.ts`: check the new explicit action-text token
   against both primary action backgrounds using the existing AA threshold.
 - `frontend/tests/e2e/company-home.spec.ts`: desktop viewport fit, removed footer,
@@ -106,7 +112,7 @@
 - Generated API types, TypeScript, production build and frontend formatting pass.
 - Real local-backend smoke: Qdrant opens, Adoption & Retention opens and closes
   with Escape, no page errors and no horizontal document overflow on mobile.
-- No changes to backend, contracts, API client, dependencies or motion code
+- No changes to backend, contracts, shared API client, dependencies or motion code
   relative to PR #86. No live research/collection job was started for visual QA.
 - Baseline captures: `tests/outputs/ui-polish-before/` (integrated main at
   `64fa8d6`, before applying the refinement).
@@ -140,3 +146,21 @@
   production build and formatting passed. Desktop fit verified at 1280×720,
   1366×768, 1440×900 and 1920×1080. Logs: `tests/outputs/ui-home-fit/`;
   final captures: `tests/outputs/ui-home-fit-final2/`.
+
+## Direct domain research and centred actions
+
+- Centre button-style link labels vertically and horizontally with flex layout.
+- Submit explicit domains/URLs directly to the existing v2 identity discovery
+  endpoint. Saved research remains an independent filter; it never gates discovery.
+- Company names retain candidate lookup. If that endpoint is missing, ask for the
+  exact website instead of incorrectly reporting a missing saved job/report.
+- Preserve identity confirmation, one-shot submissions, polling, report navigation
+  and the existing backend. No backend, contracts or generated types changed.
+- Live port-5174 check: `posthog.com` returned HTTP 202 from identity discovery,
+  navigated to confirmation and loaded the identity with HTTP 200. No name-search
+  request or browser error occurred. Full collection was not submitted.
+- Final validation: 73 unit tests and all 57 browser tests passed, including the
+  homepage-to-report path, button alignment, desktop fit, keyboard interaction,
+  reduced motion and accessibility audits. Generated types, TypeScript, build and
+  formatting passed. Logs: `tests/outputs/ui-home-fit/domain-*.log`; final browser
+  artifacts: `tests/outputs/ui-domain-final/`. Production chunk warning unchanged.
