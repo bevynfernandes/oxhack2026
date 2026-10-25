@@ -82,7 +82,7 @@ def render(fetcher: Fetcher, url: str) -> tuple[Capture, bytes]:
                 content = page.content().encode()
                 if (
                     len(content) > 4194304
-                    or fetcher.byte_count + len(content) > 33554432
+                    or fetcher.byte_count + len(content) > fetcher.max_bytes
                 ):
                     raise CollectionError("browser_capture_size_limit")
                 if failures:
@@ -90,6 +90,8 @@ def render(fetcher: Fetcher, url: str) -> tuple[Capture, bytes]:
                 from datetime import UTC, datetime
                 from uuid import uuid4
 
+                if fetcher.shared_budget:
+                    fetcher.shared_budget.capture(len(content))
                 fetcher.byte_count += len(content)
                 capture = Capture(
                     capture_id=uuid4().hex,

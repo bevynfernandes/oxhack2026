@@ -226,3 +226,18 @@ job or report. A job without a usable checkpoint requires Refresh instead.
 `POST /api/v2/research-mapping-jobs` accepts `cache_policy: reuse | bypass`;
 reuse is the default. Later collector and interpreter changes consume these
 contracts; older stored values omit the optional checkpoint/configuration fields.
+
+### Source collection coverage
+
+The website frontier records visited and outstanding URLs, samples page families,
+and follows official documentation/careers links. Linked GitHub organisations can
+supply public repositories; package manifests require reciprocal npm repository
+metadata. Hiring follows embedded public boards and deduplicates posting IDs.
+HN subdivides non-exhaustive time windows within its profile and stores unfinished
+pagination for continuation. News distinguishes matched articles and unverified
+candidates instead of marking every response partial. Public text PDFs are bounded
+to forty pages; scanned/encrypted documents remain explicit unsupported sources.
+
+Independent provider workers share atomic request/byte budgets and process-wide
+quotas. Collector execution and coverage are separate in `SourceState.details`;
+validation metadata is informational, while incomplete coverage remains visible.

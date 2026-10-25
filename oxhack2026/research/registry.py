@@ -22,6 +22,7 @@ from oxhack2026.features.sec_financials import (
     sec_annual_financials,
 )
 from oxhack2026.models.financial_inference import estimate_annual_cash_flow
+from oxhack2026.research.extraction import evidence
 from oxhack2026.research.network import CollectionError
 from oxhack2026.research.sec_identity import (
     sec_filing_candidates,
@@ -355,14 +356,49 @@ def _discover_sec_mapping(
     return verified[0]
 
 
-def collect_registry(collector: "Collector") -> None:
-    """Fetch facts for reviewed or reciprocally verified SEC issuer mappings.
+def _discover_company_number(
+    collector: "Collector",
+) -> tuple[RegistryMapping, ResearchEvidence]:
+    if not os.environ.get("COMPANIES_HOUSE_API_KEY"):
+        raise CollectionError("missing_companies_house_credentials")
+    links = [
+        url
+        for url in collector.identity.official_links
+        if re.search(r"legal|terms|privacy|imprint", urlsplit(url).path)
+        and (urlsplit(url).hostname or "").removeprefix("www.")
+        == collector.identity.canonical_domain
+    ]
+    candidates: dict[str, tuple[RegistryMapping, ResearchEvidence]] = {}
+    from bs4 import BeautifulSoup
 
-    Raises:
-        CollectionError: Missing mapping, credentials, public verification or payload.
-        OSError: Mapping configuration cannot be read.
-        ValueError: Mapping configuration is invalid.
-    """
+    for url in sorted(links, key=lambda link: (len(link), link))[:3]:
+        capture, content = collector.fetcher.fetch(url)
+        text = BeautifulSoup(content, "lxml").get_text(" ", strip=True)
+        for match in re.finditer(
+            r"(?:company|registration|registered)\s+(?:number|no\.?|#)\s*[:.]?\s*([A-Z]{2}\d{6}|\d{8})\b",
+            text,
+            re.I,
+        ):
+            number = match.group(1).upper()
+            quote = text[max(0, match.start() - 100) : match.end() + 100]
+            item = evidence(capture, quote, "legal:company_number")
+            mapping = RegistryMapping(
+                domain=collector.identity.canonical_domain,
+                jurisdiction="UK",
+                evidence_url=url,
+                reviewed=False,
+                evidence_quote=quote,
+                company_number=number,
+            )
+            candidates[number] = (mapping, item)
+    if len(candidates) != 1:
+        raise CollectionError("unverified_or_ambiguous_registry_mapping")
+    return next(iter(candidates.values()))
+
+
+def _registry_selection(
+    collector: "Collector",
+) -> tuple[RegistryMapping, ResearchEvidence]:
     selection = registry_mapping_path()
     with open(selection, "rb") as stream:
         content = stream.read(65537)
@@ -380,11 +416,26 @@ def collect_registry(collector: "Collector") -> None:
     ]
     if not matches and provider == "sec":
         mapping, item = _discover_sec_mapping(collector)
+    elif not matches and provider == "companies_house":
+        mapping, item = _discover_company_number(collector)
     elif len(matches) != 1:
         raise CollectionError("unverified_or_ambiguous_registry_mapping")
     else:
         mapping = matches[0]
         item = _mapping_support(collector, mapping)
+    return mapping, item
+
+
+def collect_registry(collector: "Collector") -> None:
+    """Fetch facts for reviewed or reciprocally verified SEC issuer mappings.
+
+    Raises:
+        CollectionError: Missing mapping, credentials, public verification or payload.
+        OSError: Mapping configuration cannot be read.
+        ValueError: Mapping configuration is invalid.
+    """
+    mapping, item = _registry_selection(collector)
+    provider = collector.source.provider
     collector.support.append(item)
     if provider == "sec":
         user_agent = os.environ.get("SEC_USER_AGENT", "")

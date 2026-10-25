@@ -57,7 +57,12 @@ def extract_document(capture: Capture, content: bytes) -> EvidenceDocument | Non
     Returns:
         Bounded normalized document with exact locations, or None for non-HTML.
     """
-    if any(kind in capture.content_type for kind in ("json", "pdf", "xml")):
+    if "pdf" in capture.content_type:
+        from oxhack2026.research.pdf import pdf_markup
+
+        content = pdf_markup(content)
+        capture = capture.model_copy(update={"content_type": "text/html"})
+    if any(kind in capture.content_type for kind in ("json", "xml")):
         return None
     if not content.lstrip().startswith(b"<"):
         return None

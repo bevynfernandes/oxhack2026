@@ -81,7 +81,7 @@ class AccountAssociation(DTO):
 
     kind: Literal["github_org", "github_repo", "npm", "hiring", "registry"]
     resource: str
-    evidence_ids: tuple[Identifier, ...]
+    evidence_ids: tuple[Identifier, ...] = Field(min_length=1)
     discovered_on: PublicURL
 
 

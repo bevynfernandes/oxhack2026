@@ -3,13 +3,14 @@
 import logging
 import re
 from dataclasses import dataclass
-from urllib.parse import urljoin, urlsplit
+from urllib.parse import urljoin
 from uuid import uuid4
 
 import orjson
 from bs4 import BeautifulSoup
 
 from oxhack2026.api.research_v2_schemas import Capture, Claim, Event, ResearchEvidence
+from oxhack2026.research.frontier import crawl_candidate
 from oxhack2026.research.network import CollectionError, public_url
 
 logger = logging.getLogger(__name__)
@@ -82,10 +83,24 @@ def _structured_names(soup: BeautifulSoup) -> list[str]:
 
 
 def _parse_markup(capture: Capture, content: bytes) -> BeautifulSoup:
+    if "pdf" in capture.content_type:
+        from oxhack2026.research.pdf import pdf_markup
+
+        content = pdf_markup(content)
     xml = "xml" in capture.content_type or content.lstrip().startswith(b"<?xml")
     if xml and b"<!DOCTYPE" in content.upper():
         raise CollectionError("xml_doctype_not_supported")
     return BeautifulSoup(content, "xml" if xml else "lxml")
+
+
+def _embedded_boards(content: bytes) -> dict[str, None]:
+    links: dict[str, None] = {}
+    for board_match in re.finditer(
+        r"https://(?:jobs\.ashbyhq\.com|jobs(?:\.eu)?\.lever\.co|(?:job-)?boards\.greenhouse\.io)/[A-Za-z0-9_-]+",
+        content.decode(errors="replace").replace(r"\/", "/"),
+    ):
+        links[board_match.group()] = None
+    return links
 
 
 def parse_page(capture: Capture, content: bytes) -> Page:
@@ -106,14 +121,17 @@ def parse_page(capture: Capture, content: bytes) -> Page:
     name = str(metadata.get("content", "")) if metadata else ""
     name = (name or (organizations[0] if organizations else "") or title)[:300]
     links: dict[str, None] = {}
-    for element in soup.select("a[href], link[href], loc, link"):
-        value = element.get("href") or element.get_text(strip=True)
+    for element in soup.select("a[href], link[href], iframe[src], loc, link"):
+        value = (
+            element.get("href") or element.get("src") or element.get_text(strip=True)
+        )
         if not isinstance(value, str) or not value:
             continue
         try:
             links[public_url(urljoin(capture.final_url, value))] = None
         except CollectionError:
             continue
+    links.update(_embedded_boards(content))
     for hidden in soup.select("script, style, noscript, template"):
         hidden.decompose()
     text = soup.get_text(" ", strip=True)
@@ -173,9 +191,4 @@ def parse_page(capture: Capture, content: bytes) -> Page:
 def company_links(links: tuple[str, ...], domain: str) -> tuple[str, ...]:
     """Select relevant same-domain crawl links; a subdomain alone is not a legal
     mapping."""
-    return tuple(
-        link
-        for link in links
-        if (urlsplit(link).hostname or "").removeprefix("www.") == domain
-        and _RELEVANT.search(urlsplit(link).path)
-    )
+    return tuple(link for link in links if crawl_candidate(link, domain))
