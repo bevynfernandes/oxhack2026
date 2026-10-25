@@ -427,6 +427,8 @@ class V2Service:
                                         "finished_at": datetime.now(UTC),
                                     }
                                 )
+                                if source.state in {"pending", "running"}
+                                else source
                                 for source in job.sources
                             ),
                         }
@@ -817,6 +819,8 @@ class V2Service:
                                 ),
                             }
                         )
+                        if source.state in {"pending", "running"}
+                        else source
                         for source in job.sources
                     ),
                 }

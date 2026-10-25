@@ -106,3 +106,77 @@ def test_invalid_profile() -> None:
     """Unsupported depth fails before any provider work."""
     with pytest.raises(ValidationError):
         ContinueRequest.model_validate({"profile": "unlimited"})
+
+
+@pytest.mark.parametrize("executor_failure", [False, True])
+def test_queued_continuation_failure_preserves_terminal_sources(
+    tmp_path: Path, executor_failure: bool
+) -> None:
+    """Disabled recovery and executor rejection preserve retained terminal sources."""
+    from oxhack2026.api.repository import RepositoryUnavailable
+    from oxhack2026.api.research_v2_schemas import PROVIDERS, Job, SourceState
+
+    store = V2Store(tmp_path)
+    now = datetime.now(UTC)
+    identity = Identity(
+        identity_id="identity",
+        request=DiscoveryRequest(domain="example.com"),
+        state="queued",
+        requested_at=now,
+        requested_domain="example.com",
+        canonical_domain="example.com",
+        company_name="Example",
+    )
+    store.save_identity(identity)
+    store.save_identity(identity.model_copy(update={"state": "ready"}))
+    states = (
+        "pending",
+        "completed",
+        "skipped",
+        "partial",
+        "failed",
+        "completed",
+        "skipped",
+        "completed",
+    )
+    previous = Job(
+        job_id="continuation",
+        identity_id=identity.identity_id,
+        requested_at=now,
+        derived_from_report_id="original",
+        sources=tuple(
+            SourceState.model_validate(
+                {
+                    "provider": provider,
+                    "name": provider,
+                    "state": state,
+                    "finished_at": now if state != "pending" else None,
+                    "reason_codes": ("retained_reason",) if state != "pending" else (),
+                }
+            )
+            for provider, state in zip(PROVIDERS, states, strict=True)
+        ),
+    )
+    executor = Mock(spec=Executor)
+    expected = previous.sources
+    if executor_failure:
+        executor.submit.side_effect = RuntimeError("executor closed")
+        service = V2Service(store, executor)
+        expected = service._resume_sources(previous)
+        with pytest.raises(RepositoryUnavailable):
+            service.create(
+                JobRequest(identity_id="identity", identity_confirmed=True), previous
+            )
+        result = store.jobs()[0]
+    else:
+        store.save_job(previous)
+        V2Service(store, executor, collection_enabled=False).recover()
+        result = store.job(previous.job_id)
+        executor.submit.assert_not_called()
+    assert result.state == "failed"
+    assert result.sources[0].state == "failed"
+    for source, retained in zip(result.sources, expected, strict=True):
+        if retained.state in {"pending", "running"}:
+            assert source.state == "failed"
+        else:
+            assert source == retained
