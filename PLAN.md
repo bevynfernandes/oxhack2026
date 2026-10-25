@@ -1,18 +1,38 @@
 # SignalShift: startup outlook
 
-Approved UI alignment (2026-10-24): **Startup Outlook → Growth (24 months),
-Survival (24 months), Financial Health (12 months) → five fundamental driver
-groups → sources and limitations**. See the
+Team integration decision (2026-10-25, [#79 clarification](https://github.com/bevynfernandes/oxhack2026/pull/79#issuecomment-6391306205)):
+**Startup Outlook → Growth (24 months), Survival (24 months), Overall outlook
+→ five fundamental driver groups → sources and limitations**. Financial Health
+remains a fundamental driver; do not duplicate it as a top-level summary card.
+Overall remains unavailable without all five required dimension scores and a
+reviewed aggregation/release policy; it is not an arbitrary average or a success
+probability. See the
 [current decision and API boundary](docs/tasks/dev2/prediction-workspace-alignment.md)
 and [canonical design reference](design/prediction-workspace/README.md).
 Ivan retains the frontend assignment. This supersedes the older page hierarchy
-below; saved v1 outcomes keep their exact meanings. Numerical predictions remain
-unavailable pending label/data review and validated local models.
+below; saved v1 outcomes keep their exact meanings. This presentation decision
+does not remove or reinterpret the existing `financial_health` API forecast field.
+Startup growth/survival probabilities and complete business scores remain gated
+on reviewed labels, validation and population applicability.
+
+The integration default is deterministic evidence mapping (`rules`); Gemini is
+opt-in through `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini`. The Live fixes in
+#81 support that explicit mode and do not require it to be the default. These
+presentation/default changes are delivered by draft #79; until it merges, main
+retains its existing runtime defaults and summary presentation.
+
+Dev 2's public-issuer financial experiments are separate research components.
+Any exposed experimental cash-flow estimate must identify its fiscal-year target,
+observed-follow-up condition, source filings, model provenance and transfer limits.
+It is not a calibrated startup-success forecast, a full Financial Health score,
+or the Overall outlook. Research artifacts and focused test results do not by
+themselves clear the production forecast gate.
 
 Latest direction: [startup prediction plan #46](https://github.com/bevynfernandes/oxhack2026/issues/46)
 and its [data-readiness and delivery plan](docs/tasks/dev2/startup-prediction-reset.md)
 update the scope below to Software/SaaS, single-company research and local backend
-models. Training waits for verified historical inputs and labels. Ivan retains
+models. Training requires verified historical inputs and labels; experimental
+components do not authorize unrelated outcome predictions. Ivan retains
 the UI assignment; Bevyn owns the delegated data/backend audit.
 
 ## 1. Product decision

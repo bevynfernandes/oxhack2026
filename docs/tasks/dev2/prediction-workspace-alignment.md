@@ -1,18 +1,23 @@
 # Prediction workspace: agreed UI and backend boundary
 
-Decision: 2026-10-24, after comparing both supplied Stitch HTML exports,
-screenshots and DESIGN.md with the merged backend. The user approved the
-structure and horizons below. The user subsequently requested a direct UI rebuild
-from the original Stitch export, with no overview scrolling.
-Training remains on hold; no validated numerical prediction is available.
+Updated integration decision: 2026-10-25, following
+[Dev 2's clarification on #79](https://github.com/bevynfernandes/oxhack2026/pull/79#issuecomment-6391306205).
+The summary now uses Growth, Survival and Overall; Financial Health remains in
+the five drivers. This supersedes the duplicate Financial Health summary from
+the 2026-10-24 Stitch alignment. Draft #79 carries the presentation/default
+implementation; this document records the agreed integration target.
+No validated startup growth/survival prediction or complete business score is
+established by the separate public-issuer research experiments.
 
 ## Page hierarchy
 
 1. **Startup Outlook**: company identity, report cutoff, overall outlook and
    concise supported drivers/risks. Null outlook is visibly unavailable.
-2. **Three future outcomes**: Growth, 24 calendar months; Survival, 24 calendar
-   months; Financial Health, 12 calendar months. These explain what the product
-   aims to predict. Missing predictions are not zero or an implied bad outlook.
+2. **Summary cards**: Growth, 24 calendar months; Survival, 24 calendar months;
+   Overall outlook. Overall is a separate combined view, without an invented
+   horizon or success-probability interpretation. It requires all five dimension
+   scores and a reviewed aggregation/release policy. Missing predictions are not
+   zero or an implied bad outlook.
 3. **Five fundamental drivers**, in shared backend order:
    Adoption & Retention, Attention & Sentiment, Financial Health,
    Industry & Competition, Team & Execution. These organize evidence and future
@@ -27,7 +32,9 @@ v1 cash-flow or financing/acquisition outcomes as financial health or survival.
 
 ## Additive backend contract
 
-New `build_untrained_outlook` results include `outlook.forecasts` in this order:
+The existing `build_untrained_outlook` API includes `outlook.forecasts` in this
+order. The revised summary presentation does not remove, rename or reinterpret
+these fields or their saved values:
 
 | outcome_id | horizon_months | definition_status | model_status | prediction |
 | --- | --- | --- | --- | --- |
@@ -51,10 +58,24 @@ the original saved analysis; do not derive new lanes from the old outcomes.
 Starting fresh research remains an explicit confirmed action. The generated
 OpenAPI/TypeScript field is optional for this compatibility boundary.
 
-## Current frontend implementation
+## Mapping default and experimental components
+
+- The integration default is `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules`.
+  `rules_gemini` explicitly enables optional Gemini interpretation. The Live
+  timeout/attribution fixes in #81 remain applicable to that opt-in mode.
+- An experimental annual cash-flow estimate belongs within the Financial Health
+  dimension, with its fiscal-year target, observed-follow-up condition, retained
+  filing evidence, model identity and population/validation limitations visible.
+- Such a component is not the pending 12-calendar-month financial-health
+  forecast, operating survival, unrestricted runway or a complete Overall score.
+- Experimental model execution and software tests do not approve calibrated
+  startup-outcome serving. Existing immutable reports retain their original
+  outcome meanings and serialized fields.
+
+## Frontend structure
 
 `frontend/src/pages/research/CompanyDossier.tsx` and `frontend/src/workspace.css`
-implement the original Stitch dossier: compact header, company identity, four
+implement the shared dossier structure: compact header, company identity, four
 summary tiles, five parallel pillars and a bottom evidence ledger. The overview
 fits the viewport; source details scroll inside a right-hand drawer. Phones switch
 between pillars in place. Local fonts avoid third-party browser requests.
@@ -65,8 +86,9 @@ Unknown metrics remain unassigned. Old embedded profiles omit the optional
 projection when serialized, preserving immutable report bytes.
 
 The earlier `design/prediction-workspace/index.html` is archived and superseded
-for visual implementation. Keep the supplied Stitch layout and the approved
-prediction semantics; no investment grades or fabricated scores.
+for visual implementation. Preserve the shared dossier interactions and the
+versioned API semantics while following the updated summary hierarchy above;
+no investment grades or fabricated scores.
 
 ## Implementation acceptance
 
