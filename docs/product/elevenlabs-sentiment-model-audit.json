@@ -1,0 +1,49 @@
+{
+  "scope": "Fresh HN retrieval and model composition with retained other-source checkpoints, not a new full search run",
+  "source_state": "partial",
+  "source_reasons": [
+    "hn_non_exhaustive_or_truncated"
+  ],
+  "titles": [
+    "Has anyone tried this tool?",
+    "Eleven v4: Our most expressive text-to-speech AI model yet",
+    "Eleven v4",
+    "Eleven v4 by ElevenLabs"
+  ],
+  "model": {
+    "group_id": "attention_sentiment",
+    "model_status": "experimental_trained",
+    "architecture": "TF-IDF and logistic regression",
+    "target": "Sentiment toward the named company in retrieved story titles",
+    "model_sha256": "368b7635377b18483abc047320af79474a0e60ad6309149bfe8c558db8e0a6d9",
+    "eligibility": "eligible",
+    "score": 48.28537410168877,
+    "predicted_value": -0.034292517966224706,
+    "prediction_unit": "mean positive-minus-negative model probability",
+    "metric_observation_ids": [],
+    "evidence_ids": [
+      "0f201fd3e2bb4d878062c36a149c2f8c"
+    ],
+    "sample_size": 1,
+    "reason_codes": [
+      "experimental_financial_news_to_title_transfer"
+    ],
+    "limitations": [
+      "Human-labeled financial news, not HN comments or company health.",
+      "Entity strings are disjoint; ownership and aliases are not verified.",
+      "Mixed-partition articles are excluded; subset difficulty can differ.",
+      "Entity offsets and text are required; mention counts cannot give sentiment.",
+      "Financial-news model applied to retrieved HN titles; domain transfer is unvalidated.",
+      "Selected titles are not representative public sentiment or business performance.",
+      "Negative recall was 1/11; do not use for risk screening."
+    ]
+  },
+  "report_id": "d8e831f150f7448880c0a2c635bb7562",
+  "classified_titles": [
+    {
+      "excerpt": "Eleven v4 by ElevenLabs",
+      "url": "https://hn.algolia.com/api/v1/search_by_date",
+      "location": "json:$.hits[3].title"
+    }
+  ]
+}
