@@ -257,7 +257,7 @@ test("desktop homepage fits without footer clutter and keeps background motion v
   await expect(
     page
       .getByRole("navigation", { name: "Main navigation" })
-      .getByRole("link", { name: "Compare & explore" }),
+      .getByRole("link", { name: "Research library" }),
   ).toBeVisible();
   expect((await auditAccessibility(page)).violations).toEqual([]);
 });

@@ -13,7 +13,7 @@ const screens = [
     "Compare companies",
   ],
   ["report", `/research/reports/${report.report_id}`, "Synthetic alpha"],
-  ["methodology", "/methodology", "How to read a company outlook"],
+  ["about", "/about", "Startup research with its evidence attached"],
   [
     "legacy",
     `/batches/${scouting.forecast.batch_id}/tools/tool-1`,

@@ -430,7 +430,7 @@
   }
 }
 
-/* Directory, comparison, methodology and legacy research share the same palette. */
+/* Directory, comparison, About and legacy research share the same palette. */
 .theme-techno-classical
   :is(
     .home-directory,
@@ -529,7 +529,7 @@
     .batch-list li,
     th,
     td,
-    .methodology > section,
+    .about-page > section,
     .receipt,
     .workspace-forecast,
     .workspace-forecast + .workspace-forecast,
@@ -558,11 +558,7 @@
   border-color: var(--theme-accent);
 }
 .theme-techno-classical
-  :is(
-    .outcome-row strong,
-    .methodology-definitions dt,
-    .workspace-forecast .forecast-value
-  ) {
+  :is(.outcome-row strong, .workspace-forecast .forecast-value) {
   color: var(--theme-text);
 }
 .theme-techno-classical
@@ -858,7 +854,7 @@
   color: var(--theme-accent);
 }
 .theme-techno-classical
-  :is(.page-heading h1, .company-directory h1, .methodology h1) {
+  :is(.page-heading h1, .company-directory h1, .about-page h1) {
   font-size: clamp(38px, 4vw, 56px);
   font-weight: 600;
   line-height: 1.05;
@@ -1164,7 +1160,7 @@
   font-size: 12px;
   line-height: 1.6;
 }
-.theme-techno-classical .methodology :is(p, li) {
+.theme-techno-classical .about-page :is(p, li) {
   line-height: 1.8;
 }
 .theme-techno-classical button:disabled {
