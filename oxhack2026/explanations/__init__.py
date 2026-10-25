@@ -1,1 +1,1 @@
-"""Evidence explanation templates."""
+"""Evidence summaries and optional Gemini interpretation."""

@@ -7,9 +7,6 @@
   https://fonts.gstatic.com/s/barlowcondensed/v13/HTxwL3I-JCGChYJ8VI-L6OO_au7B4873z3bWuQ.woff2
   through https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600&display=swap.
   Served locally; no Google Fonts request occurs in the application.
-- `observatory.svg`: original geometric line drawing created for this project.
-  Architectural arch, construction grid and orbital circles; no copied artwork,
-  third-party branding or factual chart content. Decorative CSS background only.
 
 - `barlow-condensed-latin-200.woff2`: Barlow Condensed, extra light, Latin subset,
   Google Fonts v13, same SIL OFL licence as the semibold face. Retrieved 2026-10-24

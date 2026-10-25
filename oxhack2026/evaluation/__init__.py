@@ -1,1 +1,1 @@
-"""Temporal evaluation and scouting decision templates."""
+"""Temporal evaluation, outcome metrics and shortlist comparisons."""

@@ -83,21 +83,12 @@ no external services. CI installs all declared extras and runs shared checks.
 | `contracts`, `configs`, `data/catalog` | Versioned schemas and nonsecret recipes/identity evidence |
 | `artifacts`, `reports`, `tests/outputs` | Ignored generated data and retained validation artifacts |
 | `deploy`, `docs/tasks` | Runtime/operations and reviewed handoffs |
-| `migrations` | Reserved; no PostgreSQL migration acceptance yet |
 
 
-## Container template
+## API container
 
-`Dockerfile` builds a development shell image. Its default command is Bash;
-it does not start an API, worker, or database, expose ports, or provision cloud
-resources.
-
-```bash
-docker build -t signalshift-scaffold .
-docker run --rm -it signalshift-scaffold
-```
-
-The devcontainer adds Node 24 and installs local development dependencies.
+See the [local runtime runbook](deploy/local/README.md) for the API container
+recipe and its runtime configuration.
 
 ## Contributions
 

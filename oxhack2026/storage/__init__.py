@@ -1,1 +1,1 @@
-"""Normalized storage and immutable artifact templates."""
+"""Immutable artifacts, validated publications and local recovery."""

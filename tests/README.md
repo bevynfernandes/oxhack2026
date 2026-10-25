@@ -1,6 +1,6 @@
-# Test scaffold
+# Tests
 
-test_scaffold.py checks package namespace imports only. It does not validate
+`test_package_imports.py` checks package namespace imports only. It does not validate
 product functionality.
 
 - unit/: future isolated tests with external dependencies mocked.
