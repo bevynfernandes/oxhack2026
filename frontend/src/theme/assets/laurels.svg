@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 900" fill="none">
+  <defs>
+    <g id="cup" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 18h72v18c0 30-14 50-36 55-22-5-36-25-36-55V18Z"/>
+      <path d="M20 32H1c0 22 10 35 31 38M92 32h19c0 22-10 35-31 38M56 91v23m-23 10h46m-37-10h28"/>
+      <path d="m31 12 6-15 9 13L56-10 66 10l9-13 6 15"/>
+    </g>
+    <g id="medal" stroke-linecap="round" stroke-linejoin="round">
+      <path d="m18 0 17 52M67 0 50 52M19 0h15l14 34L62 0h15"/>
+      <circle cx="43" cy="72" r="33"/>
+      <circle cx="43" cy="72" r="24"/>
+      <path d="m43 52 6 13 14 2-10 10 3 14-13-7-13 7 3-14-10-10 14-2 6-13Z"/>
+    </g>
+    <g id="laurel" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 112C-6 87-11 42 14 10m62 102c30-25 35-70 10-102"/>
+      <path d="m17 93-19-9m15-5-21-3m19-12-20-9m22-6L-4 34m25 1L10 15m20 11-4-23m43 90 19-9m-15-5 21-3m-19-12 20-9m-22-6 17-15m-25 1 11-20M56 26l4-23"/>
+      <circle cx="45" cy="58" r="29"/>
+      <path d="m45 40 6 12 13 2-10 9 3 14-12-7-12 7 3-14-10-9 13-2 6-12Z"/>
+    </g>
+    <g id="rosette" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="35" cy="35" r="32"/>
+      <circle cx="35" cy="35" r="21"/>
+      <path d="m22 58-7 39 20-12 20 12-7-39M35 14v42M14 35h42"/>
+    </g>
+  </defs>
+  <g
+    stroke="#7a3600"
+    stroke-width="1.9"
+    opacity=".34"
+    transform="translate(144 90) scale(.8)"
+  >
+    <use href="#cup" transform="translate(-20 64) scale(1.45) rotate(-7 56 60)"/>
+    <use href="#medal" stroke="#ffffff" opacity=".95" transform="translate(265 42) scale(.72) rotate(9 43 72)"/>
+    <use href="#laurel" transform="translate(540 -38) scale(1.75) rotate(-4 45 58)"/>
+    <use href="#rosette" stroke="#ffffff" opacity=".95" transform="translate(925 70) scale(.55) rotate(14 35 35)"/>
+    <use href="#cup" transform="translate(1180 6) scale(2.15) rotate(5 56 60)"/>
+
+    <use href="#medal" transform="translate(140 325) scale(1.65) rotate(-11 43 72)"/>
+    <use href="#cup" stroke="#ffffff" opacity=".95" transform="translate(485 285) scale(.66) rotate(8 56 60)"/>
+    <use href="#rosette" transform="translate(730 300) scale(1.4) rotate(-8 35 35)"/>
+    <use href="#laurel" stroke="#ffffff" opacity=".95" transform="translate(1040 285) scale(.78) rotate(12 45 58)"/>
+    <use href="#medal" transform="translate(1330 325) scale(.92) rotate(-6 43 72)"/>
+
+    <use href="#rosette" stroke="#ffffff" opacity=".95" transform="translate(-12 675) scale(.8) rotate(-12 35 35)"/>
+    <use href="#laurel" transform="translate(315 655) scale(1.22) rotate(7 45 58)"/>
+    <use href="#cup" transform="translate(655 650) scale(1.85) rotate(-5 56 60)"/>
+    <use href="#medal" stroke="#ffffff" opacity=".95" transform="translate(990 680) scale(.6) rotate(13 43 72)"/>
+    <use href="#rosette" transform="translate(1240 635) scale(1.75) rotate(-9 35 35)"/>
+
+    <use href="#medal" stroke="#ffffff" opacity=".95" transform="translate(28 230) scale(.42) rotate(12 43 72)"/>
+    <use href="#cup" transform="translate(360 175) scale(.5) rotate(-10 56 60)"/>
+    <use href="#rosette" transform="translate(690 190) scale(.46) rotate(17 35 35)"/>
+    <use href="#laurel" stroke="#ffffff" opacity=".95" transform="translate(940 170) scale(.4) rotate(-13 45 58)"/>
+    <use href="#medal" transform="translate(1260 210) scale(.48) rotate(8 43 72)"/>
+    <use href="#laurel" transform="translate(75 520) scale(.52) rotate(11 45 58)"/>
+    <use href="#rosette" stroke="#ffffff" opacity=".95" transform="translate(530 515) scale(.38) rotate(-16 35 35)"/>
+    <use href="#cup" transform="translate(865 535) scale(.48) rotate(9 56 60)"/>
+    <use href="#medal" stroke="#ffffff" opacity=".95" transform="translate(1180 505) scale(.4) rotate(-12 43 72)"/>
+  </g>
+</svg>

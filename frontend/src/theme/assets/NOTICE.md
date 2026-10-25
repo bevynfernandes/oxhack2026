@@ -15,3 +15,10 @@
   meridians, orbital rings and pedestal, created for SignalShift. Decorative only;
   it does not represent data or use Hermes artwork.
 - `grain.svg`: original small, static SVG noise tile. No JavaScript or animation.
+- `laurels.svg`: original repeating line-art pattern of trophies, medals and
+  laurels created for SignalShift. Decorative only; it contains no copied
+  artwork, branding or factual content. Its orange and white treatment uses
+  SignalShift's HRT-inspired theme palette without reproducing HRT artwork.
+- `rocket-line-drawing.svg`: Rocket Line Drawing from SVG Repo, licensed CC0.
+  Retrieved 2026-10-25 from
+  https://www.svgrepo.com/svg/480695/rocket-line-drawing. Decorative only.

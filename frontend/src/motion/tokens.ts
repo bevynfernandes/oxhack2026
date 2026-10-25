@@ -29,4 +29,6 @@ export const motionGeometry = {
   pressedScale: 0.97,
   panelOffset: 24,
   pageOffset: 16,
+  surfaceLift: -3,
+  surfaceScale: 1.006,
 } as const;

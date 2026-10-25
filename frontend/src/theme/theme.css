@@ -16,23 +16,23 @@
 }
 
 :root.theme-techno-classical {
-  color-scheme: dark;
-  --theme-canvas: #0d0d24;
-  --theme-surface: #14142b;
-  --theme-raised: #202037;
-  --theme-text: #f2f0e9;
-  --theme-muted: #b5b5c5;
-  --theme-line: #414154;
-  --theme-control-line: #7e7e99;
-  --theme-accent: #aaaaff;
-  --theme-action: #0000f2;
-  --theme-action-hover: #3030ff;
-  --theme-selected: #29294c;
-  --theme-warning: #e8c58b;
-  --theme-warning-surface: #292316;
-  --theme-danger: #ffb0a7;
-  --theme-danger-surface: #321f25;
-  --theme-positive: #a7d1bf;
+  color-scheme: light;
+  --theme-canvas: #ffe2c7;
+  --theme-surface: #fffaf5;
+  --theme-raised: #f2f2f7;
+  --theme-text: #14141a;
+  --theme-muted: #6c5141;
+  --theme-line: #d6a67c;
+  --theme-control-line: #8a5a35;
+  --theme-accent: #7a3600;
+  --theme-action: #ff8200;
+  --theme-action-hover: #e87200;
+  --theme-selected: #ffd1a6;
+  --theme-warning: #7a4300;
+  --theme-warning-surface: #fff2df;
+  --theme-danger: #8f2525;
+  --theme-danger-surface: #fff0ed;
+  --theme-positive: #1f6b50;
   --theme-display: "Barlow Condensed", "Plus Jakarta Sans Variable", sans-serif;
   --theme-mono: "JetBrains Mono Variable", ui-monospace, monospace;
   --terminal-line: var(--theme-line);
@@ -45,9 +45,14 @@
 
 .theme-techno-classical .app-shell {
   background-color: var(--theme-canvas);
-  background-image: url("./assets/grain.svg");
-  background-size: 128px 128px;
-  border: 4px solid var(--theme-action);
+  background-image: url("./assets/grain.svg"), url("./assets/laurels.svg");
+  background-position:
+    0 0,
+    center top;
+  background-repeat: repeat, no-repeat;
+  background-size:
+    128px 128px,
+    cover;
   grid-template-rows: 76px minmax(0, 1fr) 30px;
   grid-template-columns: minmax(0, 1fr);
 }
@@ -81,7 +86,7 @@
   font-variant-numeric: tabular-nums;
 }
 .theme-techno-classical :is(.site-header, .app-shell > footer) {
-  background: var(--theme-canvas);
+  background: var(--theme-surface);
   border-color: var(--theme-line);
   box-shadow: none;
 }
@@ -142,7 +147,7 @@
 }
 .theme-techno-classical :is(input, select) {
   color: var(--theme-text);
-  background-color: var(--theme-canvas);
+  background-color: var(--theme-surface);
   border: 1px solid var(--theme-control-line);
   border-radius: 3px;
   accent-color: var(--theme-accent);
@@ -473,7 +478,7 @@
 }
 .theme-techno-classical :is(.terminal-search input, .home-search input) {
   color: var(--theme-text);
-  background-color: var(--theme-canvas);
+  background-color: var(--theme-surface);
   border-color: var(--theme-control-line);
   border-radius: 3px;
 }
@@ -653,41 +658,169 @@
 .theme-techno-classical .terminal-view > main {
   overflow: auto;
 }
+.theme-techno-classical .app-shell:has(.terminal-home) {
+  background-color: #eea05a;
+  background-image:
+    url("./assets/grain.svg"),
+    radial-gradient(circle at 16% 18%, #ffd8b5 0, transparent 38%),
+    radial-gradient(circle at 82% 72%, #ff7900 0, transparent 42%);
+  background-position:
+    0 0,
+    center,
+    center;
+  background-repeat: repeat, no-repeat, no-repeat;
+  background-size:
+    128px 128px,
+    cover,
+    cover;
+}
+.theme-techno-classical .app-shell:has(.terminal-home) {
+  grid-template-rows: 52px minmax(0, 1fr);
+}
+.theme-techno-classical .app-shell:has(.terminal-home) > .site-header {
+  padding-inline: clamp(18px, 3vw, 44px);
+  background: rgb(255 250 245 / 0.58);
+  border-color: rgb(122 54 0 / 0.34);
+  backdrop-filter: blur(16px) saturate(1.08);
+}
+.theme-techno-classical
+  .app-shell:has(.terminal-home)
+  > .site-header
+  .brand
+  strong {
+  font-size: 30px;
+}
+.theme-techno-classical .app-shell:has(.terminal-home) > .site-header nav a {
+  padding-block: 14px;
+}
+.theme-techno-classical .app-shell:has(.terminal-home) > main {
+  padding: 8px 10px;
+}
+.theme-techno-classical .app-shell:has(.terminal-home) > footer {
+  display: none;
+}
 .theme-techno-classical .terminal-home {
-  width: min(1200px, 100%);
+  position: relative;
+  width: min(1220px, calc(100% - 24px));
+  height: auto;
   max-height: none;
-  margin-block: 0;
+  margin-block: auto;
   flex-shrink: 0;
-  gap: 36px;
+  gap: 12px;
+}
+.theme-techno-classical .home-pattern-region {
+  position: absolute;
+  inset-block: -70px;
+  width: 50%;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.theme-techno-classical .home-pattern-region-left {
+  left: -40px;
+}
+.theme-techno-classical .home-pattern-region-right {
+  right: -40px;
+}
+.theme-techno-classical .home-pattern-layer {
+  position: absolute;
+  inset: 0 -70px;
+}
+.theme-techno-classical .home-pattern-layer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.theme-techno-classical .home-pattern-primary {
+  opacity: 0.68;
+}
+.theme-techno-classical .home-pattern-secondary {
+  opacity: 0.4;
+}
+.theme-techno-classical .home-pattern-secondary img {
+  transform: scale(1.14) rotate(11deg);
+}
+.theme-techno-classical .home-motion-surface {
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+}
+.theme-techno-classical .home-motion-hero {
+  flex: 0 0 190px;
+}
+.theme-techno-classical .home-motion-surface > :is(header, section, aside) {
+  height: 100%;
 }
 .theme-techno-classical .home-terminal-heading {
   position: relative;
   display: grid;
-  grid-template-columns: 1.05fr 1fr;
-  gap: 24px;
-  min-height: 330px;
-  padding-block: 12px 24px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(170px, 0.5fr);
+  gap: 18px;
+  min-height: 170px;
+  padding: 16px 20px;
+  overflow: hidden;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 31px,
+      rgb(139 68 9 / 0.08) 31px 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 63px,
+      rgb(255 255 255 / 0.18) 63px 64px
+    ),
+    rgb(255 226 199 / 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--theme-control-line);
+  border-radius: 12px;
+  box-shadow: 0 10px 26px #7a36002e;
 }
-.theme-techno-classical .home-terminal-heading::after {
-  content: "";
+.theme-techno-classical .home-space-scene {
   grid-column: 2;
   grid-row: 1 / 3;
+  position: relative;
   align-self: stretch;
-  background: url("./assets/armillary.svg") no-repeat center / contain;
+  display: grid;
+  place-items: center;
   pointer-events: none;
 }
+.theme-techno-classical .home-orbit {
+  display: grid;
+  place-items: center;
+}
+.theme-techno-classical .home-orbit img {
+  width: 150px;
+  height: 150px;
+}
+.theme-techno-classical .home-rocket {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px;
+  opacity: 0.76;
+  filter: sepia(1) saturate(2.2) hue-rotate(348deg) brightness(0.72);
+}
+.theme-techno-classical .home-rocket img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
 .theme-techno-classical .home-terminal-heading h1 {
-  max-width: 8em;
-  margin: 18px 0;
-  font-size: clamp(54px, 6vw, 80px);
+  max-width: 10em;
+  margin: 8px 0;
+  font-size: clamp(40px, 4vw, 52px);
   font-weight: 200;
-  line-height: 0.98;
+  line-height: 1;
   letter-spacing: -0.035em;
+  white-space: nowrap;
 }
 .theme-techno-classical .home-terminal-heading p:last-child {
   max-width: 35em;
-  font-size: 13px;
-  line-height: 1.7;
+  font-size: 12px;
+  line-height: 1.5;
 }
 .theme-techno-classical .home-terminal-heading .directory-status {
   grid-column: 1;
@@ -697,35 +830,51 @@
   letter-spacing: 0.06em;
 }
 .theme-techno-classical .home-terminal-grid {
-  gap: 40px;
+  position: relative;
+  z-index: 1;
+  flex: 0 1 auto;
+  gap: 14px;
   grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  min-height: 0;
 }
 .theme-techno-classical
   .terminal-home
   :is(.home-directory, .home-fundamentals) {
-  padding: 24px 0;
-  border: 0;
-  border-top: 1px solid var(--theme-control-line);
-  border-radius: 0;
-  background: transparent;
+  padding: 16px 20px;
+  border: 1px solid var(--theme-control-line);
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0 31px,
+      rgb(139 68 9 / 0.075) 31px 32px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 63px,
+      rgb(255 255 255 / 0.16) 63px 64px
+    ),
+    rgb(255 226 199 / 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 26px #7a36002e;
 }
 .theme-techno-classical .home-directory-heading h2 {
-  font-size: 34px;
+  font-size: 28px;
   font-weight: 200;
 }
 .theme-techno-classical .home-fundamentals h2 {
-  font-size: 38px;
+  font-size: 30px;
   font-weight: 200;
   line-height: 1.05;
   letter-spacing: -0.02em;
 }
 .theme-techno-classical .home-directory .company-results h3 {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 200;
 }
 .theme-techno-classical .home-directory .company-result-actions .button {
-  font-size: 13px;
-  min-height: 36px;
+  font-size: 12px;
+  min-height: 32px;
 }
 .theme-techno-classical .home-directory .company-monogram {
   border-radius: 50%;
@@ -738,6 +887,56 @@
 }
 .theme-techno-classical .home-fundamentals li span {
   color: var(--theme-accent);
+}
+.theme-techno-classical .terminal-search {
+  margin-top: 12px;
+}
+.theme-techno-classical .terminal-search-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+.theme-techno-classical .terminal-search-row button {
+  min-width: 124px;
+  padding-inline: 14px;
+}
+.theme-techno-classical .terminal-search > p {
+  margin: 0;
+  color: var(--theme-muted);
+  font: 9px/1.45 var(--theme-mono);
+}
+.theme-techno-classical .home-directory .company-results li {
+  padding-block: 10px;
+}
+.theme-techno-classical .home-directory .company-results {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.theme-techno-classical .home-directory .company-results li {
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--theme-line);
+  border-radius: 6px;
+}
+.theme-techno-classical .home-directory .company-monogram {
+  width: 34px;
+  height: 34px;
+  font-size: 19px;
+}
+.theme-techno-classical .directory-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+}
+.theme-techno-classical .home-fundamentals ol {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-block: 12px;
+  padding-top: 12px;
+}
+.theme-techno-classical .home-model-note {
+  padding-top: 10px;
 }
 .theme-techno-classical
   :is(.page-heading h1, .company-directory h1, .methodology h1) {
@@ -842,13 +1041,26 @@
     display: none;
   }
   .theme-techno-classical .home-terminal-heading {
-    min-height: 300px;
+    min-height: 180px;
+  }
+}
+@media (max-width: 1200px) {
+  .theme-techno-classical .home-motion-fundamentals {
+    display: none;
   }
 }
 @media (max-width: 800px) {
   .theme-techno-classical .app-shell {
     grid-template-rows: 62px minmax(0, 1fr) 30px;
-    border-width: 3px;
+  }
+  .theme-techno-classical .app-shell:has(.terminal-home) {
+    grid-template-rows: 56px minmax(0, 1fr);
+  }
+  .theme-techno-classical .app-shell:has(.terminal-home) > main {
+    padding-inline: 10px;
+  }
+  .theme-techno-classical .app-shell:has(.terminal-home) > .site-header nav a {
+    padding-block: 15px;
   }
   .theme-techno-classical .site-header {
     padding-inline: 12px;
@@ -877,6 +1089,7 @@
   .theme-techno-classical .home-terminal-heading h1 {
     font-size: clamp(42px, 8vw, 64px);
     margin-top: 12px;
+    white-space: normal;
   }
   .theme-techno-classical .home-terminal-heading p:last-child {
     font-size: 11px;
@@ -889,10 +1102,27 @@
     grid-template-columns: 1fr;
   }
   .theme-techno-classical .terminal-home {
+    height: auto;
+    min-height: 100%;
     gap: 12px;
+  }
+  .theme-techno-classical .home-motion-hero {
+    flex-basis: auto;
+  }
+  .theme-techno-classical .home-terminal-grid {
+    flex: 0 0 auto;
   }
   .theme-techno-classical .home-directory {
     padding-top: 16px;
+  }
+  .theme-techno-classical .home-directory .company-results {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .theme-techno-classical .terminal-search-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .theme-techno-classical .terminal-search-row button {
+    width: 100%;
   }
   .theme-techno-classical .research-start > .page-heading {
     min-height: 0;
