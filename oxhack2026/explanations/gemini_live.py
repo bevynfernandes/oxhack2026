@@ -6,6 +6,7 @@ from dataclasses import dataclass, field
 import orjson
 from pydantic import BaseModel, ConfigDict, Field
 from websockets.asyncio.client import connect
+from websockets.exceptions import ConnectionClosed
 
 _ENDPOINT = (
     "wss://generativelanguage.googleapis.com/ws/"
@@ -231,11 +232,15 @@ async def generate_live(
                     )
                 if accumulator.consume(frame):
                     return accumulator.result()
-    except TimeoutError:
+    except (TimeoutError, ConnectionClosed) as error:
         if not accumulator.submitted:
             raise
         result = accumulator.result()
-        result.reason_code = "gemini_live_background_incomplete"
+        result.reason_code = (
+            "gemini_live_background_incomplete"
+            if isinstance(error, TimeoutError)
+            else "gemini_live_background_interrupted"
+        )
         return result
 
 

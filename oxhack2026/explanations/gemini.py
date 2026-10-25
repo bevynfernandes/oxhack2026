@@ -18,6 +18,7 @@ from oxhack2026.explanations.config import DEFAULT_MODEL, gemini_api_key
 _SLOTS = BoundedSemaphore(2)
 _QUOTA_LOCK = Lock()
 _RESERVATIONS: deque[tuple[float, int]] = deque()
+LIVE_BATCH_LIMIT = 24
 
 
 class MappingUnavailable(Exception):
@@ -58,7 +59,9 @@ class ClassificationBatch(BaseModel):
     """Live classifications; the backend supplies all quotes and numeric context."""
 
     model_config = ConfigDict(extra="forbid")
-    proposals: list[BlockClassification] = Field(default_factory=list, max_length=12)
+    proposals: list[BlockClassification] = Field(
+        default_factory=list, max_length=LIVE_BATCH_LIMIT
+    )
 
 
 class CachedInterpretation(BaseModel):
@@ -77,7 +80,7 @@ class GeminiInterpreter:
     """One mapping run's budgets over a shared project-conservative quota.
 
     Args:
-        deadline: Monotonic absolute deadline, at most sixty seconds away.
+        deadline: Monotonic absolute deadline, within the advertised mapping budget.
         model: Explicit stable endpoint; no automatic fallback or migration.
     """
 
