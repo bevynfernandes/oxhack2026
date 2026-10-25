@@ -29,3 +29,4 @@
 - `frontend/tests/unit/research-workflow.test.tsx`: failed-interpretation wording.
 - `frontend/tests/e2e/research.spec.ts`: desktop/mobile decision journeys and accessibility.
 - `docs/design/DECISION-BRIEF.md`: presentation contract and validation record.
+- Final keyboard validation caught a queued drawer-close callback stealing newly moved focus. The dossier now restores focus only when it remains in the closing dialog or on the body; native restoration and deliberate user focus are respected.

@@ -894,7 +894,16 @@ export default function CompanyDossier({
         ref={dialog}
         aria-labelledby="driver-dialog-title"
         onKeyDown={containFocus}
-        onClose={() => opener.current?.focus()}
+        onClose={(event) => {
+          // Native close can restore focus before this queued callback fires.
+          // Do not steal focus if the user has already moved to another control.
+          if (
+            document.activeElement === document.body ||
+            event.currentTarget.contains(document.activeElement)
+          ) {
+            opener.current?.focus();
+          }
+        }}
       >
         <header className="driver-dialog-header">
           <div>
