@@ -6,14 +6,18 @@ import report from "../../../tests/fixtures/api/research.json" with { type: "jso
 const screens = [
   ["home", "/", "Company research workspace"],
   ["domain", "/research/new", "Research a startup domain"],
-  ["directory", "/explore?snapshot=synthetic-assessments-v1", "Companies"],
+  [
+    "directory",
+    "/explore?snapshot=synthetic-assessments-v1",
+    "Research library",
+  ],
   [
     "comparison",
     "/compare?snapshot=synthetic-assessments-v1&company=alpha&company=beta",
     "Compare companies",
   ],
   ["report", `/research/reports/${report.report_id}`, "Synthetic alpha"],
-  ["methodology", "/methodology", "How to read a company outlook"],
+  ["about", "/about", "Startup research with its evidence attached"],
   [
     "legacy",
     `/batches/${scouting.forecast.batch_id}/tools/tool-1`,
@@ -222,6 +226,12 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
+    await expect(
+      page.getByRole("link", {
+        name: "SignalShift Research home",
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/");
     const search = page.getByLabel("Search companies");
     await expect(search).toHaveAccessibleDescription(
       "Enter a name or website. You’ll confirm the company before research begins.",

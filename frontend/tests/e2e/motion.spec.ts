@@ -144,13 +144,10 @@ test("selection changes immediately while the shared indicator moves", async ({
   );
   await page.keyboard.press("Escape");
   await page.getByRole("dialog").waitFor({ state: "hidden" });
-  await page
-    .getByRole("link", { name: "Methodology", exact: true })
-    .first()
-    .click();
+  await page.getByRole("link", { name: "About", exact: true }).first().click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: "Methodology", exact: true }).first(),
+    page.getByRole("link", { name: "About", exact: true }).first(),
   ).toHaveAttribute("aria-current", "page");
 });
 
