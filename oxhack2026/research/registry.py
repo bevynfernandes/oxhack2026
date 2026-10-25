@@ -460,6 +460,15 @@ def collect_registry(collector: "Collector") -> None:
     history: dict[str, object] | None = None
     for index, endpoint in enumerate(endpoints):
         payload, support = collector.json(endpoint, headers)
+        if (
+            provider == "companies_house"
+            and index == 0
+            and (
+                not isinstance(payload, dict)
+                or payload.get("company_number") != mapping.company_number
+            )
+        ):
+            raise CollectionError("registry_identity_mismatch")
         if provider == "sec":
             checked_history = _check_sec_response(
                 collector, payload, cik, headers, index == 0

@@ -491,6 +491,7 @@ test("homepage domain discovery bypasses unavailable name lookup, confirms redir
     expect(route.request().postDataJSON()).toEqual({
       identity_id: standaloneIdentity.identity_id,
       identity_confirmed: true,
+      profile: starts === 1 ? "deep" : "thorough",
     });
     return route.fulfill({
       status: 202,
@@ -539,6 +540,9 @@ test("homepage domain discovery bypasses unavailable name lookup, confirms redir
   });
   await expect(confirm).toBeDisabled();
   expect(starts).toBe(0);
+  await page
+    .getByRole("combobox", { name: "Research depth" })
+    .selectOption("deep");
   await page.getByRole("checkbox").check();
   await confirm.click();
   await expect(page.getByRole("status")).toHaveText("Research in progress");
@@ -684,3 +688,122 @@ test("source drawer wraps focus past collapsed provenance and includes expanded 
   await page.keyboard.press("Tab");
   await expect(close).toBeFocused();
 });
+
+for (const width of [1440, 375]) {
+  test(`source coverage, Gemini accounting and explicit continuation work at ${width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    let submissions = 0;
+    await page.route("**/api/v2/research-capabilities", (route) =>
+      route.fulfill({ json: capabilities }),
+    );
+    await page.route("**/api/v2/research-identities/*", (route) =>
+      route.fulfill({ json: standaloneIdentity }),
+    );
+    await page.route("**/api/v2/research-jobs/progress", (route) =>
+      route.fulfill({
+        json: {
+          job_id: "progress",
+          identity_id: standaloneIdentity.identity_id,
+          state: "partial",
+          sources: sourceStates.map((source) =>
+            source.provider === "website"
+              ? {
+                  ...source,
+                  details: {
+                    execution: "completed",
+                    applicability: "applicable",
+                    scope: "planned_sample",
+                    coverage: "limited",
+                    collected: 20,
+                    outstanding: 1,
+                    frontier: [{ url: "https://new.example/about", depth: 1 }],
+                    visited: [],
+                    accounts: [],
+                    retained_capture_ids: [],
+                    issues: [
+                      {
+                        code: "website_page_limit",
+                        severity: "warning",
+                        message: "The selected company-page limit was reached.",
+                        remedy: "Continue research to collect remaining pages.",
+                      },
+                    ],
+                  },
+                }
+              : source,
+          ),
+          reason_codes: [],
+          mapping: {
+            state: "partial",
+            completed_batches: 4,
+            reason_codes: [],
+            statistics: {
+              mode: "rules_gemini",
+              model: "acceptance-model",
+              stage: "finished",
+              candidates: 100,
+              processed: 60,
+              deferred: 40,
+              batches: 4,
+              failed_batches: 0,
+              cached_batches: 3,
+              provider_requests: 1,
+              accepted_proposals: 7,
+              rejected_proposals: 2,
+              input_tokens: null,
+              output_tokens: null,
+            },
+          },
+        },
+      }),
+    );
+    await page.route("**/api/v2/research-jobs/progress/continue", (route) => {
+      submissions++;
+      expect(route.request().postDataJSON()).toEqual({ profile: "deep" });
+      return route.fulfill({ status: 202, json: { job_id: "continued" } });
+    });
+    await page.route("**/api/v2/research-jobs/continued", (route) =>
+      route.fulfill({
+        json: {
+          job_id: "continued",
+          identity_id: standaloneIdentity.identity_id,
+          state: "queued",
+          sources: [],
+          reason_codes: [],
+        },
+      }),
+    );
+    await page.goto("/research/v2/jobs/progress");
+    await expect(
+      page.getByText("Coverage: limited · planned sample"),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/1 new provider requests · 3 cached batches/),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/input not reported, output not reported/),
+    ).toBeVisible();
+    expect(submissions).toBe(0);
+    const profile = page.getByRole("combobox", { name: "Research depth" });
+    await profile.selectOption("deep");
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= window.innerWidth,
+      ),
+    ).toBe(true);
+    await page.screenshot({
+      path: info.outputPath("research-progress.png"),
+      fullPage: true,
+    });
+    await page
+      .getByRole("button", { name: "Continue research", exact: true })
+      .click();
+    await expect(page).toHaveURL(/\/jobs\/continued$/);
+    await expect(page.getByRole("status")).toHaveText("Queued");
+    expect(submissions).toBe(1);
+  });
+}

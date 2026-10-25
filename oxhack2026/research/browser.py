@@ -34,6 +34,10 @@ def render(fetcher: Fetcher, url: str) -> tuple[Capture, bytes]:
     """
     public_url(url)
     failures: list[str] = []
+    original_deadline = fetcher.deadline
+    original_request_limit = fetcher.max_requests
+    fetcher.max_requests = min(original_request_limit, fetcher.requests + 20)
+    fetcher.deadline = min(original_deadline, time.monotonic() + 20)
 
     def fulfill(route: Route) -> None:
         if route.request.method != "GET" or route.request.resource_type in {
@@ -112,3 +116,7 @@ def render(fetcher: Fetcher, url: str) -> tuple[Capture, bytes]:
     except PlaywrightError as error:
         logger.error("Local research browser unavailable or navigation failed")  # noqa: TRY400
         raise CollectionError("browser_unavailable_or_timeout") from error
+
+    finally:
+        fetcher.deadline = original_deadline
+        fetcher.max_requests = original_request_limit

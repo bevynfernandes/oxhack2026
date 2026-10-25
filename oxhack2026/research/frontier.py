@@ -55,6 +55,26 @@ def crawl_candidate(url: str, domain: str) -> bool:
 def source_issue(code: str) -> SourceIssue:
     """Translate stable diagnostic codes to severity, explanation and next action."""
     messages = {
+        "http_403": (
+            "The source denied access to this request.",
+            "Review provider credentials and access policy before refreshing.",
+        ),
+        "http_429": (
+            "The source rate-limited this request; its backoff applies across jobs.",
+            "Wait for the provider's limit to reset before refreshing.",
+        ),
+        "capture_size_limit": (
+            "A public response exceeded the per-response capture limit.",
+            "Other pages remain usable; this response was not interpreted.",
+        ),
+        "browser_request_blocked": (
+            "A rendered page requested a resource that could not be collected safely.",
+            "Retained HTML remains available; rendering does not bypass access limits.",
+        ),
+        "browser_unavailable_or_timeout": (
+            "Local rendering was unavailable or exceeded its time limit.",
+            "Review retained HTML; enable Chromium to retry JavaScript content.",
+        ),
         "website_page_limit": (
             "The selected company-page limit was reached.",
             "Continue research to collect remaining pages.",

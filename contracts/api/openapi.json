@@ -360,7 +360,7 @@
             "type": "boolean"
           },
           "capture_bytes": {
-            "default": 33554432,
+            "default": 67108864,
             "title": "Capture Bytes",
             "type": "integer"
           },
@@ -420,7 +420,7 @@
             "type": "integer"
           },
           "request_budget": {
-            "default": 120,
+            "default": 240,
             "title": "Request Budget",
             "type": "integer"
           },
@@ -1967,6 +1967,18 @@
             ],
             "title": "Profile",
             "type": "string"
+          },
+          "source_report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Report Id"
           }
         },
         "title": "ContinueRequest",

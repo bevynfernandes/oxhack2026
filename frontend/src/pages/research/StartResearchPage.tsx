@@ -1,3 +1,4 @@
+import { ProfilePicker, type ResearchProfile } from "./ResearchWorkflow";
 import {
   MotionState,
   MotionButton,
@@ -132,6 +133,13 @@ function DomainResearchPage() {
   const { identityId = "" } = useParams();
   const [search] = useSearchParams();
   const [domain, setDomain] = useState(search.get("domain") ?? "");
+  const [profile, setProfile] = useState<ResearchProfile>(() =>
+    search.get("profile") === "fast"
+      ? "fast"
+      : search.get("profile") === "deep"
+        ? "deep"
+        : "thorough",
+  );
   const [confirmed, setConfirmed] = useState(false);
   const navigate = useNavigate();
   useEffect(() => setConfirmed(false), [identityId]);
@@ -166,11 +174,14 @@ function DomainResearchPage() {
           },
         }),
       ),
-    onSuccess: (row) => navigate("/research/identities/" + row.identity_id),
+    onSuccess: (row) =>
+      navigate(
+        "/research/identities/" + row.identity_id + "?profile=" + profile,
+      ),
   });
   const start = useMutation({
     retry: false,
-    mutationFn: () => confirmIdentity(identityId),
+    mutationFn: () => confirmIdentity(identityId, profile),
     onSuccess: (job) => navigate("/research/v2/jobs/" + job.job_id),
   });
   const preview = identity.data;
@@ -326,6 +337,11 @@ function DomainResearchPage() {
                       start.mutate();
                   }}
                 >
+                  <ProfilePicker
+                    value={profile}
+                    onChange={setProfile}
+                    disabled={start.isPending}
+                  />
                   <label className="identity-confirm">
                     <MotionInput
                       type="checkbox"

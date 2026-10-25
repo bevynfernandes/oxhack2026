@@ -70,7 +70,10 @@ export default function ResearchComparison() {
         </p>
       ) : (
         <QueryState
-          pending={queries.some((query) => query.isPending)}
+          pending={
+            !queries.some((query) => query.error) &&
+            queries.some((query) => query.isPending)
+          }
           error={queries.find((query) => query.error)?.error ?? null}
           retry={() => {
             void Promise.all(queries.map((query) => query.refetch()));

@@ -624,8 +624,9 @@ def test_browser_attempt_limit_includes_failures(tmp_path: Path) -> None:
         side_effect=CollectionError("browser_unavailable"),
     ) as renderer:
         for _ in range(3):
-            with pytest.raises(CollectionError):
-                collector._website_page(capture, content)
+            page = collector._website_page(capture, content)
+            assert page.name == "Sparse"
+        assert "browser_unavailable" in collector.reasons
         collector._website_page(capture, content)
         assert renderer.call_count == 3
 
@@ -663,6 +664,7 @@ def test_potential_claim_conflicts_are_retained(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("provider", ["sec", "companies_house"])
+@pytest.mark.parametrize("response_number", ["01234567", "07654321"])
 @pytest.mark.parametrize(
     "support_quote", [None, "Example Legal", "Not present in source"]
 )
@@ -671,6 +673,7 @@ def test_reviewed_registry_mapping(
     monkeypatch: pytest.MonkeyPatch,
     provider: str,
     support_quote: str | None,
+    response_number: str,
 ) -> None:
     """Exact reviewed identifiers gate registry facts and retain declared periods."""
     from unittest.mock import mock_open
@@ -700,6 +703,7 @@ def test_reviewed_registry_mapping(
                     "cik": 123,
                     "name": "Example Legal",
                     "company_status": "active",
+                    "company_number": response_number,
                     "accounts": {"period_end": "2025-12-31"},
                 },
             )
@@ -716,6 +720,11 @@ def test_reviewed_registry_mapping(
         assert "registry_mapping_quote_not_found" in result.reason_codes
         assert not result.claims
         assert len(result.captures) == 1
+        return
+    if provider == "companies_house" and response_number != "01234567":
+        assert "registry_identity_mismatch" in result.reason_codes
+        assert not result.claims
+        assert len(result.captures) == 2
         return
     assert result.state == "partial"
     assert len(result.captures) == 3

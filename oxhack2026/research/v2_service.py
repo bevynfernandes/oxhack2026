@@ -452,8 +452,30 @@ class V2Service:
             RepositoryUnavailable: Collection is disabled.
         """
         previous = self.store.job(job_id)
+        if request.source_report_id:
+            source_report = self.store.report(request.source_report_id)
+            if (
+                source_report.job_id != job_id
+                or source_report.identity.identity_id != previous.identity_id
+            ):
+                message = "Continuation report must belong to the selected research job"
+                raise ValueError(message)
+            previous = previous.model_copy(
+                update={
+                    "report_id": source_report.report_id,
+                    "sources": source_report.sources,
+                    "mapping": MappingProgress(
+                        state=source_report.mapping.state,
+                        finished_at=source_report.mapping.mapped_at,
+                        statistics=source_report.mapping.statistics,
+                    )
+                    if source_report.mapping
+                    else previous.mapping,
+                }
+            )
         pending = any(
-            source.details and (source.details.frontier or source.details.cursor)
+            source.state == "failed"
+            or (source.details and (source.details.frontier or source.details.cursor))
             for source in previous.sources
         )
         if previous.state not in {"completed", "partial"} or not previous.report_id:
@@ -733,7 +755,15 @@ class V2Service:
             if source.state != "pending":
                 return
             running = source.model_copy(
-                update={"state": "running", "started_at": datetime.now(UTC)}
+                update={
+                    "state": "running",
+                    "started_at": datetime.now(UTC),
+                    "details": source.details.model_copy(
+                        update={"execution": "running"}
+                    )
+                    if source.details
+                    else None,
+                }
             )
 
             def checkpoint(value: SourceState) -> None:
@@ -758,12 +788,17 @@ class V2Service:
             )
             fetcher = self._fetcher(settings)
             fetcher.shared_budget = shared
+            if settings and index == 0:
+                fetcher.max_requests = max(1, int(settings.requests * 0.6))
+                fetcher.max_bytes = max(1, int(settings.capture_bytes * 0.6))
             fetcher.deadline = min(
                 collection_deadline,
                 time.monotonic()
                 + (
                     settings.deadline_seconds * 0.42
                     if settings and index == 0
+                    else settings.deadline_seconds * 0.10
+                    if settings and index == 1
                     else 10_000
                 ),
             )
@@ -800,12 +835,23 @@ class V2Service:
             )
 
     def _interrupt(self, job: Job, reason: str) -> None:
+        from oxhack2026.research.frontier import source_issue
+
         states = tuple(
             source.model_copy(
                 update={
                     "state": "failed",
                     "finished_at": datetime.now(UTC),
-                    "reason_codes": (reason,),
+                    "reason_codes": (*source.reason_codes, reason),
+                    "details": source.details.model_copy(
+                        update={
+                            "execution": "failed",
+                            "coverage": "limited",
+                            "issues": (*source.details.issues, source_issue(reason)),
+                        }
+                    )
+                    if source.details
+                    else None,
                 }
             )
             if source.state in {"pending", "running"}

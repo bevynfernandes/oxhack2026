@@ -343,3 +343,123 @@ def test_continuation_discovers_github_then_npm(tmp_path: Path) -> None:
     assert any("api.github.com/repos/example/sdk" in url for url in requests)
     assert any("api.npmjs.org/downloads/range/" in url for url in requests)
     assert store.report(finished.report_id).model_dump_json() == original
+
+
+def test_official_package_installation_is_preserved(tmp_path: Path) -> None:
+    """An official SDK command supplies package evidence without a fuzzy name match."""
+    result = collector(
+        tmp_path,
+        "website",
+        (),
+        httpx.MockTransport(
+            lambda _: httpx.Response(
+                200,
+                text="<main><pre>npm install @example/sdk</pre></main>",
+            )
+        ),
+    ).collect()
+    assert "https://www.npmjs.com/package/@example/sdk" in result.links
+    assert result.details
+    account = next(row for row in result.details.accounts if row.kind == "npm")
+    indexed = {row.evidence_id: row for row in result.evidence}
+    assert indexed[account.evidence_ids[0]].location == "code:package_install"
+    assert indexed[account.evidence_ids[0]].excerpt == "npm install @example/sdk"
+
+
+def test_hiring_keeps_healthy_board_when_another_wrapper_fails(tmp_path: Path) -> None:
+    """An inaccessible optional wrapper preserves openings and a retry checkpoint."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "example.com":
+            return httpx.Response(404)
+        return httpx.Response(200, json={"jobs": [{"id": "active"}]})
+
+    result = collector(
+        tmp_path,
+        "hiring",
+        (
+            "https://example.com/careers",
+            "https://jobs.ashbyhq.com/example",
+        ),
+        httpx.MockTransport(respond),
+    ).collect()
+    assert result.state == "partial"
+    assert result.details and result.details.cursor
+    assert result.observations[0].value is None
+    assert result.observations[0].missing_reason == "provider_incomplete"
+    checkpoint = orjson.loads(result.details.cursor)
+    assert len(checkpoint["openings"]) == 1
+    assert checkpoint["queue"] == ["https://example.com/careers"]
+
+
+def test_provider_resource_checkpoint_survives_page_limit(tmp_path: Path) -> None:
+    """An npm continuation consumes only unprocessed verified packages."""
+    adapter = collector(
+        tmp_path, "npm", (), httpx.MockTransport(lambda _: httpx.Response(200, json={}))
+    )
+    adapter._checkpoint_resources(["@example/remaining"])
+    assert adapter._resource_queue(["already-processed"]) == ["@example/remaining"]
+    adapter._checkpoint_resources([])
+    assert adapter.cursor is None
+
+
+def test_long_navigation_does_not_mask_an_empty_app(tmp_path: Path) -> None:
+    """An empty main can request rendering despite substantial navigation text."""
+    from oxhack2026.research.extraction import parse_page
+
+    fetcher = collector(
+        tmp_path,
+        "website",
+        (),
+        httpx.MockTransport(
+            lambda _: httpx.Response(
+                200, text=f"<nav>{'Navigation ' * 100}</nav><main></main>"
+            )
+        ),
+    ).fetcher
+    capture, content = fetcher.fetch("https://example.com/")
+    assert parse_page(capture, content).needs_browser is True
+
+
+def test_jsonld_accounts_require_the_organization_domain(tmp_path: Path) -> None:
+    """A third-party Organization cannot attach its accounts to the researched site."""
+    markup = """<script type="application/ld+json">{"@graph":[
+        {"@type":"Organization","url":"https://example.com","sameAs":["https://github.com/official"]},
+        {"@type":"Organization","url":"https://customer.example","sameAs":["https://github.com/customer"]}
+    ]}</script><p>Official identity information.</p>"""
+    result = collector(
+        tmp_path,
+        "website",
+        (),
+        httpx.MockTransport(lambda _: httpx.Response(200, text=markup)),
+    ).collect()
+    assert "https://github.com/official" in result.links
+    assert "https://github.com/customer" not in result.links
+    assert result.details
+    association = result.details.accounts[0]
+    support = {item.evidence_id: item for item in result.evidence}
+    assert support[association.evidence_ids[0]].location == "jsonld:Organization.sameAs"
+
+
+def test_mid_provider_failure_retains_measurements_and_failed_execution(
+    tmp_path: Path,
+) -> None:
+    """A partial report can contain valid metrics even though the adapter failed."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/releases"):
+            return httpx.Response(503)
+        if request.url.path.endswith("/package.json"):
+            return httpx.Response(404)
+        return httpx.Response(200, json={"stargazers_count": 5, "open_issues_count": 2})
+
+    result = collector(
+        tmp_path,
+        "github",
+        ("https://github.com/example/sdk",),
+        httpx.MockTransport(respond),
+    ).collect()
+    assert result.state == "partial"
+    assert result.details and result.details.execution == "failed"
+    assert [row.value for row in result.observations] == [5, 2]
+    assert result.details.cursor
