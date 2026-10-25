@@ -87,6 +87,8 @@ class V2Service:
 
     def capabilities(self) -> Capabilities:
         """Read configuration and local executable presence without vendor requests."""
+        from oxhack2026.research.registry import registry_mapping_path
+
         browser = False
         if (
             os.environ.get("SIGNALSHIFT_RESEARCH_BROWSER") == "1"
@@ -100,7 +102,7 @@ class V2Service:
                 provider=provider,
                 available=provider not in {"sec", "companies_house"}
                 or bool(
-                    os.environ.get("SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS")
+                    registry_mapping_path().is_file()
                     and os.environ.get(
                         "SEC_USER_AGENT"
                         if provider == "sec"

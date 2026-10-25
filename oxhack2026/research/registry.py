@@ -5,6 +5,7 @@ import logging
 import os
 import re
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import TYPE_CHECKING, Annotated
 from urllib.parse import urlsplit
 from uuid import uuid4
@@ -27,6 +28,22 @@ if TYPE_CHECKING:
     from oxhack2026.research.collectors import Collector
 
 logger = logging.getLogger(__name__)
+
+
+def registry_mapping_path() -> Path:
+    """Locate operator overrides or the small bundled reviewed identity catalog.
+
+    Returns:
+        Explicit SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS path when set; otherwise
+        the packaged catalog. A catalog entry still requires its retrieved quote
+        and matching issuer response. Unknown domains do not inherit a mapping.
+    """
+    configured = os.environ.get("SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS")
+    return (
+        Path(configured)
+        if configured
+        else (Path(__file__).with_name("bundled") / "reviewed-registry-mappings.json")
+    )
 
 
 class RegistryMapping(DTO):
@@ -262,9 +279,7 @@ def collect_registry(collector: "Collector") -> None:
         OSError: Mapping configuration cannot be read.
         ValueError: Mapping configuration is invalid.
     """
-    selection = os.environ.get("SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS", "")
-    if not selection:
-        raise CollectionError("unverified_registry_mapping")
+    selection = registry_mapping_path()
     with open(selection, "rb") as stream:
         content = stream.read(65537)
     if len(content) > 65536:

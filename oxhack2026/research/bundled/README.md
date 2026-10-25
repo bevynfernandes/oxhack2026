@@ -30,3 +30,20 @@ uv run --frozen --no-sync python -m oxhack2026.research.build_name_index \
 Refresh the dated attribution in `company_search.py` when updating this snapshot.
 The snapshot is bundled so a search never downloads a million-row file or depends
 on a search-engine quota, CAPTCHA, credential or live directory availability.
+# Reviewed registry mapping
+
+`reviewed-registry-mappings.json` supplies one independently reviewed Cloudflare
+domain-to-CIK link, not a general name resolver. On 25 October 2026 the original
+SEC annual report, accession `0001477333-26-000016`, identified
+`https://www.cloudflare.com/impact/` as its own website. The complete document's
+SHA-256 was `94e61fa7cc9b825817ab51dd1f6005b29fd9681019389566cc36a90517a14780`.
+The collector retrieves this supporting filing and checks the exact quoted URL
+before using CIK `0001477333`; submissions and financial facts must repeat that CIK.
+
+The packaged mapping is used when no operator catalog override is configured.
+SEC collection still requires an identifying `SEC_USER_AGENT`. Unknown domains
+remain unmapped. To extend or replace the catalog, set
+`SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS` to a reviewed JSON file with the same
+schema. Current legal-entity mappings do not establish old corporate-family or
+reporting-scope continuity for model evaluation.
+
