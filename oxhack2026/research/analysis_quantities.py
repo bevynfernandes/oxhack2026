@@ -25,6 +25,31 @@ _METRIC = re.compile(
     r"repositories|openings?|runway)\b",
     re.I,
 )
+_RATE = re.compile(
+    r"\b(?:per|a|each)\s+(second|minute|hour|day|week|month|quarter|year|annum)\b|"
+    r"/\s*(second|minute|hour|day|week|month|quarter|year|mo|yr)\b|"
+    r"\b(monthly|annually|annual|yearly|daily|weekly|quarterly|hourly)\b",
+    re.I,
+)
+_DATE = r"(?:Q[1-4]\s*)?\d{4}(?:-\d{2}-\d{2})?"
+_WINDOW = re.compile(
+    rf"\b(?:from|between)\s+{_DATE}\s+(?:to|and|through)\s+{_DATE}|"
+    rf"\b(?:as of|during|in|for|FY|fiscal year|year ended|period ending)\s*{_DATE}",
+    re.I,
+)
+_RATE_NAMES = {
+    "mo": "month",
+    "monthly": "month",
+    "yr": "year",
+    "annum": "year",
+    "annual": "year",
+    "annually": "year",
+    "yearly": "year",
+    "daily": "day",
+    "weekly": "week",
+    "quarterly": "quarter",
+    "hourly": "hour",
+}
 _SCALES = {
     "k": 3,
     "thousand": 3,
@@ -55,19 +80,35 @@ class _Quantity:
     currency: str
     unit: str
     metric: str
+    rate: str = ""
+    window: tuple[str, ...] = ()
 
 
-def _metric(text: str, start: int, end: int) -> str:
-    """Find the nearest metric in the same clause as this amount."""
-    candidates = []
-    for match in _METRIC.finditer(text):
+def _nearby(
+    pattern: re.Pattern[str], text: str, start: int, end: int
+) -> list[re.Match[str]]:
+    """Keep context in this clause without crossing another numerical expression."""
+    matches = []
+    for match in pattern.finditer(text):
         gap = (
             text[match.end() : start]
             if match.end() <= start
             else text[end : match.start()]
         )
-        if re.search(r"[.;!?\n]|\d", gap):
-            continue
+        if not re.search(r"[.;!?\n]|\d", gap):
+            matches.append(match)
+    return matches
+
+
+def _metric(text: str, start: int, end: int) -> str:
+    """Find the nearest metric in the same clause as this amount."""
+    candidates = []
+    for match in _nearby(_METRIC, text, start, end):
+        gap = (
+            text[match.end() : start]
+            if match.end() <= start
+            else text[end : match.start()]
+        )
         candidates.append((len(gap), match.group().casefold().rstrip("s")))
     return min(candidates)[1] if candidates else ""
 
@@ -96,8 +137,27 @@ def _quantities(text: str) -> list[_Quantity]:
             unit = "percent"
         else:
             unit = unit.rstrip("s")
+        rates = _nearby(_RATE, text, match.start(), match.end())
+        rate_names = {
+            _RATE_NAMES.get(name.casefold(), name.casefold())
+            for rate in rates
+            for name in rate.groups()
+            if name
+        }
+        windows = _nearby(_WINDOW, text, match.start(), match.end())
         quantities.append(
-            _Quantity(value, currency, unit, _metric(text, match.start(), match.end()))
+            _Quantity(
+                value,
+                currency,
+                unit,
+                _metric(text, match.start(), match.end()),
+                "/".join(sorted(rate_names)),
+                tuple(
+                    date.casefold()
+                    for window in windows
+                    for date in re.findall(_DATE, window.group(), re.I)
+                ),
+            )
         )
     return quantities
 
@@ -126,6 +186,18 @@ def supported_quantities(text: str, records: list[MappedRecord]) -> bool:
                     context.currency or "" if context else "",
                     context.unit if context and context.unit != "count" else "",
                     _metric(record.concept.replace("_", " "), 0, 0),
+                    "",
+                    tuple(
+                        date.isoformat()
+                        for date in (
+                            context.measurement_start,
+                            context.measurement_end,
+                            context.measurement_instant,
+                        )
+                        if date
+                    )
+                    if context
+                    else (),
                 )
             )
     return all(
@@ -133,6 +205,8 @@ def supported_quantities(text: str, records: list[MappedRecord]) -> bool:
             quantity.value == candidate.value
             and quantity.currency == candidate.currency
             and quantity.unit == candidate.unit
+            and quantity.rate == candidate.rate
+            and quantity.window == candidate.window
             and (not quantity.metric or quantity.metric == candidate.metric)
             for candidate in support
         )

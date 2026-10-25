@@ -63,6 +63,38 @@ def test_unsupported_analysis(text: str, ids: list[str], group: str) -> None:
         ("Revenue is 100.", "Company reports revenue of 1e100.", False),
         ("Runway is 10 days.", "Company reports runway of 10 years.", False),
         ("Storage is 10 GB.", "Company reports storage of 10 MB.", False),
+        (
+            "Revenue is USD 100 per month.",
+            "Company reports revenue of USD 100 per year.",
+            False,
+        ),
+        (
+            "Revenue is USD 100 per year.",
+            "Company reports revenue of USD 100 per month.",
+            False,
+        ),
+        (
+            "Monthly revenue is USD 100.",
+            "Company reports annual revenue of USD 100.",
+            False,
+        ),
+        ("Revenue is USD 100 per month.", "Company reports revenue of USD 100.", False),
+        (
+            "Revenue is USD 100 per month.",
+            "Company reports monthly revenue of USD 100.",
+            True,
+        ),
+        (
+            "Revenue is USD 100 in 2025.",
+            "Company reports revenue of USD 100 in 2026.",
+            False,
+        ),
+        ("Revenue is USD 100 in 2025.", "Company reports revenue of USD 100.", False),
+        (
+            "Revenue is USD 100 in 2025.",
+            "Company reports revenue of USD 100 in 2025.",
+            True,
+        ),
         ("Revenue is EUR 100.", "Company reports revenue of USD 100.", False),
         ("Revenue is 10 dollars.", "Company reports revenue of 10 euros.", False),
         ("Retention is 10%.", "Company reports retention of 10 customers.", False),
