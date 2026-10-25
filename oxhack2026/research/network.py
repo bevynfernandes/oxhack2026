@@ -264,6 +264,31 @@ class Quotas:
 
 
 @dataclass
+class FetchBudget:
+    """Atomic request and captured-byte accounting across independent collectors."""
+
+    max_requests: int
+    max_bytes: int
+    requests: int = 0
+    byte_count: int = 0
+    lock: threading.Lock = field(default_factory=threading.Lock)
+
+    def request(self) -> None:
+        """Reserve one request or raise BudgetExceeded before network access."""
+        with self.lock:
+            if self.requests >= self.max_requests:
+                raise BudgetExceeded("request_or_time_budget")
+            self.requests += 1
+
+    def capture(self, size: int) -> None:
+        """Reserve captured bytes atomically; raise BudgetExceeded on overflow."""
+        with self.lock:
+            if self.byte_count + size > self.max_bytes:
+                raise BudgetExceeded("capture_size_limit")
+            self.byte_count += size
+
+
+@dataclass
 class Fetcher:
     """Per-job budgets and captures over the shared controlled network boundary.
 
@@ -282,6 +307,7 @@ class Fetcher:
     transport: httpx.BaseTransport = field(default_factory=PinnedTransport)
     deadline: float = field(default_factory=lambda: time.monotonic() + 300)
     captures: list[Capture] = field(default_factory=list)
+    shared_budget: FetchBudget | None = None
     max_requests: int = 120
     max_bytes: int = 33554432
     requests: int = 0
@@ -301,6 +327,8 @@ class Fetcher:
             if time.monotonic() > self.deadline:
                 raise BudgetExceeded("collection_deadline")
         content = bytes(chunks)
+        if self.shared_budget:
+            self.shared_budget.capture(len(content))
         self.byte_count += len(content)
         capture = Capture(
             capture_id=uuid4().hex,
@@ -334,6 +362,8 @@ class Fetcher:
             if remaining <= 0 or not self.quotas._slots.acquire(timeout=remaining):
                 raise BudgetExceeded("network_deadline")
             try:
+                if self.shared_budget:
+                    self.shared_budget.request()
                 self.requests += 1
                 request_headers = {
                     "User-Agent": "SignalShiftResearch/2",

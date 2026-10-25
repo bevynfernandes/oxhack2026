@@ -134,7 +134,9 @@ class Capture(DTO):
     collected_at: UTCDateTime
     artifact: ArtifactReference
     content_type: str
-    parser_version: Literal["research-extract-v2"] = "research-extract-v2"
+    parser_version: Literal["research-extract-v2", "research-extract-v3"] = (
+        "research-extract-v3"
+    )
     rendered: bool = False
 
 
@@ -362,6 +364,15 @@ class Report(DTO):
                 message = "Dimension inference references absent inputs"
                 raise ValueError(message)
 
+    def _association_references(self, evidence: set[str]) -> None:
+        for source in self.sources:
+            if source.details and any(
+                not set(account.evidence_ids) <= evidence
+                for account in source.details.accounts
+            ):
+                message = "Account association references absent evidence"
+                raise ValueError(message)
+
     @model_validator(mode="after")
     def _references(self) -> Self:
         captures = {item.capture_id for item in self.captures}
@@ -369,6 +380,7 @@ class Report(DTO):
         if len(captures) != len(self.captures) or len(evidence) != len(self.evidence):
             message = "Capture and evidence identifiers must be unique"
             raise ValueError(message)
+        self._association_references(evidence)
         if any(item.capture_id not in captures for item in self.evidence):
             message = "ResearchEvidence references an absent capture"
             raise ValueError(message)

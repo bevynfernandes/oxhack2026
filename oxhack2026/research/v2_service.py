@@ -4,7 +4,7 @@ import importlib.util
 import logging
 import os
 import time
-from concurrent.futures import Executor
+from concurrent.futures import Executor, ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from threading import Lock
@@ -42,6 +42,7 @@ from oxhack2026.api.research_v2_schemas import (
 from oxhack2026.models.dimension_serving import DimensionModelRegistry
 from oxhack2026.research.network import (
     CollectionError,
+    FetchBudget,
     Fetcher,
     PinnedTransport,
     Quotas,
@@ -488,6 +489,12 @@ class V2Service:
                 updates["details"] = details
                 if details.frontier or details.cursor:
                     updates.update(state="pending", started_at=None, finished_at=None)
+            if source.state in {"skipped", "failed"}:
+                updates.update(
+                    state="pending", started_at=None, finished_at=None, reason_codes=()
+                )
+            if updates.get("state") == "pending" and details:
+                updates["details"] = details.model_copy(update={"execution": "pending"})
             states.append(source.model_copy(update=updates))
         return tuple(states)
 
@@ -698,44 +705,86 @@ class V2Service:
         )
         self.store.save_job(job)
         identity = self.store.identity(job.identity_id)
-        fetcher = self._fetcher(job.settings)
+        settings = job.settings
+        shared = FetchBudget(
+            settings.requests if settings else 120,
+            settings.capture_bytes if settings else 33554432,
+        )
+        collection_deadline = time.monotonic() + (
+            settings.deadline_seconds * 0.7 if settings else 300
+        )
+
+        def collect(index: int) -> None:
+            current = self.store.job(job_id)
+            source = current.sources[index]
+            if source.state != "pending":
+                return
+            running = source.model_copy(
+                update={"state": "running", "started_at": datetime.now(UTC)}
+            )
+
+            def checkpoint(value: SourceState) -> None:
+                with self._lock:
+                    latest = self.store.job(job_id)
+                    states = list(latest.sources)
+                    states[index] = value
+                    self.store.save_job(
+                        latest.model_copy(update={"sources": tuple(states)})
+                    )
+
+            checkpoint(running)
+            linked = identity.model_copy(
+                update={
+                    "official_links": tuple(
+                        sorted(
+                            set(identity.official_links)
+                            | {url for state in current.sources for url in state.links}
+                        )
+                    )
+                }
+            )
+            fetcher = self._fetcher(settings)
+            fetcher.shared_budget = shared
+            fetcher.deadline = min(
+                collection_deadline,
+                time.monotonic()
+                + (
+                    settings.deadline_seconds * 0.42
+                    if settings and index == 0
+                    else 10_000
+                ),
+            )
+            collector = Collector(
+                fetcher,
+                linked,
+                running,
+                os.environ.get("SIGNALSHIFT_RESEARCH_BROWSER") == "1",
+                settings=settings,
+                checkpoint=checkpoint,
+            )
+            checkpoint(collector.collect())
+
         try:
-            for index, source in enumerate(job.sources):
-                if source.state != "pending":
-                    continue
-                running = source.model_copy(
-                    update={"state": "running", "started_at": datetime.now(UTC)}
-                )
-                states = list(job.sources)
-                states[index] = running
-                job = job.model_copy(update={"sources": tuple(states)})
-                self.store.save_job(job)
-                linked_identity = identity.model_copy(
-                    update={
-                        "official_links": tuple(
-                            sorted(
-                                set(identity.official_links)
-                                | {link for item in job.sources for link in item.links}
-                            )
-                        ),
-                    }
-                )
-                collector = Collector(
-                    fetcher,
-                    linked_identity,
-                    running,
-                    os.environ.get("SIGNALSHIFT_RESEARCH_BROWSER") == "1",
-                )
-                states[index] = collector.collect()
-                job = job.model_copy(update={"sources": tuple(states)})
-                self.store.save_job(job)
-            self._finish(job, identity)
+            collect(0)
+            # Package discovery consumes verified repository manifests before npm.
+            collect(1)
+            with ThreadPoolExecutor(
+                max_workers=4, thread_name_prefix="research-source"
+            ) as pool:
+                futures = [
+                    pool.submit(collect, index) for index in range(2, len(job.sources))
+                ]
+                for future in futures:
+                    future.result()
+            self._finish(self.store.job(job_id), identity)
         except (OSError, ValueError, RuntimeError) as error:
             logger.error(  # noqa: TRY400
                 "Research worker persistence or composition failed: %s",
                 type(error).__name__,
             )
-            self._interrupt(job, "worker_storage_or_composition_failure")
+            self._interrupt(
+                self.store.job(job_id), "worker_storage_or_composition_failure"
+            )
 
     def _interrupt(self, job: Job, reason: str) -> None:
         states = tuple(

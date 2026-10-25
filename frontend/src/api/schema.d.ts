@@ -786,10 +786,10 @@ export interface components {
             final_url: string;
             /**
              * Parser Version
-             * @default research-extract-v2
-             * @constant
+             * @default research-extract-v3
+             * @enum {string}
              */
-            parser_version: "research-extract-v2";
+            parser_version: "research-extract-v2" | "research-extract-v3";
             /**
              * Rendered
              * @default false
