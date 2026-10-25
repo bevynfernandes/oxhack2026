@@ -1,1 +1,1 @@
-"""Availability-aware feature and target templates."""
+"""Availability-aware company features and separate outcome labels."""

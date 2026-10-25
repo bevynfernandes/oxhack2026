@@ -1,1 +1,1 @@
-"""Read-only API template; no application or endpoints are registered."""
+"""Public API contracts and explicit application composition."""

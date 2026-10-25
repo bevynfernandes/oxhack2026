@@ -45,7 +45,7 @@ The current evidence assessments are reconstructed and contain no probabilities.
 non-root user. It excludes collector/model jobs and source data from the image.
 Build from repository root, mount the verified data root read-only at `/data`,
 set the two environment variables above and bind port 8000. Make the mount readable
-by UID 10001. The root Dockerfile remains a development shell.
+by UID 10001.
 
 Docker is unavailable in this workspace: this recipe has not passed a container
 build/runtime gate. No cloud resources, TLS endpoint, PostgreSQL migration or

@@ -1,1 +1,1 @@
-"""Forecast model templates with no numerical implementation."""
+"""Model contracts, training, baseline forecasts and portable inference."""
