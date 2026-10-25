@@ -51,3 +51,8 @@ node_modules/
 !/reports/.gitkeep
 /tests/outputs/*
 !/tests/outputs/.gitkeep
+
+# Local Vercel project linkage
+.vercel/
+.vercel
+.env*

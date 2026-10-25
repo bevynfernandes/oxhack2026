@@ -1,5 +1,6 @@
 import ResearchTools from "./ResearchTools";
 import DecisionBrief from "./DecisionBrief";
+import SignalCharts from "./SignalCharts";
 import { evidenceSummary } from "./summary";
 import { CitedResearchAnalysis } from "./ResearchWorkflow";
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
@@ -160,8 +161,9 @@ export default function CompanyDossier({
   };
   const decisionLayout = !report;
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
-  const dimensionModels =
-    standalone?.dimension_models ?? profile?.dimension_models;
+  const dimensionModels = standalone
+    ? standalone.dimension_models
+    : profile?.dimension_models;
   const cashFlowResearch = standalone?.sources.find(
     (source) => source.provider === "sec",
   )?.cash_flow_research;
@@ -519,6 +521,43 @@ export default function CompanyDossier({
           )}
           summary={evidenceSummary(profile, standalone, report)}
           onEvidence={() => open({ kind: "sources", index: 1 })}
+        />
+      )}
+      {decisionLayout && (
+        <SignalCharts
+          observations={
+            standalone
+              ? standalone.observations.map((row) => ({
+                  id: row.observation_id,
+                  metric: row.metric_id,
+                  definition: row.definition,
+                  value:
+                    row.applicability === "applicable" &&
+                    !row.missing_reason &&
+                    row.unit === "downloads"
+                      ? (row.value ?? null)
+                      : null,
+                  window: row.window ?? null,
+                }))
+              : (profile?.metrics ?? []).map((row) => ({
+                  id: row.observation_id,
+                  metric: row.metric_id,
+                  value:
+                    row.state === "observed" &&
+                    row.value?.kind === "integer" &&
+                    profile?.definitions.some(
+                      (definition) =>
+                        definition.metric_id === row.metric_id &&
+                        definition.unit === "downloads",
+                    )
+                      ? row.value.value
+                      : null,
+                  window: row.window,
+                }))
+          }
+          models={dimensionModels}
+          outlook={outlook}
+          onEvidence={() => open({ kind: "driver", index: 0 })}
         />
       )}
       {(synthetic || partial || (report && !outlook?.forecasts)) && (
