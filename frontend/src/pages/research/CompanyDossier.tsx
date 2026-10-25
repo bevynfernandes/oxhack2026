@@ -164,6 +164,15 @@ export default function CompanyDossier({
       new Map(dimensionModels?.dimensions.map((row) => [row.group_id, row])),
     [dimensionModels],
   );
+  const eventSourceUrls = useMemo(
+    () =>
+      new Map(
+        standalone?.events.flatMap((event) =>
+          event.evidence_ids.map((id) => [id, event.url] as const),
+        ),
+      ),
+    [standalone?.events],
+  );
   const cutoff = outlook?.as_of ?? profile?.publication.source.as_of;
   const synthetic = profile?.publication.source.synthetic ?? false;
   const [mobileGroup, setMobileGroup] = useState(0);
@@ -624,6 +633,17 @@ export default function CompanyDossier({
       <section className="dossier-pillars" aria-label="Fundamental drivers">
         {groups.map((group, index) => {
           const row = sections.get(group.id);
+          const component = modelSections.get(group.id);
+          const sdkScore =
+            group.id === "adoption_retention" &&
+            component?.eligibility === "eligible"
+              ? component.score
+              : null;
+          const sentimentScore =
+            group.id === "attention_sentiment" &&
+            component?.eligibility === "eligible"
+              ? component.score
+              : null;
           const ids = row?.metric_observation_ids ?? [];
           const coverage = standalone?.mapping?.dimensions.find(
             (item) => item.group_id === group.id,
@@ -640,7 +660,11 @@ export default function CompanyDossier({
                   <span className="pillar-model">
                     {group.id === "financial_health" && cashFlowResearch
                       ? "Cash-flow component trained"
-                      : "Outcome model untrained"}
+                      : sdkScore != null
+                        ? "SDK component trained"
+                        : sentimentScore != null
+                          ? "Sentiment component trained"
+                          : "Outcome model untrained"}
                   </span>
                 </div>
                 <h3>
@@ -722,9 +746,27 @@ export default function CompanyDossier({
                 )}
               </div>
               <div className="pillar-model-note">
-                <span className="micro-label">SPECIALIST OUTLOOK</span>
-                <p>Business prediction unavailable</p>
-                <small>Requires training on later company outcomes</small>
+                <span className="micro-label">
+                  {sentimentScore != null
+                    ? "EXPERIMENTAL TEXT SENTIMENT"
+                    : sdkScore != null
+                      ? "EXPERIMENTAL SDK FORECAST"
+                      : "SPECIALIST OUTLOOK"}
+                </span>
+                <p>
+                  {sentimentScore != null
+                    ? `Title sentiment index ${sentimentScore.toFixed(1)} / 100`
+                    : sdkScore != null
+                      ? `SDK demand index ${sdkScore.toFixed(1)} / 100`
+                      : "Business prediction unavailable"}
+                </p>
+                <small>
+                  {sentimentScore != null
+                    ? `${component?.sample_size} retrieved titles; unvalidated financial-news model transfer`
+                    : sdkScore != null
+                      ? "Trained download forecast; not customer retention or business success"
+                      : "Requires training on later company outcomes"}
+                </small>
               </div>
               <footer>
                 <span
@@ -884,17 +926,38 @@ export default function CompanyDossier({
                   <p>Target: {dimensionModel.target}</p>
                   {dimensionModel.score != null && (
                     <p>
-                      SDK demand percentile: {dimensionModel.score.toFixed(1)} /
-                      100. This experiment was not trained on business successes
-                      or failures and does not score this business.
+                      {dimensionModel.group_id === "attention_sentiment"
+                        ? "Title sentiment index"
+                        : "SDK demand percentile"}
+                      : {dimensionModel.score.toFixed(1)} / 100. This experiment
+                      was not trained on business successes or failures and does
+                      not score this business.
                     </p>
                   )}
                   <p>
                     Inputs from source {dimensionModels?.source_snapshot_id} as
-                    of {date(dimensionModels?.as_of ?? null)}. The index is a
-                    percentile of training proxy outcomes, not a company-success
-                    probability.
+                    of {date(dimensionModels?.as_of ?? null)}.{" "}
+                    {dimensionModel.group_id === "attention_sentiment"
+                      ? `Based on ${dimensionModel.sample_size} distinct retrieved titles. The index is 50 × (1 + mean positive probability − mean negative probability).`
+                      : "The index is a percentile of training proxy outcomes."}{" "}
+                    It is not a company-success probability.
                   </p>
+                  {standalone?.evidence
+                    .filter((item) =>
+                      dimensionModel.evidence_ids?.includes(item.evidence_id),
+                    )
+                    .map((item) => (
+                      <blockquote key={item.evidence_id}>
+                        <p>{item.excerpt}</p>
+                        <SourceLink
+                          url={
+                            eventSourceUrls.get(item.evidence_id) ?? item.url
+                          }
+                        >
+                          Classified source title
+                        </SourceLink>
+                      </blockquote>
+                    ))}
                   <Reasons reasons={dimensionModel.reason_codes} />
                   <ul>
                     {dimensionModel.limitations.map((limitation) => (

@@ -147,11 +147,11 @@ experimental dimension models and does not create outcome probabilities. Existin
 company model payloads remain attached. Unknown definitions, rejected model
 proposals and bounded interpretation coverage have explicit reasons.
 
-Install the `research` and `explanations` extras for interpretation. Deterministic
-mapping is the default after retained live Gemini audits returned provider and
-background-completion failures. Explicitly setting
-`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini` enables the optional interpreter,
-using `gemini-3.8-live-extended-thinking` through Google's Live API. Set
+Install the `research` and `explanations` extras for interpretation. Evidence
+mapping defaults to `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini`, combining
+deterministic rules with `gemini-3.8-live-extended-thinking` through Google's Live
+API. Provider and background-completion failures remain explicit limitations
+and preserve supported rule-based results. Set
 `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` explicitly to make no model requests.
 The adapter enables audio output and transcription, discards audio immediately,
 and receives data through an asynchronous, local-only evidence submission function.

@@ -89,7 +89,9 @@ their original contents.
 For evidence interpretation, install `--extra research --extra explanations` in
 addition to the API/data profile (the API image includes both). Gemini Live
 interpretation is enabled by default. Set `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules`
-explicitly for deterministic mapping without model calls. A personal `GEMINI_API_KEY` overrides
+explicitly for deterministic mapping without model calls. Existing installations
+with that override must remove it or set it to `rules_gemini` and restart the API
+to enable Gemini interpretation. A personal `GEMINI_API_KEY` overrides
 the private repository's backend default; an explicit empty environment value
 disables it. `GEMINI_MODEL` changes the model only by explicit configuration.
 To re-map existing reports without fetching sources, enable

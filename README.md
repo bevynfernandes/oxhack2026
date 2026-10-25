@@ -132,8 +132,9 @@ The main company search accepts names and HTTPS websites. Name candidates come
 from a bundled, attributed public domain directory and require identity preview;
 names absent from the directory need an exact website. See
 [current source/model limits](docs/product/free-source-decisions.md) and
-[demo evidence and remaining work](FINAL_DEMO.md). Deterministic evidence mapping
-is the default; Gemini interpretation is optional.
+[demo evidence and remaining work](FINAL_DEMO.md). Evidence mapping combines
+deterministic rules with Gemini interpretation by default. Set
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` to disable model requests.
 It requires an explicit writable research root and opt-in collection worker; saved
 company publications are optional. The frontend supports domain confirmation,
 job progress, multi-source reports and explicit retained-evidence re-mapping.

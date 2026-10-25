@@ -242,6 +242,40 @@ def _identity() -> Identity:
     )
 
 
+def test_sdk_documentation_follows_official_libraries_before_package_collection(
+    tmp_path: Path,
+) -> None:
+    """Two first-party docs pages supply missing SDK links without guessing names."""
+    requested: list[str] = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        requested.append(str(request.url))
+        if request.url.path.endswith("quickstart"):
+            html = '<a href="/docs/resources/libraries">SDK libraries</a>'
+        else:
+            html = (
+                '<a href="https://www.npmjs.com/package/@example/sdk">SDK</a>'
+                '<a href="https://github.com/example/sdk">Source</a>'
+            )
+        return httpx.Response(200, text=html)
+
+    identity = _identity().model_copy(
+        update={"official_links": ("https://example.com/docs/quickstart",)}
+    )
+    collector = Collector(
+        _fetcher(tmp_path, httpx.MockTransport(respond)),
+        identity,
+        SourceState(provider="website", name="Website"),
+    )
+    collector._sdk_documentation()
+    assert requested == [
+        "https://example.com/docs/quickstart",
+        "https://example.com/docs/resources/libraries",
+    ]
+    assert "https://www.npmjs.com/package/@example/sdk" in collector.links
+    assert len(collector.support) == 2
+
+
 def test_extracts_claims_and_dates_without_inventing_metrics(tmp_path: Path) -> None:
     """Financial prose remains attributable evidence, with location and raw capture."""
     content = (
