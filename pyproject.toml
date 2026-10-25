@@ -1,14 +1,14 @@
 [project]
 name = "oxhack2026"
 version = "0.0.1"
-description = "SignalShift project scaffold for developer-tool scouting."
+description = "SignalShift company research and evidence-based startup outlooks."
 authors = [{ name = "Bevyn Fernandes, Ivan Topchu, Daniyal Rai" }]
 readme = "README.md"
-keywords = ["forecasting", "developer-tools", "signalshift"]
+keywords = ["company-research", "forecasting", "signalshift"]
 requires-python = ">=3.12,<3.13"
 dependencies = []
 classifiers = [
-    "Development Status :: 1 - Planning",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.12",
@@ -24,16 +24,8 @@ data = [
     "orjson>=3,<4",
     "polars>=1,<2",
     "pydantic>=2.12,<3",
-    "pydantic-settings>=2,<3",
-]
-storage = [
-    "alembic>=1,<2",
-    "boto3>=1,<2",
-    "psycopg[binary]>=3,<4",
-    "sqlalchemy>=2,<3",
 ]
 models = ["catboost>=1.2,<2", "numpy>=2,<3", "scikit-learn>=1.6,<2"]
-bigquery = ["google-cloud-bigquery>=3,<4"]
 explanations = [
     "google-genai>=1,<2",
     "python-dotenv>=1,<2",
@@ -53,9 +45,7 @@ dev = [
     "mypy>=1.19.1",
     "pre-commit>=4.5.1",
     "pytest>=9.0.2",
-    "pytest-cov>=7.0.0",
     "ruff==0.17.2",
-    "tox-uv>=1.33.4",
 ]
 docs = ["mkdocs>=1.6.1", "mkdocs-material>=9.7.6"]
 
@@ -99,10 +89,3 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101"]
-
-[tool.coverage.report]
-skip_empty = true
-
-[tool.coverage.run]
-branch = true
-source = ["oxhack2026"]
