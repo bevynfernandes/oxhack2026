@@ -25,7 +25,7 @@ export const config = {
   buildCommand: "npm run build --prefix frontend",
   outputDirectory: "frontend/dist",
   rewrites: [
-    { source: "/api/:path*", destination: `${origin.origin}/api/:path*` },
+    { source: "/api/:path*", destination: "/api/proxy?__path=:path*" },
     { source: "/(.*)", destination: "/index.html" },
   ],
   headers: [

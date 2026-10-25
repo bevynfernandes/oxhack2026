@@ -54,3 +54,5 @@ node_modules/
 
 # Local Vercel project linkage
 .vercel/
+.vercel
+.env*
