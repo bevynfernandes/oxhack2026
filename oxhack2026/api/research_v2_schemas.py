@@ -21,6 +21,7 @@ from oxhack2026.api.evidence_mapping_schemas import (
 from oxhack2026.api.research_schemas import Domain, JobState, ResearchRequest
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime, Window
 from oxhack2026.models.dimension_serving import CompanyDimensionModels
+from oxhack2026.models.financial_inference import CashFlowResearchEstimate
 from oxhack2026.models.startup_outlook import StartupOutlook
 from oxhack2026.storage.contracts import ArtifactReference
 
@@ -193,6 +194,9 @@ class SourceState(DTO):
     claims: tuple["Claim", ...] = ()
     events: tuple["Event", ...] = ()
     links: tuple[PublicURL, ...] = ()
+    cash_flow_research: CashFlowResearchEstimate | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 class Observation(DTO):
@@ -313,6 +317,20 @@ class Report(DTO):
         default=None, exclude_if=lambda value: value is None
     )
 
+    def _cash_flow_references(self, evidence: set[str]) -> None:
+        for source in self.sources:
+            estimate = source.cash_flow_research
+            if estimate is None:
+                continue
+            references = set(estimate.evidence_ids)
+            if (
+                source.provider != "sec"
+                or not references <= evidence
+                or not references <= {item.evidence_id for item in source.evidence}
+            ):
+                message = "Cash-flow research requires retained SEC source evidence"
+                raise ValueError(message)
+
     @model_validator(mode="after")
     def _references(self) -> Self:
         captures = {item.capture_id for item in self.captures}
@@ -332,6 +350,7 @@ class Report(DTO):
             if not set(item.evidence_ids) <= evidence:
                 message = "Result references absent evidence"
                 raise ValueError(message)
+        self._cash_flow_references(evidence)
         if len({item.observation_id for item in self.observations}) != len(
             self.observations
         ):

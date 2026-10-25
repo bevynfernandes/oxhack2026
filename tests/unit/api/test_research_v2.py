@@ -773,6 +773,105 @@ def test_sec_history_retains_pages_and_rejects_incomplete_model_inputs(
     assert all("other.example" not in capture.url for capture in result.captures)
 
 
+@pytest.mark.parametrize("missing_cash_flow", [False, True])
+def test_sec_research_inference_uses_original_financial_facts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, missing_cash_flow: bool
+) -> None:
+    """A verified CIK yields an evidenced estimate; missing cash flow stays missing."""
+    from unittest.mock import mock_open
+
+    import orjson
+
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS", "reviewed.json")
+    monkeypatch.setenv("SEC_USER_AGENT", "Fixture research@example.invalid")
+    accession = "0000000123-26-000001"
+    mapping = [
+        {
+            "domain": "example.com",
+            "jurisdiction": "US",
+            "reviewed": True,
+            "evidence_url": "https://example.com/legal",
+            "cik": "123",
+        }
+    ]
+    concepts = {
+        "Revenues": 100_000_000,
+        "Assets": 150_000_000,
+        "NetCashProvidedByUsedInOperatingActivities": 10_000_000,
+    }
+    facts = {
+        name: {
+            "units": {
+                "USD": [
+                    {
+                        "accn": accession,
+                        "form": "10-K",
+                        "filed": "2026-02-01",
+                        "end": "2025-12-31",
+                        "val": value,
+                        **({"start": "2025-01-01"} if name != "Assets" else {}),
+                    }
+                ]
+            }
+        }
+        for name, value in concepts.items()
+        if not (
+            missing_cash_flow and name == "NetCashProvidedByUsedInOperatingActivities"
+        )
+    }
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "example.com":
+            assert request.headers["user-agent"] != "Fixture research@example.invalid"
+            return httpx.Response(200, text="Example legal identity")
+        if "companyfacts" in request.url.path:
+            return httpx.Response(200, json={"cik": 123, "facts": {"us-gaap": facts}})
+        return httpx.Response(
+            200,
+            json={
+                "cik": 123,
+                "name": "Example Legal",
+                "filings": {
+                    "recent": {
+                        "form": ["10-K"],
+                        "filingDate": ["2026-02-01"],
+                        "reportDate": ["2025-12-31"],
+                        "accessionNumber": [accession],
+                    },
+                    "files": [],
+                },
+            },
+        )
+
+    fetcher = _fetcher(tmp_path, httpx.MockTransport(respond))
+    with patch(
+        "oxhack2026.research.registry.open",
+        mock_open(read_data=orjson.dumps(mapping)),
+        create=True,
+    ):
+        result = Collector(
+            fetcher, _identity(), SourceState(provider="sec", name="SEC")
+        ).collect()
+    estimate = result.cash_flow_research
+    if missing_cash_flow:
+        assert estimate is None
+        assert (
+            "sec_model_requires_origin_revenue_cash_flow_and_assets"
+            in result.reason_codes
+        )
+    else:
+        assert estimate is not None
+        assert estimate.status == "research_estimate"
+        assert estimate.accession_number == accession
+        assert 0 <= estimate.probability <= 1
+        assert len(estimate.evidence_ids) == 3
+        assert set(estimate.evidence_ids) <= {
+            item.evidence_id for item in result.evidence
+        }
+        assert "experimental_cash_flow_research_model_ran" in result.reason_codes
+    assert len(result.captures) == 3
+
+
 def test_xml_entity_declarations_blocked(tmp_path: Path) -> None:
     """XML cannot resolve external entities around the controlled network boundary."""
     body = b'<?xml version="1.0"?><!DOCTYPE x [<!ENTITY secret SYSTEM "file:///etc/passwd">]><x>&secret;</x>'

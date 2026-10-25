@@ -6,6 +6,7 @@ import os
 import re
 from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Annotated
+from urllib.parse import urlsplit
 from uuid import uuid4
 
 import orjson
@@ -15,6 +16,8 @@ from pydantic import Field, TypeAdapter
 from oxhack2026.api.research_v2_schemas import Claim
 from oxhack2026.api.schemas import DTO, PublicURL
 from oxhack2026.features.disclosure_timing import sec_disclosure_timing
+from oxhack2026.features.sec_financials import sec_annual_filing_metadata
+from oxhack2026.models.financial_inference import estimate_annual_cash_flow
 from oxhack2026.research.network import CollectionError
 
 if TYPE_CHECKING:
@@ -64,7 +67,7 @@ def _registry_claims(
 
 def _sec_history(
     collector: "Collector", payload: object, cik: str, headers: dict[str, str]
-) -> None:
+) -> dict[str, object]:
     if not isinstance(payload, dict) or not isinstance(payload.get("filings"), dict):
         raise CollectionError("sec_missing_submissions_history")
     references = payload["filings"].get("files")
@@ -92,6 +95,7 @@ def _sec_history(
         if frame.height
         else "sec_no_annual_report_history"
     )
+    return history
 
 
 def _check_sec_response(
@@ -100,13 +104,13 @@ def _check_sec_response(
     cik: str,
     headers: dict[str, str],
     include_history: bool,
-) -> None:
+) -> dict[str, object] | None:
     if not isinstance(payload, dict) or str(payload.get("cik", "")).zfill(10) != cik:
         raise CollectionError("sec_cik_mismatch")
     if not include_history:
-        return
+        return None
     try:
-        _sec_history(collector, payload, cik, headers)
+        return _sec_history(collector, payload, cik, headers)
     except (CollectionError, orjson.JSONDecodeError) as error:
         reason = (
             str(error)
@@ -115,6 +119,49 @@ def _check_sec_response(
         )
         logger.error("SEC annual history is unavailable: %s", reason)  # noqa: TRY400
         collector.reasons.append(reason)
+        return None
+
+
+def _sec_cash_flow_research(
+    collector: "Collector",
+    payload: object,
+    submissions: object,
+    cik: str,
+    history: dict[str, object] | None,
+) -> None:
+    if history is None:
+        collector.reasons.append("sec_financial_model_requires_complete_metadata")
+        return
+    try:
+        now = datetime.now(UTC)
+        filings = sec_annual_filing_metadata(submissions, cik, now.date(), history)
+        collector.cash_flow_research = estimate_annual_cash_flow(
+            payload,
+            filings,
+            cik,
+            now,
+            tuple(item.evidence_id for item in collector.support),
+        )
+        collector.reasons.append("experimental_cash_flow_research_model_ran")
+    except (TypeError, ValueError, OSError, pl.exceptions.PolarsError) as error:
+        logger.error("SEC financial inference unavailable: %s", type(error).__name__)  # noqa: TRY400
+        collector.reasons.append(
+            str(error)
+            if isinstance(error, ValueError) and str(error).startswith("sec_")
+            else "sec_cash_flow_research_unavailable"
+        )
+
+
+def _mapping_support_headers(provider: str, url: str) -> dict[str, str] | None:
+    if provider == "sec" and urlsplit(url).hostname in {
+        "sec.gov",
+        "www.sec.gov",
+        "data.sec.gov",
+    }:
+        user_agent = os.environ.get("SEC_USER_AGENT", "")
+        if user_agent:
+            return {"User-Agent": user_agent}
+    return None
 
 
 def collect_registry(collector: "Collector") -> None:
@@ -145,7 +192,9 @@ def collect_registry(collector: "Collector") -> None:
     if len(matches) != 1:
         raise CollectionError("unverified_or_ambiguous_registry_mapping")
     mapping = matches[0]
-    capture, content = collector.fetcher.fetch(mapping.evidence_url)
+    capture, content = collector.fetcher.fetch(
+        mapping.evidence_url, _mapping_support_headers(provider, mapping.evidence_url)
+    )
     from oxhack2026.research.extraction import evidence
 
     item = evidence(
@@ -173,10 +222,18 @@ def collect_registry(collector: "Collector") -> None:
         headers = {
             "Authorization": "Basic " + base64.b64encode(f"{key}:".encode()).decode()
         }
+    submissions: object = None
+    history: dict[str, object] | None = None
     for index, endpoint in enumerate(endpoints):
         payload, support = collector.json(endpoint, headers)
         if provider == "sec":
-            _check_sec_response(collector, payload, cik, headers, index == 0)
+            checked_history = _check_sec_response(
+                collector, payload, cik, headers, index == 0
+            )
+            if index == 0:
+                submissions, history = payload, checked_history
+            else:
+                _sec_cash_flow_research(collector, payload, submissions, cik, history)
         collector.claims.extend(
             _registry_claims(
                 payload,

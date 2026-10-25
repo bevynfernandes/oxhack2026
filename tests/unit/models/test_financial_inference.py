@@ -1,13 +1,16 @@
 """Portable cash-flow inference validates transforms and preserves missing inputs."""
 
+from datetime import UTC, date, datetime
 from math import exp
 
+import polars as pl
 import pytest
 from pydantic import ValidationError
 
 from oxhack2026.features.sec_financial_panel import FINANCIAL_FEATURES
 from oxhack2026.models.financial_inference import (
     AnnualCashFlowModel,
+    estimate_annual_cash_flow,
     predict_annual_cash_flow,
 )
 
@@ -69,3 +72,79 @@ def test_invalid_inputs_do_not_generate_a_probability(
     """A damaged feature vector must fail before producing an apparent score."""
     with pytest.raises(ValueError):
         predict_annual_cash_flow(_model(), features)
+
+
+def _live_source() -> tuple[dict[str, object], pl.DataFrame]:
+    accession = "0000001750-20-000001"
+    payload = {
+        "cik": 1750,
+        "facts": {
+            "us-gaap": {
+                name: {
+                    "units": {
+                        "USD": [
+                            {
+                                "accn": accession,
+                                "filed": "2020-02-01",
+                                "form": "10-K",
+                                "end": "2019-12-31",
+                                "val": value,
+                                **({"start": "2019-01-01"} if name != "Assets" else {}),
+                            }
+                        ]
+                    }
+                }
+                for name, value in {
+                    "Revenues": 100.0,
+                    "Assets": 200.0,
+                    "NetCashProvidedByUsedInOperatingActivities": 10.0,
+                }.items()
+            }
+        },
+    }
+    filings = pl.DataFrame(
+        {
+            "accession_number": [accession],
+            "form": ["10-K"],
+            "filing_date": [date(2020, 2, 1)],
+            "period_end": [date(2019, 12, 31)],
+        }
+    )
+    return payload, filings
+
+
+def test_live_estimate_retains_filing_provenance_and_research_limits(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A valid original filing yields a clearly bounded, fully evidenced estimate."""
+    monkeypatch.setattr(
+        "oxhack2026.models.financial_inference._bundled_cash_flow_model",
+        lambda: (_model(), "2" * 64),
+    )
+    payload, filings = _live_source()
+    result = estimate_annual_cash_flow(
+        payload,
+        filings,
+        "0000001750",
+        datetime(2020, 2, 2, tzinfo=UTC),
+        ("mapping-proof", "submissions-proof", "facts-proof"),
+    )
+    assert result.status == "research_estimate"
+    assert result.accession_number == "0000001750-20-000001"
+    assert result.model_sha256 == "2" * 64
+    assert result.evaluation_sha256 == "1" * 64
+    assert 0 <= result.probability <= 1
+    assert any("25 issuers" in reason for reason in result.limitations)
+
+
+def test_live_estimate_rejects_stale_financials_before_reading_weights() -> None:
+    """A long-absent annual report cannot generate an apparently current score."""
+    payload, filings = _live_source()
+    with pytest.raises(ValueError, match="statement_stale"):
+        estimate_annual_cash_flow(
+            payload,
+            filings,
+            "0000001750",
+            datetime(2023, 2, 2, tzinfo=UTC),
+            ("mapping-proof", "submissions-proof", "facts-proof"),
+        )

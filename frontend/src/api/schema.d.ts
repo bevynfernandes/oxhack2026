@@ -758,6 +758,76 @@ export interface components {
             url: string;
         };
         /**
+         * CashFlowResearchEstimate
+         * @description Evidenced experimental component, separate from approved business forecasts.
+         *
+         *     Attributes:
+         *         status: Explicit research-estimate status, never validated private inference.
+         *         issuer_id: Independently verified SEC issuer CIK.
+         *         accession_number: Original annual report supplying the financial features.
+         *         filing_date: Publication date of that annual report.
+         *         period_end: Fiscal reporting period end; not a prediction-origin timestamp.
+         *         as_of: UTC collection/inference cutoff.
+         *         target: Versioned next-fiscal-year positive operating cash flow component.
+         *         probability: Experimental conditional probability, not a five-lane score.
+         *         architecture: Actual locally fitted classifier used for this output.
+         *         model_sha256: Exact bundled fitted parameter bytes used for inference.
+         *         evaluation_sha256: Exact frozen evaluation linked by the trained parameters.
+         *         evidence_ids: Supporting mapping, submissions and financial-fact captures.
+         *         limitations: Conditional follow-up, cohort transfer and horizon boundaries.
+         *     Raises:
+         *         ValueError: Dates contradict the source availability cutoff.
+         */
+        CashFlowResearchEstimate: {
+            /** Accession Number */
+            accession_number: string;
+            /**
+             * Architecture
+             * @default regularized_logistic_regression_c_0.1
+             * @constant
+             */
+            architecture: "regularized_logistic_regression_c_0.1";
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Evaluation Sha256 */
+            evaluation_sha256: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Filing Date
+             * Format: date
+             */
+            filing_date: string;
+            /** Issuer Id */
+            issuer_id: string;
+            /** Limitations */
+            limitations: string[];
+            /** Model Sha256 */
+            model_sha256: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Probability */
+            probability: number;
+            /**
+             * Status
+             * @default research_estimate
+             * @constant
+             */
+            status: "research_estimate";
+            /**
+             * Target
+             * @default positive_operating_cash_flow_1fy
+             * @constant
+             */
+            target: "positive_operating_cash_flow_1fy";
+        };
+        /**
          * Catalog
          * @description Versioned catalogue; batch reads use the batch's frozen mapping.
          */
@@ -2872,6 +2942,7 @@ export interface components {
              * @default []
              */
             captures: components["schemas"]["Capture"][];
+            cash_flow_research?: components["schemas"]["CashFlowResearchEstimate"] | null;
             /**
              * Claims
              * @default []
