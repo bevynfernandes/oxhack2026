@@ -64,6 +64,15 @@ This file records verified claims and remaining work. It is not a completion sig
 
 ## Work still required before a final-product claim
 
+The latest complete Cloudflare run passed in 32 seconds: primary name search,
+candidate selection, website confirmation, live source collection, and the
+trained annual cash-flow component displayed at 95.3%. The probability concerns
+positive operating cash flow next fiscal year, conditional on a future report;
+it is not a startup survival probability or a complete financial-health score.
+Desktop and 390px mobile passed without browser exceptions or horizontal overflow.
+See `docs/product/sec-full-search-browser-audit.json`; the retained local report is
+`/research/v2/reports/d82de792a93a4dc9ac0c1d3b85af8462`.
+
 - Establish the historical features and later business outcomes needed to train
   and backtest the requested dimension/outcome models.
 - Verify population coverage and model-input compatibility beyond the named
@@ -115,6 +124,24 @@ The cash-flow model's fitted JSON weights are bundled in
 matches the original pipeline across all 4,462 panel rows with maximum absolute
 probability difference 2.22e-16. This proves weight/transform parity, not complete
 production identity mapping or approval to score private companies.
+
+The live SEC collector now retains normalized original financial observations
+with exact JSON locations and can run the cash-flow component for reviewed issuer
+mappings with recent usable revenue, cash flow and assets. The Cloudflare probe
+retrieved four real captures and nine annual financial observations, published an
+immutable report, and read it back with its model/evaluation hashes intact.
+The report shows a **research estimate** of next-fiscal-year positive operating
+cash flow. This is not a complete financial-health score. The packaged catalog
+contains the reviewed Cloudflare domain/CIK link; unfamiliar companies do not
+inherit that mapping. All nine values matched an independent inline-XBRL parse
+of the original annual filing, including sign, scale, dates, currency and entity.
+
+Retained report: `/research/v2/reports/3558851a874b4be3a59527e92c170259`.
+Desktop/mobile checks passed with four supporting source documents, no browser
+exceptions, no horizontal overflow and no accessibility violations in the new
+component. See the [live report audit](docs/product/sec-live-cash-flow-report-audit.json),
+[numeric review](docs/product/sec-original-filing-numeric-review.json) and
+[browser audit](docs/product/sec-cash-flow-browser-audit.json).
 
 Do not demonstrate an SDK-download percentile as a business success score. Do not
 claim universal private-company financial data, validated probabilities, or a

@@ -59,6 +59,19 @@ model is not served; independent label/population review is also outstanding. It
 not replace the requested five business dimensions or private-startup forecasts.
 See [FINAL_DEMO.md](FINAL_DEMO.md) for verified demo claims and remaining work.
 
+A newer annual-financial experiment fitted eight classifiers on a fixed historical
+320-issuer cohort, with 290 official SEC responses. Regularized logistic regression
+for next-fiscal-year positive operating cash flow passed its statistical gate
+(ROC AUC 0.869 on 49 rows from 25 test issuers). Revenue-growth candidates lost to
+prevalence. The selected cash-flow weights are packaged as portable JSON and
+match the fitted pipeline on all 4,462 panel rows. A reviewed SEC identity with
+recent usable financials can now show dated original financial facts and an
+explicitly experimental cash-flow estimate in the report. The packaged identity
+catalog currently covers Cloudflare; other domains require reviewed mappings.
+This component does not complete the five business dimensions or private-company
+forecasts. See the [evaluation](docs/product/sec-cash-flow-evaluation.json) and
+[real report audit](docs/product/sec-live-cash-flow-report-audit.json).
+
 For local public-filings collection, configure `SEC_USER_AGENT` with your app and
 contact in the ignored `.env`, then launch with `uv run --env-file .env ...`.
 The API reads explicit process settings; it does not load that file implicitly.

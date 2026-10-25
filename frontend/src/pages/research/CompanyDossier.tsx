@@ -907,12 +907,14 @@ export default function CompanyDossier({
                 reasons={
                   section?.reason_codes.filter(
                     (reason) =>
-                      (!dimensionModel && !isCashFlowDriver) ||
-                      reason !== "model_not_trained",
+                      (!isCashFlowDriver ||
+                        reason !== "sec_annual_financial_component_only") &&
+                      ((!dimensionModel && !isCashFlowDriver) ||
+                        reason !== "model_not_trained"),
                   ) ?? ["no_published_group_mapping", "model_not_trained"]
                 }
               />
-              {standalone && !standalone.mapping && (
+              {standalone && !standalone.mapping && !isCashFlowDriver && (
                 <p>
                   This report has no published dimension evidence mapping.{" "}
                   <MotionButton

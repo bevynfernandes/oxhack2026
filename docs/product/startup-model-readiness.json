@@ -124,8 +124,8 @@
     },
     "eligible_for_serving": false,
     "remaining_release_checks": [
-      "Independent numeric and corporate-family/scope review",
-      "Verified live legal-entity mapping and report integration",
+      "Broader independent numeric and corporate-family/scope review",
+      "Expand verified domain-to-legal-entity mappings beyond the one reviewed identity",
       "Population transfer and sparse follow-up limits"
     ],
     "does_not_supply": [
@@ -139,6 +139,14 @@
       "rows": 4462,
       "max_absolute_probability_error": 2.220446049250313e-16,
       "audit": "docs/product/sec-cash-flow-portable-parity.json"
+    },
+    "experimental_report_integration": {
+      "status": "verified_for_reviewed_cloudflare_identity",
+      "financial_observations": 9,
+      "audit": "docs/product/sec-live-cash-flow-report-audit.json",
+      "browser_audit": "docs/product/sec-cash-flow-browser-audit.json",
+      "numeric_review": "docs/product/sec-original-filing-numeric-review.json",
+      "default_identity_catalog": "oxhack2026/research/bundled/reviewed-registry-mappings.json"
     }
   }
 }

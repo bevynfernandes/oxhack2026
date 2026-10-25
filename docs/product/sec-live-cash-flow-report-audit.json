@@ -1,0 +1,53 @@
+{
+  "collected_at": "2026-10-25T00:36:36.719328+00:00",
+  "report_id": "3558851a874b4be3a59527e92c170259",
+  "url": "/research/v2/reports/3558851a874b4be3a59527e92c170259",
+  "flow": "Reviewed exact CIK/domain mapping -> production Fetcher -> complete SEC history -> original financial features -> bundled local inference -> immutable report read-back",
+  "captures": 4,
+  "source_reason_codes": [
+    "sec_annual_timing_inputs_validated",
+    "experimental_cash_flow_research_model_ran",
+    "bounded_registry_history_periods_preserved_in_capture"
+  ],
+  "cash_flow_research": {
+    "status": "research_estimate",
+    "issuer_id": "0001477333",
+    "accession_number": "0001477333-26-000016",
+    "filing_date": "2026-02-26",
+    "period_end": "2025-12-31",
+    "as_of": "2026-10-25T00:36:36.691945Z",
+    "target": "positive_operating_cash_flow_1fy",
+    "probability": 0.953026860907715,
+    "architecture": "regularized_logistic_regression_c_0.1",
+    "model_sha256": "b0c276ed3db52019056b49896fed6f5a634ecea53dfd562e04d1601aeb441767",
+    "evaluation_sha256": "73ec4483e6c69a72ef8249eab882ec6e2d8dcd646916c13069412198fa84237f",
+    "evidence_ids": [
+      "5de5c6da49d640bbac1a0300056945bf",
+      "08b18f346c9b42dcab64010102a47b79",
+      "7c73946895824e81ae13fa3e9689b9f1",
+      "a03b322174a8404aa25c446eb3c9468d",
+      "3dd8192b72124f868889f5a222063dc6",
+      "a04f1bea1750443996edefe1a73f62f0",
+      "67e8ae0faa7e4fa8aa795ed7c7772b6a",
+      "81f396e6e40d4bf387d94f11d99b61aa",
+      "1b8f4a742c08447d8d80947ac56cc00e",
+      "4d6b3b29030045ee961f1fce234b83b8",
+      "d7a61ceb96cb4cd19c711cf660f738a9",
+      "0b0a816dac1a4273b23465612061c6ff",
+      "5d54ab8a651545deb8efe104a9c727bc"
+    ],
+    "limitations": [
+      "Exploratory public-issuer model; not validated for private startups.",
+      "Next-fiscal-year positive cash flow, conditional on observed follow-up.",
+      "Fiscal-year endpoint differs from 12 months after this report.",
+      "Test covered 25 issuers; corporate-family/scope review is incomplete.",
+      "This component does not measure survival, unrestricted runway or Overall."
+    ]
+  },
+  "identity_review_url": "https://www.sec.gov/Archives/edgar/data/1477333/000147733326000016/cloud-20251231.htm",
+  "identity_review_quote": "https://www.cloudflare.com/impact/",
+  "automatic_name_to_cik_tested": false,
+  "private_company_transfer_validated": false,
+  "financial_observations": 9,
+  "financial_data_status": "available"
+}
