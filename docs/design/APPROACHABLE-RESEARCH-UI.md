@@ -69,3 +69,44 @@
 - Keep the moving artwork in its own non-interactive region beside the hero.
   Evidence, table values and source ordering remain immediate and unchanged.
 - The existing working checkout and its untracked `Design.md` are not modified.
+
+## Changed files
+
+- `frontend/src/theme/theme.css`: shared palette, typography, panel geometry,
+  search/result layout, touch targets and responsive presentation.
+- `frontend/src/pages/companies/CompanyHomePage.tsx`: form styling hook,
+  confirmation help text and the saved-research heading; handlers unchanged.
+- `frontend/tests/unit/theme.test.ts`: check the new explicit action-text token
+  against both primary action backgrounds using the existing AA threshold.
+- `frontend/tests/e2e/theme.spec.ts`: updated canvas expectation and additional
+  320px, 768px and 1024px target-size, keyboard, overflow and accessibility checks.
+- `docs/design/TECHNO-CLASSICAL-THEME.md`: link the historical foundation to the
+  current presentation guide.
+- `docs/design/APPROACHABLE-RESEARCH-UI.md`: design decisions and delivery record.
+
+## Remaining constraints
+
+- Evidence panels retain their existing compact metadata and internal scrolling;
+  the page-fit regression still covers laptops and phones down to 375 × 667.
+- The narrow-screen footer keeps its existing truncated qualification; complete
+  explanations remain on the report and methodology pages.
+- The production build still reports the existing large JavaScript chunk warning.
+  This refinement adds no package, chart animation or new animation engine.
+
+## Delivery validation
+
+- Base: PR #86 at `cdabe8037ce050c8ed55986b78ee3b8efbe57f55`.
+- Unit suite: 71 passed, including spring physics, reduced motion, ambient motion,
+  disclosure lifecycle, engine boundaries and token contrast.
+- Browser suite: 55 passed, including axe audits, five dossier viewport sizes,
+  keyboard/Escape/focus restoration, responsive tables, route motion and polling.
+- Generated API types, TypeScript, production build and frontend formatting pass.
+- Real local-backend smoke: Qdrant opens, Adoption & Retention opens and closes
+  with Escape, no page errors and no horizontal document overflow on mobile.
+- No changes to backend, contracts, API client, dependencies or motion code
+  relative to PR #86. No live research/collection job was started for visual QA.
+- Baseline captures: `tests/outputs/ui-polish-before/` (integrated main at
+  `64fa8d6`, before applying the refinement).
+- Final screenshots and traces: `tests/outputs/ui-polish-integrated/`.
+- Local-backend captures: `tests/outputs/ui-polish/live/`.
+- Logs: `tests/outputs/ui-polish/integrated-{unit,browser,build,format}.log`.
