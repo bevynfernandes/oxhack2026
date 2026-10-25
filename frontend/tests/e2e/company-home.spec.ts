@@ -15,6 +15,9 @@ test("company homepage searches and opens a saved analysis with keyboard", async
     name: "Open dossier for Synthetic alpha",
   });
   await expect(analysis).toBeVisible();
+  await expect(analysis).toHaveCSS("display", /^(inline-)?flex$/);
+  await expect(analysis).toHaveCSS("align-items", "center");
+  await expect(analysis).toHaveCSS("justify-content", "center");
   await expect(
     page.getByRole("link", { name: "Open dossier for Synthetic beta" }),
   ).toHaveCount(0);
@@ -47,6 +50,24 @@ test("company homepage searches and opens a saved analysis with keyboard", async
   ).toBeVisible();
 });
 
+for (const status of [404, 500, 503]) {
+  test(`unavailable name lookup (${status}) explains how to research a website without a saved-link error`, async ({
+    page,
+  }) => {
+    await page.route("**/api/v2/company-search", (route) =>
+      route.fulfill({ status, json: {} }),
+    );
+    await page.goto("/");
+    await page.getByLabel("Search companies").fill("Posthog");
+    await page
+      .getByRole("button", { name: "Research company", exact: true })
+      .click();
+    await expect(page.getByRole("alert")).toHaveText(
+      "Company-name lookup is unavailable. Enter the company’s exact website domain to research it directly.",
+    );
+  });
+}
+
 test("homepage honestly handles empty and failed publication lists", async ({
   page,
 }) => {
@@ -73,7 +94,7 @@ test("homepage honestly handles empty and failed publication lists", async ({
   );
 });
 
-test("directory pagination and footer remain reachable on a small mobile screen", async ({
+test("directory pagination remains reachable on a small mobile screen", async ({
   page,
 }) => {
   await page.route("**/api/v1/company-snapshots/*/companies", async (route) => {
@@ -98,11 +119,9 @@ test("directory pagination and footer remain reachable on a small mobile screen"
     page.getByRole("link", { name: /Open dossier for/ }),
   ).toHaveCount(2);
   await expect(page.getByText("Page 1 of 2")).toBeVisible();
-  const footer = page.getByRole("link", {
-    name: "Browse publications & compare companies",
-  });
-  await footer.scrollIntoViewIfNeeded();
-  await expect(footer).toBeInViewport();
+  const next = page.getByRole("button", { name: "Next", exact: true });
+  await next.scrollIntoViewIfNeeded();
+  await expect(next).toBeInViewport();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -176,3 +195,126 @@ test("search covers every configured publication and dotted company names", asyn
     page.getByRole("link", { name: "Open dossier for Node.js" }),
   ).toHaveCount(0);
 });
+
+test("desktop homepage fits without footer clutter and keeps background motion visible", async ({
+  page,
+}, info) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(
+    page.getByRole("link", { name: "Open dossier for Synthetic alpha" }),
+  ).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator(".directory-footer")).toHaveCount(0);
+  await expect(page.locator(".app-shell > footer")).toBeHidden();
+  for (const [width, height] of [
+    [1280, 720],
+    [1366, 768],
+    [1440, 900],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect
+      .poll(
+        () =>
+          page
+            .locator("main")
+            .evaluate((node) => node.scrollHeight <= node.clientHeight),
+        { message: `${width}x${height} homepage must fit` },
+      )
+      .toBe(true);
+    await expect(
+      page.getByRole("link", { name: "Open dossier for Synthetic beta" }),
+    ).toBeInViewport();
+    await page.screenshot({ path: info.outputPath(`home-fit-${width}.png`) });
+  }
+  const pattern = page.locator('[data-motion-ambient="drift"]');
+  expect(
+    await pattern.evaluate((node) => Number(getComputedStyle(node).opacity)),
+  ).toBeGreaterThanOrEqual(0.6);
+  expect(
+    await page
+      .locator(".home-pattern-region-left")
+      .evaluate((node) => getComputedStyle(node).position),
+  ).toBe("fixed");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const start = await pattern.evaluate(
+    (node) => getComputedStyle(node).transform,
+  );
+  await expect
+    .poll(() => pattern.evaluate((node) => getComputedStyle(node).transform))
+    .not.toBe(start);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect
+    .poll(() =>
+      pattern.evaluate(
+        (node) =>
+          new DOMMatrixReadOnly(getComputedStyle(node).transform).isIdentity,
+      ),
+    )
+    .toBe(true);
+  await page.setViewportSize({ width: 375, height: 667 });
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Compare & explore" }),
+  ).toBeVisible();
+  expect((await auditAccessibility(page)).violations).toEqual([]);
+});
+
+for (const width of [375, 1024, 1440]) {
+  test(`name-search candidates retain readable identities and usable actions at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const previews: unknown[] = [];
+    await page.route("**/api/v2/company-search", (route) =>
+      route.fulfill({
+        json: {
+          query: "ElevenLabs",
+          reason_codes: [],
+          candidates: ["elevenlabs.io", "eleven-labs.com"].map((domain) => ({
+            domain,
+            name: "ElevenLabs company candidate",
+            website: `https://${domain}`,
+            source: "public_directory",
+          })),
+        },
+      }),
+    );
+    await page.route("**/api/v2/research-identities", (route) => {
+      previews.push(route.request().postDataJSON());
+      return route.fulfill({ status: 503, json: {} });
+    });
+    await page.goto("/");
+    await page.getByLabel("Search companies").fill("ElevenLabs");
+    await page
+      .getByRole("button", { name: "Research company", exact: true })
+      .click();
+    const rows = page.locator(".company-candidates li");
+    await expect(rows).toHaveCount(2);
+    for (const row of await rows.all()) {
+      const identity = row.locator("div").first();
+      expect((await identity.boundingBox())!.width).toBeGreaterThan(140);
+      expect(
+        await identity.evaluate((node) => node.scrollWidth <= node.clientWidth),
+      ).toBe(true);
+      await expect(row.getByRole("button")).toBeEnabled();
+    }
+    expect(
+      await page
+        .locator("main")
+        .evaluate((node) => node.scrollWidth <= node.clientWidth),
+    ).toBe(true);
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+    expect(previews).toEqual([]);
+    await page
+      .getByRole("button", { name: "Inspect eleven-labs.com", exact: true })
+      .click();
+    await expect(page.getByRole("alert")).toContainText(
+      "Research is unavailable",
+    );
+    expect(previews).toEqual([{ domain: "https://eleven-labs.com" }]);
+  });
+}

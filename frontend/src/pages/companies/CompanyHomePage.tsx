@@ -65,7 +65,7 @@ export default function CompanyHomePage() {
     }),
   });
   const rows =
-    publications.length > 0
+    publications.length > 0 && companyQueries.every((query) => !query.isPending)
       ? companyQueries
           .flatMap((query, index) =>
             (query.data?.items ?? []).map((row) => ({
@@ -102,8 +102,9 @@ export default function CompanyHomePage() {
             <p className="eyebrow">SOFTWARE & SAAS RESEARCH</p>
             <h1>Company research workspace</h1>
             <p>
-              Research a company by name or website, then inspect its outlook,
-              fundamentals and source evidence.
+              Build a dated evidence report from a company’s website. Inspect
+              fundamentals and sources; validated success predictions are
+              unavailable.
             </p>
           </div>
           <span className="directory-status">
@@ -128,11 +129,34 @@ export default function CompanyHomePage() {
               <span>NAME / DOMAIN</span>
             </div>
             <form
-              className="terminal-search"
+              className="terminal-search company-research-form"
               onSubmit={(event) => {
                 event.preventDefault();
-                if (search.trim().length >= 2 && !searching)
-                  lookup.mutate(search.trim());
+                const query = search.trim();
+                if (query.length < 2 || searching) return;
+                const host = companyDomain(
+                  query.includes("://") ? query : `https://${query}`,
+                );
+                // Exact websites use standalone discovery, independent of saved publications.
+                if (host?.includes(".")) preview.mutate(query);
+                else {
+                  const exact = companyQueries
+                    .flatMap((result) => result.data?.items ?? [])
+                    .filter(
+                      (row) =>
+                        row.company.display_name.toLowerCase() ===
+                        query.toLowerCase(),
+                    );
+                  const domains = [
+                    ...new Set(
+                      exact
+                        .map((row) => companyDomain(row.company.website_url))
+                        .filter((domain): domain is string => Boolean(domain)),
+                    ),
+                  ];
+                  if (domains.length === 1) preview.mutate(domains[0]);
+                  else lookup.mutate(query);
+                }
               }}
             >
               <label htmlFor="company-domain-search">Search companies</label>
@@ -170,9 +194,12 @@ export default function CompanyHomePage() {
                   )}
                 </MotionButton>
               </div>
-              <p id="company-domain-search-help">
-                Search saved companies immediately or inspect a new company by
-                its name or exact website domain.
+              <p
+                id="company-domain-search-help"
+                className="company-search-help"
+              >
+                Enter a name or website. You’ll confirm the company before
+                research begins.
               </p>
             </form>
             {(lookup.error || preview.error) && (
@@ -252,14 +279,16 @@ export default function CompanyHomePage() {
             )}
             {rows && (
               <>
+                <h3 className="saved-research-heading">Saved research</h3>
                 <p className="directory-count" role="status">
                   {rows.length} {rows.length === 1 ? "company" : "companies"}{" "}
                   available across configured publications
                 </p>
                 {rows.length === 0 && (
                   <p>
-                    No companies match your search. Try another company name or
-                    exact website domain.
+                    No companies match your search in saved research. Enter the
+                    company’s website and select Research company to research it
+                    for the first time.
                   </p>
                 )}
                 <ul className="company-results">
@@ -336,9 +365,6 @@ export default function CompanyHomePage() {
                 )}
               </>
             )}
-            <div className="directory-footer">
-              <Link to="/explore">Browse publications & compare companies</Link>
-            </div>
           </section>
         </MotionSurface>
         <MotionSurface className="home-motion-surface home-motion-fundamentals">

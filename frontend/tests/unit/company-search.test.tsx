@@ -50,34 +50,21 @@ function workspace() {
   );
 }
 
-it("uses the primary search bar to preview an explicitly supplied domain", async () => {
-  vi.mocked(searchCompanies).mockResolvedValue({
-    query: "example.com",
-    reason_codes: [],
-    candidates: [
-      {
-        name: "example.com",
-        domain: "example.com",
-        website: "https://example.com",
-        source: "input",
-      },
-    ],
-  });
-  workspace();
-  fireEvent.change(screen.getByLabelText("Search companies"), {
-    target: { value: "example.com" },
-  });
-  fireEvent.click(screen.getByRole("button", { name: "Research company" }));
-  expect(await screen.findByText("Check this company identity")).toBeVisible();
-  expect(searchCompanies).toHaveBeenCalledWith(
-    "example.com",
-    expect.anything(),
-  );
-  expect(previewCompany).toHaveBeenCalledWith(
-    "https://example.com",
-    expect.anything(),
-  );
-});
+it.each(["example.com", "https://example.com/about", "www.example.com"])(
+  "previews an unsaved website directly without name lookup: %s",
+  async (domain) => {
+    workspace();
+    fireEvent.change(screen.getByLabelText("Search companies"), {
+      target: { value: domain },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Research company" }));
+    expect(
+      await screen.findByText("Check this company identity"),
+    ).toBeVisible();
+    expect(searchCompanies).not.toHaveBeenCalled();
+    expect(previewCompany).toHaveBeenCalledWith(domain, expect.anything());
+  },
+);
 
 it("requires a website choice for ambiguous company names", async () => {
   vi.mocked(searchCompanies).mockResolvedValue({
@@ -139,7 +126,7 @@ it("keeps new research available when saved assessments cannot be loaded", async
 });
 
 it("shows the supplied website favicon while company lookup is pending", async () => {
-  vi.mocked(searchCompanies).mockReturnValue(new Promise(() => {}));
+  vi.mocked(previewCompany).mockReturnValue(new Promise(() => {}));
   workspace();
   fireEvent.change(screen.getByLabelText("Search companies"), {
     target: { value: "elevenlabs.io" },

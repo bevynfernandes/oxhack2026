@@ -1,3 +1,4 @@
+import ResearchLibrary from "../research/ResearchLibrary";
 import {
   MotionButton,
   MotionInput,
@@ -105,6 +106,12 @@ export default function CompanyListPage() {
           peers.
         </p>
       </header>
+      <ResearchLibrary />
+      <h2>Published company cohorts</h2>
+      <p>
+        These historical dossiers share a published snapshot. Fresh reports
+        appear in Your research above after you open them.
+      </p>
       <QueryState
         pending={choices.isPending}
         error={choices.error}
