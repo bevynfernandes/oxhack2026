@@ -9,7 +9,7 @@ compare relevant peers. [PLAN.md](PLAN.md) defines the revised product;
 implemented. The initial Qdrant/Weaviate bundle includes dated public evidence and
 explicit commercial gaps. A separate 229-company public discovery cohort retains
 inactive/acquired companies without inventing historical labels. Company API/UI
-integration is tracked in [the acceptance audit](docs/workstreams/dev1/STATUS.md).
+checks are retained in [the initial acceptance audit](docs/archive/workstreams/dev1/STATUS.md).
 No validated startup-success probabilities are claimed.
 
 ## Development setup
@@ -29,7 +29,6 @@ Individual runtime environments can use narrower profiles, for example:
 uv sync --frozen --no-dev --extra api --extra data
 ```
 
-Extras reserve dependencies only; installing them does not implement features.
 Notebook helpers are installed into the local virtual environment and are not
 project requirements. An exact `uv sync` can remove those helpers; rerun
 `make notebooks` or use `--inexact` when preserving them.
@@ -57,8 +56,9 @@ npm --prefix frontend run dev
 ```
 
 See [frontend/README.md](frontend/README.md) for the frontend structure.
-See [the API handoff](docs/workstreams/dev3/README.md) for backend startup and
-repository wiring. Administrative data commands are available through
+See [the local runtime runbook](deploy/local/README.md) for backend startup,
+publication selection and worker configuration. Administrative data commands are
+available through
 `python -m oxhack2026 data --help`; no `signalshift` shell entry point is installed.
 
 ## Verification
@@ -80,6 +80,7 @@ no external services. CI installs all declared extras and runs shared checks.
 | `oxhack2026/features`, `models`, `evaluation`, `explanations` | Model contracts, evidence assessments and research evaluation |
 | `oxhack2026/api`, `frontend` | Public API and company workflow |
 | `oxhack2026/cli` | Administrative commands |
+| `oxhack2026/research` | Identity confirmation, durable jobs and source-linked reports |
 | `contracts`, `configs`, `data/catalog` | Versioned schemas and nonsecret recipes/identity evidence |
 | `artifacts`, `reports`, `tests/outputs` | Ignored generated data and retained validation artifacts |
 | `deploy`, `docs/tasks` | Runtime/operations and reviewed handoffs |
@@ -92,15 +93,15 @@ recipe and its runtime configuration.
 
 ## Contributions
 
-For the three-developer implementation split, start with
-[the team guide](plans/README.md) and the individual workstream plans it links.
+Current setup and review steps are in [CONTRIBUTING.md](CONTRIBUTING.md).
+Historical plans, handoffs and completed checkpoints are indexed in
+[the project archive](docs/archive/index.md).
 
-Read [AGENTS.md](AGENTS.md), [CONTRIBUTING.md](CONTRIBUTING.md), and
-[PLAN.md](PLAN.md). Keep generated datasets, credentials, and retained test
+Read [AGENTS.md](AGENTS.md) and [PLAN.md](PLAN.md). Keep generated datasets, credentials, and retained test
 outputs out of version control.
 
 Standalone startup research is available through the additive v2 backend. See the
 [local worker setup, API sequence and evidence semantics](docs/tasks/dev3/research-v2.md).
 It requires an explicit writable research root and opt-in collection worker; saved
-company publications are optional. The existing frontend needs the corresponding
-v2 domain-confirmation and multi-source presentation work before exposing this flow.
+company publications are optional. The frontend supports domain confirmation,
+job progress, multi-source reports and explicit retained-evidence re-mapping.

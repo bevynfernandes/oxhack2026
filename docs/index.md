@@ -1,29 +1,37 @@
 # SignalShift
 
-Company outlooks from dated traction, execution, commercial and financing
-evidence. Three separate outcomes cover operating growth, cash-flow
-self-sufficiency, and financing/acquisition. The current product organizes
-verified evidence and explicit gaps; it does not serve validated probabilities.
+Company research and startup outlooks from dated adoption, execution, commercial
+and financing evidence. The application presents source-linked assessments,
+explicit gaps and restricted experimental model outputs. Company-outcome
+forecasts remain unavailable until their data and evaluation gates pass.
 
-## Implemented data path
+## Development and runtime
 
-- Strict company source contracts, effective identities and raw provenance.
-- Resumable npm/GitHub/primary-announcement collection and frozen source coverage.
-- Immutable source/assessment publication with exact readers and atomic pointers.
-- Real two-company evidence/assessment bundle with verified backup and recovery.
-- Public 229-company discovery cohort retaining inactive/acquired records and
-  unresolved follow-up, plus primary closure evidence for Datree.
+Use Python 3.12, uv and Node 24. From the repository root:
 
-## Operations and status
+```bash
+make install notebooks frontend-install
+make check test build docs-test frontend-check
+```
 
-- [Dev 1 acceptance audit](workstreams/dev1/STATUS.md).
-- [Company collection](tasks/dev1/D1-O2-company-collection.md).
-- [Public cohort discovery](tasks/dev1/D1-O4-public-cohort-discovery.md).
-- [Real assessment handoff](tasks/dev1/D1-O5-real-assessment-handoff.md).
-- [Recovery and bounded refresh](tasks/dev1/D1-O6-local-recovery.md).
+- [Local API and container setup](https://github.com/bevynfernandes/oxhack2026/blob/main/deploy/local/README.md).
+- [Standalone research, worker storage and provider configuration](tasks/dev3/research-v2.md).
+- [Company publication recovery and bounded refresh](tasks/dev1/D1-O6-local-recovery.md).
+- [Module boundaries](modules.md) and [CI checks](ci-performance.md).
 
-The repository-root PLAN.md defines team scope. Run `make install notebooks
-frontend-install` for development and `make check test build docs-test` for shared
-Python checks. Run data filesystem acceptance explicitly with
-`uv run --frozen --no-sync pytest tests/integration/data -m integration`.
-No cloud deployment or predictive calibration is established by these checks.
+## Evidence and models
+
+Company sources, assessments and research reports retain dated provenance and
+immutable artifact references. Research can operate independently of saved
+company publications. Five experimental dimension models have retained training
+results and explicit serving restrictions; missing financials remain unknown.
+
+- [Dimension training results and forecast mapping](tasks/dev2/public-dimension-training-20261024.md).
+- [Public model research and source limits](tasks/dev2/public-model-research-20261024.md).
+- [Company outcome policy](tasks/dev2/company-outcome-policy.md).
+- [Product decisions](https://github.com/bevynfernandes/oxhack2026/blob/main/PLAN.md).
+
+Default unit tests and browser fixtures are synthetic software checks. Integration
+and real-data acceptance require their explicit local setup. Neither passing tests
+nor schema validity establishes predictive performance or cloud deployment.
+Historical plans and completed handoffs are in the [project archive](archive/index.md).

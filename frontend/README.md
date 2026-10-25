@@ -15,8 +15,8 @@ npm run dev
 ```
 
 Vite proxies `/api` to `http://127.0.0.1:8000`. Start the API separately using the
-Dev 3 deployment handoff. Production uses the same origin and needs no browser
-credentials or VITE-prefixed environment variables. Without a configured API
+[local runtime runbook](../deploy/local/README.md). Production uses the same
+origin and needs no browser credentials or VITE-prefixed environment variables. Without a configured API
 repository, the UI shows an explicit unavailable state.
 
 The application never imports test fixtures. The browser test command explicitly
@@ -151,15 +151,15 @@ No offline export or demo server is included in this workstream.
   states or read errors. POSTs never retry automatically; 429 shows Retry-After.
 - Standalone reports omit saved-assessment navigation. Fresh measurements, claims,
   retrieved events and capture provenance are inspectable in the existing drawer.
-  The backend currently leaves fresh metrics unassigned to model dimensions; the
-  UI provides a link to all fresh measurements instead of inventing a mapping.
+  Retained source evidence can be re-mapped when the runtime advertises that
+  capability; original fresh measurements remain inspectable independently.
 - **Refresh research** returns to explicit identity confirmation. It creates a new
   job/report and preserves the prior immutable report. No numerical forecasts are
   available; unavailable financials and incomplete counts remain explicit.
 - Runtime: configure `SIGNALSHIFT_RESEARCH_ROOT` and
   `SIGNALSHIFT_RESEARCH_ENABLED=1` as documented in
-  `docs/tasks/dev3/research-v2.md`. JavaScript rendering is optional; provider
-  credentials and reviewed registry mappings remain server-side.
+  [the research runtime guide](../docs/tasks/dev3/research-v2.md). JavaScript
+  rendering is optional; provider credentials and reviewed registry mappings remain server-side.
 - Live browser acceptance: set `SIGNALSHIFT_LIVE_RESEARCH_UI=1` with the real-company
   Playwright configuration and a separate writable research root. It researches
   Qdrant, PostHog and Linear through the UI, inspects genuine captures, refreshes

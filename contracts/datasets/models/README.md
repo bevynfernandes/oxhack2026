@@ -82,6 +82,6 @@ synthetic provenance. Placeholder paths/hashes are schema examples only and
 must not be loaded as real data or used in product demonstrations.
 
 C1 is merged. Observation identities remain dataset/mapping/revision references,
-while artifact references use C1 directly. Exact Parquet/Arrow feature layouts
-will be frozen with the D2-02 builders. Breaking field, target, or meaning changes
+while artifact references use C1 directly. Download feature and label builders
+select frozen observation vintages with explicit availability policies. Breaking field, target, or meaning changes
 increment the version and regenerate schemas and labelled fixtures together.

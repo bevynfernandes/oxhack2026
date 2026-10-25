@@ -1,10 +1,22 @@
-# Contract templates
+# Generated contracts
 
-Reserved for API and dataset schemas defined in PLAN.md sections 3, 5, and 8.
-No schema is frozen or implemented yet.
+Python types are the source of truth for the committed contract snapshots:
 
-- api/: future exported OpenAPI documents and labelled contract fixtures.
-- datasets/: future observation, dataset-manifest, feature, and label schemas.
+- [api/](api/README.md): OpenAPI and frontend TypeScript export workflow.
+- [datasets/data/](datasets/data/README.md): identities, observations, source
+  coverage, manifests and immutable artifact references.
+- [datasets/models/](datasets/models/README.md): features, labels, assessments,
+  forecasts and evaluation artifacts.
 
-Generate frontend types from the implemented API schema. Keep forecast and
-future-reveal payloads separate. Do not place invented production results here.
+Regenerate affected exports from the repository root:
+
+```bash
+uv run --frozen --no-sync python -m oxhack2026.api.export_contract
+uv run --frozen --no-sync python -m oxhack2026.storage.export_contracts
+uv run --frozen --no-sync python contracts/datasets/models/export.py
+npm --prefix frontend run generate:types
+```
+
+Saved tests check schema/OpenAPI drift, and frontend builds check generated types.
+Review breaking field, version or meaning changes together with their consumers
+and fixtures. Keep future labels/reveal payloads separate from features/forecasts.

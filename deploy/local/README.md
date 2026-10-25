@@ -41,8 +41,9 @@ The current evidence assessments are reconstructed and contain no probabilities.
 
 ## Container recipe
 
-`deploy/local/Dockerfile.api` packages only the API/data profile and runs as a
-non-root user. It excludes collector/model jobs and source data from the image.
+`deploy/local/Dockerfile.api` includes API/data, research and explanation
+dependencies plus Chromium, and runs as a non-root user. Training libraries and
+source data are excluded; the collection worker requires explicit runtime opt-in.
 Build from repository root, mount the verified data root read-only at `/data`,
 set the two environment variables above and bind port 8000. Make the mount readable
 by UID 10001.
