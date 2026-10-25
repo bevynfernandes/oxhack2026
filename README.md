@@ -88,6 +88,12 @@ unsupported business forecasts stay unavailable. See the
 Set `SIGNALSHIFT_PRELOADED_COMPANIES=0` to disable the default, or select your own
 explicit company root/publications as before.
 
+The two saved dossiers also display three dated AI-authored outlook indices,
+stored with the frontend so they need no live Gemini request or API key. These
+are subjective estimates, distinct from the statistical contracts above, and are
+not calibrated probabilities. They apply only to this exact source snapshot.
+See the [judge explanation](docs/qa/demo-judge-notes-2026-10-25.md).
+
 ## Frontend and API
 
 ```bash

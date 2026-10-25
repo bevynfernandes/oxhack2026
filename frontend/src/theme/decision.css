@@ -133,6 +133,129 @@
 .theme-techno-classical .decision-dossier .dossier-summary {
   gap: 12px;
 }
+.forecast-section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  padding: 12px 2px 0;
+}
+.forecast-section-heading h2 {
+  font: 500 clamp(26px, 3vw, 38px)/1.15 var(--theme-display);
+  margin: 8px 0 0;
+}
+.forecast-section-heading > p {
+  max-width: 240px;
+  font: 11px/1.6 var(--theme-mono);
+  margin: 0;
+}
+.theme-techno-classical .decision-dossier .prepared-outlooks {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.theme-techno-classical .decision-dossier .ai-forecast-card {
+  --forecast-accent: #a13e08;
+  align-items: start;
+  padding: 24px;
+  border-top: 4px solid var(--forecast-accent);
+  background-color: #fff0df;
+  box-shadow: 0 6px 24px #6829000b;
+}
+.theme-techno-classical .ai-forecast-card[data-outcome="survival"] {
+  --forecast-accent: #2f5b45;
+}
+.theme-techno-classical .ai-forecast-card[data-outcome="financial_health"] {
+  --forecast-accent: #62503c;
+}
+.ai-forecast-card > div {
+  width: 100%;
+}
+.forecast-card-meta,
+.forecast-card-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font: 9px/1.6 var(--theme-mono);
+  color: var(--theme-muted);
+}
+.theme-techno-classical .ai-forecast-card h3 {
+  font: 500 24px/1.25 var(--theme-display);
+  text-transform: none;
+  color: var(--theme-text);
+  letter-spacing: 0;
+  margin: 24px 0 12px;
+}
+.theme-techno-classical .ai-forecast-card .stat-value {
+  font: 500 76px/1 var(--theme-display);
+  color: var(--forecast-accent);
+  letter-spacing: -3px;
+  align-items: baseline;
+}
+.theme-techno-classical .ai-forecast-card .stat-unit {
+  font: 12px var(--theme-mono);
+  color: var(--theme-muted);
+  letter-spacing: 0;
+}
+.ai-forecast-card .forecast-score-label {
+  font: 10px var(--theme-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 10px;
+}
+.forecast-score-track {
+  height: 5px;
+  background: #dbc7ae;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+.forecast-score-track > span {
+  display: block;
+  height: 100%;
+  background: var(--forecast-accent);
+  border-radius: inherit;
+}
+.theme-techno-classical .ai-forecast-card .forecast-rationale {
+  font: 13px/1.7 var(--theme-body);
+  color: var(--theme-text);
+  margin-bottom: 20px;
+}
+.forecast-caveat {
+  padding: 14px 0;
+  margin-bottom: 12px;
+  border-top: 1px solid var(--theme-line);
+  border-bottom: 1px solid var(--theme-line);
+}
+.forecast-caveat > span {
+  font: 10px var(--theme-mono);
+  text-transform: uppercase;
+}
+.theme-techno-classical .ai-forecast-card .forecast-caveat p,
+.theme-techno-classical .ai-forecast-card .motion-disclosure-content p {
+  font: 12px/1.6 var(--theme-body);
+}
+.ai-forecast-card .forecast-card-footer {
+  align-items: center;
+  margin-bottom: 16px;
+}
+.ai-forecast-card details {
+  font-size: 12px;
+}
+.prepared-outlooks > .dossier-stat:last-child:not(.ai-forecast-card) {
+  grid-column: 1 / -1;
+}
+@media (max-width: 900px) {
+  .theme-techno-classical .decision-dossier .prepared-outlooks {
+    grid-template-columns: 1fr;
+  }
+  .forecast-section-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+  .forecast-section-heading > p {
+    max-width: none;
+  }
+}
 .theme-techno-classical .decision-dossier .dossier-stat {
   padding: 16px 20px;
   min-height: 118px;

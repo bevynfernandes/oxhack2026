@@ -16,6 +16,18 @@ for (const name of ["Qdrant", "Weaviate"]) {
     await expect(
       page.getByRole("heading", { name: "What the evidence tells us" }),
     ).toBeVisible();
+    const meters = page.getByRole("meter");
+    await expect(meters).toHaveCount(3);
+    const scores = name === "Qdrant" ? [76, 84, 58] : [72, 86, 60];
+    for (let index = 0; index < scores.length; index++) {
+      await expect(meters.nth(index)).toHaveAttribute(
+        "aria-valuenow",
+        String(scores[index]),
+      );
+    }
+    await expect(
+      page.getByText("AI outlook estimate", { exact: true }),
+    ).toHaveCount(3);
     for (const group of [
       "Adoption & Retention",
       "Attention & Sentiment",
@@ -63,6 +75,12 @@ for (const name of ["Qdrant", "Weaviate"]) {
       path: info.outputPath(`${name}-desktop.png`),
       fullPage: true,
     });
+    await page
+      .getByRole("heading", { name: "Three perspectives on what comes next" })
+      .scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: info.outputPath(`${name}-outlooks-desktop.png`),
+    });
     await page.setViewportSize({ width: 390, height: 844 });
     await page.emulateMedia({ reducedMotion: "reduce" });
     expect(
@@ -77,6 +95,13 @@ for (const name of ["Qdrant", "Weaviate"]) {
       path: info.outputPath(`${name}-mobile.png`),
       fullPage: true,
     });
+    await page
+      .getByRole("heading", { name: "Growth outlook", exact: true })
+      .scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: info.outputPath(`${name}-outlooks-mobile.png`),
+    });
+    expect((await auditAccessibility(page)).violations).toEqual([]);
     expect(errors).toEqual([]);
   });
 }
