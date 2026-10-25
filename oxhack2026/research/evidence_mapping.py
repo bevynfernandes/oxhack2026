@@ -13,7 +13,7 @@ from typing import Literal
 from urllib.parse import urlsplit
 
 import orjson
-from pydantic import ValidationError
+from pydantic import BaseModel, ValidationError
 
 from oxhack2026.api.evidence_mapping_schemas import (
     MAPPING_DEADLINE_SECONDS,
@@ -25,6 +25,8 @@ from oxhack2026.api.evidence_mapping_schemas import (
     QuoteAnchor,
     SubjectKind,
 )
+from oxhack2026.api.research_analysis import InterpretationStatistics, ResearchAnalysis
+from oxhack2026.api.research_configuration import ResearchSettings
 from oxhack2026.api.research_v2_schemas import Capture, Claim, Report, ResearchEvidence
 from oxhack2026.explanations.config import mapping_mode as mapping_mode
 from oxhack2026.explanations.gemini import (
@@ -41,6 +43,7 @@ from oxhack2026.models.startup_outlook import (
     SpecialistOutlook,
     StartupOutlook,
 )
+from oxhack2026.research.analysis import AnalysisBatch, synthesize
 from oxhack2026.research.documents import (
     PARSER_VERSION,
     DocumentBlock,
@@ -49,6 +52,7 @@ from oxhack2026.research.documents import (
     extract_document,
     page_family,
 )
+from oxhack2026.research.interpretation import EvidenceChunk, evidence_chunks
 from oxhack2026.research.mapping_policy import (
     CONCEPT_LOOKUP,
     EVENT_GROUPS,
@@ -58,6 +62,7 @@ from oxhack2026.research.mapping_policy import (
     metric_eligible,
     price_only_financial_claim,
 )
+from oxhack2026.research.network import CollectionError
 from oxhack2026.research.numerical_claims import normalize_quantity
 from oxhack2026.storage.artifacts import FileArtifactStore
 from oxhack2026.storage.contracts import ArtifactReference
@@ -202,6 +207,10 @@ class MappingEngine:
     root: Path
     checkpoint: Callable[[MappingProgress], None] | None = None
     interpreter: GeminiInterpreter | None = None
+    cache_policy: Literal["reuse", "bypass"] = "reuse"
+    deadline: float | None = None
+    _extended: bool = False
+    _statistics: InterpretationStatistics | None = None
     _artifacts: list[ArtifactReference] = field(default_factory=list)
     _reasons: list[str] = field(default_factory=list)
 
@@ -218,8 +227,19 @@ class MappingEngine:
             ValueError: Captured artifacts are corrupt or configuration is invalid.
         """
         started = datetime.now(UTC)
-        deadline = time.monotonic() + MAPPING_DEADLINE_SECONDS - 2
-        mode = mapping_mode()
+        settings = report.settings
+        self._extended = settings is not None
+        deadline = self.deadline or (
+            time.monotonic()
+            + (
+                settings.deadline_seconds * 0.3
+                if settings
+                else MAPPING_DEADLINE_SECONDS
+            )
+            - 2
+        )
+        mode = settings.mapping_mode if settings else mapping_mode()
+        self._statistics = InterpretationStatistics(mode=mode)
         self._artifacts = []
         self._reasons = []
         store = FileArtifactStore(self.root)
@@ -239,7 +259,19 @@ class MappingEngine:
             if time.monotonic() >= deadline:
                 self._reasons.append("mapping_deadline")
                 break
-            document = self._document(capture, content)
+            try:
+                document = self._document(capture, content)
+            except CollectionError as error:
+                logger.error("Captured document extraction failed: %s", str(error))  # noqa: TRY400
+                self._reasons.append(str(error))
+                work.dispositions.append(
+                    MappingDisposition(
+                        candidate_id=capture.capture_id,
+                        state="unmapped",
+                        reason=str(error),
+                    )
+                )
+                continue
             if document is None:
                 work.dispositions.append(
                     MappingDisposition(
@@ -249,30 +281,22 @@ class MappingEngine:
                     )
                 )
                 continue
-            for block in document.blocks:
-                rule = classify(block.text)
-                if rule is None:
-                    candidates.append((document, block))
-                    work.dispositions.append(
-                        MappingDisposition(
-                            candidate_id=block.block_id,
-                            state="unmapped",
-                            reason="no_explicit_concept_or_proposition",
-                        )
-                    )
-                    continue
-                subject = _subject(block.text, document, report.identity.company_name)
-                if block.role == "quotation":
-                    subject = "customer" if subject == "customer" else "unresolved"
-                candidate = ClaimCandidate(document, block, rule.concept, subject)
-                mapped = self._claim(report, candidate)
-                self._accept(mapped, candidate, work, _claim_key(mapped, block.text))
+            self._map_document(report, document, work, candidates)
         self._progress(started, 0)
-        interpreter = self.interpreter or GeminiInterpreter(deadline)
+        interpreter = self._interpreter(settings, deadline)
+        analysis = None
         if mode == "rules_gemini":
-            self._interpret(report, candidates, work, interpreter, started)
-            self._reasons.extend(interpreter.reason_codes)
+            analysis = self._run_interpreter(
+                report, candidates, work, interpreter, started
+            )
+        self._sync_statistics(interpreter)
+        self._set_statistics(stage="finished")
         bundle = MappingBundle(
+            schema_version="evidence-mapping-v2"
+            if self._extended
+            else "evidence-mapping-v1",
+            statistics=self._statistics,
+            analysis=analysis,
             mapped_at=datetime.now(UTC),
             source_as_of=report.outlook.as_of,
             derived_from_report_id=source_report_id,
@@ -318,6 +342,104 @@ class MappingEngine:
             }
         )
         return Report.model_validate_json(result.model_dump_json())
+
+    def _run_interpreter(
+        self,
+        report: Report,
+        candidates: list[tuple[EvidenceDocument, DocumentBlock]],
+        work: MappingWork,
+        interpreter: GeminiInterpreter,
+        started: datetime,
+    ) -> ResearchAnalysis | None:
+        interpreter.open_session()
+        try:
+            analysis = None
+            if self._extended:
+                self._extract_with_reserve(
+                    report, candidates, work, interpreter, started
+                )
+                self._set_statistics(stage="synthesizing")
+                self._progress(
+                    started, self._statistics.batches if self._statistics else 0
+                )
+                analysis = synthesize(
+                    work.records,
+                    lambda prompt: self._response(prompt, interpreter, AnalysisBatch),
+                )
+                self._reasons.extend(analysis.reason_codes)
+            else:
+                self._interpret(report, candidates, work, interpreter, started)
+            self._reasons.extend(interpreter.reason_codes)
+            return analysis
+        finally:
+            interpreter.close_session()
+
+    def _extract_with_reserve(
+        self,
+        report: Report,
+        candidates: list[tuple[EvidenceDocument, DocumentBlock]],
+        work: MappingWork,
+        interpreter: GeminiInterpreter,
+        started: datetime,
+    ) -> None:
+        """Reserve time, one provider request and input capacity for cited synthesis."""
+        deadline, requests, input_budget = (
+            interpreter.deadline,
+            interpreter.max_requests,
+            interpreter.max_input,
+        )
+        remaining = max(0, deadline - time.monotonic())
+        interpreter.deadline -= min(120, remaining * 0.3)
+        interpreter.max_requests -= 1
+        interpreter.max_input -= min(32_000, int(input_budget * 0.4))
+        try:
+            self._interpret_extended(report, candidates, work, interpreter, started)
+        finally:
+            interpreter.deadline = deadline
+            interpreter.max_requests = requests
+            interpreter.max_input = input_budget
+
+    def _interpreter(
+        self, settings: ResearchSettings | None, deadline: float
+    ) -> GeminiInterpreter:
+        interpreter = self.interpreter or (
+            GeminiInterpreter(deadline, model=settings.model)
+            if settings
+            else GeminiInterpreter(deadline)
+        )
+        if settings:
+            interpreter.max_requests = settings.model_requests
+            interpreter.max_input = settings.input_reservation
+        return interpreter
+
+    def _map_document(
+        self,
+        report: Report,
+        document: EvidenceDocument,
+        work: MappingWork,
+        candidates: list[tuple[EvidenceDocument, DocumentBlock]],
+    ) -> None:
+        for block in document.blocks:
+            rule = classify(block.text)
+            if self._extended:
+                candidates.append((document, block))
+            if rule is None:
+                if not self._extended:
+                    candidates.append((document, block))
+                work.dispositions.append(
+                    MappingDisposition(
+                        candidate_id=block.block_id,
+                        state="unmapped",
+                        reason="no_explicit_concept_or_proposition",
+                    )
+                )
+                continue
+            subject = _subject(block.text, document, report.identity.company_name)
+            if block.role == "quotation":
+                subject = "customer" if subject == "customer" else "unresolved"
+            candidate = ClaimCandidate(document, block, rule.concept, subject)
+            mapped = self._claim(report, candidate)
+            self._accept(mapped, candidate, work, _claim_key(mapped, block.text))
 
     def _structured(
         self, report: Report
@@ -562,9 +684,179 @@ class MappingEngine:
         if self.checkpoint:
             self.checkpoint(
                 MappingProgress(
-                    state="running", started_at=started, completed_batches=batches
+                    state="running",
+                    started_at=started,
+                    completed_batches=batches,
+                    statistics=self._statistics,
                 )
             )
+
+    def _set_statistics(self, **updates: object) -> None:
+        if self._statistics:
+            self._statistics = self._statistics.model_copy(update=updates)
+
+    def _sync_statistics(self, interpreter: GeminiInterpreter) -> None:
+        known = getattr(interpreter, "usage_available", False) is True
+        self._set_statistics(
+            provider_requests=interpreter.attempts,
+            input_tokens=interpreter.input_tokens if known else None,
+            output_tokens=interpreter.output_tokens if known else None,
+        )
+
+    def _cache_key(
+        self,
+        prompt: str,
+        interpreter: GeminiInterpreter,
+        schema: type[BaseModel] | None = None,
+    ) -> str:
+        version = (
+            "research-analysis-v1"
+            if schema
+            else "evidence-proposals-v2"
+            if self._extended
+            else "evidence-proposals-v1"
+        )
+        return _identifier(prompt, interpreter.model, version)
+
+    def _interpret_extended(
+        self,
+        report: Report,
+        candidates: list[tuple[EvidenceDocument, DocumentBlock]],
+        work: MappingWork,
+        interpreter: GeminiInterpreter,
+        started: datetime,
+    ) -> None:
+        candidates.sort(
+            key=lambda item: (
+                not bool(re.search(r"\d", item[1].text)),
+                page_family(item[0].url),
+            )
+        )
+        chunks = evidence_chunks(
+            candidates, report.identity.company_name, "-live" in interpreter.model
+        )
+        # Existing completed chunks are cheap to replay before spending on new work.
+        chunks.sort(
+            key=lambda chunk: (
+                not (
+                    self.root
+                    / "research-v2"
+                    / "mapping-cache"
+                    / f"{self._cache_key(chunk.prompt, interpreter)}.json"
+                ).exists()
+            )
+        )
+        count = sum(len(chunk.lookup) for chunk in chunks)
+        self._set_statistics(
+            candidates=count,
+            deferred=count,
+            stage="extracting",
+            model=interpreter.model,
+        )
+        for chunk in chunks:
+            if (
+                interpreter.attempts >= interpreter.max_requests
+                or time.monotonic() >= interpreter.deadline
+            ):
+                self._reasons.append("gemini_candidate_budget")
+                break
+            if not self._interpret_chunk(report, chunk, work, interpreter):
+                break
+            if self._statistics:
+                processed = self._statistics.processed + len(chunk.lookup)
+                self._set_statistics(
+                    processed=processed,
+                    deferred=count - processed,
+                    batches=self._statistics.batches + 1,
+                )
+                self._sync_statistics(interpreter)
+                self._progress(started, self._statistics.batches)
+        if self._statistics and self._statistics.deferred:
+            self._reasons.append("gemini_candidate_budget")
+
+    def _chunk_response(
+        self, prompt: str, interpreter: GeminiInterpreter
+    ) -> list[object]:
+        for attempt in range(2):
+            try:
+                return _proposal_values(self._response(prompt, interpreter))
+            except MappingUnavailable as error:
+                retryable = str(error) in {
+                    "gemini_rate_limited",
+                    "gemini_provider_unavailable",
+                    "gemini_live_provider_unavailable",
+                    "gemini_invalid_output",
+                }
+                if (
+                    attempt
+                    or not retryable
+                    or interpreter.attempts >= interpreter.max_requests
+                    or time.monotonic() + 2 >= interpreter.deadline
+                ):
+                    raise
+                logger.error("Retrying bounded interpretation after %s", str(error))  # noqa: TRY400
+                interpreter.close_session()
+                interpreter.open_session()
+                time.sleep(1)
+        raise MappingUnavailable("gemini_invalid_output")
+
+    def _interpret_chunk(
+        self,
+        report: Report,
+        chunk: EvidenceChunk,
+        work: MappingWork,
+        interpreter: GeminiInterpreter,
+    ) -> bool:
+        try:
+            values = self._chunk_response(chunk.prompt, interpreter)
+        except (
+            MappingUnavailable,
+            ValidationError,
+            orjson.JSONDecodeError,
+            ImportError,
+        ) as error:
+            logger.error("Evidence chunk unavailable: %s", type(error).__name__)  # noqa: TRY400
+            self._reasons.append(
+                str(error)
+                if isinstance(error, MappingUnavailable)
+                else "gemini_invalid_or_unavailable"
+            )
+            if self._statistics:
+                self._set_statistics(failed_batches=self._statistics.failed_batches + 1)
+            return False
+        self._apply_proposals(report, values, chunk.lookup, work)
+        return True
+
+    def _apply_proposals(
+        self,
+        report: Report,
+        values: list[object],
+        lookup: dict[str, tuple[EvidenceDocument, DocumentBlock]],
+        work: MappingWork,
+    ) -> None:
+        for value in values:
+            before = len(work.dispositions)
+            try:
+                proposal = _validated_proposal(value, lookup)
+                self._proposal(report, proposal, lookup, work)
+            except (ValidationError, MappingUnavailable):
+                logger.error("Rejected malformed evidence proposal")  # noqa: TRY400
+                work.dispositions.append(
+                    MappingDisposition(
+                        candidate_id=_identifier(str(value)),
+                        state="rejected",
+                        reason="gemini_invalid_proposal",
+                    )
+                )
+            if self._statistics:
+                rejected = any(
+                    row.state == "rejected" for row in work.dispositions[before:]
+                )
+                self._set_statistics(
+                    accepted_proposals=self._statistics.accepted_proposals
+                    + (not rejected),
+                    rejected_proposals=self._statistics.rejected_proposals + rejected,
+                )
 
     def _interpret(
         self,
@@ -640,42 +932,48 @@ class MappingEngine:
                 if isinstance(error, (MappingUnavailable, ImportError)):
                     break
                 continue
-            for value in proposals:
-                try:
-                    proposal = _validated_proposal(value, lookup)
-                except (ValidationError, MappingUnavailable):
-                    logger.error("Rejected malformed evidence proposal")  # noqa: TRY400
-                    work.dispositions.append(
-                        MappingDisposition(
-                            candidate_id=_identifier(str(value)),
-                            state="rejected",
-                            reason="gemini_invalid_proposal",
-                        )
-                    )
-                    continue
-                self._proposal(report, proposal, lookup, work)
+            self._apply_proposals(report, proposals, lookup, work)
             completed_batches += 1
             self._progress(started, completed_batches)
         if len(candidates) > candidate_limit or len(batches) > batch_limit:
             self._reasons.append("gemini_candidate_budget")
 
-    def _response(self, prompt: str, interpreter: GeminiInterpreter) -> str:
+    def _response(
+        self,
+        prompt: str,
+        interpreter: GeminiInterpreter,
+        schema: type[BaseModel] | None = None,
+    ) -> str:
         store = FileArtifactStore(self.root)
-        key = _identifier(prompt, interpreter.model, "evidence-proposals-v1")
+        key = self._cache_key(prompt, interpreter, schema)
         path = self.root / "research-v2" / "mapping-cache" / f"{key}.json"
         with file_lock(path.with_suffix(".lock")):
-            if path.exists():
+            if path.exists() and self.cache_policy == "reuse":
+                if self._statistics:
+                    self._set_statistics(
+                        cached_batches=self._statistics.cached_batches + 1
+                    )
                 reference = ArtifactReference.model_validate_json(path.read_bytes())
                 captured = CachedInterpretation.model_validate_json(
                     store.read(reference)
                 )
                 interpreter.model_version = captured.model_version
+                interpreter.reason_codes.extend(
+                    code
+                    for code in captured.reason_codes
+                    if code not in interpreter.reason_codes
+                )
             else:
                 before_input, before_output = (
                     interpreter.input_tokens,
                     interpreter.output_tokens,
                 )
-                response = interpreter.generate(prompt)
+                prior_reasons = len(interpreter.reason_codes)
+                response = (
+                    interpreter.generate(prompt, schema)
+                    if schema
+                    else interpreter.generate(prompt)
+                )
                 captured = CachedInterpretation(
                     response=response,
                     prompt_sha256=sha256(prompt.encode()).hexdigest(),
@@ -683,11 +981,31 @@ class MappingEngine:
                     model_version=interpreter.model_version,
                     input_tokens=interpreter.input_tokens - before_input,
                     output_tokens=interpreter.output_tokens - before_output,
+                    reason_codes=tuple(interpreter.reason_codes[prior_reasons:]),
                 )
                 reference = store.write(
                     captured.model_dump_json().encode(), "application/json"
                 )
-                if not interpreter.reason_codes:
+                try:
+                    if schema:
+                        schema.model_validate_json(response)
+                    else:
+                        _proposal_values(response)
+                except (
+                    ValidationError,
+                    MappingUnavailable,
+                    orjson.JSONDecodeError,
+                ) as error:
+                    self._artifacts.append(reference)
+                    raise MappingUnavailable("gemini_invalid_output") from error
+                interruptions = {
+                    "gemini_live_background_incomplete",
+                    "gemini_live_background_interrupted",
+                }
+                if not captured.reason_codes or (
+                    set(captured.reason_codes) <= interruptions
+                    and orjson.loads(response).get("proposals")
+                ):
                     atomic_write(path, reference.model_dump_json().encode())
         self._artifacts.append(reference)
         return captured.response

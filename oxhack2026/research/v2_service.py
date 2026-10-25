@@ -553,10 +553,21 @@ class V2Service:
                 )
             self.store.save_job(current.model_copy(update={"mapping": progress}))
 
-        result = MappingEngine(self.store.root, checkpoint).map(report)
+        job = self.store.job(job_id)
+        deadline = None
+        if job.settings and job.started_at:
+            remaining = (
+                job.settings.deadline_seconds
+                - (datetime.now(UTC) - job.started_at).total_seconds()
+            )
+            deadline = time.monotonic() + max(0, remaining)
+        result = MappingEngine(self.store.root, checkpoint, deadline=deadline).map(
+            report
+        )
         current = self.store.job(job_id)
         checkpoint(
             MappingProgress(
+                statistics=result.mapping.statistics if result.mapping else None,
                 state=result.mapping.state if result.mapping else "failed",
                 started_at=current.mapping.started_at if current.mapping else None,
                 finished_at=datetime.now(UTC),
@@ -656,17 +667,19 @@ class V2Service:
             source = source.model_copy(
                 update={
                     "report_id": report_id,
+                    "settings": job.settings,
                     "outlook": source.outlook.model_copy(
                         update={"source_snapshot_id": report_id}
                     ),
                 }
             )
-            report = MappingEngine(self.store.root, checkpoint).map(
-                source, job.source_report_id
-            )
+            report = MappingEngine(
+                self.store.root, checkpoint, cache_policy=job.cache_policy
+            ).map(source, job.source_report_id)
             self.store.publish(report)
             current = self.store.mapping_job(job_id)
             progress = MappingProgress(
+                statistics=report.mapping.statistics if report.mapping else None,
                 state=report.mapping.state if report.mapping else "failed",
                 started_at=started,
                 finished_at=datetime.now(UTC),

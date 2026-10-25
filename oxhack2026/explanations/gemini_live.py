@@ -1,16 +1,17 @@
 """Bounded Gemini Live transport with grounded submissions and discarded audio."""
 
 import asyncio
+from contextlib import AbstractAsyncContextManager
 from dataclasses import dataclass, field
 
 import orjson
 from pydantic import BaseModel, ConfigDict, Field
-from websockets.asyncio.client import connect
+from websockets.asyncio.client import ClientConnection, connect
 from websockets.exceptions import ConnectionClosed
 
 _ENDPOINT = (
     "wss://generativelanguage.googleapis.com/ws/"
-    "google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
+    "google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent"
 )
 
 
@@ -78,6 +79,7 @@ class LiveResult:
     input_tokens: int
     output_tokens: int
     reason_code: str | None = None
+    usage_available: bool = False
 
 
 @dataclass
@@ -89,11 +91,13 @@ class _Accumulator:
     input_tokens: int = 0
     output_tokens: int = 0
     text_size: int = 0
+    usage_available: bool = False
 
     def consume(self, frame: _Frame) -> bool:
         if frame.error or frame.go_away:
             raise LiveProtocolError("gemini_live_interrupted")
         if frame.usage_metadata:
+            self.usage_available = True
             usage = frame.usage_metadata
             self.input_tokens = max(self.input_tokens, usage.prompt_token_count)
             self.output_tokens = max(
@@ -129,7 +133,12 @@ class _Accumulator:
         )
         if not response.strip():
             raise LiveProtocolError("gemini_empty_or_refused")
-        return LiveResult(response, self.input_tokens, self.output_tokens)
+        return LiveResult(
+            response,
+            self.input_tokens,
+            self.output_tokens,
+            usage_available=self.usage_available,
+        )
 
 
 def _setup(model: str, schema: dict[str, object]) -> dict[str, object]:
@@ -167,81 +176,145 @@ def _setup(model: str, schema: dict[str, object]) -> dict[str, object]:
     }
 
 
-async def generate_live(
-    key: str, model: str, prompt: str, schema: dict[str, object], timeout: float
-) -> LiveResult:
-    """Return a Live answer only after explicit background reasoning idle.
+class LiveSession:
+    """Reuse bounded Live turns, rotating connections when schema/context changes."""
 
-    Args:
-        key: Server credential, sent only in an authentication header.
-        model: Explicit Live model; no fallback is attempted.
-        prompt: Bounded public source blocks and trusted mapping instructions.
-        schema: Inline schema for the local evidence submission function.
-        timeout: Remaining wall-clock budget, including connection and setup.
-    Returns:
-        Untrusted proposal JSON (or answer text) and server-reported usage.
-    Raises:
-        LiveProtocolError: Setup, interruption or output bounds prevented completion.
-        TimeoutError: The whole session exceeded its deadline.
-        OSError: The connection failed.
-    """
-    accumulator = _Accumulator()
-    try:
-        async with (
-            asyncio.timeout(timeout),
-            connect(
+    def __init__(self, key: str, model: str) -> None:
+        """Keep a backend credential only for this interpreter's session lifetime."""
+        self._key = key
+        self._model = model
+        self._connection: AbstractAsyncContextManager[ClientConnection] | None = None
+        self._socket: ClientConnection | None = None
+        self._schema: dict[str, object] | None = None
+        self._turns = 0
+        self._input_bytes = 0
+
+    def context_size(self, schema: dict[str, object]) -> int:
+        """Return conservative retained input bytes for the next compatible turn."""
+        return self._input_bytes if self._schema == schema and self._turns < 3 else 0
+
+    async def close(self) -> None:
+        """Close this connection and discard credentials/context from its transport."""
+        if self._connection:
+            await self._connection.__aexit__(None, None, None)
+        self._connection, self._socket, self._schema = None, None, None
+        self._turns, self._input_bytes = 0, 0
+
+    async def _open(
+        self, schema: dict[str, object], timeout: float
+    ) -> ClientConnection:
+        if self._schema != schema or self._turns >= 3:
+            await self.close()
+        if self._socket is None:
+            self._connection = connect(
                 _ENDPOINT,
-                additional_headers={"x-goog-api-key": key},
+                additional_headers={"x-goog-api-key": self._key},
                 open_timeout=min(10, timeout),
                 close_timeout=0.5,
                 max_size=4 * 1024 * 1024,
                 max_queue=4,
-            ) as socket,
-        ):
-            await socket.send(orjson.dumps({"setup": _setup(model, schema)}).decode())
-            frame = _Frame.model_validate_json(await socket.recv())
+            )
+            self._socket = await self._connection.__aenter__()
+            await self._socket.send(
+                orjson.dumps({"setup": _setup(self._model, schema)}).decode()
+            )
+            frame = _Frame.model_validate_json(await self._socket.recv())
             if frame.setup_complete is None or frame.error:
                 raise LiveProtocolError("gemini_live_setup_rejected")
+            self._schema = schema
+        return self._socket
+
+    async def generate(
+        self, prompt: str, schema: dict[str, object], timeout: float
+    ) -> LiveResult:
+        """Receive one validated submission turn through explicit reasoning IDLE.
+
+        Args:
+            prompt: Bounded public evidence and trusted instructions.
+            schema: Async local function schema, independently checked by the caller.
+            timeout: Remaining total time for setup, reasoning and submissions.
+        Returns:
+            Public proposals/text and provider-reported usage, without audio/thoughts.
+        Raises:
+            LiveProtocolError: Setup, schema or response bounds were violated.
+            TimeoutError: No proposal was submitted before the deadline.
+            OSError: The connection failed before useful results.
+        """
+        accumulator = _Accumulator()
+        try:
+            async with asyncio.timeout(timeout):
+                socket = await self._open(schema, timeout)
+                await socket.send(
+                    orjson.dumps(
+                        {
+                            "clientContent": {
+                                "turns": [
+                                    {"role": "user", "parts": [{"text": prompt}]}
+                                ],
+                                "turnComplete": True,
+                            }
+                        }
+                    ).decode()
+                )
+                self._turns += 1
+                self._input_bytes += len(prompt.encode()) + 2048
+                return await _receive(socket, accumulator)
+        except (TimeoutError, ConnectionClosed) as error:
+            if not accumulator.submitted:
+                raise
+            result = accumulator.result()
+            result.reason_code = (
+                "gemini_live_background_incomplete"
+                if isinstance(error, TimeoutError)
+                else "gemini_live_background_interrupted"
+            )
+            await self.close()
+            return result
+
+
+async def _receive(socket: ClientConnection, accumulator: _Accumulator) -> LiveResult:
+    received = 0
+    while True:
+        raw = await socket.recv()
+        received += len(raw)
+        if received > 8 * 1024 * 1024:
+            raise LiveProtocolError("gemini_live_response_budget")
+        frame = _Frame.model_validate_json(raw)
+        if frame.tool_call:
             await socket.send(
                 orjson.dumps(
                     {
-                        "clientContent": {
-                            "turns": [{"role": "user", "parts": [{"text": prompt}]}],
-                            "turnComplete": True,
+                        "toolResponse": {
+                            "functionResponses": _submissions(
+                                frame.tool_call, accumulator
+                            ),
                         }
                     }
                 ).decode()
             )
-            received = 0
-            while True:
-                raw = await socket.recv()
-                received += len(raw)
-                if received > 8 * 1024 * 1024:
-                    raise LiveProtocolError("gemini_live_response_budget")
-                frame = _Frame.model_validate_json(raw)
-                if frame.tool_call:
-                    replies = _submissions(frame.tool_call, accumulator)
-                    await socket.send(
-                        orjson.dumps(
-                            {
-                                "toolResponse": {
-                                    "functionResponses": replies,
-                                }
-                            }
-                        ).decode()
-                    )
-                if accumulator.consume(frame):
-                    return accumulator.result()
-    except (TimeoutError, ConnectionClosed) as error:
-        if not accumulator.submitted:
-            raise
-        result = accumulator.result()
-        result.reason_code = (
-            "gemini_live_background_incomplete"
-            if isinstance(error, TimeoutError)
-            else "gemini_live_background_interrupted"
-        )
-        return result
+        if accumulator.consume(frame):
+            return accumulator.result()
+
+
+async def generate_live(
+    key: str, model: str, prompt: str, schema: dict[str, object], timeout: float
+) -> LiveResult:
+    """Run one isolated Live request; propagate protocol, connection and timeout errors.
+
+    Args:
+        key: Backend credential sent only in the authentication header.
+        model: Explicit configured model, without fallback.
+        prompt: Public source text and trusted instructions.
+        schema: Local async submission schema.
+        timeout: Full request deadline including setup.
+    Returns:
+        Public response/usage after IDLE, or an explicitly interrupted submission.
+    """
+    session = LiveSession(key, model)
+    try:
+        return await session.generate(prompt, schema, timeout)
+    finally:
+        await session.close()
 
 
 def _submissions(call: _ToolCall, state: _Accumulator) -> list[dict[str, object]]:

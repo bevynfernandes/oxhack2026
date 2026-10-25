@@ -559,6 +559,26 @@ export interface components {
             resource: string;
         };
         /**
+         * AnalysisStatement
+         * @description One finding tied to accepted source evidence; never a forecast.
+         */
+        AnalysisStatement: {
+            /**
+             * Group Id
+             * @enum {string}
+             */
+            group_id: "adoption_retention" | "attention_sentiment" | "financial_health" | "industry_competition" | "team_execution";
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "finding" | "conflict" | "gap";
+            /** Mapping Ids */
+            mapping_ids: string[];
+            /** Text */
+            text: string;
+        };
+        /**
          * ArtifactReference
          * @description Hashed artifact relative to a configured bundle root, never a signed URL.
          */
@@ -2057,6 +2077,74 @@ export interface components {
             value: number;
         };
         /**
+         * InterpretationStatistics
+         * @description Actual run accounting; cached work never becomes a new provider call.
+         */
+        InterpretationStatistics: {
+            /**
+             * Accepted Proposals
+             * @default 0
+             */
+            accepted_proposals: number;
+            /**
+             * Batches
+             * @default 0
+             */
+            batches: number;
+            /**
+             * Cached Batches
+             * @default 0
+             */
+            cached_batches: number;
+            /**
+             * Candidates
+             * @default 0
+             */
+            candidates: number;
+            /**
+             * Deferred
+             * @default 0
+             */
+            deferred: number;
+            /**
+             * Failed Batches
+             * @default 0
+             */
+            failed_batches: number;
+            /** Input Tokens */
+            input_tokens?: number | null;
+            /**
+             * Mode
+             * @enum {string}
+             */
+            mode: "rules" | "rules_gemini";
+            /** Model */
+            model?: string | null;
+            /** Output Tokens */
+            output_tokens?: number | null;
+            /**
+             * Processed
+             * @default 0
+             */
+            processed: number;
+            /**
+             * Provider Requests
+             * @default 0
+             */
+            provider_requests: number;
+            /**
+             * Rejected Proposals
+             * @default 0
+             */
+            rejected_proposals: number;
+            /**
+             * Stage
+             * @default preparing
+             * @enum {string}
+             */
+            stage: "preparing" | "extracting" | "synthesizing" | "finished";
+        };
+        /**
          * Interval
          * @description An interval already approved by the model owner's serving gate.
          */
@@ -2215,6 +2303,7 @@ export interface components {
          * @description Immutable mapping provenance and its exact supporting artifacts.
          */
         MappingBundle: {
+            analysis?: components["schemas"]["ResearchAnalysis"] | null;
             /**
              * Artifacts
              * @default []
@@ -2286,9 +2375,9 @@ export interface components {
             /**
              * Schema Version
              * @default evidence-mapping-v1
-             * @constant
+             * @enum {string}
              */
-            schema_version: "evidence-mapping-v1";
+            schema_version: "evidence-mapping-v1" | "evidence-mapping-v2";
             /**
              * Source As Of
              * Format: date-time
@@ -2299,6 +2388,7 @@ export interface components {
              * @enum {string}
              */
             state: "completed" | "partial";
+            statistics?: components["schemas"]["InterpretationStatistics"] | null;
         };
         /**
          * MappingCapability
@@ -2405,6 +2495,7 @@ export interface components {
              * @enum {string}
              */
             state: "pending" | "running" | "completed" | "partial" | "failed" | "skipped";
+            statistics?: components["schemas"]["InterpretationStatistics"] | null;
         };
         /**
          * Metric
@@ -2781,6 +2872,32 @@ export interface components {
             label: string;
             /** Url */
             url: string;
+        };
+        /**
+         * ResearchAnalysis
+         * @description Locally validated analysis or an explicit inability to generate it.
+         */
+        ResearchAnalysis: {
+            /**
+             * Method
+             * @enum {string}
+             */
+            method: "gemini" | "rules";
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "completed" | "partial" | "unavailable";
+            /**
+             * Statements
+             * @default []
+             */
+            statements: components["schemas"]["AnalysisStatement"][];
         };
         /**
          * ResearchEvidence
