@@ -393,6 +393,12 @@ button.secondary:hover {
   font-size: 10px;
   color: #586b82;
 }
+.stat-explanation {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.4;
+}
 .stat-icon {
   display: grid;
   place-items: center;
@@ -1281,6 +1287,9 @@ button.secondary:hover {
   .dossier-stat p {
     font-size: 8px;
     margin-top: 3px;
+  }
+  .stat-explanation {
+    font-size: 9px;
   }
   .stat-unit {
     font-size: 9px;

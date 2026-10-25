@@ -54,6 +54,13 @@ This file records verified claims and remaining work. It is not a completion sig
 - Top cards now show Growth, Survival and Overall. Financial Health remains one
   of the five dimensions. Overall is the requested dimension index, not another
   outcome probability. Unsupported scores remain unavailable.
+- Latest main's editorial theme was merged (`a409428`). Name candidates still fit
+  at 1440/390/320px and the live PostHog URL preview works. A 375x667 card-clipping
+  regression was corrected by sizing and shortening the Overall explanation.
+  Both focused dossier/accessibility browser checks pass, with 67 frontend unit
+  tests and typechecking also passing after the merge. Retained evidence is under
+  `tests/outputs/theme-merge-business-models-20261025` and
+  `tests/outputs/theme-model-merge-fixed-20261025`.
 
 ## Work still required before a final-product claim
 

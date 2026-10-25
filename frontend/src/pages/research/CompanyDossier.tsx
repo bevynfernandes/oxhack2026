@@ -518,7 +518,9 @@ export default function CompanyDossier({
                 <h3>Overall outlook</h3>
                 <div className="stat-value">—</div>
                 <p>Combined score unavailable</p>
-                <small>Requires five validated business dimension scores</small>
+                <small className="stat-explanation">
+                  Needs all five dimension scores
+                </small>
               </div>
               <span className="stat-icon">
                 <Icon name="chart" />
