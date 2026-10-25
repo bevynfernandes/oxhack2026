@@ -49,6 +49,18 @@ button.motion-disclosure-trigger {
   padding-top: 0.5rem;
 }
 
+.motion-spinner-ring {
+  animation: company-spinner-orbit 1.2s linear infinite;
+}
+.motion-spinner-ring[data-reduced-motion="true"] {
+  animation: none;
+}
+@keyframes company-spinner-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

@@ -7,7 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "react-router-dom";
 import { api, type DTO } from "../../api/client";
 import { date, QueryState, Reasons } from "../../components/Common";
-import { researchResult } from "./client";
+import CompanySpinner from "../../components/CompanySpinner";
+import { fetchIdentity, researchResult } from "./client";
 
 /** Poll durable reads only and stop at terminal states or a read failure. */
 function LegacyResearchJobPage() {
@@ -45,7 +46,10 @@ function LegacyResearchJobPage() {
         <section className="panel" aria-label="Research job">
           <p>{job.request.domain}</p>
           <MotionState stateKey={job.state}>
-            <h2 role="status">
+            <h2 role="status" className="loading-label">
+              {["queued", "running"].includes(job.state) && (
+                <CompanySpinner website={job.request.domain} />
+              )}
               {
                 {
                   queued: "Queued",
@@ -195,6 +199,12 @@ function StandaloneJobPage() {
         : false,
   });
   const job = query.data;
+  const identity = useQuery({
+    queryKey: ["research-identity", job?.identity_id],
+    queryFn: () => fetchIdentity(job!.identity_id),
+    enabled: Boolean(job && ["queued", "running"].includes(job.state)),
+    retry: false,
+  });
   return (
     <article className="research-start">
       <Link to="/">Companies</Link>
@@ -207,7 +217,10 @@ function StandaloneJobPage() {
       {job && (
         <section className="panel">
           <MotionState stateKey={job.state}>
-            <h2 role="status">
+            <h2 role="status" className="loading-label">
+              {["queued", "running"].includes(job.state) && (
+                <CompanySpinner website={identity.data?.canonical_domain} />
+              )}
               {
                 {
                   queued: "Queued",

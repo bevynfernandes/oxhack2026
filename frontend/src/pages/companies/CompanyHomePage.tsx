@@ -14,6 +14,7 @@ import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { companyDomain, matchesCompanySearch } from "./identity";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
+import CompanySpinner from "../../components/CompanySpinner";
 import { previewCompany, searchCompanies } from "../research/client";
 
 const PAGE_SIZE = 2;
@@ -162,7 +163,17 @@ export default function CompanyHomePage() {
                   type="submit"
                   disabled={search.trim().length < 2 || searching}
                 >
-                  {searching ? "Finding company…" : "Research company"}
+                  {searching ? (
+                    <span className="loading-label">
+                      <CompanySpinner
+                        size="small"
+                        website={preview.variables ?? search}
+                      />
+                      Finding company…
+                    </span>
+                  ) : (
+                    "Research company"
+                  )}
                 </MotionButton>
               </div>
               <p
