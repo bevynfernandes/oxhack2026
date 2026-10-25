@@ -1,4 +1,5 @@
 import ResearchTools from "./ResearchTools";
+import DecisionBrief from "./DecisionBrief";
 import { evidenceSummary } from "./summary";
 import { CitedResearchAnalysis } from "./ResearchWorkflow";
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
@@ -442,13 +443,21 @@ export default function CompanyDossier({
     tabRefs.current[next]?.focus();
   };
   return (
-    <article className="company-dossier" aria-label="Company research dossier">
+    <article
+      className={`company-dossier ${standalone ? "decision-dossier" : ""}`}
+      aria-label="Company research dossier"
+    >
       <header className="dossier-company">
         <div className="dossier-identity">
           <div className="dossier-monogram" aria-hidden="true">
             {company.display_name.slice(0, 1)}
           </div>
           <div>
+            {standalone && (
+              <span className="micro-label">
+                COMPANY RESEARCH / DECISION WORKSPACE
+              </span>
+            )}
             <div className="dossier-name">
               <h1>{company.display_name}</h1>
               <span className="stage-tag">
@@ -473,20 +482,22 @@ export default function CompanyDossier({
           </strong>
           <small>Source-backed · as of {date(cutoff ?? null)}</small>
         </div>
-        <div className="dossier-outlook">
-          <span className="outlook-mark" aria-hidden="true">
-            —
-          </span>
-          <div>
-            <span className="micro-label">STARTUP OUTLOOK</span>
-            <h2>Overall outlook unavailable</h2>
-            <small>
-              {dimensionModels
-                ? "Auxiliary proxy experiments available · outcome models pending"
-                : "Outcome models not trained"}
-            </small>
+        {!standalone && (
+          <div className="dossier-outlook">
+            <span className="outlook-mark" aria-hidden="true">
+              —
+            </span>
+            <div>
+              <span className="micro-label">STARTUP OUTLOOK</span>
+              <h2>Overall outlook unavailable</h2>
+              <small>
+                {dimensionModels
+                  ? "Auxiliary proxy experiments available · outcome models pending"
+                  : "Outcome models not trained"}
+              </small>
+            </div>
           </div>
-        </div>
+        )}
         <div className="dossier-actions">
           <Link className="button" to={researchPath}>
             {standalone ? "Refresh research" : "Research company"}{" "}
@@ -498,7 +509,13 @@ export default function CompanyDossier({
           </MotionButton>
         </div>
       </header>
-      {standalone && <CitedResearchAnalysis report={standalone} />}
+      {standalone && (
+        <DecisionBrief
+          report={standalone}
+          summary={evidenceSummary(profile, standalone, report)}
+          onEvidence={() => open({ kind: "sources", index: 1 })}
+        />
+      )}
       {(synthetic || partial || (report && !outlook?.forecasts)) && (
         <div className="dossier-banners">
           <SyntheticNotice synthetic={synthetic} />
@@ -555,7 +572,11 @@ export default function CompanyDossier({
               ))}
             <section className="dossier-stat">
               <div>
-                <h3>Overall outlook</h3>
+                <h3>
+                  {standalone
+                    ? "Overall outlook unavailable"
+                    : "Overall outlook"}
+                </h3>
                 <div className="stat-value">—</div>
                 <p>Combined score unavailable</p>
                 <small className="stat-explanation">
@@ -601,8 +622,10 @@ export default function CompanyDossier({
               </span>
             </div>
             <p>
-              {measurements.size} measurements ·{" "}
-              {standalone || report ? "Research report" : "Saved analysis"}
+              {standalone
+                ? `${usable} usable measurement${usable === 1 ? "" : "s"}`
+                : `${measurements.size} measurements`}{" "}
+              · {standalone || report ? "Research report" : "Saved analysis"}
             </p>
             {standalone && (
               <MotionButton
@@ -622,7 +645,11 @@ export default function CompanyDossier({
         <h2>
           BUSINESS FUNDAMENTALS <span>(5 DIMENSIONS)</span>
         </h2>
-        <p>Select a pillar to inspect measurements and model readiness</p>
+        <p>
+          {standalone
+            ? "Open a dimension for its evidence and limitations"
+            : "Select a pillar to inspect measurements and model readiness"}
+        </p>
         <span className="model-label">
           <Icon name="shield" /> Business outcome models · not trained
         </span>
@@ -682,15 +709,17 @@ export default function CompanyDossier({
               <header>
                 <div className="pillar-top">
                   <span>DIMENSION 0{index + 1}</span>
-                  <span className="pillar-model">
-                    {group.id === "financial_health" && cashFlowResearch
-                      ? "Cash-flow component trained"
-                      : sdkScore != null
-                        ? "SDK component trained"
-                        : sentimentScore != null
-                          ? "Sentiment component trained"
-                          : "Outcome model untrained"}
-                  </span>
+                  {!standalone && (
+                    <span className="pillar-model">
+                      {group.id === "financial_health" && cashFlowResearch
+                        ? "Cash-flow component trained"
+                        : sdkScore != null
+                          ? "SDK component trained"
+                          : sentimentScore != null
+                            ? "Sentiment component trained"
+                            : "Outcome model untrained"}
+                    </span>
+                  )}
                 </div>
                 <h3>
                   <MotionButton
@@ -704,7 +733,9 @@ export default function CompanyDossier({
                     <Icon name="arrow" />
                   </MotionButton>
                 </h3>
-                <p className="pillar-description">{group.description}</p>
+                {!standalone && (
+                  <p className="pillar-description">{group.description}</p>
+                )}
               </header>
               <div
                 className="pillar-measurements"
@@ -770,29 +801,31 @@ export default function CompanyDossier({
                   </small>
                 )}
               </div>
-              <div className="pillar-model-note">
-                <span className="micro-label">
-                  {sentimentScore != null
-                    ? "EXPERIMENTAL TEXT SENTIMENT"
-                    : sdkScore != null
-                      ? "EXPERIMENTAL SDK FORECAST"
-                      : "SPECIALIST OUTLOOK"}
-                </span>
-                <p>
-                  {sentimentScore != null
-                    ? `Title sentiment index ${sentimentScore.toFixed(1)} / 100`
-                    : sdkScore != null
-                      ? `SDK demand index ${sdkScore.toFixed(1)} / 100`
-                      : "Business prediction unavailable"}
-                </p>
-                <small>
-                  {sentimentScore != null
-                    ? `${component?.sample_size} retrieved titles; unvalidated financial-news model transfer`
-                    : sdkScore != null
-                      ? "Trained download forecast; not customer retention or business success"
-                      : "Requires training on later company outcomes"}
-                </small>
-              </div>
+              {!standalone && (
+                <div className="pillar-model-note">
+                  <span className="micro-label">
+                    {sentimentScore != null
+                      ? "EXPERIMENTAL TEXT SENTIMENT"
+                      : sdkScore != null
+                        ? "EXPERIMENTAL SDK FORECAST"
+                        : "SPECIALIST OUTLOOK"}
+                  </span>
+                  <p>
+                    {sentimentScore != null
+                      ? `Title sentiment index ${sentimentScore.toFixed(1)} / 100`
+                      : sdkScore != null
+                        ? `SDK demand index ${sdkScore.toFixed(1)} / 100`
+                        : "Business prediction unavailable"}
+                  </p>
+                  <small>
+                    {sentimentScore != null
+                      ? `${component?.sample_size} retrieved titles; unvalidated financial-news model transfer`
+                      : sdkScore != null
+                        ? "Trained download forecast; not customer retention or business success"
+                        : "Requires training on later company outcomes"}
+                  </small>
+                </div>
+              )}
               <footer>
                 <span
                   className={`pillar-status ${row?.data_status === "available" ? "available" : ""}`}
@@ -813,6 +846,14 @@ export default function CompanyDossier({
           );
         })}
       </section>
+      {standalone && (
+        <MotionDisclosure
+          className="decision-research-details"
+          summary="Research findings, citations & continuation"
+        >
+          <CitedResearchAnalysis report={standalone} />
+        </MotionDisclosure>
+      )}
       <div className="dossier-ledger">
         <ResearchTools
           path={location.pathname}

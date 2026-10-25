@@ -79,7 +79,14 @@ export function InterpretationSummary({
       ) : (
         <>
           <p>
-            {statistics.stage.replaceAll("_", " ")} · {statistics.model}
+            {statistics.stage === "finished" &&
+            statistics.failed_batches > 0 &&
+            statistics.processed === 0
+              ? "Interpretation unavailable"
+              : statistics.stage === "finished" && statistics.deferred > 0
+                ? "Partial interpretation"
+                : statistics.stage.replaceAll("_", " ")}{" "}
+            · {statistics.model}
           </p>
           <p>
             {statistics.processed} of {statistics.candidates} evidence blocks
