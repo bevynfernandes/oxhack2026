@@ -126,7 +126,7 @@ it("keeps new research available when saved assessments cannot be loaded", async
 });
 
 it("shows the supplied website favicon while company lookup is pending", async () => {
-  vi.mocked(searchCompanies).mockReturnValue(new Promise(() => {}));
+  vi.mocked(previewCompany).mockReturnValue(new Promise(() => {}));
   workspace();
   fireEvent.change(screen.getByLabelText("Search companies"), {
     target: { value: "elevenlabs.io" },

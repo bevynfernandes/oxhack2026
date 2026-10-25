@@ -65,7 +65,7 @@ export default function CompanyHomePage() {
     }),
   });
   const rows =
-    publications.length > 0
+    publications.length > 0 && companyQueries.every((query) => !query.isPending)
       ? companyQueries
           .flatMap((query, index) =>
             (query.data?.items ?? []).map((row) => ({
@@ -102,8 +102,9 @@ export default function CompanyHomePage() {
             <p className="eyebrow">SOFTWARE & SAAS RESEARCH</p>
             <h1>Company research workspace</h1>
             <p>
-              Research a company by name or website, then inspect its outlook,
-              fundamentals and source evidence.
+              Build a dated evidence report from a company’s website. Inspect
+              fundamentals and sources; validated success predictions are
+              unavailable.
             </p>
           </div>
           <span className="directory-status">
@@ -138,7 +139,24 @@ export default function CompanyHomePage() {
                 );
                 // Exact websites use standalone discovery, independent of saved publications.
                 if (host?.includes(".")) preview.mutate(query);
-                else lookup.mutate(query);
+                else {
+                  const exact = companyQueries
+                    .flatMap((result) => result.data?.items ?? [])
+                    .filter(
+                      (row) =>
+                        row.company.display_name.toLowerCase() ===
+                        query.toLowerCase(),
+                    );
+                  const domains = [
+                    ...new Set(
+                      exact
+                        .map((row) => companyDomain(row.company.website_url))
+                        .filter((domain): domain is string => Boolean(domain)),
+                    ),
+                  ];
+                  if (domains.length === 1) preview.mutate(domains[0]);
+                  else lookup.mutate(query);
+                }
               }}
             >
               <label htmlFor="company-domain-search">Search companies</label>

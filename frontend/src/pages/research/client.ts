@@ -55,8 +55,8 @@ export async function fetchCapabilities() {
 /** Find candidate websites without guessing a company domain or starting research. */
 export async function searchCompanies(query: string) {
   const result = await api.POST("/api/v2/company-search", { body: { query } });
-  if (result.response.status === 404) {
-    const error = new ApiError(404);
+  if (result.response.status === 404 || result.response.status >= 500) {
+    const error = new ApiError(result.response.status);
     error.message =
       "Company-name lookup is unavailable. Enter the company’s exact website domain to research it directly.";
     throw error;
