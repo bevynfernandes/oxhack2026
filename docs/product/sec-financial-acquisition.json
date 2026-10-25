@@ -1,0 +1,2828 @@
+{
+  "cohort_sha256": "21f92ecac40b5055298a212831f0775a4b13ad2207e24e689100e6fffb7b7495",
+  "plan_sha256": "d1ab1d19843509cb389c74869f9b3243b0076f64554ece94ad8ac5caaaab73e5",
+  "attempted": 320,
+  "expected": 320,
+  "records": [
+    {
+      "cik": "0000796534",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000796534.json",
+      "retrieved_at": "2026-10-25T00:09:14.272839+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3721657,
+      "sha256": "e34f737832d7e79c90086c2611e7135348872a2cd2915c7dc9558d826f1fd9c6"
+    },
+    {
+      "cik": "0000853695",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000853695.json",
+      "retrieved_at": "2026-10-25T00:09:14.780419+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 95219,
+      "sha256": "f02f189f8fb020c0b3a4fd60a71acc9f7fda5647fbf4c2c0ea22cd2e5576e899"
+    },
+    {
+      "cik": "0000102752",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000102752.json",
+      "retrieved_at": "2026-10-25T00:09:15.568303+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2551683,
+      "sha256": "ba8e79c4e2caf2b0e71f81903f6fc7bc46c4b9c28d65a407af512e8ec63b9c08"
+    },
+    {
+      "cik": "0000918581",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000918581.json",
+      "retrieved_at": "2026-10-25T00:09:16.683928+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1034818,
+      "sha256": "a3ddd2328391b85e9b06496feca3ace495b32490c8dc0f556325a23a3c0e3484"
+    },
+    {
+      "cik": "0000913241",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000913241.json",
+      "retrieved_at": "2026-10-25T00:09:17.772635+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4420017,
+      "sha256": "e5aa906507bdb8c79a00cda069b40c6f0a4ca03c209474bc46812ecf2463aea0"
+    },
+    {
+      "cik": "0001005210",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001005210.json",
+      "retrieved_at": "2026-10-25T00:09:18.895486+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2856806,
+      "sha256": "3da1636da3395d7495a01561029ee2abbfa76a4fa37f948f0b84f33ae2c04b32"
+    },
+    {
+      "cik": "0001397773",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001397773.json",
+      "retrieved_at": "2026-10-25T00:09:20.020332+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000014693",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000014693.json",
+      "retrieved_at": "2026-10-25T00:09:20.790551+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3121380,
+      "sha256": "5402ce319d3908f1d4d972a33dae5983c0f2b7f1f713df64c0ec7995200ebfbf"
+    },
+    {
+      "cik": "0000885307",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000885307.json",
+      "retrieved_at": "2026-10-25T00:09:22.358076+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1647969,
+      "sha256": "84a9b7a0d805cbb37d2536ade8c618d0453c7f735f4827e423604d2dfcae33a7"
+    },
+    {
+      "cik": "0001059324",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001059324.json",
+      "retrieved_at": "2026-10-25T00:09:22.951051+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 600599,
+      "sha256": "e6c6a0b2f34869c1be3b8e7f648da793a0b15ae8952342a4872ece43e89f6373"
+    },
+    {
+      "cik": "0000018672",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000018672.json",
+      "retrieved_at": "2026-10-25T00:09:24.312452+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 99233,
+      "sha256": "6ebe79e5b139f09461dd077cd1593ac3c75b2557a8e0ebbec6584a66ed28e9d5"
+    },
+    {
+      "cik": "0001082431",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001082431.json",
+      "retrieved_at": "2026-10-25T00:09:25.084315+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 32091,
+      "sha256": "3807c3d62f9b36acaf5506671638c9a0e808fd4c55e6fb4223558bd9ad1c2c30"
+    },
+    {
+      "cik": "0001005286",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001005286.json",
+      "retrieved_at": "2026-10-25T00:09:26.175576+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3702870,
+      "sha256": "1558a2ffe6e0c9b46b5ee698b0dbe287366a9808531f7c820d0d5517eb583dd6"
+    },
+    {
+      "cik": "0001165320",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001165320.json",
+      "retrieved_at": "2026-10-25T00:09:27.451695+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1596990,
+      "sha256": "12b1d1f0b357f0e2b89807866d8015ff01521dc77cf9434cd2743e05e167f8a9"
+    },
+    {
+      "cik": "0000724941",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000724941.json",
+      "retrieved_at": "2026-10-25T00:09:28.337975+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 332218,
+      "sha256": "c298c5f7aed735b3d85065fcbb2c4a61a246b82914333fc978fc56a4c6bf71b1"
+    },
+    {
+      "cik": "0000351998",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000351998.json",
+      "retrieved_at": "2026-10-25T00:09:29.362789+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2220161,
+      "sha256": "05ce7c3ba1138ebdef310f189bf8e6516309869688826070f77e8d09d2f7b687"
+    },
+    {
+      "cik": "0001326003",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001326003.json",
+      "retrieved_at": "2026-10-25T00:09:30.600246+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 315899,
+      "sha256": "325ff4a01aa20be2b23a81fb80f65ab0f176fa374e8cb295f85225c0ffc5d40e"
+    },
+    {
+      "cik": "0001139950",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001139950.json",
+      "retrieved_at": "2026-10-25T00:09:31.679738+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001416090",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001416090.json",
+      "retrieved_at": "2026-10-25T00:09:32.349863+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2244174,
+      "sha256": "0bc10af79af341dd8c86306526b2fbab5f900ddb1ebdce68e8e04bcf7f202e19"
+    },
+    {
+      "cik": "0001083663",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001083663.json",
+      "retrieved_at": "2026-10-25T00:09:34.873776+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 60186,
+      "sha256": "5ee2313a6889ff01859d0a471b934b2c9209de497b7f7e14c78906bd002a6493"
+    },
+    {
+      "cik": "0001156375",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001156375.json",
+      "retrieved_at": "2026-10-25T00:09:35.094471+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4244681,
+      "sha256": "8b12c0ae5c33f2d035d7d0c0c17a2fd1f23849c155f69f9e1fc6d98e19f62914"
+    },
+    {
+      "cik": "0001413547",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001413547.json",
+      "retrieved_at": "2026-10-25T00:09:36.132643+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 580013,
+      "sha256": "40cad50c175f87980494410bcbb69021b0cdd592d94997a326f9b8a4c79a516e"
+    },
+    {
+      "cik": "0001130144",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001130144.json",
+      "retrieved_at": "2026-10-25T00:09:37.318943+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4539327,
+      "sha256": "4a9b210121bf9bcef8a04d33f2348722d5c054802094c44facebbfe78b833f83"
+    },
+    {
+      "cik": "0001377720",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001377720.json",
+      "retrieved_at": "2026-10-25T00:09:38.259571+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 89056,
+      "sha256": "5df6437f3cb5dbdc7fcaf9a1ae0b726c4fc067481e0e9bcde0741ce9af8a7407"
+    },
+    {
+      "cik": "0001051827",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001051827.json",
+      "retrieved_at": "2026-10-25T00:09:39.630129+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000944075",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000944075.json",
+      "retrieved_at": "2026-10-25T00:09:40.305160+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2062436,
+      "sha256": "312d9ed8e7c5d6c0be833dd9b3a779dfc840153f471a5979fbf4500cda1c5857"
+    },
+    {
+      "cik": "0000030831",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000030831.json",
+      "retrieved_at": "2026-10-25T00:09:41.716345+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1552007,
+      "sha256": "0bd97813650b1e2a75ee2371bba6674f99ee96e731db0aa5cb12b63f4f1eb1ce"
+    },
+    {
+      "cik": "0000794170",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000794170.json",
+      "retrieved_at": "2026-10-25T00:09:42.583477+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3782367,
+      "sha256": "6c86150b8f71267603602881b604329de4e828a36f8ee7fbfb36c54725dd887c"
+    },
+    {
+      "cik": "0000074303",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000074303.json",
+      "retrieved_at": "2026-10-25T00:09:43.482717+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 5428091,
+      "sha256": "c1a33a07cb59348dc41317d4e1af4051836a6aee29bce1eec5db50916ef2de5f"
+    },
+    {
+      "cik": "0001493006",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001493006.json",
+      "retrieved_at": "2026-10-25T00:09:44.593503+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 482796,
+      "sha256": "b5c79948ed28c11a04e1b3c47a8dada50a784f758b5e857328aadb8f7b17e9bd"
+    },
+    {
+      "cik": "0000077159",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000077159.json",
+      "retrieved_at": "2026-10-25T00:09:45.768270+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2802857,
+      "sha256": "39f11f6c097164819b2e4f29a8c170b61f9e3b334bafb50a5ed0fc2ca67a6d2d"
+    },
+    {
+      "cik": "0000002488",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000002488.json",
+      "retrieved_at": "2026-10-25T00:09:46.885044+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3672449,
+      "sha256": "21a29c75076d90fced568785d855fc427a15c7458bc0bb153a9dedd88ad3349e"
+    },
+    {
+      "cik": "0001007587",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001007587.json",
+      "retrieved_at": "2026-10-25T00:09:47.741107+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3258589,
+      "sha256": "914d28e5b9f9d91fb8c6587d08f5dbb91ba9b98461bbd2aaf27c0edd2276c449"
+    },
+    {
+      "cik": "0001275187",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001275187.json",
+      "retrieved_at": "2026-10-25T00:09:48.923041+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3456889,
+      "sha256": "0ba13541ff38a1ca462bae2a799a8152cbe93a66061911c14131bf3a85e93094"
+    },
+    {
+      "cik": "0001478682",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001478682.json",
+      "retrieved_at": "2026-10-25T00:09:49.814898+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 177578,
+      "sha256": "4b10c56c31d76fca197d5c7b21aeb96ed730873e7d18b908fd785cfeb13a52fa"
+    },
+    {
+      "cik": "0001064863",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001064863.json",
+      "retrieved_at": "2026-10-25T00:09:51.141242+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 513806,
+      "sha256": "0536eb0b0a17bf5ae7cff83d42ef19c01ece4064ecf50d6ddee92a8349484731"
+    },
+    {
+      "cik": "0001099290",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001099290.json",
+      "retrieved_at": "2026-10-25T00:09:52.048653+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 799070,
+      "sha256": "b91fbb7a282b189fae3520b9fbe6221b402f390bb68764501314a8918afc3256"
+    },
+    {
+      "cik": "0001498311",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001498311.json",
+      "retrieved_at": "2026-10-25T00:09:53.104704+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001034669",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001034669.json",
+      "retrieved_at": "2026-10-25T00:09:53.995355+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 487457,
+      "sha256": "8e1ee74c41fa92c234a74ccb784d046327af07a39b24d14b2f0664fe9aeb06bf"
+    },
+    {
+      "cik": "0001421538",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001421538.json",
+      "retrieved_at": "2026-10-25T00:09:55.350837+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 504579,
+      "sha256": "9656330fac4410ec355919d73b67ef02588523d8e7ea0d1f45b852fb749a424f"
+    },
+    {
+      "cik": "0001420216",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001420216.json",
+      "retrieved_at": "2026-10-25T00:09:56.334692+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 65076,
+      "sha256": "eb303187e62fc3bd01c8a2d914b57bf3bce80edbd46fce4a55ad8e344ee26e5e"
+    },
+    {
+      "cik": "0001430602",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001430602.json",
+      "retrieved_at": "2026-10-25T00:09:57.235215+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2215724,
+      "sha256": "34a9ab5de01b417f8e1381707a4a9d87aa7da47b68298c7753bb24564bdc2ce8"
+    },
+    {
+      "cik": "0001474098",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001474098.json",
+      "retrieved_at": "2026-10-25T00:09:58.424004+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3061148,
+      "sha256": "e31e2a1096d149992b88bf5fb895f2e941fc8fd70dc685b69a66f55eeddcfdef"
+    },
+    {
+      "cik": "0001166708",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001166708.json",
+      "retrieved_at": "2026-10-25T00:09:59.327454+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2616700,
+      "sha256": "ef043b930c2d6170138d5f55d8ba1d02f8dd2fc2bc8f08af210d5228b6301d99"
+    },
+    {
+      "cik": "0001436975",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001436975.json",
+      "retrieved_at": "2026-10-25T00:10:00.366971+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2114945,
+      "sha256": "bfa7fbb16a3031cea57714dd18243d03d7174866efb088d7d76bc1146aaeb7da"
+    },
+    {
+      "cik": "0001382413",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001382413.json",
+      "retrieved_at": "2026-10-25T00:10:01.644784+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 498059,
+      "sha256": "0bec1392f9bbec5e9549ed51e4b332f45ce921f8191a5da897068cca4ccd4c80"
+    },
+    {
+      "cik": "0000823876",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000823876.json",
+      "retrieved_at": "2026-10-25T00:10:02.572652+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 39180,
+      "sha256": "33c57265382026f151fe75b4847758839f97ccb3f5da22e7766fa08b648bdadc"
+    },
+    {
+      "cik": "0000083246",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000083246.json",
+      "retrieved_at": "2026-10-25T00:10:03.591915+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 6006697,
+      "sha256": "030e0fb8581bda6bcca5bed8bb549a59d307c2b0629c1a5282ab12e1fab671e9"
+    },
+    {
+      "cik": "0001486452",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001486452.json",
+      "retrieved_at": "2026-10-25T00:10:04.939245+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 78749,
+      "sha256": "caaae412962afe4b695732178079461f242cbb373de04d3cb0d04459854c04f5"
+    },
+    {
+      "cik": "0000732485",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000732485.json",
+      "retrieved_at": "2026-10-25T00:10:05.671800+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 528917,
+      "sha256": "3f62be4a8c50eba22f76a82da6084b52d73367f446a7fe74dfe8775d01654497"
+    },
+    {
+      "cik": "0001310695",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001310695.json",
+      "retrieved_at": "2026-10-25T00:10:06.823508+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001104252",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001104252.json",
+      "retrieved_at": "2026-10-25T00:10:07.718168+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 133767,
+      "sha256": "1e57c74cdfcc420bdbbb7bfd94c095ce624bbd6048849403c8aefe6c58e45816"
+    },
+    {
+      "cik": "0000790705",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000790705.json",
+      "retrieved_at": "2026-10-25T00:10:09.060023+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 294763,
+      "sha256": "e506b077ee65e22be0fca1877ff1dbe45a80262e355e5574cc6373f858af9da8"
+    },
+    {
+      "cik": "0001425173",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001425173.json",
+      "retrieved_at": "2026-10-25T00:10:09.966305+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 398926,
+      "sha256": "e7f3991edbf222f188a8b2d41d4243004c4382733894003600529b62b6555f62"
+    },
+    {
+      "cik": "0001123312",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001123312.json",
+      "retrieved_at": "2026-10-25T00:10:10.988201+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 474766,
+      "sha256": "aedacf27270d7565a7be6f0c2837f3e97d7f8768739f0e4ff6a8b753332a8c5c"
+    },
+    {
+      "cik": "0001449224",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001449224.json",
+      "retrieved_at": "2026-10-25T00:10:12.092495+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 161197,
+      "sha256": "b26c2d828879f3c8a93b0cff2ffe50a3ba4c1473e7f8f7c77dfd902e7743055a"
+    },
+    {
+      "cik": "0001042809",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001042809.json",
+      "retrieved_at": "2026-10-25T00:10:13.137425+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 63934,
+      "sha256": "ece5a008feed44895aa7eda2092c951b2c89cedf09a36d282debaae0c656c00a"
+    },
+    {
+      "cik": "0001387998",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001387998.json",
+      "retrieved_at": "2026-10-25T00:10:14.108502+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 450009,
+      "sha256": "fcb00dba4984588e976b09ffbfcc715046f80dbbe0f6909912017bf6d113435f"
+    },
+    {
+      "cik": "0001056358",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001056358.json",
+      "retrieved_at": "2026-10-25T00:10:15.269816+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3244337,
+      "sha256": "503b6b2c91cc68b8f2b52cfba7f4eac1a21ed7ab88d06bdaaad332faa490c963"
+    },
+    {
+      "cik": "0000073020",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000073020.json",
+      "retrieved_at": "2026-10-25T00:10:16.405241+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1951001,
+      "sha256": "e6bf595e0302fc3a1b90693fb18b41573585047bfd1403d143745e0fdafeca2c"
+    },
+    {
+      "cik": "0001487941",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001487941.json",
+      "retrieved_at": "2026-10-25T00:10:17.369743+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 561972,
+      "sha256": "ebda9a49a4b99dd5565f92d15fb18452aaf0cab607265bc86cc20816cb0826bf"
+    },
+    {
+      "cik": "0001107699",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001107699.json",
+      "retrieved_at": "2026-10-25T00:10:18.412777+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001308569",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001308569.json",
+      "retrieved_at": "2026-10-25T00:10:19.287987+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1369847,
+      "sha256": "f658b873df4608d23db68ac8ef058d9db02be90330b7f938f59be68847bae828"
+    },
+    {
+      "cik": "0001069152",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001069152.json",
+      "retrieved_at": "2026-10-25T00:10:20.806139+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 479284,
+      "sha256": "435275b7ff8e96b5fe2d7f4d7275235523b48d00ee19ce2f450511d25e7bf5f8"
+    },
+    {
+      "cik": "0001143238",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001143238.json",
+      "retrieved_at": "2026-10-25T00:10:21.544586+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 861882,
+      "sha256": "5a6993b9562baa2cb86e08ac134c163b6864b4af900a46c17f580d59a16cdf6a"
+    },
+    {
+      "cik": "0001467027",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001467027.json",
+      "retrieved_at": "2026-10-25T00:10:22.675859+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 292372,
+      "sha256": "dc15218c8b2159f61b5c0e8b6dc28f3ba31d51f9813a98fb0a0968659be5a027"
+    },
+    {
+      "cik": "0000095304",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000095304.json",
+      "retrieved_at": "2026-10-25T00:10:23.690528+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 568684,
+      "sha256": "9d79d32daf2cf01d37c7ba858bef251f04c05d3f4bdefd6ab9eb8ebb88c068b5"
+    },
+    {
+      "cik": "0000319240",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000319240.json",
+      "retrieved_at": "2026-10-25T00:10:24.765189+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 226193,
+      "sha256": "9a2e721bb7f58501a66f07895cd028b0b6753f0cf183da35ca2adc358d234233"
+    },
+    {
+      "cik": "0001016169",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001016169.json",
+      "retrieved_at": "2026-10-25T00:10:25.748353+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1743187,
+      "sha256": "540b8a117c7898b4d835a42d9aec42c261c74ea0da49d4755fcc6f2d9b68be71"
+    },
+    {
+      "cik": "0000066901",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000066901.json",
+      "retrieved_at": "2026-10-25T00:10:27.004769+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 47,
+      "sha256": "1bb98fefd02c0901e82083fd25b4ab06ab468773c325f67d6c89016901d1529d"
+    },
+    {
+      "cik": "0000914142",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000914142.json",
+      "retrieved_at": "2026-10-25T00:10:27.741028+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 334252,
+      "sha256": "901637443a4f6f941c305fa68e706b73ea3e902efa52492d98c80e583367aa10"
+    },
+    {
+      "cik": "0001270436",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001270436.json",
+      "retrieved_at": "2026-10-25T00:10:29.057982+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3399011,
+      "sha256": "979ed6ec3a2aa9c51e737cbfbb80d5c0f174afd5b14cc48cf0acca9750be39ba"
+    },
+    {
+      "cik": "0001271046",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001271046.json",
+      "retrieved_at": "2026-10-25T00:10:30.525457+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 455916,
+      "sha256": "618aa78dd95c8cfc197b56a72a71659251c55b763f5d65313d725b40814cd129"
+    },
+    {
+      "cik": "0001381325",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001381325.json",
+      "retrieved_at": "2026-10-25T00:10:31.158161+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 81952,
+      "sha256": "511ba5fcb5acc86488dd4e5f860f9ad2fe37193e18ee33cdf895ed7929073401"
+    },
+    {
+      "cik": "0001385310",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001385310.json",
+      "retrieved_at": "2026-10-25T00:10:32.026686+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 575716,
+      "sha256": "ee9c8ded8428e6b5f5f6b51f4116c2b57320ed08f6fe220da79e8db533177c7e"
+    },
+    {
+      "cik": "0001201792",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001201792.json",
+      "retrieved_at": "2026-10-25T00:10:33.136973+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2903458,
+      "sha256": "27e9d7df128a1ab8af74557c9afc6e9e672b6488929c8edd2cbc6129d759e81b"
+    },
+    {
+      "cik": "0001385544",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001385544.json",
+      "retrieved_at": "2026-10-25T00:10:34.228977+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1144532,
+      "sha256": "1a64ede6d5de9bab558c162a2abfe1d296e776a794e83ed67a71d96325ddad19"
+    },
+    {
+      "cik": "0000874766",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000874766.json",
+      "retrieved_at": "2026-10-25T00:10:35.373579+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 5937353,
+      "sha256": "b32a49dbbcbfebfc5b5b2fcb81e613a626abd492765b1e381d8167eb0ae8c9c1"
+    },
+    {
+      "cik": "0001392363",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001392363.json",
+      "retrieved_at": "2026-10-25T00:10:36.192915+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1117050,
+      "sha256": "1993d353e0be40ca05545a53854806287d43c52ae4dcc9250d4dc21bbf0ab94a"
+    },
+    {
+      "cik": "0000315852",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000315852.json",
+      "retrieved_at": "2026-10-25T00:10:37.390898+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4676110,
+      "sha256": "7ec00cc786d154a68d45e35c78867546d55daef3dcb1e9afb1c5af2fae4aff5d"
+    },
+    {
+      "cik": "0000913760",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000913760.json",
+      "retrieved_at": "2026-10-25T00:10:38.370351+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4738496,
+      "sha256": "76252590b2e9ba6b1c744c51f8f4032ef9e0be89b688ba4c53b3dd7a23e4fb27"
+    },
+    {
+      "cik": "0000783005",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000783005.json",
+      "retrieved_at": "2026-10-25T00:10:39.397819+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1871238,
+      "sha256": "a35602e9fed974274f3c60570e6b80a61eca1508614d382737808ca6f64331e5"
+    },
+    {
+      "cik": "0001253557",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001253557.json",
+      "retrieved_at": "2026-10-25T00:10:40.738726+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 230948,
+      "sha256": "85f4730a62c4b018dc911e520ad38ad62871d77271dc9909f1228cf7ef349493"
+    },
+    {
+      "cik": "0001325955",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001325955.json",
+      "retrieved_at": "2026-10-25T00:10:41.513703+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1577904,
+      "sha256": "9ded2d3bfa60d52acb83d8ab7a573f05a1a02109ae1726bf93821e8059b41ad8"
+    },
+    {
+      "cik": "0001101093",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001101093.json",
+      "retrieved_at": "2026-10-25T00:10:42.923287+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001162747",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001162747.json",
+      "retrieved_at": "2026-10-25T00:10:43.593109+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000924719",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000924719.json",
+      "retrieved_at": "2026-10-25T00:10:44.788120+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2193503,
+      "sha256": "8071312d3a87137c3890340b3d9afdac73ac0212e6cde6f59df1784acc1b6cbd"
+    },
+    {
+      "cik": "0001020859",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001020859.json",
+      "retrieved_at": "2026-10-25T00:10:45.919709+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3783387,
+      "sha256": "bbe02d24455f63fa21e70f398d796052e107f348b96932f40bce6c3ed1b1905a"
+    },
+    {
+      "cik": "0001140028",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001140028.json",
+      "retrieved_at": "2026-10-25T00:10:46.785855+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 341336,
+      "sha256": "2ed2cc22fd8292aa0128d79e3c5e99a92a3230deaeea072b6779cdc7d5dfd70b"
+    },
+    {
+      "cik": "0000091741",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000091741.json",
+      "retrieved_at": "2026-10-25T00:10:48.018417+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 112939,
+      "sha256": "81df944f66636d3d3b3cfe81933b9b7be183d013567c21cf1659bdd3432b6842"
+    },
+    {
+      "cik": "0001126703",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001126703.json",
+      "retrieved_at": "2026-10-25T00:10:48.772342+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 511405,
+      "sha256": "e62bdcd2563ccd8396a753ad6ef586eacec325fe42ed49d591e740e1f3fa5ff6"
+    },
+    {
+      "cik": "0001137005",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001137005.json",
+      "retrieved_at": "2026-10-25T00:10:50.024070+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 517949,
+      "sha256": "fc4f9cbfd643621d86ed2b35727989036c1802405eaa55274bc8b9b1425b7760"
+    },
+    {
+      "cik": "0000277375",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000277375.json",
+      "retrieved_at": "2026-10-25T00:10:51.078264+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1138941,
+      "sha256": "94605da8e54727154c21e168be44e057bc36bc3deb755df01a785bc19ec52c24"
+    },
+    {
+      "cik": "0000887905",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000887905.json",
+      "retrieved_at": "2026-10-25T00:10:52.148883+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2962217,
+      "sha256": "b3a9914ed70bbe3aa139b5c7f2ebfde923b557a5d1039b440684d951fbce3bdf"
+    },
+    {
+      "cik": "0001375554",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001375554.json",
+      "retrieved_at": "2026-10-25T00:10:53.255190+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 278803,
+      "sha256": "562892fe702aba62b64b1fc748d260247e97285f9ac374169d0c33ed7dd2035c"
+    },
+    {
+      "cik": "0000820736",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000820736.json",
+      "retrieved_at": "2026-10-25T00:10:54.246500+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 631305,
+      "sha256": "71c8aa47dcc47d86303b4ece6ef6d9e4deffefda8c29cda348830cc98a04a854"
+    },
+    {
+      "cik": "0000353386",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000353386.json",
+      "retrieved_at": "2026-10-25T00:10:55.351990+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 169005,
+      "sha256": "c93010f2ed7a5e970cd2574d73a465a30df512776d3c3cd7c7c6218108005113"
+    },
+    {
+      "cik": "0001491525",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001491525.json",
+      "retrieved_at": "2026-10-25T00:10:56.338448+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 505309,
+      "sha256": "c825a019adffc5ae1bcce3dea16805bdb08f154d058cefab8e9d97283f613629"
+    },
+    {
+      "cik": "0000863680",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000863680.json",
+      "retrieved_at": "2026-10-25T00:10:57.354030+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000800458",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000800458.json",
+      "retrieved_at": "2026-10-25T00:10:58.322200+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 773500,
+      "sha256": "aafb1d4d8af46a02a53637934d711d99a0b1edc783d985fcc46771304ad07f37"
+    },
+    {
+      "cik": "0001123541",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001123541.json",
+      "retrieved_at": "2026-10-25T00:10:59.675148+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 250621,
+      "sha256": "93e6309f66915c6f43c29b42f4bb2984f14dd7b062659d8418040a8eb2d8e57c"
+    },
+    {
+      "cik": "0001129633",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001129633.json",
+      "retrieved_at": "2026-10-25T00:11:00.574809+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1873757,
+      "sha256": "0e62a67a8d500dcff3b1f11110fe8204a4fd0012fd9554b6f651289970a91af9"
+    },
+    {
+      "cik": "0001325879",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001325879.json",
+      "retrieved_at": "2026-10-25T00:11:01.856462+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1882747,
+      "sha256": "21053fe6782ba81440d08f448d6550d472a314e4c7a3593116292fa1b36bb710"
+    },
+    {
+      "cik": "0001287808",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001287808.json",
+      "retrieved_at": "2026-10-25T00:11:02.756109+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2956584,
+      "sha256": "d66855c6ab9c3d7031b170c1888db89f37fea9a109340c2cd91222cbcafbbd6b"
+    },
+    {
+      "cik": "0001466258",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001466258.json",
+      "retrieved_at": "2026-10-25T00:11:04.066093+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4362148,
+      "sha256": "b514b24aaf89f3bb84f578aa9ce522656f011b8796723013a2c41faeec0490df"
+    },
+    {
+      "cik": "0001417926",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001417926.json",
+      "retrieved_at": "2026-10-25T00:11:04.877356+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2144264,
+      "sha256": "685ad9dc506bdfe829560566a030c772be69de24616cba6e2a255a48eadc071b"
+    },
+    {
+      "cik": "0001123735",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001123735.json",
+      "retrieved_at": "2026-10-25T00:11:05.917053+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 978236,
+      "sha256": "e62d9f3bb5843acc72bc886db76bfa0caae0689ed4ea924fab7ed239c8da6c9d"
+    },
+    {
+      "cik": "0001401284",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001401284.json",
+      "retrieved_at": "2026-10-25T00:11:06.969532+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000037748",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000037748.json",
+      "retrieved_at": "2026-10-25T00:11:07.799825+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 320274,
+      "sha256": "fa051fe335c36d4438ceb92cb2e2fa33fcfe5c742331b59751722ced1a142e4c"
+    },
+    {
+      "cik": "0000825315",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000825315.json",
+      "retrieved_at": "2026-10-25T00:11:09.097508+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 283955,
+      "sha256": "eb9ff54f0b8880288eac23d67c2ace0e07db197893f7ad689fcdb0711f6a0fc8"
+    },
+    {
+      "cik": "0001253329",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001253329.json",
+      "retrieved_at": "2026-10-25T00:11:10.075250+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 122943,
+      "sha256": "a8cf5dfd2c4273372cced44543a32d614733738de88a8ff0dc9b7ffb25a615c7"
+    },
+    {
+      "cik": "0000216228",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000216228.json",
+      "retrieved_at": "2026-10-25T00:11:11.038335+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 5090131,
+      "sha256": "c2d3c2cd057b5f1982f66291c0a6423a993e25adf15a9617104ddb274edcbec5"
+    },
+    {
+      "cik": "0001061134",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001061134.json",
+      "retrieved_at": "2026-10-25T00:11:12.080487+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001236997",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001236997.json",
+      "retrieved_at": "2026-10-25T00:11:13.239772+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1218021,
+      "sha256": "c04b3a8a3ce49d73c932e0f1be3bf6720f95ff9513400881c60e37bed7a1a66f"
+    },
+    {
+      "cik": "0001340909",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001340909.json",
+      "retrieved_at": "2026-10-25T00:11:14.642787+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001175029",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001175029.json",
+      "retrieved_at": "2026-10-25T00:11:15.162627+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 285906,
+      "sha256": "462d900c06772ee7cce518bbaa15acebc89a93bcec959490fd75cfcc62f319f9"
+    },
+    {
+      "cik": "0001476170",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001476170.json",
+      "retrieved_at": "2026-10-25T00:11:16.491213+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 981658,
+      "sha256": "3cc0951983ac55b9b6d423bfb426b1f19fd0499cdb496e3ee089d34933123628"
+    },
+    {
+      "cik": "0001095266",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001095266.json",
+      "retrieved_at": "2026-10-25T00:11:17.585340+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 62363,
+      "sha256": "e15e538e21ed7f832148bb29b2496ce1bef68ffabad0bb1f900bf40a705f749d"
+    },
+    {
+      "cik": "0001399095",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001399095.json",
+      "retrieved_at": "2026-10-25T00:11:18.566664+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 372856,
+      "sha256": "85d4239b7879a0cbad4acaad09b23621ccc489137f904d108c67eb9c6e65349f"
+    },
+    {
+      "cik": "0000039899",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000039899.json",
+      "retrieved_at": "2026-10-25T00:11:19.760820+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3670833,
+      "sha256": "38e8135cb308ab0dc6275656e66afe3e1d93e4db5ce30f1d38114893f628a0cd"
+    },
+    {
+      "cik": "0000839345",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000839345.json",
+      "retrieved_at": "2026-10-25T00:11:23.259492+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 21782,
+      "sha256": "e41a2261f96ea56b00753cd6f75025a1b2cfadd06c7716daf903bd1b5036d4ac"
+    },
+    {
+      "cik": "0001171008",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001171008.json",
+      "retrieved_at": "2026-10-25T00:11:23.501800+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 933706,
+      "sha256": "8d966f77e25c2683d3d85d6b1c19c8d29bc438044d927c97203f199b85f7b4f7"
+    },
+    {
+      "cik": "0001372041",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001372041.json",
+      "retrieved_at": "2026-10-25T00:11:24.592736+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 82466,
+      "sha256": "b30d829ab7d4890b13fd0f27d300d83c7947b15eb454fe83d0976c4d96501b46"
+    },
+    {
+      "cik": "0000930553",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000930553.json",
+      "retrieved_at": "2026-10-25T00:11:25.671627+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 135208,
+      "sha256": "70232d4781651c6f5fe62387cc9007ee77947b2f25062ad41f83e63aa44603c2"
+    },
+    {
+      "cik": "0001017699",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001017699.json",
+      "retrieved_at": "2026-10-25T00:11:26.889263+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 130362,
+      "sha256": "1cb57d677f53fbb7b58e38ce47b680a8134968d48926162e9e6d12bcb8d9c3b0"
+    },
+    {
+      "cik": "0001490711",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001490711.json",
+      "retrieved_at": "2026-10-25T00:11:27.793620+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 185806,
+      "sha256": "01906e11619c4a02be7a27752d66150bc917c9228a79206e62b9a60c9f157fdb"
+    },
+    {
+      "cik": "0001431656",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001431656.json",
+      "retrieved_at": "2026-10-25T00:11:28.854381+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000022767",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000022767.json",
+      "retrieved_at": "2026-10-25T00:11:29.774686+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 125757,
+      "sha256": "97ee306b0923eeda43c2dbfe493dabbe09af5ad61d472d58c3a86883dfaa7d77"
+    },
+    {
+      "cik": "0001342505",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001342505.json",
+      "retrieved_at": "2026-10-25T00:11:31.633940+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 494514,
+      "sha256": "6f97327e133e77fc2cd92fa5e016f3c16c788008236e406b391c3b37486d0e3c"
+    },
+    {
+      "cik": "0000850606",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000850606.json",
+      "retrieved_at": "2026-10-25T00:11:32.035148+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 210838,
+      "sha256": "69baa7425e741db856a4b4919dd5302e351f2b0ab6e6f5051dd87f2b6b585cf5"
+    },
+    {
+      "cik": "0000839443",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000839443.json",
+      "retrieved_at": "2026-10-25T00:11:33.116879+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 174824,
+      "sha256": "1d10a8df5d90b16331fc819065dc25d82097ad0953a55d7ab78cbe34a90e609e"
+    },
+    {
+      "cik": "0001424151",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001424151.json",
+      "retrieved_at": "2026-10-25T00:11:34.340643+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 263341,
+      "sha256": "81b0df49b134712b3ab491313fca6e4fc63ab10b540bae43257eb936c9a8216c"
+    },
+    {
+      "cik": "0000737468",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000737468.json",
+      "retrieved_at": "2026-10-25T00:11:35.142774+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 5213555,
+      "sha256": "19f9971fd349091d723784dc21d0520ec58fdc1b14275d5c4cd224158197e626"
+    },
+    {
+      "cik": "0001047884",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001047884.json",
+      "retrieved_at": "2026-10-25T00:11:37.487198+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2225115,
+      "sha256": "4d6cf9f384a1970d08d89dfb0c7a26e2e086e91e271ca4c8d7a84b498383e711"
+    },
+    {
+      "cik": "0001125280",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001125280.json",
+      "retrieved_at": "2026-10-25T00:11:38.249654+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 605186,
+      "sha256": "4584bc199d5c2be6c67f5f614e6dc7b17ef55f5fdd1da5e9797d83174efa63da"
+    },
+    {
+      "cik": "0000351931",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000351931.json",
+      "retrieved_at": "2026-10-25T00:11:39.246966+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 106570,
+      "sha256": "bd1a13d2a61f24d737af8b12436e717f6f429280c36551e78728c2534331c24f"
+    },
+    {
+      "cik": "0001217027",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001217027.json",
+      "retrieved_at": "2026-10-25T00:11:40.013518+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001142417",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001142417.json",
+      "retrieved_at": "2026-10-25T00:11:40.852316+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3077420,
+      "sha256": "3a1de642053c3dc7d9537d9785fe517bdc901e75269a92864e46a78287f882f0"
+    },
+    {
+      "cik": "0000932628",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000932628.json",
+      "retrieved_at": "2026-10-25T00:11:42.366422+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1636433,
+      "sha256": "6167f883b17da0713556d9f17bf795f38fd1cbd76089f35b50e7bb8941fdc0a0"
+    },
+    {
+      "cik": "0001145404",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001145404.json",
+      "retrieved_at": "2026-10-25T00:11:43.245719+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 458191,
+      "sha256": "20683b32c99e194cbbfb0d666064fc9840e53228f73ab1f2dfeab7a0582684f5"
+    },
+    {
+      "cik": "0000865754",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000865754.json",
+      "retrieved_at": "2026-10-25T00:11:44.118306+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 445530,
+      "sha256": "684363b744a5735425a8858cbae009e43a7fcab588d0c165448cf202bc000374"
+    },
+    {
+      "cik": "0001419428",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001419428.json",
+      "retrieved_at": "2026-10-25T00:11:45.311228+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 748278,
+      "sha256": "4efff34ee0d0e467f4da3d967edc33a5a89f614427e762ccf2acca5472adc099"
+    },
+    {
+      "cik": "0000707179",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000707179.json",
+      "retrieved_at": "2026-10-25T00:11:46.413334+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 6877145,
+      "sha256": "ef32fff77b0e8d610629bb964e9574d6019b6684425c6b6d1ec7e328788fecae"
+    },
+    {
+      "cik": "0001388855",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001388855.json",
+      "retrieved_at": "2026-10-25T00:11:48.101242+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 222076,
+      "sha256": "b2401e5af51d40b5494d15adccea8c92a71914a21291d3489514f831d5c08459"
+    },
+    {
+      "cik": "0000027996",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000027996.json",
+      "retrieved_at": "2026-10-25T00:11:48.457422+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4641472,
+      "sha256": "c44437aab6b2b7133fb0e5c25ab3e10f9f915df58aa3ae4209ed775c3b317b00"
+    },
+    {
+      "cik": "0000106040",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000106040.json",
+      "retrieved_at": "2026-10-25T00:11:49.603685+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4294134,
+      "sha256": "40160bdeb0eac939896bcb6a9f79b436fc467c41b473c17ef673e26fdccb80e7"
+    },
+    {
+      "cik": "0000914329",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000914329.json",
+      "retrieved_at": "2026-10-25T00:11:50.437705+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1416454,
+      "sha256": "a77f70088f21c1f7bda0a9b6762120f037547cbc255bf78337d5e4925b8221e1"
+    },
+    {
+      "cik": "0001308711",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001308711.json",
+      "retrieved_at": "2026-10-25T00:11:53.242066+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1254056,
+      "sha256": "9cf0a210c8b730886e9658779bca671ec4ce220bdd0659276217ac963e8930e8"
+    },
+    {
+      "cik": "0001401667",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001401667.json",
+      "retrieved_at": "2026-10-25T00:11:53.712224+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2485587,
+      "sha256": "4b2b449f06e175eebf840b512ad515ef71296ad006f32415c1f427849828bc3d"
+    },
+    {
+      "cik": "0000889348",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000889348.json",
+      "retrieved_at": "2026-10-25T00:11:54.684014+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2424886,
+      "sha256": "3b5d607f2c5986aa0744cdfd9cb322a7f49ff24ed108e013e8985524371a9189"
+    },
+    {
+      "cik": "0001164012",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001164012.json",
+      "retrieved_at": "2026-10-25T00:11:55.805802+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 298448,
+      "sha256": "9b1d5acad79c47f6d5b3376401f20ea9a32e11a1a6e06fbc29f3e14cbb701889"
+    },
+    {
+      "cik": "0001082027",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001082027.json",
+      "retrieved_at": "2026-10-25T00:11:56.759780+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 637197,
+      "sha256": "3edeb4e4ff3bbe453675a64a6dac00ad5ebbc434ee77af37661f58e1168d9a9d"
+    },
+    {
+      "cik": "0000792935",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000792935.json",
+      "retrieved_at": "2026-10-25T00:11:57.859286+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1978746,
+      "sha256": "a4f8fd956c34e77db45dcdd54cc03aee5ac808fb7b9e32559ac9d8a78af1e44e"
+    },
+    {
+      "cik": "0000899923",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000899923.json",
+      "retrieved_at": "2026-10-25T00:11:58.886216+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3595624,
+      "sha256": "c3eafeff4dd551a90d16a39253ddb88b03cb419169f7bce5239bc051ac48cc07"
+    },
+    {
+      "cik": "0001296435",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001296435.json",
+      "retrieved_at": "2026-10-25T00:12:00.176143+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2261320,
+      "sha256": "ccf290522fe98f638577fe1d77468baaa76d46077a3be198dde8cefe13b7ed5d"
+    },
+    {
+      "cik": "0001131554",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001131554.json",
+      "retrieved_at": "2026-10-25T00:12:00.980629+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3638280,
+      "sha256": "34971f5aeba96356d15b6b32d2d874d3160bd8066f0c04109baed21b68977ebf"
+    },
+    {
+      "cik": "0001095291",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001095291.json",
+      "retrieved_at": "2026-10-25T00:12:02.189010+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1497422,
+      "sha256": "f449da7b3368995bcbfe388ad89b56b5d1997413c08174928551dfaf0aab5769"
+    },
+    {
+      "cik": "0000007623",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000007623.json",
+      "retrieved_at": "2026-10-25T00:12:03.245883+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2592360,
+      "sha256": "79f532218bff25240a0fa4a4f34408f1a7a5ab76df7b9e42bb537ca302cc8838"
+    },
+    {
+      "cik": "0001378846",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001378846.json",
+      "retrieved_at": "2026-10-25T00:12:04.375361+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 104180,
+      "sha256": "7331ac515d84a8613f2272cd0e1bf5b0ccc78c0a32fdf8d801132bda90a53577"
+    },
+    {
+      "cik": "0001330466",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001330466.json",
+      "retrieved_at": "2026-10-25T00:12:05.251338+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 597829,
+      "sha256": "4daf596597b3150a5961f7d49f24095129b566593a4e2a0b3436ebb5f22a0763"
+    },
+    {
+      "cik": "0001353282",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001353282.json",
+      "retrieved_at": "2026-10-25T00:12:06.486716+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 603907,
+      "sha256": "3e34caeb450697c878ce527a30ab3fb73dbcce7a34fd29df0b5e0803f051b751"
+    },
+    {
+      "cik": "0000060849",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000060849.json",
+      "retrieved_at": "2026-10-25T00:12:07.564272+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 632584,
+      "sha256": "8cef4e0a6f181f221366288935c7683135fdeee235efa2c16fb39af638c53390"
+    },
+    {
+      "cik": "0000830253",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000830253.json",
+      "retrieved_at": "2026-10-25T00:12:08.424729+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001494722",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001494722.json",
+      "retrieved_at": "2026-10-25T00:12:09.404626+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 468576,
+      "sha256": "a2c6ac7009075812cf5d2f8afc65703eab8f97c53c042b5a25af4c3ffdfc83c3"
+    },
+    {
+      "cik": "0000312065",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000312065.json",
+      "retrieved_at": "2026-10-25T00:12:11.252252+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 372875,
+      "sha256": "1fc21446f2aea874c45742bd4240e267dfcac0c6afd32c21f2218112067400e8"
+    },
+    {
+      "cik": "0001402305",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001402305.json",
+      "retrieved_at": "2026-10-25T00:12:11.694795+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 322388,
+      "sha256": "254d97c8b965bc4faeb972cd8a0a1b92101b9a9f29525959b1bdd73db350e03d"
+    },
+    {
+      "cik": "0001258602",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001258602.json",
+      "retrieved_at": "2026-10-25T00:12:12.676564+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3771293,
+      "sha256": "b7808c49c80b34ceb4c93b8748e92c5873685487ebcbfca30fc34595b226ea6b"
+    },
+    {
+      "cik": "0001328989",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001328989.json",
+      "retrieved_at": "2026-10-25T00:12:14.556719+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001485469",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001485469.json",
+      "retrieved_at": "2026-10-25T00:12:14.936250+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2163321,
+      "sha256": "dd8352501a42d64055fed9c8ba25abe0bb74ad76e60c06fbd71de0d2f44bb7b9"
+    },
+    {
+      "cik": "0001049108",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001049108.json",
+      "retrieved_at": "2026-10-25T00:12:16.545364+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 325673,
+      "sha256": "61d9eec6ea82516540318fb955312be72eab67f055e38fa8900c83535ec295f4"
+    },
+    {
+      "cik": "0000316793",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000316793.json",
+      "retrieved_at": "2026-10-25T00:12:17.054000+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1106111,
+      "sha256": "10dd0adbd54438fde05c17baa0ae9639bb35dea79bf0fb5c1b6864f1b8a341f4"
+    },
+    {
+      "cik": "0001163966",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001163966.json",
+      "retrieved_at": "2026-10-25T00:12:18.179659+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 241560,
+      "sha256": "995f773ffd3d88f55960af91edf206c9f7384c96b7f6885b4142d1a5888ca20f"
+    },
+    {
+      "cik": "0001471271",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001471271.json",
+      "retrieved_at": "2026-10-25T00:12:19.072626+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 371229,
+      "sha256": "5759f6dccd098e790ca5d78a4179a24b1f4b2066f066927bb35307a049695d26"
+    },
+    {
+      "cik": "0001410087",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001410087.json",
+      "retrieved_at": "2026-10-25T00:12:20.222220+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 271377,
+      "sha256": "03c3e6ace6c5e7156c60c2099696ba7828aa44a99e276d73555a1f1c01486bf5"
+    },
+    {
+      "cik": "0000101462",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000101462.json",
+      "retrieved_at": "2026-10-25T00:12:21.231899+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 857759,
+      "sha256": "9e3e73aae85342fa85cf4b0dc6e87fe9b1b10fae6ffc83a0d0e0241feecc0d9b"
+    },
+    {
+      "cik": "0001093430",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001093430.json",
+      "retrieved_at": "2026-10-25T00:12:22.275067+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 930461,
+      "sha256": "1466b4b0f0959172a7e2b452486116d821368bddd488f8cd3417b20a8e75d0bd"
+    },
+    {
+      "cik": "0000916457",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000916457.json",
+      "retrieved_at": "2026-10-25T00:12:23.307038+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2915349,
+      "sha256": "b7d2f9cc9bf5106f98b45c9f7f1f000e0d6ae2fd25043d236e3af9c99eb56045"
+    },
+    {
+      "cik": "0001030058",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001030058.json",
+      "retrieved_at": "2026-10-25T00:12:24.491380+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 90246,
+      "sha256": "43867b68adef649a4511ed275709a04a67543c43c1f2bee997bfde1e17579e13"
+    },
+    {
+      "cik": "0001505367",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001505367.json",
+      "retrieved_at": "2026-10-25T00:12:25.330916+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 419625,
+      "sha256": "96446f676d4c103270235dcaca2ba5722618496a395531b787195df0a033f9dd"
+    },
+    {
+      "cik": "0001496623",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001496623.json",
+      "retrieved_at": "2026-10-25T00:12:26.467458+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 375847,
+      "sha256": "6c61539cc5e1b8b17220b8b8fbe8fd739ee84f6a2608ed52e92c5ee5177efa4c"
+    },
+    {
+      "cik": "0001128383",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001128383.json",
+      "retrieved_at": "2026-10-25T00:12:27.507622+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001328003",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001328003.json",
+      "retrieved_at": "2026-10-25T00:12:28.443773+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 193392,
+      "sha256": "ecfc5d113443b9a026d38a0778b52ff2b0efdd07d9400844ef023d75edf90e9b"
+    },
+    {
+      "cik": "0001130866",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001130866.json",
+      "retrieved_at": "2026-10-25T00:12:29.739665+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 600510,
+      "sha256": "3136b19b0a1bb5429ffa243674a1b8e68a1efb5ea98768a358b9aeb2c0d3f6d2"
+    },
+    {
+      "cik": "0001046188",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001046188.json",
+      "retrieved_at": "2026-10-25T00:12:30.716217+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1073759,
+      "sha256": "2dd5a6b6bea20cf07abd6e696f7e5444c30025f2d36e217affdba787edf55fb8"
+    },
+    {
+      "cik": "0001353972",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001353972.json",
+      "retrieved_at": "2026-10-25T00:12:31.753334+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 120493,
+      "sha256": "9c2c6114e4446f35d73fcad94e1fa4ceeb92fda375d278874be5f5b8007c5358"
+    },
+    {
+      "cik": "0000355766",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000355766.json",
+      "retrieved_at": "2026-10-25T00:12:32.806984+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 405095,
+      "sha256": "d5ead650a9a425905db34e02dd6cb98183dab0ec0cffa5735e13c16e2d45bb31"
+    },
+    {
+      "cik": "0001320854",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001320854.json",
+      "retrieved_at": "2026-10-25T00:12:33.976464+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2868863,
+      "sha256": "ec6c8640a3c10de5c7ca80b3d160b4ea859e06a8575dcea5ed83b35b3eb0c2da"
+    },
+    {
+      "cik": "0001396838",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001396838.json",
+      "retrieved_at": "2026-10-25T00:12:34.958748+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 512138,
+      "sha256": "242318a737ff6c48d22f20cfeeee5c7bad4edb26191e2701a534e150c70c8287"
+    },
+    {
+      "cik": "0001169055",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001169055.json",
+      "retrieved_at": "2026-10-25T00:12:35.994926+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 153077,
+      "sha256": "0ed58b4b8a8045f17ef9ab1ecbe9a73f1f0af7d6dce1b874ce7d7c5e1e69be6f"
+    },
+    {
+      "cik": "0001309402",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001309402.json",
+      "retrieved_at": "2026-10-25T00:12:37.036730+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3619984,
+      "sha256": "db9fcf737b51370991c1476c264eedbc3ce343daaad597e7b99da4381a56e472"
+    },
+    {
+      "cik": "0001420821",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001420821.json",
+      "retrieved_at": "2026-10-25T00:12:38.320875+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001396033",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001396033.json",
+      "retrieved_at": "2026-10-25T00:12:38.981675+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1821633,
+      "sha256": "bccc27e4290203dcbd1355a36d27b1c2bfdd474db9114b394cc1c95a4dcba289"
+    },
+    {
+      "cik": "0001059376",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001059376.json",
+      "retrieved_at": "2026-10-25T00:12:40.471416+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000880562",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000880562.json",
+      "retrieved_at": "2026-10-25T00:12:41.058240+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 764585,
+      "sha256": "a4c7179cd738a15de0a778e0dcfdffe3c121c14cd4f15a5beb96d8dbfcc37c55"
+    },
+    {
+      "cik": "0001332445",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001332445.json",
+      "retrieved_at": "2026-10-25T00:12:42.472875+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 293389,
+      "sha256": "7f5fd44174e8309711375697594355de2130cde9301924131712c35ea44201c2"
+    },
+    {
+      "cik": "0000016732",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000016732.json",
+      "retrieved_at": "2026-10-25T00:12:43.359724+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4759185,
+      "sha256": "7fe30aa1d0907099e195b1a37f491261e5ed59d466e4174f53215b5f1c345bb4"
+    },
+    {
+      "cik": "0000056679",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000056679.json",
+      "retrieved_at": "2026-10-25T00:12:44.269376+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3649176,
+      "sha256": "f6c30cc4d76aaa990edec7e3c8c1e4dd48281e38064a0f60599874b29c22c413"
+    },
+    {
+      "cik": "0001487952",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001487952.json",
+      "retrieved_at": "2026-10-25T00:12:45.589941+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3386134,
+      "sha256": "84c513c5353fe7b85630be75c2e10c8f089ed412987948882b55330bb3db07a9"
+    },
+    {
+      "cik": "0001390134",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001390134.json",
+      "retrieved_at": "2026-10-25T00:12:46.336133+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 124603,
+      "sha256": "b1e5bd043abca3994ce866a1da6e1c8c74d8fef7bd6345135a871fd06641c195"
+    },
+    {
+      "cik": "0001024725",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001024725.json",
+      "retrieved_at": "2026-10-25T00:12:47.561791+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3553171,
+      "sha256": "617e39a2a0b07091c2f0ff6785868f0f5ffd0ec40705f5c1641de2a95ecf143d"
+    },
+    {
+      "cik": "0001039684",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001039684.json",
+      "retrieved_at": "2026-10-25T00:12:48.675511+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4354953,
+      "sha256": "7836d924a1b1474511788058f753cfadea623f42c27c4e4c3526b6d6d0c3f515"
+    },
+    {
+      "cik": "0001380393",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001380393.json",
+      "retrieved_at": "2026-10-25T00:12:49.619688+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1303561,
+      "sha256": "9ba55be086eaaede7e9023860edcbc00018f175fe04cbd7fa53c2344c4c48115"
+    },
+    {
+      "cik": "0000740371",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000740371.json",
+      "retrieved_at": "2026-10-25T00:12:50.721038+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 70103,
+      "sha256": "4808d09ab5ca673a482d800f993f3f0e4fdba67ec54646a2b31df23575493b73"
+    },
+    {
+      "cik": "0001045942",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001045942.json",
+      "retrieved_at": "2026-10-25T00:12:52.024344+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2910988,
+      "sha256": "915056ce6e8ad1b61cee7bfd1e33324307709f171b591f37a948927c6bfec6fc"
+    },
+    {
+      "cik": "0001125259",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001125259.json",
+      "retrieved_at": "2026-10-25T00:12:52.879515+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 76490,
+      "sha256": "a1e56cde5d2d847f712f624b16d5e4bebec9f6bd9cfc9ed879e45f6c6196f7ba"
+    },
+    {
+      "cik": "0001385720",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001385720.json",
+      "retrieved_at": "2026-10-25T00:12:53.806188+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 81851,
+      "sha256": "d41ce2558f85c7b209c792f488e90ddd8987ab265b7907267b0cfd35ddc87f4e"
+    },
+    {
+      "cik": "0001104265",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001104265.json",
+      "retrieved_at": "2026-10-25T00:12:55.078467+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 410762,
+      "sha256": "cbd43c05de11091c0b8942a42c99339687fb93daddda9f32cf66ba305d103b50"
+    },
+    {
+      "cik": "0001335103",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001335103.json",
+      "retrieved_at": "2026-10-25T00:12:55.935089+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1163294,
+      "sha256": "6b487b6d6aa0a735e07855358b10c0014003743452cad5b8c8bf2155ac6c1078"
+    },
+    {
+      "cik": "0000701811",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000701811.json",
+      "retrieved_at": "2026-10-25T00:12:57.020879+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1567880,
+      "sha256": "82c291a7274afacc06f0c3e6b09d93d48cc8b08fdeb9df9a7e76d0bffde82f1f"
+    },
+    {
+      "cik": "0000020629",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000020629.json",
+      "retrieved_at": "2026-10-25T00:12:58.102671+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1710302,
+      "sha256": "3f251cf042ed1602b59148fbefb99cfce457c3c222333f084d02b507ea29e9d1"
+    },
+    {
+      "cik": "0001017303",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001017303.json",
+      "retrieved_at": "2026-10-25T00:12:59.616159+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2744954,
+      "sha256": "f6b28b0b78433fdcc424ff5c39b5f05351896a34e6fe83bf8785f53fa4d5534b"
+    },
+    {
+      "cik": "0001042773",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001042773.json",
+      "retrieved_at": "2026-10-25T00:13:00.300687+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1411841,
+      "sha256": "5f4b63e883c735d5436c494e0303ff6c819edd88e6102c0ee164298b3c694703"
+    },
+    {
+      "cik": "0001260125",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001260125.json",
+      "retrieved_at": "2026-10-25T00:13:01.300260+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001033128",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001033128.json",
+      "retrieved_at": "2026-10-25T00:13:02.170648+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1234871,
+      "sha256": "a42fafc94e8f2c74bc5115a78db0bcac063437e413d70ee49cb1eedcc5f2716b"
+    },
+    {
+      "cik": "0001292518",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001292518.json",
+      "retrieved_at": "2026-10-25T00:13:03.472855+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 172760,
+      "sha256": "1d0f753f282a6c14f3ad1ef0e714773a8077a0812d59c6b111c8f90d2687ff5d"
+    },
+    {
+      "cik": "0001100748",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001100748.json",
+      "retrieved_at": "2026-10-25T00:13:04.379907+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001329136",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001329136.json",
+      "retrieved_at": "2026-10-25T00:13:05.384194+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 465907,
+      "sha256": "09076e07bf7f6fab17999502b67a8a0fc7442f2b1da3970372b47e1483b08cff"
+    },
+    {
+      "cik": "0000097148",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000097148.json",
+      "retrieved_at": "2026-10-25T00:13:06.742521+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001175151",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001175151.json",
+      "retrieved_at": "2026-10-25T00:13:07.452515+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2691784,
+      "sha256": "8bb195ec858f16302b2a8454a5ffe3eff6c1e6cd0312136a64a7a2f621b86836"
+    },
+    {
+      "cik": "0001015739",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001015739.json",
+      "retrieved_at": "2026-10-25T00:13:08.906069+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2012877,
+      "sha256": "f7e9c0285f56431cfc4ef5d838d77071ea9c12bf0b5469343731ad4368827ebf"
+    },
+    {
+      "cik": "0000923284",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000923284.json",
+      "retrieved_at": "2026-10-25T00:13:09.671293+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1286905,
+      "sha256": "f2ed5c2dd2cd9b0df128207a533ae50fb41e1a8df66e918ad9e741cc3df56287"
+    },
+    {
+      "cik": "0000106640",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000106640.json",
+      "retrieved_at": "2026-10-25T00:13:10.877016+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4114760,
+      "sha256": "16ddb67390ae21ae266b630bd7f87f02c7209dffb05e2e93587536a3cc4885e1"
+    },
+    {
+      "cik": "0001389294",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001389294.json",
+      "retrieved_at": "2026-10-25T00:13:11.642631+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 405365,
+      "sha256": "cca7c5f5320cc3d0d767bcd7238c44c1a22a33a963b5950475b0f225386af242"
+    },
+    {
+      "cik": "0000840264",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000840264.json",
+      "retrieved_at": "2026-10-25T00:13:12.861081+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 717284,
+      "sha256": "4b683baff866e82289b7003fb43669731224ad208fd2fe97bb54a4fbbb95ec0b"
+    },
+    {
+      "cik": "0000920527",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000920527.json",
+      "retrieved_at": "2026-10-25T00:13:13.985152+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 537888,
+      "sha256": "3bb29f1d6e3ca65bd2bbd0528e3b4884bfb5b2d88841d3bcdaa616f96040357c"
+    },
+    {
+      "cik": "0000790070",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000790070.json",
+      "retrieved_at": "2026-10-25T00:13:14.977431+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2207106,
+      "sha256": "6be16603efa8e52c9e1fe3355718ddcfd41d426fade3cb5983bc7fff99d734b1"
+    },
+    {
+      "cik": "0000844059",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000844059.json",
+      "retrieved_at": "2026-10-25T00:13:16.062342+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3152447,
+      "sha256": "6499da22ee328614a28d0d261a619761dc7c04d7cb4296eb4d9f6ccf721c98dc"
+    },
+    {
+      "cik": "0001368964",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001368964.json",
+      "retrieved_at": "2026-10-25T00:13:17.221433+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 130870,
+      "sha256": "9d33cafbcc060e6267655e49674513cb76079fae4efd5510f8a8e40589662dc2"
+    },
+    {
+      "cik": "0001041514",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001041514.json",
+      "retrieved_at": "2026-10-25T00:13:18.108599+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4707668,
+      "sha256": "2a4c8aa201a4759b66d7dee4004a37de9b09af0502b5e3273ccb539b46a6a972"
+    },
+    {
+      "cik": "0001178336",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001178336.json",
+      "retrieved_at": "2026-10-25T00:13:20.167138+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 102234,
+      "sha256": "1807ac6154d342b3ee61720ed9491bff6c47f769cc89e33197cef332e3195338"
+    },
+    {
+      "cik": "0001487935",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001487935.json",
+      "retrieved_at": "2026-10-25T00:13:20.590332+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000825788",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000825788.json",
+      "retrieved_at": "2026-10-25T00:13:21.424798+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1587695,
+      "sha256": "e01c9f7a51e5e1ee2285b348e33fe1a16dffe5e20f6a89c7adf2be4d90d9b832"
+    },
+    {
+      "cik": "0001354030",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001354030.json",
+      "retrieved_at": "2026-10-25T00:13:22.721821+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 51747,
+      "sha256": "ac2e13b4b281e45e9d1a583a2690fb5a389a4895aa7345008c47c3a60f42bb4b"
+    },
+    {
+      "cik": "0001090396",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001090396.json",
+      "retrieved_at": "2026-10-25T00:13:23.603800+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1940722,
+      "sha256": "ee08592988e3218cc43c9fc77a22e6819ee9c12a81465f8c20878eafa7d70f7e"
+    },
+    {
+      "cik": "0001454742",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001454742.json",
+      "retrieved_at": "2026-10-25T00:13:24.825208+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1460669,
+      "sha256": "2d9a11dce25c13072ec0a067ef215b5bd626c480b273f45bf5a687b2319e08fe"
+    },
+    {
+      "cik": "0001081091",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001081091.json",
+      "retrieved_at": "2026-10-25T00:13:25.769698+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 367995,
+      "sha256": "1ac7fa8c663efc0bad41ffd4b6a2cccb2ab7df2e51911b61a353306750289f71"
+    },
+    {
+      "cik": "0001487252",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001487252.json",
+      "retrieved_at": "2026-10-25T00:13:26.751790+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 562359,
+      "sha256": "b537cb9ef22be3e10e18408cd716591d19aeca2d25421e37c58cd575b54be87a"
+    },
+    {
+      "cik": "0001331754",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001331754.json",
+      "retrieved_at": "2026-10-25T00:13:27.892166+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4308330,
+      "sha256": "f56899a94ef9dd97c1e0c784a6c6852ee5f9ca7aef70f00c31bf22239f0ccaa2"
+    },
+    {
+      "cik": "0000006885",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000006885.json",
+      "retrieved_at": "2026-10-25T00:13:30.404374+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1624223,
+      "sha256": "100ec60153f5dd1af6e01abdfefe250dec41344efe79e0a9565571e28ce023e8"
+    },
+    {
+      "cik": "0001144215",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001144215.json",
+      "retrieved_at": "2026-10-25T00:13:30.829863+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3545152,
+      "sha256": "7ca2e9c4ad93e13f5dcaf1ec3e2846c9b9d569a6f9ccf9a7a4958c6aea1b9400"
+    },
+    {
+      "cik": "0001437557",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001437557.json",
+      "retrieved_at": "2026-10-25T00:13:31.840517+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1833901,
+      "sha256": "0578afb75dacf21c21b732b2d55715d94a136d1639516bfe5f9cd22c3ec956f4"
+    },
+    {
+      "cik": "0001466827",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001466827.json",
+      "retrieved_at": "2026-10-25T00:13:32.942701+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000822418",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000822418.json",
+      "retrieved_at": "2026-10-25T00:13:33.950924+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 354423,
+      "sha256": "ce9a3732a49ed9ea2f1a29f5fc2d8b5f02880e29ddc552d156c2bb1232edf48c"
+    },
+    {
+      "cik": "0001355242",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001355242.json",
+      "retrieved_at": "2026-10-25T00:13:35.112162+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 224826,
+      "sha256": "94238ef838f3fae335b7a8325a2a7e7c1ace5724b1ba3723213bec175ba4cca3"
+    },
+    {
+      "cik": "0001288855",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001288855.json",
+      "retrieved_at": "2026-10-25T00:13:35.968248+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2809865,
+      "sha256": "49f02f4e5790ea8db4f2f0f98bfd03fb40ad3002ae4dd39d0186be7bc9ea4270"
+    },
+    {
+      "cik": "0001074871",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001074871.json",
+      "retrieved_at": "2026-10-25T00:13:37.192334+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1472351,
+      "sha256": "2b325d3fa30f8488a3e4ff91a726d81077a4c6bf83709115a727a3eee8f803b6"
+    },
+    {
+      "cik": "0001040130",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001040130.json",
+      "retrieved_at": "2026-10-25T00:13:38.149454+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2123345,
+      "sha256": "325986dff3825bf20fcaea88ca14101400e2ccf6d2c83efb8962a2f7a7ead52d"
+    },
+    {
+      "cik": "0000017313",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000017313.json",
+      "retrieved_at": "2026-10-25T00:13:39.509142+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1285335,
+      "sha256": "5f0ddee412da9a6ccbd150edfce31ac19916569ab650355d40e4a417c513e36a"
+    },
+    {
+      "cik": "0000004187",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000004187.json",
+      "retrieved_at": "2026-10-25T00:13:40.188918+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1377632,
+      "sha256": "9b21888edcea1be4491763d9f4f4c2ea11d2aadae208f3e717d663457b401bdc"
+    },
+    {
+      "cik": "0001069394",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001069394.json",
+      "retrieved_at": "2026-10-25T00:13:41.270299+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2893791,
+      "sha256": "2a49964e62eb607c1ae837b7bd836ee6de6da6500090c166d08aecf8c019c67f"
+    },
+    {
+      "cik": "0001116463",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001116463.json",
+      "retrieved_at": "2026-10-25T00:13:42.465106+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2949405,
+      "sha256": "0b0265cdb333779daa6691586affed52269e9bfc21be13379479db69cd5d09ec"
+    },
+    {
+      "cik": "0000911568",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000911568.json",
+      "retrieved_at": "2026-10-25T00:13:43.552807+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 162892,
+      "sha256": "cf2e652df32cb8051378982c9ad71d17ce477c687a5ea3de87fbb241a34cacea"
+    },
+    {
+      "cik": "0000752642",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000752642.json",
+      "retrieved_at": "2026-10-25T00:13:44.423440+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3004887,
+      "sha256": "27a33f3b1ce786cb9d894869202c92f55541c83662f42e1fbe1c6166c4ea32e8"
+    },
+    {
+      "cik": "0001473597",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001473597.json",
+      "retrieved_at": "2026-10-25T00:13:45.337427+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1390854,
+      "sha256": "411c8325064c627894963bca0e52f6be59002889414903b5aa8c840403a46117"
+    },
+    {
+      "cik": "0001235468",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001235468.json",
+      "retrieved_at": "2026-10-25T00:13:46.548023+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2817562,
+      "sha256": "fa25ef3c6d782248749c4827aba53ed3f5de80145dc952d3e27d7104b751a801"
+    },
+    {
+      "cik": "0001439724",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001439724.json",
+      "retrieved_at": "2026-10-25T00:13:47.571408+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 98483,
+      "sha256": "e41d33c9bbef6c6995654825ee53940d50e6074f6346ca7b98bfac02ccc80e77"
+    },
+    {
+      "cik": "0001466225",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001466225.json",
+      "retrieved_at": "2026-10-25T00:13:48.603528+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1833670,
+      "sha256": "424a918e67ba3f3ccef0fbbf7d7218c9de6268d6e2d4832ab767915dc0c521f0"
+    },
+    {
+      "cik": "0001498622",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001498622.json",
+      "retrieved_at": "2026-10-25T00:13:49.755369+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 252871,
+      "sha256": "00fc90a47315537594b3b2d7d4a96a126d7d9f0c6047d5a29a7f663d875495dd"
+    },
+    {
+      "cik": "0001114925",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001114925.json",
+      "retrieved_at": "2026-10-25T00:13:51.156506+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2195115,
+      "sha256": "774f11a2affee774e433082548859292a0f049ce6ab865b9abf06a3e8d46fb6f"
+    },
+    {
+      "cik": "0001111634",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001111634.json",
+      "retrieved_at": "2026-10-25T00:13:53.530948+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 40044,
+      "sha256": "4c10ee3d68b4f0e7884f0f11129158a1f9c033fd9a1beb701f6677d5ab1cf6d9"
+    },
+    {
+      "cik": "0000929452",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000929452.json",
+      "retrieved_at": "2026-10-25T00:13:53.958807+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1768283,
+      "sha256": "72f999111563dfa89649c95c41b6c8b494a6989ac086b72812262b24d7a8ba91"
+    },
+    {
+      "cik": "0001302244",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001302244.json",
+      "retrieved_at": "2026-10-25T00:13:55.450526+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 420599,
+      "sha256": "a1e65390931f4e805e9e487c39d98b265c7fa9f4a7df2873935495aa74bad392"
+    },
+    {
+      "cik": "0000894544",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000894544.json",
+      "retrieved_at": "2026-10-25T00:13:58.229067+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 367177,
+      "sha256": "a74d9dc73c9f891143a9ea5772327c978921b688705c37a79bfa8fd9fff462bf"
+    },
+    {
+      "cik": "0001296286",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001296286.json",
+      "retrieved_at": "2026-10-25T00:13:59.566569+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 217480,
+      "sha256": "96560f480af3cb183776e8ed7c1e4682ddeb3083653e52c8f55554ccfb821623"
+    },
+    {
+      "cik": "0001408198",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001408198.json",
+      "retrieved_at": "2026-10-25T00:14:00.469850+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4190795,
+      "sha256": "aca20794f56b4262ca4fa85cbf2e62c953670abefcee8ed17d2a74d2288bc091"
+    },
+    {
+      "cik": "0001365388",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001365388.json",
+      "retrieved_at": "2026-10-25T00:14:04.072412+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1023473,
+      "sha256": "cfc7e16e3065398f8b13963f1f5f17884edc7e4ec95812cf1092d52aac40e273"
+    },
+    {
+      "cik": "0000949852",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000949852.json",
+      "retrieved_at": "2026-10-25T00:14:04.743743+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 583532,
+      "sha256": "d36dc1b7de7829d66224e1673ffb7054b062905e053e6a55bc2405e668fb7987"
+    },
+    {
+      "cik": "0001114485",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001114485.json",
+      "retrieved_at": "2026-10-25T00:14:05.494890+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001495220",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001495220.json",
+      "retrieved_at": "2026-10-25T00:14:06.357446+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000078838",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000078838.json",
+      "retrieved_at": "2026-10-25T00:14:07.566101+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 28865,
+      "sha256": "5ccffb57280fef85e8d598f0ec6dc02f310d8c4b056259ba15f01f8ff99b6dcc"
+    },
+    {
+      "cik": "0001287668",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001287668.json",
+      "retrieved_at": "2026-10-25T00:14:08.658562+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 138874,
+      "sha256": "3ffaf109afb6d9b61c7c36b914e7a504c5229606fa2b9aa04feb9c8bfe533730"
+    },
+    {
+      "cik": "0001417425",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001417425.json",
+      "retrieved_at": "2026-10-25T00:14:09.680757+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 96656,
+      "sha256": "fd853c521809e6d020d772e8875c8e1a83516e86491596b244af4b5264ebe1dd"
+    },
+    {
+      "cik": "0001366744",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001366744.json",
+      "retrieved_at": "2026-10-25T00:14:10.714306+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1188359,
+      "sha256": "cac5c93d66d966cdbc4c1de8a634470215d35e0aa06280c0ffb563cadd3e52b7"
+    },
+    {
+      "cik": "0001058626",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001058626.json",
+      "retrieved_at": "2026-10-25T00:14:11.898729+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0001478259",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001478259.json",
+      "retrieved_at": "2026-10-25T00:14:12.687022+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 308398,
+      "sha256": "62fe3d6e34fb862bfc7742115cddf41958608c5e73068e5b375eaf719608ad94"
+    },
+    {
+      "cik": "0001049861",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001049861.json",
+      "retrieved_at": "2026-10-25T00:14:14.004153+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000844856",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000844856.json",
+      "retrieved_at": "2026-10-25T00:14:14.780110+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2124634,
+      "sha256": "c494efabb02127267bba7137044383ebe74e06634e5d8fa5ac99adcdd4c2cf68"
+    },
+    {
+      "cik": "0000018808",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000018808.json",
+      "retrieved_at": "2026-10-25T00:14:16.057424+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 265213,
+      "sha256": "f22fc135cb26fb8f0741177bfdaf01c739f5eac393c8788f83f76ac8c70a1cdc"
+    },
+    {
+      "cik": "0001414043",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001414043.json",
+      "retrieved_at": "2026-10-25T00:14:16.991430+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1201067,
+      "sha256": "61bbe39b006bc742e80c62224e7997b830e971d15a4e5ea2347c2d156d7c3fe7"
+    },
+    {
+      "cik": "0000799235",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000799235.json",
+      "retrieved_at": "2026-10-25T00:14:18.912251+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 957678,
+      "sha256": "6dca79e38c2513ff49a94fc019528405a94932778758e23f36dfba3ec5340ce2"
+    },
+    {
+      "cik": "0000842633",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000842633.json",
+      "retrieved_at": "2026-10-25T00:14:19.774150+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3210787,
+      "sha256": "c4a454f7862d498d2aa10105dc78b4908f1382718a2e6099bed31016d4f365ad"
+    },
+    {
+      "cik": "0000822663",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000822663.json",
+      "retrieved_at": "2026-10-25T00:14:21.380592+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3018210,
+      "sha256": "b28ba276a652f6ab89fe8d9b8a41ee63aff5eb154a01990e4ea5531c9183454d"
+    },
+    {
+      "cik": "0001041609",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001041609.json",
+      "retrieved_at": "2026-10-25T00:14:23.013252+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 65190,
+      "sha256": "77f7ed701a40d3102209f7a5a15cc96f987af9b81e15fa52c6498d1d0bfee466"
+    },
+    {
+      "cik": "0001006820",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001006820.json",
+      "retrieved_at": "2026-10-25T00:14:23.511745+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 181375,
+      "sha256": "ddf316251d27b5f8c2c5da9308bb4067c690ac508587749e1889222b09510335"
+    },
+    {
+      "cik": "0000813716",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000813716.json",
+      "retrieved_at": "2026-10-25T00:14:24.403759+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1527351,
+      "sha256": "ec208103a5659b9c108816047d7b183adceb6cc7767021827d2eda6a1cf1c6f4"
+    },
+    {
+      "cik": "0001024075",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001024075.json",
+      "retrieved_at": "2026-10-25T00:14:25.565098+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 139720,
+      "sha256": "d8fe3258b0854a5509998763756c2d0a4e068f1ace83684537abc2068d3a5059"
+    },
+    {
+      "cik": "0000357108",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000357108.json",
+      "retrieved_at": "2026-10-25T00:14:26.721232+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 559731,
+      "sha256": "f506db81b29a61e647cab6fdb2d9c1ccc283d9df6fc3c7ecc8b26650e6d20b09"
+    },
+    {
+      "cik": "0000021665",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000021665.json",
+      "retrieved_at": "2026-10-25T00:14:27.613203+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3582380,
+      "sha256": "450c2668961565047c7745ff5df5d38b40cc57d6940c48fe8f32dca13100f96d"
+    },
+    {
+      "cik": "0001310383",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001310383.json",
+      "retrieved_at": "2026-10-25T00:14:28.509229+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2336737,
+      "sha256": "d84433c298f19972258718faa5de37031e5853feef78fdb86fc96c679743a5b5"
+    },
+    {
+      "cik": "0001383088",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001383088.json",
+      "retrieved_at": "2026-10-25T00:14:29.819578+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 811087,
+      "sha256": "41fe84b5e51b40b1caeb4d9f43573698f0988ce322aaa194887e811ce1647c13"
+    },
+    {
+      "cik": "0001359841",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001359841.json",
+      "retrieved_at": "2026-10-25T00:14:30.757825+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3548344,
+      "sha256": "70a41978af344b8c3c32160adfba719108fd77edcf620d9e57bae2c7e6f84d79"
+    },
+    {
+      "cik": "0001419553",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001419553.json",
+      "retrieved_at": "2026-10-25T00:14:32.179767+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 265065,
+      "sha256": "22d67d292caf55eece1bad50269acd43ae4ac5f44b367d2107c52a0c89a74aa9"
+    },
+    {
+      "cik": "0000042542",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000042542.json",
+      "retrieved_at": "2026-10-25T00:14:32.877218+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 814037,
+      "sha256": "1dff52d7c5b57b49353ee62938675c01f3cad6ee4bf5f8448971d1e0e9172610"
+    },
+    {
+      "cik": "0000882835",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000882835.json",
+      "retrieved_at": "2026-10-25T00:14:34.074763+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3434191,
+      "sha256": "052fc6e4bef90d7703fc3ae1485b31f5a849e72ff2d6feaedecf8811f41ef339"
+    },
+    {
+      "cik": "0000810136",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000810136.json",
+      "retrieved_at": "2026-10-25T00:14:34.792525+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3230164,
+      "sha256": "d5be2991411bc641e8aa7927cb0e1493ce5d2a881d09bcbfbf0bc3ad262750a2"
+    },
+    {
+      "cik": "0001080657",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001080657.json",
+      "retrieved_at": "2026-10-25T00:14:35.827554+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2206526,
+      "sha256": "de41f6f2d15749d3538263d0ffe6824a64d3eb6ba75dfd03ee4c2f5d96956a8f"
+    },
+    {
+      "cik": "0001163519",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001163519.json",
+      "retrieved_at": "2026-10-25T00:14:37.668432+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000890926",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000890926.json",
+      "retrieved_at": "2026-10-25T00:14:37.991259+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3601476,
+      "sha256": "60eaa5bc46787b5da18a328bab66b3cd3d544ce4001f04ae2a33561b01ea8e42"
+    },
+    {
+      "cik": "0001411685",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001411685.json",
+      "retrieved_at": "2026-10-25T00:14:39.711995+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2084836,
+      "sha256": "1d0d09c7b53b173e35f99fba8d3201ca751174b9bb70167acdba04307bebca91"
+    },
+    {
+      "cik": "0001441236",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001441236.json",
+      "retrieved_at": "2026-10-25T00:14:43.074895+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 3399486,
+      "sha256": "0d1c6e4733bcded0418359aaadb43cca8a70bf88b630cdc58e9328b1bf21856e"
+    },
+    {
+      "cik": "0001285224",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001285224.json",
+      "retrieved_at": "2026-10-25T00:14:47.549291+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1700259,
+      "sha256": "f01a5d61b323d31895796be101e236f5903b0d68961617474b9bae4faf4a2668"
+    },
+    {
+      "cik": "0001139552",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001139552.json",
+      "retrieved_at": "2026-10-25T00:14:50.183649+00:00",
+      "http_status": 404,
+      "status": "unavailable"
+    },
+    {
+      "cik": "0000107815",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000107815.json",
+      "retrieved_at": "2026-10-25T00:14:50.346466+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2812903,
+      "sha256": "3dcd3f86383e154bb3b38b4d779fbbf0b271e8da4d2332f7b87477c68cf81474"
+    },
+    {
+      "cik": "0001375063",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001375063.json",
+      "retrieved_at": "2026-10-25T00:14:51.733311+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1267849,
+      "sha256": "e654e32cfb7bdfb3b731aaff1707f086f4c8d4724cfe0787caa3bfc532d0e2ee"
+    },
+    {
+      "cik": "0000895329",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000895329.json",
+      "retrieved_at": "2026-10-25T00:14:52.701155+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 298308,
+      "sha256": "88960a91fe555727250bb5c852cd91f9956afdee623ad8970944160987cc035a"
+    },
+    {
+      "cik": "0001166928",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001166928.json",
+      "retrieved_at": "2026-10-25T00:14:53.739484+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 4460627,
+      "sha256": "2e97ab0a85215c5cc68956014707ddc6117afb56bc963370d83c37148e3caff2"
+    },
+    {
+      "cik": "0001282266",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001282266.json",
+      "retrieved_at": "2026-10-25T00:14:55.068315+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2676770,
+      "sha256": "cff5245f5bffd892d6a7ad268ca09ca82d5d5b03779733d8db43edf7637e21be"
+    },
+    {
+      "cik": "0001028215",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001028215.json",
+      "retrieved_at": "2026-10-25T00:14:56.078397+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1396563,
+      "sha256": "b2251b9fa84ce0f9a94d7013c66e7d646baf7e910f1375143bd6dad0c7d0c9f5"
+    },
+    {
+      "cik": "0000892822",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000892822.json",
+      "retrieved_at": "2026-10-25T00:14:56.937826+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 245247,
+      "sha256": "66921f87da4e0d86dffa3310999789de19d5bb59093e2b9e10f65f5dea1f7b7b"
+    },
+    {
+      "cik": "0000065172",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000065172.json",
+      "retrieved_at": "2026-10-25T00:14:57.922628+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 750872,
+      "sha256": "3baa9bc899308da7f71f43587a462270619651e255aa4f8595f85fdb46e23612"
+    },
+    {
+      "cik": "0001335293",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001335293.json",
+      "retrieved_at": "2026-10-25T00:14:58.853224+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1140961,
+      "sha256": "1ef9f63f3bfc1989538105b6f5b81c00e4a01914cd82142b25d60189f290af35"
+    },
+    {
+      "cik": "0001454007",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001454007.json",
+      "retrieved_at": "2026-10-25T00:15:00.101448+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 261388,
+      "sha256": "8026e09a5a0308a816d913d9186b77270741b24d27463006281521cc4b636cfc"
+    },
+    {
+      "cik": "0001381786",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001381786.json",
+      "retrieved_at": "2026-10-25T00:15:01.087557+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 50391,
+      "sha256": "c808282b9a4020fa95d2dff65969b9cd82020842e5452fdb6f2867d7e5d23507"
+    },
+    {
+      "cik": "0001077319",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001077319.json",
+      "retrieved_at": "2026-10-25T00:15:02.110836+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 64170,
+      "sha256": "b2cf3cadf0449ed5a7ec9fe9f4413d5566d65cc67eefdffa11850e007e2b4bbd"
+    },
+    {
+      "cik": "0001411168",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001411168.json",
+      "retrieved_at": "2026-10-25T00:15:03.201746+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 534543,
+      "sha256": "6e2c6809a5983e707a6f1868cd3d29af6778c7e7d698db99d67386ed8be8290e"
+    },
+    {
+      "cik": "0001434598",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001434598.json",
+      "retrieved_at": "2026-10-25T00:15:04.272205+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 98133,
+      "sha256": "30a8bb5bff15da19d7134d13bd2e409c1827d43a4ef1f7b8fc2b81848cfd0169"
+    },
+    {
+      "cik": "0000946563",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000946563.json",
+      "retrieved_at": "2026-10-25T00:15:05.329017+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 2124370,
+      "sha256": "228d61f077ff22ebe588be830897b45b080f3049cee8bdc2d0703285644543ab"
+    },
+    {
+      "cik": "0000819050",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000819050.json",
+      "retrieved_at": "2026-10-25T00:15:06.438419+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 1640973,
+      "sha256": "6fecfe00ee0329e381ab0cdafff131fdf63df70c71bdb42c6df3a1f241c98b6a"
+    },
+    {
+      "cik": "0000793983",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000793983.json",
+      "retrieved_at": "2026-10-25T00:15:07.452980+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 105950,
+      "sha256": "2c49f1d861a6e13bdb59d6f1e31c4dcd394108abee23ca7f99bf555fa6f3aa5f"
+    },
+    {
+      "cik": "0001088162",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001088162.json",
+      "retrieved_at": "2026-10-25T00:15:08.497021+00:00",
+      "http_status": 200,
+      "status": "downloaded",
+      "bytes": 896318,
+      "sha256": "25e27560a90beddcf866588444a9a8fedc3df97b796c4c81e3d2f9a80625b034"
+    }
+  ]
+}

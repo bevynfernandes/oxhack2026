@@ -100,8 +100,16 @@ from original accessions: 747 metric rows across 83 annual filings in the five
 pilot issuers. Missing and conflicting values remain explicit; this includes
 pre-XBRL reports and unsupported custom concepts. See the
 [extraction audit](docs/product/sec-annual-financial-pilot-audit.json).
-These five source-access stress tests are not a training or evaluation cohort;
-financial-model fitting remains next.
+These five source-access stress tests are not a training or evaluation cohort.
+A separate fixed 320-issuer historical cohort produced 290 official financial
+responses. Eight classifiers were fitted across two annual financial targets.
+Regularized logistic regression for next-year positive operating cash flow passed
+the statistical gate: test ROC AUC 0.869, Brier 0.134 versus baseline 0.213, on
+49 rows from 25 held-out issuers. This remains an exploratory reporting-company
+component, conditional on observed follow-up; it is not survival or unrestricted
+runway. The two-fiscal-year revenue-growth candidates lost to the prevalence
+baseline and were rejected. See the [cash-flow evaluation](docs/product/sec-cash-flow-evaluation.json)
+and [growth evaluation](docs/product/sec-revenue-growth-evaluation.json).
 
 Do not demonstrate an SDK-download percentile as a business success score. Do not
 claim universal private-company financial data, validated probabilities, or a

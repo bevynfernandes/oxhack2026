@@ -102,5 +102,37 @@
     "latest_evaluation": "docs/product/disclosure-bankruptcy-full-history-evaluation.json",
     "latest_statistical_gate_passed": false
   },
-  "extrapolation_preference": "User permits doing as much as available public sources support and extrapolating. Clearly identify estimates, assumptions, transfer limits and uncertainty; do not invent missing company facts or misstate validation."
+  "extrapolation_preference": "User permits doing as much as available public sources support and extrapolating. Clearly identify estimates, assumptions, transfer limits and uncertainty; do not invent missing company facts or misstate validation.",
+  "financial_component_experiment": {
+    "fitted_estimators": 8,
+    "cohort_selected": 320,
+    "official_responses": 290,
+    "cash_flow": {
+      "target": "Positive next-fiscal-year operating cash flow, conditional on observed original follow-up",
+      "selected_model": "logistic_c_0.1",
+      "statistical_gate_passed": true,
+      "test_issuers": 25,
+      "test_rows": 49,
+      "roc_auc": 0.8693877551020408,
+      "evaluation": "docs/product/sec-cash-flow-evaluation.json"
+    },
+    "revenue_growth": {
+      "target": "Recognized annual revenue growth of at least 10% over two fiscal years, conditional on observed follow-up",
+      "selected_model": "training_prevalence",
+      "statistical_gate_passed": false,
+      "evaluation": "docs/product/sec-revenue-growth-evaluation.json"
+    },
+    "eligible_for_serving": false,
+    "remaining_release_checks": [
+      "Independent numeric and corporate-family/scope review",
+      "Live feature and portable-weight parity",
+      "Population transfer and sparse follow-up limits"
+    ],
+    "does_not_supply": [
+      "Paid retention",
+      "Operating survival",
+      "Five business dimensions",
+      "Complete overall index"
+    ]
+  }
 }

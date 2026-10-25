@@ -1,0 +1,133 @@
+{
+  "schema_version": "sec-financial-component-v1",
+  "component": "positive_operating_cash_flow_1fy",
+  "status": "research_models_trained",
+  "eligible_for_serving": false,
+  "provenance": {
+    "plan_sha256": "d1ab1d19843509cb389c74869f9b3243b0076f64554ece94ad8ac5caaaab73e5",
+    "cohort_sha256": "21f92ecac40b5055298a212831f0775a4b13ad2207e24e689100e6fffb7b7495",
+    "acquisition_sha256": "d954f7bd52f7f975086f2b0d41c31b4daa7015235bcdeeef05de40a2419ab0b1",
+    "metadata_sha256": "f2e3c041cb8eb2cb4b251e11eae25f61b5e18fab0bef34544b912611c0fd219e",
+    "observations_sha256": "46f5a32f2eb265c64d4a0a63f79bcfb055c6ab34fd8e43fb913ee8282c282fb9",
+    "implementation_commit": "bb5fca3"
+  },
+  "features": [
+    "log_revenue",
+    "log_assets",
+    "operating_cash_flow_margin",
+    "net_income_margin",
+    "gross_margin",
+    "liabilities_to_assets",
+    "cash_to_assets",
+    "current_ratio",
+    "report_lag_days"
+  ],
+  "coverage": [
+    {
+      "partition": "excluded",
+      "origins": 3757,
+      "issuers": 286,
+      "censored_origins": 2489
+    },
+    {
+      "partition": "test",
+      "origins": 59,
+      "issuers": 29,
+      "censored_origins": 10
+    },
+    {
+      "partition": "train",
+      "origins": 614,
+      "issuers": 181,
+      "censored_origins": 228
+    },
+    {
+      "partition": "validation",
+      "origins": 32,
+      "issuers": 17,
+      "censored_origins": 6
+    }
+  ],
+  "counts": {
+    "train": {
+      "rows": 386,
+      "issuers": 140,
+      "positive_rows": 240
+    },
+    "validation": {
+      "rows": 26,
+      "issuers": 15,
+      "positive_rows": 17
+    },
+    "test": {
+      "rows": 49,
+      "issuers": 25,
+      "positive_rows": 35
+    }
+  },
+  "training_prevalence": 0.6217616580310881,
+  "selected_model": "logistic_c_0.1",
+  "validation": {
+    "training_prevalence": {
+      "roc_auc": 0.5,
+      "average_precision": 0.6538461538461539,
+      "brier": 0.22736077581845254,
+      "log_loss": 0.6472480889960277
+    },
+    "logistic_c_0.1": {
+      "roc_auc": 0.7124183006535948,
+      "average_precision": 0.8093385926400227,
+      "brier": 0.19346696351186615,
+      "log_loss": 0.5700464484030378
+    },
+    "logistic_c_1": {
+      "roc_auc": 0.6862745098039216,
+      "average_precision": 0.7796865357388308,
+      "brier": 0.22326298926679033,
+      "log_loss": 0.6775519557749955
+    },
+    "decision_tree_depth_3": {
+      "roc_auc": 0.673202614379085,
+      "average_precision": 0.762061337355455,
+      "brier": 0.21789793987175787,
+      "log_loss": 0.6786767961932987
+    },
+    "histogram_gradient_boosting": {
+      "roc_auc": 0.7516339869281046,
+      "average_precision": 0.8415373912816368,
+      "brier": 0.18508128826718198,
+      "log_loss": 0.5714182383725211
+    }
+  },
+  "test": {
+    "roc_auc": 0.8693877551020408,
+    "average_precision": 0.9451207856907057,
+    "brier": 0.133637584547283,
+    "log_loss": 0.40688449177300856
+  },
+  "test_prevalence_baseline": {
+    "roc_auc": 0.5,
+    "average_precision": 0.7142857142857143,
+    "brier": 0.21264233363887047,
+    "log_loss": 0.6172076751610267
+  },
+  "test_log_loss_improvement_95pct_issuer_bootstrap": [
+    0.002358914129180365,
+    0.36918787333736175
+  ],
+  "statistical_gate_passed": true,
+  "model_artifact_sha256": {
+    "logistic_c_0.1": "69bbf974e8376570de70d5d0146d7617a975e3ba2ab3d120f584d84b3fb0f357",
+    "logistic_c_1": "796aab4aa8a76dc97886eaf16c076b5df39a0da4b932ca9f6ce5b2a4de3d302f",
+    "decision_tree_depth_3": "ef77b1fa7230a757dbd1ebbcc3372dc9c7442d4f46f096e0866cc123ae366132",
+    "histogram_gradient_boosting": "32bd2589b5ef13e3a4f3e91561c29c4e042b4d22726b1b93bc42f43e08291804"
+  },
+  "limitations": [
+    "Historical US reporting issuers; not representative private startups.",
+    "Targets require observed follow-up reports; attrition is not failure.",
+    "Fiscal-year endpoints differ from exact calendar horizons from filing.",
+    "Retrospective SEC snapshots can contain corrected source metadata.",
+    "Issuer separation is not a completed corporate-family or scope audit.",
+    "No operating-survival, paid-retention or complete resilience labels."
+  ]
+}
