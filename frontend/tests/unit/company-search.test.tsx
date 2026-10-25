@@ -137,3 +137,20 @@ it("keeps new research available when saved assessments cannot be loaded", async
     screen.getByRole("button", { name: "Retry saved assessments" }),
   ).toBeEnabled();
 });
+
+it("shows the supplied website favicon while company lookup is pending", async () => {
+  vi.mocked(searchCompanies).mockReturnValue(new Promise(() => {}));
+  workspace();
+  fireEvent.change(screen.getByLabelText("Search companies"), {
+    target: { value: "elevenlabs.io" },
+  });
+  fireEvent.click(screen.getByRole("button", { name: "Research company" }));
+  const pending = await screen.findByRole("button", {
+    name: "Finding company…",
+  });
+  expect(pending).toBeDisabled();
+  expect(pending.querySelector("img")).toHaveAttribute(
+    "src",
+    "https://elevenlabs.io/favicon.ico",
+  );
+});

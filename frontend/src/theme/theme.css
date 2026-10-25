@@ -675,7 +675,7 @@
     cover;
 }
 .theme-techno-classical .app-shell:has(.terminal-home) {
-  grid-template-rows: 52px minmax(0, 1fr);
+  grid-template-rows: 76px minmax(0, 1fr);
 }
 .theme-techno-classical .app-shell:has(.terminal-home) > .site-header {
   padding-inline: clamp(18px, 3vw, 44px);
@@ -1054,7 +1054,7 @@
     grid-template-rows: 62px minmax(0, 1fr) 30px;
   }
   .theme-techno-classical .app-shell:has(.terminal-home) {
-    grid-template-rows: 56px minmax(0, 1fr);
+    grid-template-rows: 62px minmax(0, 1fr);
   }
   .theme-techno-classical .app-shell:has(.terminal-home) > main {
     padding-inline: 10px;
@@ -1301,4 +1301,26 @@
   ) {
   background-color: transparent;
   border-color: transparent;
+}
+
+/* Keep spring surfaces shrinkable inside narrow research layouts. */
+.home-motion-surface {
+  min-width: 0;
+}
+/* Decorative motion stays within the viewport; controls retain normal overflow. */
+@media (max-width: 800px) {
+  .theme-techno-classical .home-pattern-region-left {
+    left: 0;
+  }
+  .theme-techno-classical .home-pattern-region-right {
+    right: 0;
+  }
+  .theme-techno-classical .home-space-scene {
+    overflow: clip;
+  }
+}
+@media (forced-colors: active) {
+  .theme-techno-classical .app-shell:has(.terminal-home) {
+    background-image: none;
+  }
 }

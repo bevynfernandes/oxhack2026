@@ -12,6 +12,18 @@ import { MotionButton } from "./controls";
 import { useMotionPreference, useMotionTransition } from "./provider";
 import { motionGeometry } from "./tokens";
 
+/** Rotate an indeterminate activity ring, stopping live with reduced motion. */
+export function MotionSpinnerRing({ className = "" }: { className?: string }) {
+  const reduced = useMotionPreference();
+  return (
+    <span
+      className={`motion-spinner-ring ${className}`}
+      data-reduced-motion={reduced}
+      aria-hidden="true"
+    />
+  );
+}
+
 /** Give grouped interactive content shared spring feedback without changing its semantics. */
 export function MotionSurface({
   children,
