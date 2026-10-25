@@ -1,4 +1,5 @@
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
+import { CashFlowResearch } from "./CashFlowResearch";
 import {
   MotionSelection,
   MotionIndicator,
@@ -905,6 +906,12 @@ export default function CompanyDossier({
                   </MotionButton>
                 </p>
               )}
+              {standalone && currentGroup.id === "financial_health" && (
+                <CashFlowResearch
+                  sources={standalone.sources}
+                  evidence={standalone.evidence}
+                />
+              )}
               <h3>Observed evidence</h3>
               {renderMeasurements(
                 section?.metric_observation_ids ?? [],
@@ -1091,6 +1098,7 @@ export default function CompanyDossier({
 function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
   return (
     <>
+      <CashFlowResearch sources={report.sources} evidence={report.evidence} />
       <h3>Fresh source coverage</h3>
       <SourceProgress sources={report.sources} />
       <h3>Attributed claims</h3>

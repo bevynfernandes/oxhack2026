@@ -1652,6 +1652,11 @@ button.secondary:hover {
   margin-block: 16px;
   overflow-wrap: anywhere;
 }
+
+.cash-flow-research {
+  margin-block: 16px;
+  overflow-wrap: anywhere;
+}
 .evidence-mapping-controls p {
   margin: 0;
 }
