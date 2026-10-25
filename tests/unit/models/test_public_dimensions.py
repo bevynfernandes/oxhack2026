@@ -169,6 +169,40 @@ def test_sentiment_rejects_bad_spans_missing_classes_and_empty_inference() -> No
         EntitySentimentModel.model_validate(model.model_dump() | {"idf": ()})
 
 
+def test_portable_sentiment_matches_sklearn_unicode_tfidf_and_softmax() -> None:
+    """Sparse portable inference matches the training library, including unknowns."""
+    import numpy as np
+    from sklearn.feature_extraction.text import TfidfVectorizer  # type: ignore[import-untyped]
+
+    model = EntitySentimentModel(
+        classes=("Negative", "Neutral", "Positive"),
+        vocabulary={"targetentity": 0, "cafe": 1, "targetentity cafe": 2},
+        idf=(1, 2, 3),
+        coefficients=((1, -2, 0.4), (0, 0.5, -1), (-1, 2, 0.3)),
+        intercepts=(0.2, 0, -0.1),
+        source_sha256="a" * 64,
+        limitations=("Test parameters",),
+    )
+    contexts = ("targetentity CAFÉ café", "targetentity cafe", "unknown words 你好")
+    vectorizer = TfidfVectorizer(
+        ngram_range=(1, 2),
+        strip_accents="unicode",
+        sublinear_tf=True,
+        vocabulary=model.vocabulary,
+    )
+    vectorizer.idf_ = np.array(model.idf)
+    logits = vectorizer.transform(contexts) @ np.array(model.coefficients).T
+    logits += np.array(model.intercepts)
+    logits -= logits.max(axis=1, keepdims=True)
+    expected = np.exp(logits)
+    expected /= expected.sum(axis=1, keepdims=True)
+    actual = predict_entity_sentiment(model, contexts)
+    for prediction, probabilities in zip(actual, expected, strict=True):
+        assert prediction == pytest.approx(
+            dict(zip(model.classes, probabilities.tolist(), strict=True)), abs=1e-14
+        )
+
+
 def test_index_has_explicit_equal_weights_and_abstains_on_missing_groups() -> None:
     """Missing observations do not become zero scores or renormalized weights."""
     scores = dict.fromkeys(SPECIALIST_GROUP_IDS, 80.0)

@@ -127,6 +127,49 @@ def test_synthetic_saved_sources_never_receive_real_model_scores(
         registry.evaluate(source, "unknown")
 
 
+def test_sentiment_component_retains_sample_and_exact_source_provenance(
+    registry: DimensionModelRegistry,
+) -> None:
+    """Text evidence supports a descriptive index without manufacturing metrics."""
+    result = registry.evaluate_inputs(
+        DimensionInputs(
+            "test",
+            "source",
+            datetime(2026, 10, 25, tzinfo=UTC),
+            (None, (), "missing"),
+            (("targetentity test", "title-1"), ("targetentity other", "title-2")),
+        )
+    )
+    sentiment = result.dimensions[1]
+    assert sentiment.score == pytest.approx(50)
+    assert sentiment.sample_size == 2
+    assert sentiment.evidence_ids == ("title-1", "title-2")
+    assert sentiment.metric_observation_ids == ()
+    assert "unvalidated" in " ".join(sentiment.limitations)
+
+
+def test_title_context_requires_exact_company_mention_and_retained_excerpt() -> None:
+    """A domain link alone cannot assign another company's title sentiment."""
+    from oxhack2026.research.composition import _sentiment_inputs
+
+    event = Mock(
+        kind="hn_exact_domain_story",
+        title="Example launches a new product",
+        evidence_ids=("title",),
+    )
+    proof = Mock(evidence_id="title", excerpt=event.title)
+    job = Mock(sources=(Mock(provider="hn", events=(event,), evidence=(proof,)),))
+    identity = Mock(company_name="Example")
+    assert _sentiment_inputs(job, identity) == (
+        (" targetentity  launches a new product", "title"),
+    )
+    identity.company_name = "Unrelated"
+    assert _sentiment_inputs(job, identity) == ()
+    identity.company_name = "Example"
+    proof.excerpt = "A different captured excerpt"
+    assert _sentiment_inputs(job, identity) == ()
+
+
 def test_fresh_research_adapter_requires_matching_complete_windows() -> None:
     """Fresh npm observations use the same two counts and transformation as training."""
     from datetime import timedelta

@@ -378,6 +378,15 @@ class Collector:
         if len(packages) > 2:
             self.reasons.append("npm_package_limit")
 
+    def _hn_title_evidence(
+        self, title: str, index: int, fallback: ResearchEvidence
+    ) -> ResearchEvidence:
+        if not title:
+            return fallback
+        item = evidence(self.fetcher.captures[-1], title, f"json:$.hits[{index}].title")
+        self.support.append(item)
+        return item
+
     def hn(self) -> None:
         """Retain paginated exact-domain records separately from an exhaustive-
         window count."""
@@ -408,7 +417,7 @@ class Collector:
             if not isinstance(data, dict) or not isinstance(data.get("hits"), list):
                 raise CollectionError("invalid_hn_response")
             exhaustive = exhaustive and data.get("exhaustiveNbHits") is True
-            for hit in data["hits"]:
+            for hit_index, hit in enumerate(data["hits"]):
                 if not isinstance(hit, dict):
                     continue
                 link = str(hit.get("url") or "")
@@ -424,13 +433,17 @@ class Collector:
                     or not int(start.timestamp()) <= published < int(end.timestamp())
                 ):
                     continue
+                title = str(hit.get("title") or "")
+                title_evidence = self._hn_title_evidence(title, hit_index, item)
                 records[identifier] = Event(
                     event_id=f"hn-{identifier}",
                     kind="hn_exact_domain_story",
-                    title=str(hit.get("title") or ""),
+                    title=title,
                     url=f"https://news.ycombinator.com/item?id={identifier}",
                     published_at=datetime.fromtimestamp(published, UTC).isoformat(),
-                    evidence_ids=(item.evidence_id,),
+                    evidence_ids=tuple(
+                        dict.fromkeys((item.evidence_id, title_evidence.evidence_id))
+                    ),
                 )
             pages = data.get("nbPages")
             if isinstance(pages, int) and page + 1 >= pages:

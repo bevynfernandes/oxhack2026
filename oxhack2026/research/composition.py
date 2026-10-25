@@ -16,6 +16,7 @@ from oxhack2026.api.research_v2_schemas import (
     ResearchEvidence,
 )
 from oxhack2026.models.dimension_serving import DimensionInputs, DimensionModelRegistry
+from oxhack2026.models.public_dimensions import entity_context
 from oxhack2026.models.startup_outlook import (
     FORECAST_HORIZONS,
     SPECIALIST_GROUP_IDS,
@@ -121,7 +122,45 @@ def _adoption_features(
     return adoption
 
 
-def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
+def _sentiment_inputs(
+    job: Job, identity: Identity | None
+) -> tuple[tuple[str, str], ...]:
+    if identity is None or len(identity.company_name.strip()) < 3:
+        return ()
+    pattern = re.compile(
+        rf"(?<!\w){re.escape(identity.company_name)}(?!\w)", re.IGNORECASE
+    )
+    contexts: dict[str, tuple[str, str]] = {}
+    for source in job.sources:
+        if source.provider != "hn":
+            continue
+        support = {item.evidence_id: item for item in source.evidence}
+        for event in source.events:
+            if (
+                event.kind != "hn_exact_domain_story"
+                or event.title.casefold() in contexts
+            ):
+                continue
+            match = pattern.search(event.title)
+            proof = next(
+                (
+                    support[key]
+                    for key in event.evidence_ids
+                    if key in support and support[key].excerpt == event.title
+                ),
+                None,
+            )
+            if match is not None and proof is not None:
+                contexts[event.title.casefold()] = (
+                    entity_context(event.title, match.start(), match.end()),
+                    proof.evidence_id,
+                )
+    return tuple(contexts.values())[:30]
+
+
+def _dimension_inputs(
+    job: Job, outlook: StartupOutlook, identity: Identity | None = None
+) -> DimensionInputs:
     evidence = {
         row.evidence_id: row for source in job.sources for row in source.evidence
     }
@@ -154,7 +193,11 @@ def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
         default=(None, (), "requires_complete_adjacent_npm_windows"),
     )
     return DimensionInputs(
-        outlook.company_id, outlook.source_snapshot_id, outlook.as_of, adoption
+        outlook.company_id,
+        outlook.source_snapshot_id,
+        outlook.as_of,
+        adoption,
+        _sentiment_inputs(job, identity),
     )
 
 
@@ -289,7 +332,9 @@ def compose(
         evidence=(*identity.evidence, *support),
         captures=(*identity.captures, *captures),
         outlook=outlook,
-        dimension_models=models.evaluate_inputs(_dimension_inputs(job, outlook))
+        dimension_models=models.evaluate_inputs(
+            _dimension_inputs(job, outlook, identity)
+        )
         if models
         else None,
         limitations=tuple(limitations),

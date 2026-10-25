@@ -18,6 +18,7 @@ from oxhack2026.models.public_dimensions import (
     EntitySentimentModel,
     NumericDimensionModel,
     dimension_percentile,
+    predict_entity_sentiment,
     predict_numeric_dimension,
 )
 from oxhack2026.models.public_training import public_dimension_recipes
@@ -38,10 +39,12 @@ class DimensionModelView(Contract):
         target: Plain-language target, distinct from the three company forecasts.
         model_sha256: Exact fitted artifact digest, without local storage paths.
         eligibility: Whether this company's inputs support experimental inference.
-        score: Training-outcome percentile, never a company-success probability.
+        score: Descriptive proxy percentile or text valence, never success probability.
         predicted_value: Model output in the explicitly named transformed units.
         prediction_unit: Units of the raw proxy prediction.
         metric_observation_ids: Exact source inputs consumed by this inference.
+        evidence_ids: Exact text excerpts used for sentiment inference.
+        sample_size: Number of distinct source titles classified, when applicable.
         reason_codes: Missingness, applicability and experimental-quality reasons.
         limitations: Training population and quality restrictions.
     Raises:
@@ -60,6 +63,12 @@ class DimensionModelView(Contract):
     predicted_value: float | None = None
     prediction_unit: str | None = None
     metric_observation_ids: tuple[Identifier, ...] = ()
+    evidence_ids: tuple[Identifier, ...] | None = Field(
+        default=None, exclude_if=lambda value: not value
+    )
+    sample_size: Annotated[int, Field(gt=0)] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     reason_codes: tuple[Identifier, ...]
     limitations: tuple[str, ...]
 
@@ -78,7 +87,9 @@ class DimensionModelView(Contract):
         ):
             message = "Experimental predictions require complete eligible inputs"
             raise ValueError(message)
-        if self.eligibility == "eligible" and not self.metric_observation_ids:
+        if self.eligibility == "eligible" and not (
+            self.metric_observation_ids or self.evidence_ids
+        ):
             message = "Experimental inference requires exact source observations"
             raise ValueError(message)
         return self
@@ -199,12 +210,14 @@ class DimensionInputs:
         source_snapshot_id: Source publication or immutable fresh report ID.
         as_of: Source measurement cutoff, distinct from training time.
         adoption: Feature values, observation IDs and eligibility reason.
+        sentiment: Entity-marked contexts and their exact source evidence IDs.
     """
 
     company_id: str
     source_snapshot_id: str
     as_of: datetime
     adoption: tuple[tuple[float, ...] | None, tuple[str, ...], str]
+    sentiment: tuple[tuple[str, str], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -300,17 +313,51 @@ class DimensionModelRegistry:
         for group in SPECIALIST_GROUP_IDS:
             model = self.models[group]
             if isinstance(model, EntitySentimentModel):
+                probabilities = predict_entity_sentiment(
+                    model, tuple(context for context, _ in inputs.sentiment)
+                )
+                balance = (
+                    sum(row["Positive"] - row["Negative"] for row in probabilities)
+                    / len(probabilities)
+                    if probabilities
+                    else None
+                )
                 views.append(
                     DimensionModelView(
                         group_id=group,
                         architecture="TF-IDF and logistic regression",
-                        target="Sentiment toward a named company in financial news",
-                        model_sha256=self.hashes[group],
-                        eligibility="insufficient_data",
-                        reason_codes=(
-                            "requires_validated_company_text_and_entity_spans",
+                        target=(
+                            "Sentiment toward the named company "
+                            "in retrieved story titles"
                         ),
-                        limitations=model.limitations,
+                        model_sha256=self.hashes[group],
+                        eligibility="eligible"
+                        if probabilities
+                        else "insufficient_data",
+                        score=50 * (1 + balance) if balance is not None else None,
+                        predicted_value=balance,
+                        prediction_unit="mean positive-minus-negative model probability"
+                        if probabilities
+                        else None,
+                        evidence_ids=tuple(
+                            dict.fromkeys(key for _, key in inputs.sentiment)
+                        ),
+                        sample_size=len(probabilities) or None,
+                        reason_codes=("experimental_financial_news_to_title_transfer",)
+                        if probabilities
+                        else ("requires_validated_company_text_and_entity_spans",),
+                        limitations=(
+                            *model.limitations,
+                            (
+                                "Financial-news model applied to retrieved HN titles; "
+                                "domain transfer is unvalidated."
+                            ),
+                            (
+                                "Selected titles are not representative public "
+                                "sentiment or business performance."
+                            ),
+                            "Negative recall was 1/11; do not use for risk screening.",
+                        ),
                     )
                 )
                 continue
