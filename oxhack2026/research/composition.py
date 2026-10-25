@@ -2,7 +2,7 @@
 
 import re
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from math import log, log1p
 from urllib.parse import unquote, urlsplit
 from uuid import uuid4
@@ -140,6 +140,8 @@ def compose(
     now = datetime.now(UTC)
     observations = [row for source in job.sources for row in source.observations]
     for metric_id, (unit, reason) in _GAPS.items():
+        if any(row.metric_id == metric_id for row in observations):
+            continue
         observations.append(
             Observation(
                 observation_id=uuid4().hex,
@@ -158,6 +160,21 @@ def compose(
         if identity.saved_context
         else identity.identity_id
     )
+    financial = tuple(
+        row
+        for source in job.sources
+        if source.provider == "sec"
+        for row in source.observations
+        if row.metric_id == "revenue" or row.metric_id.startswith("sec_")
+    )
+    usable_financial = tuple(
+        row
+        for row in financial
+        if row.value is not None
+        and row.window is not None
+        and row.window.end >= now - timedelta(days=550)
+    )
+    financial_ids = {row.observation_id for row in financial}
     outlook = StartupOutlook(
         company_id=company_id,
         source_snapshot_id=report_id,
@@ -171,13 +188,33 @@ def compose(
         specialists=tuple(
             SpecialistOutlook(
                 group_id=group,
+                data_status="available" if usable_financial else "insufficient_data",
+                metric_observation_ids=tuple(row.observation_id for row in financial),
+                usable_metric_observation_ids=tuple(
+                    row.observation_id for row in usable_financial
+                ),
+                evidence_ids=tuple(
+                    sorted(
+                        {key for row in usable_financial for key in row.evidence_ids}
+                    )
+                ),
+                reason_codes=(
+                    "model_not_trained",
+                    "sec_annual_financial_component_only",
+                ),
+            )
+            if group == "financial_health" and financial
+            else SpecialistOutlook(
+                group_id=group,
                 data_status="insufficient_data",
                 reason_codes=("model_not_trained", "no_approved_metric_group_mapping"),
             )
             for group in SPECIALIST_GROUP_IDS
         ),
         unassigned_metric_observation_ids=tuple(
-            row.observation_id for row in observations
+            row.observation_id
+            for row in observations
+            if row.observation_id not in financial_ids
         ),
     )
     limitations = [
@@ -199,7 +236,7 @@ def compose(
         (
             "Outcome forecasts remain null; experimental dimensions are separate."
             if models
-            else "Numerical forecasts remain null; no models were trained or run."
+            else "Growth, survival and complete business scores remain unavailable."
         ),
     ]
     limitations.extend(

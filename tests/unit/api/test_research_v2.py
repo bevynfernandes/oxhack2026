@@ -874,11 +874,52 @@ def test_sec_research_inference_uses_original_financial_facts(
         assert estimate.status == "research_estimate"
         assert estimate.accession_number == accession
         assert 0 <= estimate.probability <= 1
-        assert len(estimate.evidence_ids) == 3
+        assert len(estimate.evidence_ids) == 6
         assert set(estimate.evidence_ids) <= {
             item.evidence_id for item in result.evidence
         }
         assert "experimental_cash_flow_research_model_ran" in result.reason_codes
+        assert {item.metric_id for item in result.observations} == {
+            "revenue",
+            "sec_assets_usd",
+            "sec_operating_cash_flow_usd",
+        }
+        from oxhack2026.api.research_v2_schemas import Job
+        from oxhack2026.research.composition import compose
+        from oxhack2026.research.evidence_mapping import MappingEngine
+
+        monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
+        report = compose(
+            Job(
+                job_id="financial-probe",
+                identity_id="identity",
+                requested_at=datetime.now(UTC),
+                sources=tuple(
+                    result
+                    if provider == "sec"
+                    else SourceState(provider=provider, name=provider)
+                    for provider in PROVIDERS
+                ),
+            ),
+            _identity(),
+        )
+        assert (
+            len([row for row in report.observations if row.metric_id == "revenue"]) == 1
+        )
+        financial = next(
+            row
+            for row in report.outlook.specialists
+            if row.group_id == "financial_health"
+        )
+        assert financial.data_status == "available"
+        assert len(financial.usable_metric_observation_ids) == 3
+        mapped = MappingEngine(tmp_path).map(report)
+        assert mapped.mapping is not None
+        revenue = next(
+            row for row in mapped.mapping.records if row.concept == "revenue"
+        )
+        assert revenue.attribution == "company_reported"
+        assert revenue.metric_eligible is True
     assert len(result.captures) == 3
 
 

@@ -156,6 +156,9 @@ export default function CompanyDossier({
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
   const dimensionModels =
     standalone?.dimension_models ?? profile?.dimension_models;
+  const cashFlowResearch = standalone?.sources.find(
+    (source) => source.provider === "sec",
+  )?.cash_flow_research;
   const modelSections = useMemo(
     () =>
       new Map(dimensionModels?.dimensions.map((row) => [row.group_id, row])),
@@ -293,6 +296,8 @@ export default function CompanyDossier({
       row.reason_codes.includes("provider_results_truncated"),
     );
   const currentGroup = groups[panel.index];
+  const isCashFlowDriver =
+    currentGroup.id === "financial_health" && !!cashFlowResearch;
   const section =
     panel.kind === "driver" ? sections.get(currentGroup.id) : undefined;
   const dimensionModel =
@@ -632,7 +637,11 @@ export default function CompanyDossier({
               <header>
                 <div className="pillar-top">
                   <span>DIMENSION 0{index + 1}</span>
-                  <span className="pillar-model">Outcome model untrained</span>
+                  <span className="pillar-model">
+                    {group.id === "financial_health" && cashFlowResearch
+                      ? "Cash-flow component trained"
+                      : "Outcome model untrained"}
+                  </span>
                 </div>
                 <h3>
                   <MotionButton
@@ -852,11 +861,18 @@ export default function CompanyDossier({
               <div className="drawer-model-state">
                 <Icon name={currentGroup.icon} />
                 <div>
-                  <strong>Business outcome model not trained</strong>
+                  <strong>
+                    {isCashFlowDriver
+                      ? "Cash-flow component model trained"
+                      : "Business outcome model not trained"}
+                  </strong>
                   <p>
                     Data:{" "}
                     {section ? dataNames[section.data_status] : "Not published"}{" "}
-                    · Model: no trained company-outcome model
+                    ·{" "}
+                    {isCashFlowDriver
+                      ? "Experimental annual cash-flow model"
+                      : "Model: no trained company-outcome model"}
                   </p>
                 </div>
               </div>
@@ -891,7 +907,8 @@ export default function CompanyDossier({
                 reasons={
                   section?.reason_codes.filter(
                     (reason) =>
-                      !dimensionModel || reason !== "model_not_trained",
+                      (!dimensionModel && !isCashFlowDriver) ||
+                      reason !== "model_not_trained",
                   ) ?? ["no_published_group_mapping", "model_not_trained"]
                 }
               />

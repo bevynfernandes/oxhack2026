@@ -13,55 +13,63 @@ export function CashFlowResearch({
   const estimates = sources.flatMap((source) =>
     source.cash_flow_research ? [source.cash_flow_research] : [],
   );
+  const evidenceById = new Map(
+    evidence.map((item) => [item.evidence_id, item]),
+  );
   if (!estimates.length) return null;
   return (
     <section className="cash-flow-research" aria-label="Cash-flow research">
       <h3>Experimental cash-flow estimate</h3>
-      {estimates.map((estimate) => (
-        <article key={`${estimate.issuer_id}-${estimate.accession_number}`}>
-          <p>
-            <strong>
-              {new Intl.NumberFormat("en-GB", {
-                style: "percent",
-                maximumFractionDigits: 1,
-              }).format(estimate.probability)}
-            </strong>{" "}
-            estimated likelihood of positive operating cash flow in the next
-            fiscal-year report, conditional on observed follow-up.
-          </p>
-          <p className="notice warning">
-            Research estimate from a small public-company sample. This component
-            does not establish survival, cash runway or the Overall score.
-          </p>
-          <p className="evidence-timestamp">
-            Annual period ended {date(estimate.period_end)} · Filed{" "}
-            {date(estimate.filing_date)}
-          </p>
-          <MotionDisclosure summary={<>Model and supporting filings</>}>
+      {estimates.map((estimate) => {
+        const supportingSources = new Map<string, DTO<"ResearchEvidence">>();
+        for (const id of estimate.evidence_ids) {
+          const source = evidenceById.get(id);
+          if (source) supportingSources.set(source.url, source);
+        }
+        return (
+          <article key={`${estimate.issuer_id}-${estimate.accession_number}`}>
             <p>
-              Regularized logistic regression, trained locally. SEC issuer{" "}
-              {estimate.issuer_id}; original accession{" "}
-              {estimate.accession_number}.
+              <strong>
+                {new Intl.NumberFormat("en-GB", {
+                  style: "percent",
+                  maximumFractionDigits: 1,
+                }).format(estimate.probability)}
+              </strong>{" "}
+              estimated likelihood of positive operating cash flow in the next
+              fiscal-year report, conditional on observed follow-up.
             </p>
-            <ul>
-              {estimate.limitations.map((limitation) => (
-                <li key={limitation}>{limitation}</li>
-              ))}
-            </ul>
-            {estimate.evidence_ids.map((id) => {
-              const source = evidence.find((item) => item.evidence_id === id);
-              return source ? (
-                <p key={id}>
+            <p className="notice warning">
+              Research estimate from a small public-company sample. This
+              component does not establish survival, cash runway or the Overall
+              score.
+            </p>
+            <p className="evidence-timestamp">
+              Annual period ended {date(estimate.period_end)} · Filed{" "}
+              {date(estimate.filing_date)}
+            </p>
+            <MotionDisclosure summary={<>Model and supporting filings</>}>
+              <p>
+                Regularized logistic regression, trained locally. SEC issuer{" "}
+                {estimate.issuer_id}; original accession{" "}
+                {estimate.accession_number}.
+              </p>
+              <ul>
+                {estimate.limitations.map((limitation) => (
+                  <li key={limitation}>{limitation}</li>
+                ))}
+              </ul>
+              {[...supportingSources.values()].map((source) => (
+                <p key={source.url}>
                   <SourceLink url={source.url}>Supporting source</SourceLink> ·{" "}
                   Collected {date(source.collected_at)}
                 </p>
-              ) : null;
-            })}
-            <p>Fitted model SHA-256: {estimate.model_sha256}</p>
-            <p>Evaluation SHA-256: {estimate.evaluation_sha256}</p>
-          </MotionDisclosure>
-        </article>
-      ))}
+              ))}
+              <p>Fitted model SHA-256: {estimate.model_sha256}</p>
+              <p>Evaluation SHA-256: {estimate.evaluation_sha256}</p>
+            </MotionDisclosure>
+          </article>
+        );
+      })}
     </section>
   );
 }

@@ -4,7 +4,7 @@ import base64
 import logging
 import os
 import re
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import TYPE_CHECKING, Annotated
 from urllib.parse import urlsplit
 from uuid import uuid4
@@ -13,10 +13,13 @@ import orjson
 import polars as pl
 from pydantic import Field, TypeAdapter
 
-from oxhack2026.api.research_v2_schemas import Claim, ResearchEvidence
-from oxhack2026.api.schemas import DTO, PublicURL
+from oxhack2026.api.research_v2_schemas import Claim, Observation, ResearchEvidence
+from oxhack2026.api.schemas import DTO, PublicURL, Window
 from oxhack2026.features.disclosure_timing import sec_disclosure_timing
-from oxhack2026.features.sec_financials import sec_annual_filing_metadata
+from oxhack2026.features.sec_financials import (
+    sec_annual_filing_metadata,
+    sec_annual_financials,
+)
 from oxhack2026.models.financial_inference import estimate_annual_cash_flow
 from oxhack2026.research.network import CollectionError
 
@@ -123,6 +126,68 @@ def _check_sec_response(
         return None
 
 
+def _sec_financial_observations(
+    collector: "Collector",
+    payload: object,
+    filings: pl.DataFrame,
+    cik: str,
+    as_of: datetime,
+) -> None:
+    from oxhack2026.research.extraction import evidence
+
+    parsed = sec_annual_financials(payload, filings, cik, as_of.date())
+    if parsed.is_empty() or not isinstance(payload, dict):
+        return
+    latest = parsed.filter(pl.col("accession_number") == parsed["accession_number"][-1])
+    capture = collector.fetcher.captures[-1]
+    for row in latest.iter_rows(named=True):
+        if row["status"] != "observed":
+            continue
+        concept = row["concepts"][0]
+        facts = payload["facts"]["us-gaap"][concept]["units"]["USD"]
+        index, fact = next(
+            (index, fact)
+            for index, fact in enumerate(facts)
+            if fact.get("accn") == row["accession_number"]
+            and fact.get("filed") == row["filing_date"].isoformat()
+            and fact.get("end") == row["period_end"].isoformat()
+            and fact.get("start")
+            == (row["period_start"].isoformat() if row["period_start"] else None)
+            and float(fact["val"]) == row["value"]
+        )
+        item = evidence(
+            capture,
+            orjson.dumps(fact).decode(),
+            f"json:$.facts.us-gaap.{concept}.units.USD[{index}]",
+        )
+        collector.support.append(item)
+        start = row["period_start"] or row["period_end"]
+        end = row["period_end"] + timedelta(days=1)
+        collector.observations.append(
+            Observation(
+                observation_id=uuid4().hex,
+                metric_id="revenue"
+                if row["metric"] == "revenue"
+                else f"sec_{row['metric']}_usd",
+                definition=(
+                    f"Consolidated {row['metric'].replace('_', ' ')}, "
+                    "company-reported in "
+                    f"original SEC accession {row['accession_number']}; "
+                    f"period ended {row['period_end']}. "
+                    "Cash is not unrestricted runway."
+                ),
+                unit="USD",
+                value=row["value"],
+                collected_at=as_of,
+                window=Window(
+                    start=datetime.combine(start, datetime.min.time(), UTC),
+                    end=datetime.combine(end, datetime.min.time(), UTC),
+                ),
+                evidence_ids=(item.evidence_id,),
+            )
+        )
+
+
 def _sec_cash_flow_research(
     collector: "Collector",
     payload: object,
@@ -136,6 +201,7 @@ def _sec_cash_flow_research(
     try:
         now = datetime.now(UTC)
         filings = sec_annual_filing_metadata(submissions, cik, now.date(), history)
+        _sec_financial_observations(collector, payload, filings, cik, now)
         collector.cash_flow_research = estimate_annual_cash_flow(
             payload,
             filings,

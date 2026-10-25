@@ -93,6 +93,19 @@ CONCEPTS = (
 )
 CONCEPT_LOOKUP = {rule.concept: rule for rule in CONCEPTS}
 _PATTERNS = tuple((rule, re.compile(rule.pattern, re.IGNORECASE)) for rule in CONCEPTS)
+SEC_FINANCIAL_METRICS = frozenset(
+    {
+        "revenue",
+        "sec_operating_cash_flow_usd",
+        "sec_net_income_usd",
+        "sec_gross_profit_usd",
+        "sec_assets_usd",
+        "sec_liabilities_usd",
+        "sec_current_assets_usd",
+        "sec_current_liabilities_usd",
+        "sec_cash_and_equivalents_usd",
+    }
+)
 METRIC_GROUPS: dict[str, SpecialistGroupId] = {
     "npm_downloads_latest_30d": "adoption_retention",
     "npm_downloads_previous_30d": "adoption_retention",
@@ -105,6 +118,7 @@ METRIC_GROUPS: dict[str, SpecialistGroupId] = {
     "retention": "adoption_retention",
     "runway": "financial_health",
     "competitor_coverage": "industry_competition",
+    **dict.fromkeys(SEC_FINANCIAL_METRICS, "financial_health"),
 }
 EVENT_GROUPS: dict[str, SpecialistGroupId] = {
     "hn_exact_domain_story": "attention_sentiment",
@@ -119,6 +133,7 @@ METRIC_PROVIDERS = {
     "github_stars": "github",
     "github_open_issues": "github",
     "advertised_openings": "hiring",
+    **dict.fromkeys(SEC_FINANCIAL_METRICS, "sec"),
 }
 
 
@@ -153,9 +168,19 @@ def metric_eligible(row: Observation, as_of: datetime) -> tuple[bool, str]:
     if not supported:
         return False, "normalization_policy_unavailable"
     instant = row.window.end if row.window else row.collected_at
-    days = 14 if row.metric_id == "advertised_openings" else 7
+    days = (
+        550
+        if row.metric_id in SEC_FINANCIAL_METRICS
+        else 14
+        if row.metric_id == "advertised_openings"
+        else 7
+    )
     if instant > as_of or as_of - instant > timedelta(days=days):
         return False, "stale_or_future_measurement"
     if row.metric_id.startswith(("npm_", "hn_")) and row.window is None:
         return False, "missing_measurement_period"
+    if row.metric_id in SEC_FINANCIAL_METRICS:
+        if row.unit != "USD" or row.window is None:
+            return False, "unsupported_financial_unit_or_period"
+        return True, "original_sec_financial_fact"
     return True, "validated_platform_measurement"

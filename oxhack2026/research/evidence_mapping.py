@@ -353,7 +353,9 @@ class MappingEngine:
                     if row.metric_id.startswith(("npm", "github"))
                     else "company",
                     subject_name=report.identity.company_name,
-                    attribution="platform_measured",
+                    attribution="company_reported"
+                    if owners.get(row.observation_id) == "sec"
+                    else "platform_measured",
                     method="rule",
                     evidence_ids=row.evidence_ids,
                     resource=evidence[row.evidence_ids[0]].url
