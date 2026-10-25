@@ -226,6 +226,12 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
+    await expect(
+      page.getByRole("link", {
+        name: "SignalShift Research home",
+        exact: true,
+      }),
+    ).toHaveAttribute("href", "/");
     const search = page.getByLabel("Search companies");
     await expect(search).toHaveAccessibleDescription(
       "Enter a name or website. You’ll confirm the company before research begins.",

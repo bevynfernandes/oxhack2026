@@ -32,7 +32,11 @@ export default function App() {
         Skip to content
       </a>
       <header className="site-header">
-        <NavLink to="/" className="brand">
+        <NavLink
+          to="/"
+          className="brand"
+          aria-label="SignalShift Research home"
+        >
           <span className="brand-symbol">
             <Icon name="activity" />
           </span>

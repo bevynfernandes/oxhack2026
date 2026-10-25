@@ -34,7 +34,10 @@ test("About explains the current product without requiring published data", asyn
     path: testInfo.outputPath("about-mobile.png"),
     fullPage: true,
   });
-  await page.getByRole("link", { name: "Data health", exact: true }).click();
+  await page
+    .getByRole("main")
+    .getByRole("link", { name: "Data health", exact: true })
+    .click();
   await expect(page).toHaveURL(/\/data-health$/);
 });
 
