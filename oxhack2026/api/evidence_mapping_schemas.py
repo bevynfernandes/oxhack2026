@@ -6,6 +6,7 @@ from typing import Literal, Self
 
 from pydantic import Field, model_validator
 
+from oxhack2026.api.research_configuration import ResearchSettings
 from oxhack2026.api.schemas import DTO, Identifier, UTCDateTime
 from oxhack2026.models.startup_outlook import SPECIALIST_GROUP_IDS, SpecialistGroupId
 from oxhack2026.storage.contracts import ArtifactReference
@@ -214,14 +215,19 @@ class MappingJobRequest(DTO):
     """Explicitly request a new interpretation of retained source evidence."""
 
     source_report_id: Identifier
+    cache_policy: Literal["reuse", "bypass"] = Field(default_factory=lambda: "reuse")
 
 
 class MappingJob(DTO):
     """Durable re-mapping work sharing the research worker capacity."""
 
+    settings: ResearchSettings | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
     schema_version: Literal["research-mapping-job-v1"] = "research-mapping-job-v1"
     job_id: Identifier
     source_report_id: Identifier
+    cache_policy: Literal["reuse", "bypass"] = Field(default_factory=lambda: "reuse")
     requested_at: UTCDateTime
     progress: MappingProgress = Field(default_factory=MappingProgress)
     report_id: Identifier | None = None

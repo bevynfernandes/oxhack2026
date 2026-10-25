@@ -3,6 +3,7 @@
 import importlib.util
 import logging
 import os
+import time
 from concurrent.futures import Executor
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -19,6 +20,12 @@ from oxhack2026.api.evidence_mapping_schemas import (
     MappingProgress,
 )
 from oxhack2026.api.repository import RepositoryUnavailable
+from oxhack2026.api.research_configuration import (
+    ContinueRequest,
+    ResearchProfile,
+    ResearchSettings,
+    profile_settings,
+)
 from oxhack2026.api.research_v2_schemas import (
     PROVIDERS,
     Capabilities,
@@ -84,6 +91,7 @@ class V2Service:
     collection_enabled: bool = True
     mapping_enabled: bool = True
     _lock: Lock = field(default_factory=Lock)
+    process_started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def capabilities(self) -> Capabilities:
         """Read configuration and local executable presence without vendor requests."""
@@ -118,6 +126,11 @@ class V2Service:
             for provider in PROVIDERS
         )
         return Capabilities(
+            profiles=tuple(
+                self._settings(name) for name in ("fast", "thorough", "deep")
+            ),
+            process_started_at=self.process_started_at,
+            runtime_revision=os.environ.get("SIGNALSHIFT_RUNTIME_REVISION"),
             storage_available=self.store.root.is_dir(),
             collection_enabled=self.executor is not None and self.collection_enabled,
             worker_available=self.executor is not None,
@@ -235,8 +248,26 @@ class V2Service:
                 raise RepositoryUnavailable from error
             return identity
 
-    def _fetcher(self) -> Fetcher:
-        return Fetcher(FileArtifactStore(self.store.root), self.quotas, self.transport)
+    def _settings(self, profile: ResearchProfile) -> ResearchSettings:
+        from oxhack2026.explanations.config import DEFAULT_MODEL, mapping_mode
+
+        settings = profile_settings(profile)
+        return settings.model_copy(
+            update={
+                "model": os.environ.get("GEMINI_MODEL") or DEFAULT_MODEL,
+                "mapping_mode": mapping_mode(),
+            }
+        )
+
+    def _fetcher(self, settings: ResearchSettings | None = None) -> Fetcher:
+        fetcher = Fetcher(
+            FileArtifactStore(self.store.root), self.quotas, self.transport
+        )
+        if settings:
+            fetcher.deadline = time.monotonic() + settings.deadline_seconds * 0.7
+            fetcher.max_requests = settings.requests
+            fetcher.max_bytes = settings.capture_bytes
+        return fetcher
 
     def run_discovery(self, identity_id: str) -> None:
         """Read one homepage plus two official identity pages; retain redirect
@@ -333,7 +364,7 @@ class V2Service:
             )
         )
 
-    def create(self, request: JobRequest) -> Job:
+    def create(self, request: JobRequest, resume_from: Job | None = None) -> Job:
         """Coalesce active work for a confirmed canonical domain; refresh terminal work.
 
         Raises:
@@ -352,7 +383,10 @@ class V2Service:
                 if previous.state in {"queued", "running"}:
                     known = self.store.identity(previous.identity_id)
                     if (
-                        known.canonical_domain == identity.canonical_domain
+                        previous.settings == self._settings(request.profile)
+                        and previous.derived_from_report_id
+                        == (resume_from.report_id if resume_from else None)
+                        and known.canonical_domain == identity.canonical_domain
                         and known.saved_context == identity.saved_context
                     ):
                         return previous
@@ -360,6 +394,8 @@ class V2Service:
             job = Job(
                 job_id=uuid4().hex,
                 identity_id=identity.identity_id,
+                settings=self._settings(request.profile),
+                derived_from_report_id=resume_from.report_id if resume_from else None,
                 requested_at=datetime.now(UTC),
                 sources=tuple(
                     SourceState(provider=provider, name=_NAMES[provider])
@@ -367,6 +403,10 @@ class V2Service:
                 ),
                 mapping=MappingProgress() if self.mapping_enabled else None,
             )
+            if resume_from:
+                job = job.model_copy(
+                    update={"sources": self._resume_sources(resume_from)}
+                )
             self.store.save_job(job)
             if self.executor is None:
                 raise RepositoryUnavailable
@@ -387,6 +427,8 @@ class V2Service:
                                         "finished_at": datetime.now(UTC),
                                     }
                                 )
+                                if source.state in {"pending", "running"}
+                                else source
                                 for source in job.sources
                             ),
                         }
@@ -394,6 +436,60 @@ class V2Service:
                 )
                 raise RepositoryUnavailable from error
             return job
+
+    def continue_job(self, job_id: str, request: ContinueRequest) -> Job:
+        """Queue remaining terminal work without changing its report.
+
+        Args:
+            job_id: Exact previous job with durable source or interpretation work.
+            request: New bounded research depth.
+        Returns:
+            A new or coalesced continuation job.
+        Raises:
+            ValueError: Work is active or no usable continuation checkpoint exists.
+            KeyError: Previous job is absent.
+            RepositoryUnavailable: Collection is disabled.
+        """
+        previous = self.store.job(job_id)
+        pending = any(
+            source.details and (source.details.frontier or source.details.cursor)
+            for source in previous.sources
+        )
+        if previous.state not in {"completed", "partial"} or not previous.report_id:
+            message = "Continue requires a terminal useful research job"
+            raise ValueError(message)
+        if not pending and not (
+            previous.mapping and previous.mapping.state == "partial"
+        ):
+            message = "No continuation checkpoint; refresh research instead"
+            raise ValueError(message)
+        return self.create(
+            JobRequest(
+                identity_id=previous.identity_id,
+                identity_confirmed=True,
+                profile=request.profile,
+            ),
+            previous,
+        )
+
+    def _resume_sources(self, previous: Job) -> tuple[SourceState, ...]:
+        states = []
+        for source in previous.sources:
+            details = source.details
+            updates: dict[str, object] = {}
+            if details:
+                details = details.model_copy(
+                    update={
+                        "retained_capture_ids": tuple(
+                            c.capture_id for c in source.captures
+                        ),
+                    }
+                )
+                updates["details"] = details
+                if details.frontier or details.cursor:
+                    updates.update(state="pending", started_at=None, finished_at=None)
+            states.append(source.model_copy(update=updates))
+        return tuple(states)
 
     def _finish(self, job: Job, identity: Identity) -> None:
         from oxhack2026.research.composition import compose
@@ -405,7 +501,12 @@ class V2Service:
         report_id = None
         state = "failed"
         if useful:
-            report = compose(job, identity, self.dimension_models)
+            report = compose(job, identity, self.dimension_models).model_copy(
+                update={
+                    "settings": job.settings,
+                    "derived_from_report_id": job.derived_from_report_id,
+                }
+            )
             if self.mapping_enabled:
                 report = self._map_report(job.job_id, report)
             self.store.publish(report)
@@ -473,11 +574,16 @@ class V2Service:
         """
         if self.executor is None or not self.mapping_enabled:
             raise RepositoryUnavailable
-        self.store.report(request.source_report_id)
+        source_report = self.store.report(request.source_report_id)
+        settings = self._settings(
+            source_report.settings.profile if source_report.settings else "thorough"
+        )
         with self._lock:
             for previous in self.store.mapping_jobs():
                 if (
                     previous.source_report_id == request.source_report_id
+                    and previous.cache_policy == request.cache_policy
+                    and previous.settings == settings
                     and previous.progress.state in {"pending", "running"}
                 ):
                     return previous
@@ -485,6 +591,8 @@ class V2Service:
             job = MappingJob(
                 job_id=uuid4().hex,
                 source_report_id=request.source_report_id,
+                cache_policy=request.cache_policy,
+                settings=settings,
                 requested_at=datetime.now(UTC),
             )
             self.store.save_mapping_job(job)
@@ -590,7 +698,7 @@ class V2Service:
         )
         self.store.save_job(job)
         identity = self.store.identity(job.identity_id)
-        fetcher = self._fetcher()
+        fetcher = self._fetcher(job.settings)
         try:
             for index, source in enumerate(job.sources):
                 if source.state != "pending":
@@ -711,6 +819,8 @@ class V2Service:
                                 ),
                             }
                         )
+                        if source.state in {"pending", "running"}
+                        else source
                         for source in job.sources
                     ),
                 }

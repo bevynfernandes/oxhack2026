@@ -456,6 +456,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/research-jobs/{job_id}/continue": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Continue Research
+         * @description Explicitly queue remaining checkpointed work as a new immutable report.
+         */
+        post: operations["research_v2_continue"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/research-mapping-jobs": {
         parameters: {
             query?: never;
@@ -521,6 +541,23 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AccountAssociation
+         * @description A verified official-page association, never a fuzzy-name attachment.
+         */
+        AccountAssociation: {
+            /** Discovered On */
+            discovered_on: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "github_org" | "github_repo" | "npm" | "hiring" | "registry";
+            /** Resource */
+            resource: string;
+        };
         /**
          * ArtifactReference
          * @description Hashed artifact relative to a configured bundle root, never a signed URL.
@@ -687,7 +724,7 @@ export interface components {
             collection_enabled: boolean;
             /**
              * Deadline Seconds
-             * @default 300
+             * @default 600
              */
             deadline_seconds: number;
             mapping?: components["schemas"]["MappingCapability"] | null;
@@ -696,6 +733,10 @@ export interface components {
              * @default 8
              */
             network_operations: number;
+            /** Process Started At */
+            process_started_at?: string | null;
+            /** Profiles */
+            profiles?: components["schemas"]["ResearchSettings"][];
             /** Providers */
             providers: components["schemas"]["ProviderCapability"][];
             /**
@@ -713,6 +754,8 @@ export interface components {
              * @default 4194304
              */
             response_bytes: number;
+            /** Runtime Revision */
+            runtime_revision?: string | null;
             /**
              * Schema Version
              * @default research-capabilities-v2
@@ -1423,6 +1466,30 @@ export interface components {
             supporting_signal: string | null;
         };
         /**
+         * ContinueRequest
+         * @description Explicitly spend one selected profile's budget on remaining work.
+         */
+        ContinueRequest: {
+            /**
+             * Profile
+             * @enum {string}
+             */
+            profile?: "fast" | "thorough" | "deep";
+        };
+        /**
+         * CrawlTarget
+         * @description A public page left to collect at a bounded discovery depth.
+         */
+        CrawlTarget: {
+            /**
+             * Depth
+             * @default 0
+             */
+            depth: number;
+            /** Url */
+            url: string;
+        };
+        /**
          * Cutoff
          * @description An explicitly published, selectable forecast batch.
          */
@@ -2015,6 +2082,8 @@ export interface components {
          * @description Durable multi-source work; complete collector checkpoints survive recovery.
          */
         Job: {
+            /** Derived From Report Id */
+            derived_from_report_id?: string | null;
             /** Finished At */
             finished_at?: string | null;
             /** Identity Id */
@@ -2040,6 +2109,7 @@ export interface components {
              * @constant
              */
             schema_version: "research-job-v2";
+            settings?: components["schemas"]["ResearchSettings"] | null;
             /** Sources */
             sources: components["schemas"]["SourceState"][];
             /** Started At */
@@ -2063,6 +2133,11 @@ export interface components {
             identity_confirmed: true;
             /** Identity Id */
             identity_id: string;
+            /**
+             * Profile
+             * @enum {string}
+             */
+            profile?: "fast" | "thorough" | "deep";
         };
         /**
          * MappedRecord
@@ -2267,6 +2342,11 @@ export interface components {
          * @description Durable re-mapping work sharing the research worker capacity.
          */
         MappingJob: {
+            /**
+             * Cache Policy
+             * @enum {string}
+             */
+            cache_policy?: "reuse" | "bypass";
             /** Job Id */
             job_id: string;
             progress?: components["schemas"]["MappingProgress"];
@@ -2283,6 +2363,7 @@ export interface components {
              * @constant
              */
             schema_version: "research-mapping-job-v1";
+            settings?: components["schemas"]["ResearchSettings"] | null;
             /** Source Report Id */
             source_report_id: string;
         };
@@ -2291,6 +2372,11 @@ export interface components {
          * @description Explicitly request a new interpretation of retained source evidence.
          */
         MappingJobRequest: {
+            /**
+             * Cache Policy
+             * @enum {string}
+             */
+            cache_policy?: "reuse" | "bypass";
             /** Source Report Id */
             source_report_id: string;
         };
@@ -2653,6 +2739,8 @@ export interface components {
             captures: components["schemas"]["Capture"][];
             /** Claims */
             claims: components["schemas"]["Claim"][];
+            /** Derived From Report Id */
+            derived_from_report_id?: string | null;
             dimension_models?: components["schemas"]["CompanyDimensionModels"] | null;
             /** Events */
             events: components["schemas"]["Event"][];
@@ -2680,6 +2768,7 @@ export interface components {
              * @constant
              */
             schema_version: "research-report-v2";
+            settings?: components["schemas"]["ResearchSettings"] | null;
             /** Sources */
             sources: components["schemas"]["SourceState"][];
         };
@@ -2836,6 +2925,69 @@ export interface components {
             identity_confirmed: true;
         };
         /**
+         * ResearchSettings
+         * @description Resolved immutable limits and interpreter configuration for one job.
+         */
+        ResearchSettings: {
+            /**
+             * Article Pages
+             * @default 12
+             */
+            article_pages: number;
+            /**
+             * Browser Pages
+             * @default 6
+             */
+            browser_pages: number;
+            /**
+             * Capture Bytes
+             * @default 67108864
+             */
+            capture_bytes: number;
+            /**
+             * Company Pages
+             * @default 60
+             */
+            company_pages: number;
+            /**
+             * Deadline Seconds
+             * @default 600
+             */
+            deadline_seconds: number;
+            /**
+             * Input Reservation
+             * @default 180000
+             */
+            input_reservation: number;
+            /**
+             * Mapping Mode
+             * @default rules_gemini
+             * @enum {string}
+             */
+            mapping_mode: "rules" | "rules_gemini";
+            /**
+             * Model
+             * @default gemini-3.8-live-extended-thinking
+             */
+            model: string;
+            /**
+             * Model Requests
+             * @default 12
+             */
+            model_requests: number;
+            /**
+             * Profile
+             * @default thorough
+             * @enum {string}
+             */
+            profile: "fast" | "thorough" | "deep";
+            /**
+             * Requests
+             * @default 240
+             */
+            requests: number;
+        };
+        /**
          * ResearchSourceState
          * @description Actual bounded provider state, independent of model/data readiness.
          */
@@ -2917,6 +3069,70 @@ export interface components {
             value: number | null;
         };
         /**
+         * SourceDetails
+         * @description Execution and coverage are independent; continuation retains actual work.
+         */
+        SourceDetails: {
+            /**
+             * Accounts
+             * @default []
+             */
+            accounts: components["schemas"]["AccountAssociation"][];
+            /**
+             * Applicability
+             * @default unknown
+             * @enum {string}
+             */
+            applicability: "applicable" | "unknown" | "not_applicable";
+            /**
+             * Collected
+             * @default 0
+             */
+            collected: number;
+            /**
+             * Coverage
+             * @enum {string}
+             */
+            coverage: "complete" | "limited" | "unknown" | "not_applicable";
+            /** Cursor */
+            cursor?: string | null;
+            /**
+             * Execution
+             * @enum {string}
+             */
+            execution: "pending" | "running" | "completed" | "failed" | "skipped";
+            /**
+             * Frontier
+             * @default []
+             */
+            frontier: components["schemas"]["CrawlTarget"][];
+            /**
+             * Issues
+             * @default []
+             */
+            issues: components["schemas"]["SourceIssue"][];
+            /**
+             * Outstanding
+             * @default 0
+             */
+            outstanding: number;
+            /**
+             * Retained Capture Ids
+             * @default []
+             */
+            retained_capture_ids: string[];
+            /**
+             * Scope
+             * @enum {string}
+             */
+            scope: "planned_sample" | "provider_window" | "verified_entity";
+            /**
+             * Visited
+             * @default []
+             */
+            visited: string[];
+        };
+        /**
          * SourceHealth
          * @description Public source coverage; diagnostics contain no internal error strings.
          */
@@ -2939,6 +3155,23 @@ export interface components {
             source: string;
         };
         /**
+         * SourceIssue
+         * @description An actionable source explanation; information alone is not a failure.
+         */
+        SourceIssue: {
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /** Remedy */
+            remedy?: string | null;
+            /**
+             * Severity
+             * @enum {string}
+             */
+            severity: "info" | "warning" | "error";
+        };
+        /**
          * SourceState
          * @description One collector checkpoint, including skipped and interrupted work.
          */
@@ -2954,6 +3187,7 @@ export interface components {
              * @default []
              */
             claims: components["schemas"]["Claim"][];
+            details?: components["schemas"]["SourceDetails"] | null;
             /**
              * Events
              * @default []
@@ -4268,6 +4502,41 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    research_v2_continue: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                job_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContinueRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
                 headers: {
                     [name: string]: unknown;
                 };

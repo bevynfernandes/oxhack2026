@@ -282,6 +282,8 @@ class Fetcher:
     transport: httpx.BaseTransport = field(default_factory=PinnedTransport)
     deadline: float = field(default_factory=lambda: time.monotonic() + 300)
     captures: list[Capture] = field(default_factory=list)
+    max_requests: int = 120
+    max_bytes: int = 33554432
     requests: int = 0
     byte_count: int = 0
 
@@ -294,7 +296,7 @@ class Fetcher:
             chunks.extend(chunk)
             if len(chunks) > byte_limit:
                 raise BudgetExceeded("response_size_limit")
-            if self.byte_count + len(chunks) > 33554432:
+            if self.byte_count + len(chunks) > self.max_bytes:
                 raise BudgetExceeded("capture_size_limit")
             if time.monotonic() > self.deadline:
                 raise BudgetExceeded("collection_deadline")
@@ -325,7 +327,7 @@ class Fetcher:
         for _ in range(6):
             safe = public_url(url)
             host = urlsplit(url).hostname or ""
-            if self.requests >= 120 or time.monotonic() >= self.deadline:
+            if self.requests >= self.max_requests or time.monotonic() >= self.deadline:
                 raise BudgetExceeded("request_or_time_budget")
             self.quotas.reserve(host, self.deadline, bool(headers))
             remaining = self.deadline - time.monotonic()
