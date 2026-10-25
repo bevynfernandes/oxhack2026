@@ -13,7 +13,7 @@
 
 ## Validation
 
-- Frontend unit suite: 111 passed.
+- Frontend unit suite after comparison update: 112 passed.
 - Full Playwright suite: 75 passed, including desktop/mobile, accessibility, keyboard, reduced motion, drawer/disclosure lifecycle, loading/error states and mixed comparison.
 - Repeated drawer-to-disclosure keyboard regression: 10/10 passed across desktop/mobile.
 - Provider/backend regression tests: 185 passed across Gemini text, Google search, interpretation, evidence mapping, research analysis and profiles.
@@ -29,9 +29,15 @@
 - SEC, Companies House and browser-assisted collection remain unconfigured locally.
 - Growth, survival and financial-health outcome predictions remain unavailable. An SDK forecast percentile is not a startup-success probability.
 
+## Comparison follow-up
+
+- Comparison now preserves eligible SDK-demand and title-sentiment model outputs from each exact immutable resource instead of always showing a blanket unavailable label.
+- Model targets, dates, architectures and limitations remain attached to each output; no winner or company-success odds are derived. Fresh reports never inherit model output from older saved context.
+- Real Playwright comparison at 1440px and 390px: Qdrant 34.8/100 and Weaviate 34.2/100 SDK forecast percentiles, model-detail disclosures, no overflow or automated accessibility violations.
+
 ## Presentation evidence
 
-- Slide 6 uses genuine retained report `6c29b0fa697c40a0aca299a14f2c978f`, showing ElevenLabs' experimental 31.3/100 next-30-day SDK-demand forecast percentile.
-- Screenshot captured with Playwright, cropped only; no generated numbers or synthetic fixtures.
-- Deck/PDF exported separately from the repository. Slides 1–5 and 7–8 are pixel-identical to the preceding deck.
-- Raw browser logs, screenshots and exports are retained under ignored `tests/outputs/final-runtime/` and `tests/outputs/final-*`.
+- Slide 6 retains its original comparison title, layout and sidebar copy. Only its comparison screenshot and source notes are updated.
+- Screenshot shows real Qdrant and Weaviate experimental SDK forecasts from `company-assessments-vector-20261024-v1`; cropped only, without generated values.
+- Slides 1–5 and 7–8 remain pixel-identical to the original Phronesis deck.
+- Raw browser logs, screenshots and exports are retained under ignored `tests/outputs/`.

@@ -15,6 +15,14 @@ export type EvidenceSummary = {
   gaps: string[];
   limitations: string[];
   synthetic: boolean;
+  experiments: {
+    label: string;
+    score: number;
+    target: string;
+    architecture: string;
+    asOf: string;
+    limitations: string[];
+  }[];
   measurements: {
     id: string;
     label: string;
@@ -81,6 +89,26 @@ export function evidenceSummary(
   const gaps = groups
     .filter((row) => row.data_status === "insufficient_data")
     .map((row) => row.group_id.replaceAll("_", " "));
+  // A fresh report must never inherit a saved context's older model output.
+  const models = report ? report.dimension_models : profile?.dimension_models;
+  const experiments = (models?.dimensions ?? [])
+    .filter(
+      (row) =>
+        row.eligibility === "eligible" &&
+        row.score != null &&
+        ["adoption_retention", "attention_sentiment"].includes(row.group_id),
+    )
+    .map((row) => ({
+      label:
+        row.group_id === "adoption_retention"
+          ? "SDK demand forecast percentile"
+          : "Title sentiment index",
+      score: row.score!,
+      target: row.target,
+      architecture: row.architecture,
+      asOf: models!.as_of,
+      limitations: row.limitations,
+    }));
   return {
     name:
       report?.identity.company_name ??
@@ -118,5 +146,6 @@ export function evidenceSummary(
       report?.outlook.synthetic ??
       false,
     measurements,
+    experiments,
   };
 }

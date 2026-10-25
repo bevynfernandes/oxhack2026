@@ -97,8 +97,35 @@ export default function ResearchComparison() {
                 <p>{row.domain}</p>
                 <p>{row.context}</p>
                 <p>Research date: {date(row.asOf)}</p>
+                {row.experiments.map((experiment) => (
+                  <section
+                    className="comparison-experiment"
+                    key={experiment.label}
+                  >
+                    <span className="micro-label">
+                      Experimental model result
+                    </span>
+                    <h3>{experiment.label}</h3>
+                    <p className="decision-signal-value">
+                      {experiment.score.toFixed(1)} <span>/ 100</span>
+                    </p>
+                    <p>{experiment.target}</p>
+                    <small>Not company-success odds or model confidence.</small>
+                    <MotionDisclosure summary="Model details & limitations">
+                      <p>
+                        {experiment.architecture} · Inputs as of{" "}
+                        {date(experiment.asOf)}
+                      </p>
+                      <ul>
+                        {experiment.limitations.map((limit) => (
+                          <li key={limit}>{limit}</li>
+                        ))}
+                      </ul>
+                    </MotionDisclosure>
+                  </section>
+                ))}
                 <p>
-                  <strong>Prediction unavailable</strong>
+                  <strong>Company-success prediction unavailable</strong>
                 </p>
                 <p>{row.coverage}</p>
                 <h3>Supporting evidence</h3>

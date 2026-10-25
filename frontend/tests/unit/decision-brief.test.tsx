@@ -33,6 +33,7 @@ const report = {
   },
 } as unknown as Report;
 const summary: EvidenceSummary = {
+  experiments: [],
   name: "Example",
   domain: "example.com",
   asOf: null,
