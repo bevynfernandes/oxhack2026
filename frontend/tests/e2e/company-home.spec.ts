@@ -261,3 +261,60 @@ test("desktop homepage fits without footer clutter and keeps background motion v
   ).toBeVisible();
   expect((await auditAccessibility(page)).violations).toEqual([]);
 });
+
+for (const width of [375, 1024, 1440]) {
+  test(`name-search candidates retain readable identities and usable actions at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    const previews: unknown[] = [];
+    await page.route("**/api/v2/company-search", (route) =>
+      route.fulfill({
+        json: {
+          query: "ElevenLabs",
+          reason_codes: [],
+          candidates: ["elevenlabs.io", "eleven-labs.com"].map((domain) => ({
+            domain,
+            name: "ElevenLabs company candidate",
+            website: `https://${domain}`,
+            source: "public_directory",
+          })),
+        },
+      }),
+    );
+    await page.route("**/api/v2/research-identities", (route) => {
+      previews.push(route.request().postDataJSON());
+      return route.fulfill({ status: 503, json: {} });
+    });
+    await page.goto("/");
+    await page.getByLabel("Search companies").fill("ElevenLabs");
+    await page
+      .getByRole("button", { name: "Research company", exact: true })
+      .click();
+    const rows = page.locator(".company-candidates li");
+    await expect(rows).toHaveCount(2);
+    for (const row of await rows.all()) {
+      const identity = row.locator("div").first();
+      expect((await identity.boundingBox())!.width).toBeGreaterThan(140);
+      expect(
+        await identity.evaluate((node) => node.scrollWidth <= node.clientWidth),
+      ).toBe(true);
+      await expect(row.getByRole("button")).toBeEnabled();
+    }
+    expect(
+      await page
+        .locator("main")
+        .evaluate((node) => node.scrollWidth <= node.clientWidth),
+    ).toBe(true);
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+    expect(previews).toEqual([]);
+    await page
+      .getByRole("button", { name: "Inspect eleven-labs.com", exact: true })
+      .click();
+    await expect(page.getByRole("alert")).toContainText(
+      "Research is unavailable",
+    );
+    expect(previews).toEqual([{ domain: "https://eleven-labs.com" }]);
+  });
+}

@@ -180,6 +180,15 @@ test("theme can roll back to the preserved light styles and respects forced colo
   );
   expect(await canvas()).toBe("rgb(247, 249, 252)");
   await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.locator(".home-space-scene")).toBeHidden();
+  for (const region of await page.locator(".home-pattern-region").all()) {
+    await expect(region).toBeHidden();
+  }
+  expect(
+    await page
+      .locator("main")
+      .evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
   await page.getByLabel("Search companies").scrollIntoViewIfNeeded();
   await expect(page.getByLabel("Search companies")).toBeInViewport();
   expect(

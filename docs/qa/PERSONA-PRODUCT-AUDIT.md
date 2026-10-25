@@ -138,6 +138,7 @@ The review diff against the integrated #90 UI base includes earlier #88 refineme
 - `frontend/src/pages/research/summary.ts`
 - `frontend/src/pages/research/savedSearches.ts`
 - `frontend/src/theme/theme.css`
+- `frontend/src/theme/assets/rocket-line-drawing.svg`
 - `frontend/tests/e2e/company-home.spec.ts`
 - `frontend/tests/e2e/research-library.spec.ts`
 - `frontend/tests/e2e/research.spec.ts`
@@ -153,3 +154,12 @@ The review diff against the integrated #90 UI base includes earlier #88 refineme
 - PR #90 merged into the integrated UI branch.
 - PR #93 contains the persona fixes and carries forward #88 refinements; review #93 as the integrated successor rather than merging the conflicting #88 independently.
 - Working preview: `http://localhost:5174/`. Use **Compare & explore → Your research**, or **Decision summary & notes** on any dossier.
+
+## Review follow-up
+
+- Checked #93, #88, #90 and the three inline change requests on #86. #93 had no new reviewer findings; all six GitHub check groups passed on `a86c405`.
+- Candidate layout, decorative overflow and unthemed fallback fixes are included in #93. Added explicit candidate geometry/accessibility/action regressions at 375, 1024 and 1440px; strengthened rollback assertions to check hidden artwork and the main region's internal width.
+- Corrected a missed inherited finding: normalized the rocket SVG's CRLF/trailing whitespace. XML structure, path geometry and styles are unchanged. The complete diff from main now passes whitespace validation.
+- Rechecked the inherited Python formatting finding: the integrated file is formatted and Python CI is green.
+- Original #86 threads remain open until #93 is integrated into that branch; replies identify the fix and validation rather than implying that #86 alone contains every correction.
+- Follow-up validation: 30 homepage/theme browser tests, production build/generated types and formatting; original full-suite results remain recorded above.
