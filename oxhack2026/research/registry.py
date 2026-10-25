@@ -13,7 +13,7 @@ import orjson
 import polars as pl
 from pydantic import Field, TypeAdapter
 
-from oxhack2026.api.research_v2_schemas import Claim
+from oxhack2026.api.research_v2_schemas import Claim, ResearchEvidence
 from oxhack2026.api.schemas import DTO, PublicURL
 from oxhack2026.features.disclosure_timing import sec_disclosure_timing
 from oxhack2026.features.sec_financials import sec_annual_filing_metadata
@@ -33,6 +33,7 @@ class RegistryMapping(DTO):
     jurisdiction: str
     evidence_url: PublicURL
     reviewed: bool
+    evidence_quote: Annotated[str, Field(min_length=10, max_length=1000)] | None = None
     cik: Annotated[str, Field(pattern=r"^[0-9]{1,10}$")] | None = None
     company_number: Annotated[str, Field(pattern=r"^[A-Z0-9]{8}$")] | None = None
 
@@ -164,6 +165,29 @@ def _mapping_support_headers(provider: str, url: str) -> dict[str, str] | None:
     return None
 
 
+def _mapping_support(
+    collector: "Collector", mapping: RegistryMapping
+) -> ResearchEvidence:
+    from oxhack2026.research.extraction import evidence
+
+    capture, content = collector.fetcher.fetch(
+        mapping.evidence_url,
+        _mapping_support_headers(collector.source.provider, mapping.evidence_url),
+    )
+    text = content.decode(errors="replace")
+    location = "reviewed_registry_mapping_support"
+    excerpt = text[:2000]
+    if mapping.evidence_quote:
+        position = text.find(mapping.evidence_quote)
+        if position < 0:
+            raise CollectionError("registry_mapping_quote_not_found")
+        location += f":character:{position}"
+        excerpt = text[
+            max(0, position - 200) : position + len(mapping.evidence_quote) + 200
+        ]
+    return evidence(capture, excerpt, location)
+
+
 def collect_registry(collector: "Collector") -> None:
     """Fetch registry facts for exact reviewed mappings; missing keys remain explicit.
 
@@ -192,16 +216,7 @@ def collect_registry(collector: "Collector") -> None:
     if len(matches) != 1:
         raise CollectionError("unverified_or_ambiguous_registry_mapping")
     mapping = matches[0]
-    capture, content = collector.fetcher.fetch(
-        mapping.evidence_url, _mapping_support_headers(provider, mapping.evidence_url)
-    )
-    from oxhack2026.research.extraction import evidence
-
-    item = evidence(
-        capture,
-        content[:2000].decode(errors="replace"),
-        "reviewed_registry_mapping_support",
-    )
+    item = _mapping_support(collector, mapping)
     collector.support.append(item)
     if provider == "sec":
         user_agent = os.environ.get("SEC_USER_AGENT", "")

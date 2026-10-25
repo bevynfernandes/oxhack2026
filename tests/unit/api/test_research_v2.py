@@ -630,10 +630,14 @@ def test_potential_claim_conflicts_are_retained(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize("provider", ["sec", "companies_house"])
+@pytest.mark.parametrize(
+    "support_quote", [None, "Example Legal", "Not present in source"]
+)
 def test_reviewed_registry_mapping(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     provider: str,
+    support_quote: str | None,
 ) -> None:
     """Exact reviewed identifiers gate registry facts and retain declared periods."""
     from unittest.mock import mock_open
@@ -649,6 +653,7 @@ def test_reviewed_registry_mapping(
             "jurisdiction": "US" if provider == "sec" else "UK",
             "evidence_url": "https://example.com/legal",
             "reviewed": True,
+            "evidence_quote": support_quote,
             "cik": "123",
             "company_number": "01234567",
         }
@@ -674,6 +679,11 @@ def test_reviewed_registry_mapping(
         create=True,
     ):
         result = Collector(fetcher, _identity(), source).collect()
+    if support_quote == "Not present in source":
+        assert "registry_mapping_quote_not_found" in result.reason_codes
+        assert not result.claims
+        assert len(result.captures) == 1
+        return
     assert result.state == "partial"
     assert len(result.captures) == 3
     assert any("2025-12-31" in claim.text for claim in result.claims)
