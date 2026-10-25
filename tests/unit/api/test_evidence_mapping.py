@@ -253,8 +253,8 @@ def test_gemini_prompt_and_credentials_are_bounded(
 def test_gemini_quote_validation_and_cache_replay(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Reject invented quotes and replay cached proposals without API calls."""
-    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules_gemini")
+    """Validate default Gemini proposals and replay cache without provider calls."""
+    monkeypatch.delenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", raising=False)
     report = source_report(
         tmp_path,
         (
@@ -375,7 +375,7 @@ def test_capabilities_do_not_import_collection_or_interpretation(
     monkeypatch.setenv("GEMINI_API_KEY", "")
     service = V2Service(V2Store(tmp_path))
     capability = service.mapping_capability()
-    assert capability.mode == "rules"
+    assert capability.mode == "rules_gemini"
     assert capability.enabled is False
     assert capability.gemini_available is False
     assert capability.deadline_seconds == 120
@@ -391,6 +391,24 @@ def test_unknown_configuration_and_page_families(
     assert page_family("https://other.example/unternehmen") == "company"
     assert page_family("https://other.example/pricing") == "commercial"
     assert page_family("https://other.example/unknown") == "other"
+
+
+def test_rules_mode_disables_interpreter(tmp_path: Path) -> None:
+    """An explicit rules-only mode never invokes Gemini even with a client."""
+    report = source_report(
+        tmp_path,
+        "<main><p>Our platform helps independent developers build software.</p></main>",
+    )
+    client = Mock(spec=GeminiInterpreter)
+    client.model_version = None
+    client.input_tokens = client.output_tokens = client.attempts = 0
+
+    result = MappingEngine(tmp_path, interpreter=client).map(report)
+
+    client.generate.assert_not_called()
+    assert result.mapping
+    assert result.mapping.mode == "rules"
+    assert all(row.method != "gemini" for row in result.mapping.records)
 
 
 def test_atomic_sentences_and_leaf_divs_keep_exact_offsets(tmp_path: Path) -> None:

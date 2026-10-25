@@ -64,14 +64,14 @@ def test_explicit_model_override(monkeypatch: pytest.MonkeyPatch) -> None:
     assert GeminiInterpreter(0).model == "gemini-2.5-flash"
 
 
-def test_gemini_live_requires_explicit_mode(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Unreliable optional generation never becomes a default research dependency."""
+def test_gemini_live_enabled_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Gemini Live is the default; an explicit rules override disables it."""
     monkeypatch.delenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", raising=False)
     monkeypatch.delenv("GEMINI_MODEL", raising=False)
-    assert config.mapping_mode() == "rules"
-    assert GeminiInterpreter(0).model == "gemini-3.8-live-extended-thinking"
-    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules_gemini")
     assert config.mapping_mode() == "rules_gemini"
+    assert GeminiInterpreter(0).model == "gemini-3.8-live-extended-thinking"
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
+    assert config.mapping_mode() == "rules"
 
 
 def test_provider_error_sanitized(monkeypatch: pytest.MonkeyPatch) -> None:

@@ -45,8 +45,9 @@ This file records verified claims and remaining work. It is not a completion sig
 - The backend retains source artifacts, hashes and attributable evidence.
 - Main includes Gemini-assisted source mapping with independent quote validation.
   A real Qdrant mapping audit was partial; provider failures do not justify invented
-  measurements or successful mapping claims. Deterministic mapping is now the
-  default; Gemini interpretation remains an explicit opt-in.
+  measurements or successful mapping claims. Gemini interpretation runs alongside
+  deterministic mapping by default; `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules`
+  disables model requests.
 - Existing local ML models were actually fitted, but their targets are narrow
   proxies. They do not establish startup success or survival prediction.
 - A separate business-event experiment fitted three regularized logistic models

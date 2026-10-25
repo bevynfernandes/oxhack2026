@@ -35,8 +35,9 @@ Gemini's actual retained-capture audit is
 It returned partial results with provider/background-completion errors. Exact
 source quotations and independent subject checks remain mandatory; its output
 does not become numerical ground truth.
-Deterministic mapping is now the default; Gemini remains an explicit opt-in. A
-global provider failure ends the optional batch loop immediately while preserving
+Gemini interpretation is enabled by default alongside deterministic mapping. Set
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` to disable model requests. A global
+provider failure ends the optional batch loop immediately while preserving
 supported rule-based results. Failed optional interpretation is never presented
 as a successful model mapping.
 

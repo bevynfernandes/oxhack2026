@@ -5,7 +5,8 @@ Bevyn owns research jobs/report storage and embeds `StartupOutlook` from
 `oxhack2026.models.startup_outlook`. Ivan renders the backend payload. Existing
 company source/assessment v1 contracts are unchanged.
 
-The current presentation decision is recorded at the top of [PLAN.md](../../../PLAN.md):
+The current presentation decision is recorded at the top of
+[PLAN.md](https://github.com/bevynfernandes/oxhack2026/blob/main/PLAN.md):
 Growth and Survival remain the two outcome cards; Overall is a separate dimension
 index. Financial Health remains a dimension. The retained backend financial
 forecast is preserved for compatibility, with its original 12-month definition;
