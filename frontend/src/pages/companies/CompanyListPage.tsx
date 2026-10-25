@@ -103,10 +103,11 @@ export default function CompanyListPage() {
   return (
     <>
       <header className="page-heading">
-        <h1>Companies</h1>
+        <p className="eyebrow">RESEARCH WORKSPACE</p>
+        <h1>Research library</h1>
         <p>
-          Explore startup evidence, understand the gaps and compare relevant
-          peers.
+          Return to startup research you have already opened, or compare the
+          evidence for two companies side by side.
         </p>
       </header>
       <ResearchLibrary />

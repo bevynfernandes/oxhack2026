@@ -45,14 +45,16 @@ for (const width of [1440, 375]) {
     await page
       .getByRole("link", { name: "Research library", exact: true })
       .click();
-    const library = page.getByRole("region", { name: "Your research" });
+    const library = page.getByRole("region", {
+      name: "Startup research comparison",
+    });
     await expect(library).toContainText("Verify paying customer retention");
     await library.getByLabel("Watchlist only").check();
     await expect(
       library.getByRole("checkbox", { name: /Compare research for/ }),
     ).toHaveCount(1);
     await library.getByRole("searchbox").fill("Synthetic");
-    await library.getByRole("button", { name: "Save this search" }).click();
+    await library.getByRole("button", { name: "Save filter" }).click();
     await page.reload();
     await library
       .getByRole("button", { name: "Use search: Synthetic · Watchlist" })
@@ -67,7 +69,12 @@ for (const width of [1440, 375]) {
     await expect(checks).toHaveCount(2);
     await checks.nth(0).check();
     await checks.nth(1).check();
-    await page.getByRole("link", { name: "Compare research (2)" }).click();
+    await expect(
+      library.getByRole("heading", { name: "Your startup selection" }),
+    ).toBeVisible();
+    await expect(library.getByText("Selected 01")).toBeVisible();
+    await expect(library.getByText("Selected 02")).toBeVisible();
+    await page.getByRole("link", { name: "Compare 2 startups" }).click();
     await expect(
       page.getByRole("region", { name: "Research evidence comparison" }),
     ).toBeVisible();

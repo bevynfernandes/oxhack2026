@@ -6,7 +6,11 @@ import report from "../../../tests/fixtures/api/research.json" with { type: "jso
 const screens = [
   ["home", "/", "Company research workspace"],
   ["domain", "/research/new", "Research a startup domain"],
-  ["directory", "/explore?snapshot=synthetic-assessments-v1", "Companies"],
+  [
+    "directory",
+    "/explore?snapshot=synthetic-assessments-v1",
+    "Research library",
+  ],
   [
     "comparison",
     "/compare?snapshot=synthetic-assessments-v1&company=alpha&company=beta",
