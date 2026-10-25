@@ -5,7 +5,14 @@ Bevyn owns research jobs/report storage and embeds `StartupOutlook` from
 `oxhack2026.models.startup_outlook`. Ivan renders the backend payload. Existing
 company source/assessment v1 contracts are unchanged.
 
-The user-approved [prediction workspace](prediction-workspace-alignment.md) adds
+The current presentation decision is recorded at the top of [PLAN.md](../../../PLAN.md):
+Growth and Survival remain the two outcome cards; Overall is a separate dimension
+index. Financial Health remains a dimension. The retained backend financial
+forecast is preserved for compatibility, with its original 12-month definition;
+it is not converted into the Overall index. This supersedes the earlier
+three-outcome UI arrangement described below.
+
+The earlier [prediction workspace](prediction-workspace-alignment.md) adds
 three `forecasts` above the five driver groups: Growth/Survival at 24 calendar
 months and Financial Health at 12. New builders include all three with null
 predictions, `pending_label_policy` and `model_not_trained`. Their ordered reasons
