@@ -1,8 +1,14 @@
-# Configuration templates
+# Versioned configuration
 
-Reserved for versioned, non-secret source, feature, target, and experiment
-configuration. The exact target and availability policies are in PLAN.md.
+Nonsecret, versioned inputs for data collection and model experiments:
 
-No configuration loader or enforcement exists yet. Credentials belong in an
-ignored .env file or deployment secret injection; .env.example lists planned
-names without values. Do not place credentials in this directory.
+- `data/`: pinned npm, company-source and public-cohort collection recipes.
+- `experiments/`: company and public-SDK experiment settings.
+
+The administrative data/model commands validate these inputs through their Python
+contracts. Keep source identities, policy versions and experimental cutoffs
+explicit so collection and evaluation can be reproduced.
+
+Runtime environment configuration is documented in
+[the local runbook](../deploy/local/README.md). Files in this directory contain no
+provider credentials; `.env.example` lists supported runtime configuration names.

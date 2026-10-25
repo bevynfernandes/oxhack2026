@@ -35,6 +35,6 @@ snapshot separately; retired selections fail rather than resolving another polic
   profile, source inspection and comparison, including mobile/keyboard and axe
   checks. Commercial measurements remain unknown and probabilities remain null.
 - Retained browser evidence: `tests/outputs/company-first-ui-real/`; details are
-  in the [Dev 1 acceptance audit](../../workstreams/dev1/STATUS.md).
+  in the [Dev 1 acceptance audit](../../archive/workstreams/dev1/STATUS.md).
 - Fresh research and the broader prediction proposal in #46 are separate gates;
   this verifies the existing saved-assessment application only.

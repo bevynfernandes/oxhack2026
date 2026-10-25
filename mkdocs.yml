@@ -1,12 +1,15 @@
 site_name: SignalShift
-site_description: Project scaffold for evidence-based developer-tool scouting.
+site_description: Company research and startup outlooks from dated evidence.
 repo_url: https://github.com/bevynfernandes/oxhack2026
 repo_name: bevynfernandes/oxhack2026
 nav:
   - Home: index.md
   - Module boundaries: modules.md
   - CI performance: ci-performance.md
-  - Task handoff template: tasks/TEMPLATE.md
+  - Research runtime: tasks/dev3/research-v2.md
+  - Publication recovery: tasks/dev1/D1-O6-local-recovery.md
+  - Model status: tasks/dev2/public-dimension-training-20261024.md
+  - Project archive: archive/index.md
 theme:
   name: material
 plugins:

@@ -39,8 +39,10 @@ the first usable checkpoint is a clearly labelled evidence assessment.
 This replaces the download-only objective following the user's direction on
 2026-10-24 and [team agreement in #19](https://github.com/bevynfernandes/oxhack2026/issues/19).
 Dev 1 owns this shared specification; Dev 2 owns precise outcome/model rules;
-Dev 3 owns the application/design. Ownership in [plans/README.md](plans/README.md)
-continues to apply. Do not create three independent scoring implementations.
+Dev 3 owns the application/design. The original workstream split is retained in the
+[archived team guide](docs/archive/plans/README.md); current contribution steps
+are in [CONTRIBUTING.md](CONTRIBUTING.md). Do not create three independent
+scoring implementations.
 
 Downloads are one product-adoption signal for applicable developer tools. They
 are not customers, revenue, company growth or a company-success label. Start
@@ -103,7 +105,7 @@ acceptance are tracked in [PR #21](https://github.com/bevynfernandes/oxhack2026/
 ## 4. Data and contract checkpoint
 
 The proposed C1 fields, initial metric set, source access and historical cohort
-procedure are in [Dev 1's source contract](docs/workstreams/dev1/STARTUP_OUTLOOK.md).
+procedure are in [Dev 1's source contract](docs/archive/workstreams/dev1/STARTUP_OUTLOOK.md).
 Agree those names with Dev 2/3 before exporting public schemas. Add company
 contracts alongside existing download contracts; do not reinterpret old artifacts.
 
@@ -184,7 +186,7 @@ has recorded its user's exclusion of that work. Local development and replayable
 immutable research artifacts remain supported. Optional explanations cannot
 invent numbers or replace source-backed assessment logic.
 
-The [archived download plan](plans/archive/DOWNLOAD_FORECAST_PLAN.md) preserves
+The [archived download plan](docs/archive/plans/archive/DOWNLOAD_FORECAST_PLAN.md) preserves
 existing download-specific algorithms and implementation rationale. It is not
 the current product specification. Its package targets, rankings, five-company
 shortlist, success exclusions and completion gates do not override this plan.
