@@ -137,4 +137,7 @@ deterministic rules with Gemini interpretation by default. Set
 `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` to disable model requests.
 It requires an explicit writable research root and opt-in collection worker; saved
 company publications are optional. The frontend supports domain confirmation,
-job progress, multi-source reports and explicit retained-evidence re-mapping.
+job progress, Fast/Thorough/Deep profiles, cited Gemini findings, explicit
+continuation and retained-evidence re-mapping with cache reuse/bypass. Restart
+the API worker after pulling implementation changes; capabilities expose its
+start time and configured runtime revision.

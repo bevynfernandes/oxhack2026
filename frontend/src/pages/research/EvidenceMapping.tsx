@@ -1,3 +1,4 @@
+import { InterpretationSummary } from "./ResearchWorkflow";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import type { DTO } from "../../api/client";
@@ -5,6 +6,7 @@ import { date, Reasons, SourceLink } from "../../components/Common";
 import CompanySpinner from "../../components/CompanySpinner";
 import {
   MotionButton,
+  MotionInput,
   MotionDisclosure,
   MotionLink as Link,
 } from "../../motion";
@@ -21,6 +23,7 @@ type Group = DTO<"SpecialistOutlook">["group_id"];
 /** A new interpretation is an explicit write; source collection dates stay frozen. */
 export function MappingControls({ report }: { report: Report }) {
   const [jobId, setJobId] = useState<string | null>(null);
+  const [reuseCache, setReuseCache] = useState(true);
   const capabilities = useQuery({
     queryKey: ["research-capabilities"],
     queryFn: fetchCapabilities,
@@ -28,7 +31,8 @@ export function MappingControls({ report }: { report: Report }) {
     refetchOnWindowFocus: false,
   });
   const create = useMutation({
-    mutationFn: () => createMappingJob(report.report_id),
+    mutationFn: () =>
+      createMappingJob(report.report_id, reuseCache ? "reuse" : "bypass"),
     retry: false,
     onSuccess: (job) => setJobId(job.job_id),
   });
@@ -61,6 +65,15 @@ export function MappingControls({ report }: { report: Report }) {
           : "This report has no dimension evidence mapping yet."}
         {report.mapping?.model && <> · {report.mapping.model}</>}
       </p>
+      <label>
+        <MotionInput
+          type="checkbox"
+          checked={reuseCache}
+          disabled={active}
+          onChange={(event) => setReuseCache(event.target.checked)}
+        />{" "}
+        Reuse unchanged interpretation from cache
+      </label>
       <MotionButton
         className="secondary"
         disabled={active || !capabilities.data?.mapping?.enabled}
@@ -88,6 +101,7 @@ export function MappingControls({ report }: { report: Report }) {
           {job.progress?.completed_batches ?? 0} batches processed
         </p>
       )}
+      {job && <InterpretationSummary statistics={job.progress?.statistics} />}
       {job && <Reasons reasons={job.progress?.reason_codes ?? []} />}
       {report.mapping && (
         <Reasons reasons={report.mapping.reason_codes ?? []} />

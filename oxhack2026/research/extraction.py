@@ -3,7 +3,7 @@
 import logging
 import re
 from dataclasses import dataclass
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlsplit
 from uuid import uuid4
 
 import orjson
@@ -44,6 +44,7 @@ class Page:
     events: tuple[Event, ...]
     organizations: tuple[str, ...]
     needs_browser: bool
+    account_evidence: tuple[tuple[str, ResearchEvidence], ...] = ()
 
 
 def evidence(capture: Capture, excerpt: str, location: str) -> ResearchEvidence:
@@ -82,6 +83,52 @@ def _structured_names(soup: BeautifulSoup) -> list[str]:
     return organizations
 
 
+def _organization_accounts(value: object, host: str) -> tuple[str, ...]:
+    """Extract sameAs only from an Organization explicitly identifying this host."""
+    if isinstance(value, list):
+        return tuple(url for row in value for url in _organization_accounts(row, host))
+    if not isinstance(value, dict):
+        return ()
+    linked = list(_organization_accounts(value.get("@graph"), host))
+    reference = value.get("url") or value.get("@id")
+    kind = value.get("@type")
+    if not isinstance(reference, str) or not (
+        kind == "Organization" or (isinstance(kind, list) and "Organization" in kind)
+    ):
+        return tuple(linked)
+    if (urlsplit(reference).hostname or "").removeprefix("www.") != host:
+        return tuple(linked)
+    accounts = value.get("sameAs", [])
+    if isinstance(accounts, str):
+        accounts = [accounts]
+    if isinstance(accounts, list):
+        linked.extend(url for url in accounts if isinstance(url, str))
+    return tuple(linked)
+
+
+def _structured_accounts(
+    soup: BeautifulSoup, capture: Capture
+) -> dict[str, ResearchEvidence]:
+    """Retain officially scoped JSON-LD account links with their actual location."""
+    accounts: dict[str, ResearchEvidence] = {}
+    host = (urlsplit(capture.final_url).hostname or "").removeprefix("www.")
+    for script in soup.select('script[type="application/ld+json"]'):
+        try:
+            urls = _organization_accounts(orjson.loads(script.get_text()), host)
+        except orjson.JSONDecodeError:
+            logger.error("Invalid account JSON-LD")  # noqa: TRY400
+            continue
+        for url in urls:
+            try:
+                normalized = public_url(url)
+            except CollectionError:
+                continue
+            accounts[normalized] = evidence(
+                capture, normalized, "jsonld:Organization.sameAs"
+            )
+    return accounts
+
+
 def _parse_markup(capture: Capture, content: bytes) -> BeautifulSoup:
     if "pdf" in capture.content_type:
         from oxhack2026.research.pdf import pdf_markup
@@ -101,6 +148,36 @@ def _embedded_boards(content: bytes) -> dict[str, None]:
     ):
         links[board_match.group()] = None
     return links
+
+
+def _package_commands(
+    soup: BeautifulSoup, capture: Capture
+) -> dict[str, ResearchEvidence]:
+    """Retain installation candidates and quotes without establishing ownership."""
+    packages: dict[str, ResearchEvidence] = {}
+    for block in soup.select("pre, code"):
+        code = block.get_text(" ", strip=True)
+        for match in re.finditer(
+            r"(?:npm\s+(?:install|i|add)|pnpm\s+(?:add|install)|yarn\s+add|bun\s+add)"
+            r"\s+(?:--[\w-]+\s+)*(@[a-z0-9_.-]+/[a-z0-9_.-]+|[a-z0-9_.-]+)",
+            code,
+        ):
+            package = match.group(1)
+            if package.startswith("-"):
+                continue
+            url = f"https://www.npmjs.com/package/{package}"
+            packages.setdefault(
+                url, evidence(capture, match.group(), "code:package_install")
+            )
+    return packages
+
+
+def _needs_browser(soup: BeautifulSoup, text: str) -> bool:
+    """Detect short pages or empty main content obscured by navigation text."""
+    main = soup.find("main")
+    return len(text) < 200 or (
+        main is not None and len(main.get_text(" ", strip=True)) < 80
+    )
 
 
 def parse_page(capture: Capture, content: bytes) -> Page:
@@ -132,12 +209,16 @@ def parse_page(capture: Capture, content: bytes) -> Page:
         except CollectionError:
             continue
     links.update(_embedded_boards(content))
+    account_evidence = _structured_accounts(soup, capture)
+    account_evidence.update(_package_commands(soup, capture))
+    links.update(dict.fromkeys(account_evidence))
     for hidden in soup.select("script, style, noscript, template"):
         hidden.decompose()
     text = soup.get_text(" ", strip=True)
     if _BLOCKED.search(text[:12000]):
         raise CollectionError("access_challenge_or_paywall")
     support = [evidence(capture, text[:3000] or title, "visible_text")]
+    support.extend(account_evidence.values())
     if name:
         support.append(evidence(capture, name, "metadata:og:site_name/jsonld/title"))
     claims: list[Claim] = []
@@ -184,7 +265,8 @@ def parse_page(capture: Capture, content: bytes) -> Page:
         claims=tuple(claims),
         events=tuple(events),
         organizations=tuple(organizations),
-        needs_browser=len(text) < 200,
+        needs_browser=_needs_browser(soup, text),
+        account_evidence=tuple(account_evidence.items()),
     )
 
 

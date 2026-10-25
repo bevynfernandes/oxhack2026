@@ -1666,3 +1666,45 @@ button.secondary:hover {
   border-left: 2px solid var(--terminal-line);
   overflow-wrap: anywhere;
 }
+
+.research-profile {
+  display: grid;
+  gap: 8px;
+  margin-block: 12px;
+}
+.research-profile select {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 8px;
+}
+.research-analysis,
+.research-continuation,
+.interpretation-summary {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.research-analysis {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 16px;
+}
+.research-analysis h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+.research-analysis blockquote {
+  margin: 12px 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--terminal-line);
+}
+.terminal-view > main:has(.research-analysis) {
+  overflow: auto;
+}
+.company-dossier:has(> .research-analysis) {
+  height: auto;
+  min-height: 100%;
+}
+.company-dossier:has(> .research-analysis) .dossier-pillars {
+  min-height: 360px;
+}

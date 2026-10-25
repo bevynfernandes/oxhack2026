@@ -152,9 +152,15 @@ def test_shared_budget_is_atomic() -> None:
     "url,expected",
     [
         ("https://docs.example.com/quickstart", True),
+        ("https://blog.example.com/launch", True),
+        ("https://newsroom.example.com/updates", True),
+        ("https://changelog.example.com/releases", True),
+        ("https://jobs.example.com/engineering", True),
         ("https://example.com/legal", True),
         ("https://example.com/docs/main.js", False),
         ("https://docs.example.com.evil.test/docs", False),
+        ("https://blog.example.com.evil.test/launch", False),
+        ("https://unrelated.example.com/launch", False),
     ],
 )
 def test_public_frontier_scope(url: str, expected: bool) -> None:
@@ -343,3 +349,259 @@ def test_continuation_discovers_github_then_npm(tmp_path: Path) -> None:
     assert any("api.github.com/repos/example/sdk" in url for url in requests)
     assert any("api.npmjs.org/downloads/range/" in url for url in requests)
     assert store.report(finished.report_id).model_dump_json() == original
+
+
+@pytest.mark.parametrize(
+    "package,homepage,owned",
+    [
+        ("react", "https://react.dev", False),
+        ("@example/sdk", "https://third-party.example", False),
+        ("@example/sdk", "https://example.com.evil.test", False),
+        ("@example/sdk", "http://example.com", False),
+        ("@example/sdk", None, False),
+        ("@example/sdk", "https://example.com/docs", True),
+        ("unrelated-sdk-name", "https://example.com/docs", True),
+    ],
+)
+def test_install_candidates_require_reciprocal_company_ownership(
+    tmp_path: Path, package: str, homepage: str | None, owned: bool
+) -> None:
+    """Dependencies stay quoted candidates; only an owned SDK gets adoption metrics."""
+    from datetime import timedelta
+
+    requests: list[str] = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        requests.append(str(request.url))
+        if request.url.host == "example.com":
+            return httpx.Response(
+                200,
+                text=(
+                    "<main>"
+                    + (
+                        "Install our company's SDK."
+                        if owned
+                        else "First install the dependency maintained elsewhere."
+                    )
+                    + f'<pre>npm install {package}</pre><a href="https://www.npmjs.com/package/{package}">Package</a></main>'
+                ),
+            )
+        if request.url.host == "registry.npmjs.org":
+            return httpx.Response(200, json={"name": package, "homepage": homepage})
+        end = datetime.now(UTC).date() - timedelta(days=1)
+        return httpx.Response(
+            200,
+            json={
+                "downloads": [
+                    {"day": (end - timedelta(days=i)).isoformat(), "downloads": 1}
+                    for i in range(65)
+                ]
+            },
+        )
+
+    transport = httpx.MockTransport(respond)
+    website = collector(tmp_path, "website", (), transport).collect()
+    assert f"https://www.npmjs.com/package/{package}" in website.links
+    assert any(
+        row.location == "code:package_install"
+        and row.excerpt == f"npm install {package}"
+        for row in website.evidence
+    )
+    assert website.details and not any(
+        row.kind == "npm" for row in website.details.accounts
+    )
+    npm = collector(tmp_path, "npm", website.links, transport).collect()
+    if owned:
+        assert [row.value for row in npm.observations] == [30, 30]
+        assert npm.details and any(row.kind == "npm" for row in npm.details.accounts)
+        historical = npm.model_copy(update={"reason_codes": ()})
+        original = historical.model_dump_json()
+        legacy = collector(
+            tmp_path,
+            "npm",
+            website.links,
+            httpx.MockTransport(
+                lambda _: httpx.Response(
+                    200,
+                    json={
+                        "name": package,
+                        "homepage": "https://third-party.example",
+                    },
+                )
+            ),
+        )
+        legacy.source = historical.model_copy(update={"state": "running"})
+        legacy.__post_init__()
+        unverified = legacy.collect()
+        assert not unverified.observations
+        assert unverified.details and not unverified.details.accounts
+        assert historical.model_dump_json() == original
+    else:
+        assert npm.state == "skipped"
+        assert not npm.observations
+        assert not any("api.npmjs.org/downloads/range/" in url for url in requests)
+
+
+@pytest.mark.parametrize("verified", [False, True])
+def test_continuation_revalidates_legacy_npm_sources(
+    tmp_path: Path, verified: bool
+) -> None:
+    """Only ownership-validated npm checkpoints bypass fresh association checks."""
+    from oxhack2026.api.research_v2_schemas import PROVIDERS, Job, SourceDetails
+    from oxhack2026.research.frontier import NPM_ASSOCIATION_VERIFIED
+    from oxhack2026.research.v2_service import V2Service
+    from oxhack2026.research.v2_store import V2Store
+
+    job = Job(
+        job_id="legacy",
+        identity_id="identity",
+        requested_at=datetime.now(UTC),
+        finished_at=datetime.now(UTC),
+        report_id="original",
+        state="completed",
+        sources=tuple(
+            SourceState(
+                provider=provider,
+                name=provider,
+                state="completed",
+                reason_codes=(NPM_ASSOCIATION_VERIFIED,)
+                if provider == "npm" and verified
+                else (),
+                details=SourceDetails(
+                    execution="completed", scope="provider_window", coverage="complete"
+                ),
+            )
+            for provider in PROVIDERS
+        ),
+    )
+    original = job.model_dump_json()
+    resumed = V2Service(V2Store(tmp_path))._resume_sources(job)
+    npm = next(source for source in resumed if source.provider == "npm")
+    assert npm.state == ("completed" if verified else "pending")
+    assert npm.details and npm.details.execution == npm.state
+    assert job.model_dump_json() == original
+
+
+def test_hiring_keeps_healthy_board_when_another_wrapper_fails(tmp_path: Path) -> None:
+    """An inaccessible optional wrapper preserves openings and a retry checkpoint."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if request.url.host == "example.com":
+            return httpx.Response(404)
+        return httpx.Response(200, json={"jobs": [{"id": "active"}]})
+
+    result = collector(
+        tmp_path,
+        "hiring",
+        (
+            "https://example.com/careers",
+            "https://jobs.ashbyhq.com/example",
+        ),
+        httpx.MockTransport(respond),
+    ).collect()
+    assert result.state == "partial"
+    assert result.details and result.details.cursor
+    assert result.observations[0].value is None
+    assert result.observations[0].missing_reason == "provider_incomplete"
+    checkpoint = orjson.loads(result.details.cursor)
+    assert len(checkpoint["openings"]) == 1
+    assert checkpoint["queue"] == ["https://example.com/careers"]
+
+
+def test_provider_resource_checkpoint_survives_page_limit(tmp_path: Path) -> None:
+    """An npm continuation consumes only unprocessed verified packages."""
+    adapter = collector(
+        tmp_path, "npm", (), httpx.MockTransport(lambda _: httpx.Response(200, json={}))
+    )
+    adapter._checkpoint_resources(["@example/remaining"])
+    assert adapter._resource_queue(["already-processed"]) == ["@example/remaining"]
+    adapter._checkpoint_resources([])
+    assert adapter.cursor is None
+
+
+def test_long_navigation_does_not_mask_an_empty_app(tmp_path: Path) -> None:
+    """An empty main can request rendering despite substantial navigation text."""
+    from oxhack2026.research.extraction import parse_page
+
+    fetcher = collector(
+        tmp_path,
+        "website",
+        (),
+        httpx.MockTransport(
+            lambda _: httpx.Response(
+                200, text=f"<nav>{'Navigation ' * 100}</nav><main></main>"
+            )
+        ),
+    ).fetcher
+    capture, content = fetcher.fetch("https://example.com/")
+    assert parse_page(capture, content).needs_browser is True
+
+
+def test_jsonld_accounts_require_the_organization_domain(tmp_path: Path) -> None:
+    """A third-party Organization cannot attach its accounts to the researched site."""
+    markup = """<script type="application/ld+json">{"@graph":[
+        {"@type":"Organization","url":"https://example.com","sameAs":["https://github.com/official"]},
+        {"@type":"Organization","url":"https://customer.example","sameAs":["https://github.com/customer"]}
+    ]}</script><p>Official identity information.</p>"""
+    result = collector(
+        tmp_path,
+        "website",
+        (),
+        httpx.MockTransport(lambda _: httpx.Response(200, text=markup)),
+    ).collect()
+    assert "https://github.com/official" in result.links
+    assert "https://github.com/customer" not in result.links
+    assert result.details
+    association = result.details.accounts[0]
+    support = {item.evidence_id: item for item in result.evidence}
+    assert support[association.evidence_ids[0]].location == "jsonld:Organization.sameAs"
+
+
+def test_mid_provider_failure_retains_measurements_and_failed_execution(
+    tmp_path: Path,
+) -> None:
+    """A partial report can contain valid metrics even though the adapter failed."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        if request.url.path.endswith("/releases"):
+            return httpx.Response(503)
+        if request.url.path.endswith("/package.json"):
+            return httpx.Response(404)
+        return httpx.Response(200, json={"stargazers_count": 5, "open_issues_count": 2})
+
+    result = collector(
+        tmp_path,
+        "github",
+        ("https://github.com/example/sdk",),
+        httpx.MockTransport(respond),
+    ).collect()
+    assert result.state == "partial"
+    assert result.details and result.details.execution == "failed"
+    assert [row.value for row in result.observations] == [5, 2]
+    assert result.details.cursor
+
+
+def test_crawl_follows_linked_public_update_subdomains(tmp_path: Path) -> None:
+    """Company blogs use the same host scope for discovery and final URL checks."""
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        link = '<a href="https://blog.example.com/launch">Product news</a>'
+        return httpx.Response(
+            200,
+            text=(
+                "<main>"
+                + "Our company provides public software for developer teams. " * 5
+                + (link if request.url.host == "example.com" else "")
+                + "</main>"
+            ),
+        )
+
+    result = collector(tmp_path, "website", (), httpx.MockTransport(respond)).collect()
+    assert any(
+        capture.final_url == "https://blog.example.com/launch"
+        for capture in result.captures
+    )
+    assert any(
+        item.url == "https://blog.example.com/launch" for item in result.evidence
+    )
+    assert "unconfirmed_redirect_destination" not in result.reason_codes

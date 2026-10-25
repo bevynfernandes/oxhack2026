@@ -15,6 +15,31 @@ _FAMILIES = (
     ("product", r"product|platform|solution|feature"),
 )
 _ASSET = re.compile(r"\.(?:js|css|woff2?|png|jpe?g|svg|gif|mp4|zip|ico)$", re.I)
+NPM_ASSOCIATION_VERIFIED = "npm_company_association_validated"
+_OFFICIAL_PREFIXES = frozenset(
+    {
+        "docs",
+        "developers",
+        "careers",
+        "jobs",
+        "blog",
+        "newsroom",
+        "changelog",
+    }
+)
+
+
+def official_host(host: str, domain: str) -> bool:
+    """Recognize the confirmed host and linked public company content subdomains.
+
+    Args:
+        host: Normalized destination hostname with an optional www prefix removed.
+        domain: Explicitly confirmed company hostname.
+    Returns:
+        Whether collection may use this host; this establishes no legal identity.
+    """
+    prefix, _, parent = host.partition(".")
+    return host == domain or (parent == domain and prefix in _OFFICIAL_PREFIXES)
 
 
 def crawl_family(url: str) -> str:
@@ -36,13 +61,8 @@ def crawl_candidate(url: str, domain: str) -> bool:
     """
     parsed = urlsplit(url)
     host = (parsed.hostname or "").removeprefix("www.")
-    official = host == domain or host in {
-        f"docs.{domain}",
-        f"developers.{domain}",
-        f"careers.{domain}",
-    }
     return (
-        official
+        official_host(host, domain)
         and not _ASSET.search(parsed.path)
         and not re.match(
             r"/(?:login|signin|signup|account|auth|cart|checkout|search|calendar)(?:/|$)",
@@ -55,6 +75,26 @@ def crawl_candidate(url: str, domain: str) -> bool:
 def source_issue(code: str) -> SourceIssue:
     """Translate stable diagnostic codes to severity, explanation and next action."""
     messages = {
+        "http_403": (
+            "The source denied access to this request.",
+            "Review provider credentials and access policy before refreshing.",
+        ),
+        "http_429": (
+            "The source rate-limited this request; its backoff applies across jobs.",
+            "Wait for the provider's limit to reset before refreshing.",
+        ),
+        "capture_size_limit": (
+            "A public response exceeded the per-response capture limit.",
+            "Other pages remain usable; this response was not interpreted.",
+        ),
+        "browser_request_blocked": (
+            "A rendered page requested a resource that could not be collected safely.",
+            "Retained HTML remains available; rendering does not bypass access limits.",
+        ),
+        "browser_unavailable_or_timeout": (
+            "Local rendering was unavailable or exceeded its time limit.",
+            "Review retained HTML; enable Chromium to retry JavaScript content.",
+        ),
         "website_page_limit": (
             "The selected company-page limit was reached.",
             "Continue research to collect remaining pages.",
@@ -70,6 +110,10 @@ def source_issue(code: str) -> SourceIssue:
         "unverified_package_mapping": (
             "No verified public npm package was discovered.",
             "Package adoption is unavailable without an official association.",
+        ),
+        "unverified_package_ownership": (
+            "An npm link or installation command did not establish package ownership.",
+            "Verify the package's company homepage or reciprocal repository manifest.",
         ),
         "careers_page_without_structured_opening_count": (
             (

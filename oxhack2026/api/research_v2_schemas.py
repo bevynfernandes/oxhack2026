@@ -450,9 +450,9 @@ class Capabilities(DTO):
     process_started_at: UTCDateTime | None = None
     runtime_revision: str | None = None
     deadline_seconds: int = 600
-    request_budget: int = 120
+    request_budget: int = 240
     response_bytes: int = 4194304
-    capture_bytes: int = 33554432
+    capture_bytes: int = 67108864
     mapping: MappingCapability | None = Field(
         default=None, exclude_if=lambda value: value is None
     )

@@ -152,6 +152,11 @@ def test_queued_continuation_failure_preserves_terminal_sources(
                     "state": state,
                     "finished_at": now if state != "pending" else None,
                     "reason_codes": ("retained_reason",) if state != "pending" else (),
+                    "details": SourceDetails(
+                        execution="pending", scope="planned_sample", coverage="unknown"
+                    )
+                    if state == "pending"
+                    else None,
                 }
             )
             for provider, state in zip(PROVIDERS, states, strict=True)
@@ -178,5 +183,79 @@ def test_queued_continuation_failure_preserves_terminal_sources(
     for source, retained in zip(result.sources, expected, strict=True):
         if retained.state in {"pending", "running"}:
             assert source.state == "failed"
+            if source.details:
+                assert source.details.execution == "failed"
+                assert source.details.coverage == "limited"
+                assert source.details.issues[-1].code == result.reason_codes[-1]
         else:
             assert source == retained
+
+
+@pytest.mark.parametrize("retry_failed", [False, True])
+def test_continuation_uses_only_a_report_from_the_same_job(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, retry_failed: bool
+) -> None:
+    """A re-mapped report may continue its own job while cross-job links fail closed."""
+    from oxhack2026.api.evidence_mapping_schemas import MappingProgress
+    from oxhack2026.api.research_v2_schemas import PROVIDERS, Job, SourceState
+    from oxhack2026.research.composition import compose
+    from oxhack2026.research.evidence_mapping import MappingEngine
+
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
+    now = datetime.now(UTC)
+    identity = Identity(
+        identity_id="identity",
+        request=DiscoveryRequest(domain="example.com"),
+        state="ready",
+        requested_at=now,
+        finished_at=now,
+        requested_domain="example.com",
+        canonical_domain="example.com",
+        company_name="Example",
+    )
+    previous = Job(
+        job_id="job",
+        identity_id="identity",
+        requested_at=now,
+        started_at=now,
+        finished_at=now,
+        state="completed",
+        report_id="original",
+        sources=tuple(
+            SourceState(
+                provider=provider,
+                name=provider,
+                state="failed"
+                if retry_failed and provider == "github"
+                else "completed",
+                finished_at=now,
+            )
+            for provider in PROVIDERS
+        ),
+        mapping=MappingProgress(state="completed", finished_at=now),
+    )
+    report = MappingEngine(tmp_path).map(compose(previous, identity))
+    assert report.mapping
+    report = report.model_copy(
+        update={
+            "report_id": "remapped",
+            "mapping": report.mapping.model_copy(
+                update={"state": "completed" if retry_failed else "partial"}
+            ),
+        }
+    )
+    store = Mock(spec=V2Store)
+    store.job.return_value = previous
+    store.report.return_value = report
+    service = V2Service(store)
+    create = Mock(return_value=previous)
+    monkeypatch.setattr(service, "create", create)
+    service.continue_job("job", ContinueRequest(source_report_id="remapped"))
+    resumed = create.call_args.args[1]
+    assert resumed.report_id == "remapped"
+    assert previous.report_id == "original"
+    assert report.mapping
+    assert resumed.mapping.finished_at == report.mapping.mapped_at
+    store.report.return_value = report.model_copy(update={"job_id": "unrelated"})
+    with pytest.raises(ValueError, match="must belong"):
+        service.continue_job("job", ContinueRequest(source_report_id="remapped"))

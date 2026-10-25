@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { rememberResearch } from "./library";
+import { ContinueControls, InterpretationSummary } from "./ResearchWorkflow";
 import {
   MotionState,
   MotionDisclosure,
@@ -47,8 +48,8 @@ function LegacyResearchJobPage() {
       {job && (
         <section className="panel" aria-label="Research job">
           <p>{job.request.domain}</p>
-          <MotionState stateKey={job.state}>
-            <h2 role="status" className="loading-label">
+          <MotionState stateKey={job.state} role="status">
+            <h2 className="loading-label">
               {["queued", "running"].includes(job.state) && (
                 <CompanySpinner website={job.request.domain} />
               )}
@@ -148,9 +149,23 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
             className="source-progress-state"
             stateKey={source.state}
           >
-            <span>{source.state}</span>
+            <span>{source.details?.execution ?? source.state}</span>
           </MotionState>
-          <Reasons reasons={source.reason_codes} />
+          {source.details ? (
+            <>
+              <p>
+                Coverage: {source.details.coverage.replaceAll("_", " ")} ·{" "}
+                {source.details.scope.replaceAll("_", " ")}
+              </p>
+              {source.details.issues.map((issue) => (
+                <p key={issue.code}>
+                  {issue.message} <small>{issue.remedy}</small>
+                </p>
+              ))}
+            </>
+          ) : (
+            <Reasons reasons={source.reason_codes} />
+          )}
           {source.finished_at && (
             <small>Finished {date(source.finished_at)}</small>
           )}
@@ -159,8 +174,13 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
               summary={
                 <>
                   {" "}
-                  Collected results · {source.observations.length} measurements
-                  · {source.evidence.length} excerpts{" "}
+                  Collected results ·{" "}
+                  {
+                    source.observations.filter((row) => row.value != null)
+                      .length
+                  }{" "}
+                  measurements · {source.claims.length} claims ·{" "}
+                  {source.evidence.length} excerpts{" "}
                 </>
               }
             >
@@ -258,8 +278,8 @@ function StandaloneJobPage() {
       />
       {job && (
         <section className="panel">
-          <MotionState stateKey={job.state}>
-            <h2 role="status" className="loading-label">
+          <MotionState stateKey={job.state} role="status">
+            <h2 className="loading-label">
               {["queued", "running"].includes(job.state) && (
                 <CompanySpinner website={identity.data?.canonical_domain} />
               )}
@@ -280,12 +300,19 @@ function StandaloneJobPage() {
           </p>
           <Reasons reasons={job.reason_codes} />
           <SourceProgress sources={job.sources} />
+          {(job.state === "completed" || job.state === "partial") &&
+            job.report_id && (
+              <ContinueControls
+                jobId={job.job_id}
+                sources={job.sources}
+                mapping={job.mapping}
+                settings={job.settings}
+              />
+            )}
           {job.mapping && (
             <section aria-label="Evidence mapping progress">
               <h3>Evidence mapping: {job.mapping.state}</h3>
-              <p>
-                {job.mapping.completed_batches} interpretation batches processed
-              </p>
+              <InterpretationSummary statistics={job.mapping.statistics} />
               <Reasons reasons={job.mapping.reason_codes} />
             </section>
           )}

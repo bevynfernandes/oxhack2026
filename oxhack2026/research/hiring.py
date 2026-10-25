@@ -11,7 +11,7 @@ from bs4 import BeautifulSoup
 
 from oxhack2026.api.research_v2_schemas import Capture, ResearchEvidence
 from oxhack2026.research.extraction import Page, evidence, parse_page
-from oxhack2026.research.network import CollectionError
+from oxhack2026.research.network import BudgetExceeded, CollectionError
 
 if TYPE_CHECKING:
     from oxhack2026.research.collectors import Collector
@@ -70,6 +70,8 @@ def _board(collector: "Collector", url: str) -> dict[str, ResearchEvidence] | No
 
 
 def _structured_jobs(content: bytes) -> list[dict[str, object]]:
+    if content.lstrip().startswith(b"<?xml"):
+        return []
     soup = BeautifulSoup(content, "lxml")
     found: list[dict[str, object]] = []
     for script in soup.select('script[type="application/ld+json"]'):
@@ -109,47 +111,126 @@ def collect_hiring(collector: "Collector") -> None:
     Raises:
         CollectionError: No official careers link or a provider request failed.
     """
-    queue = deque(
-        sorted(url for url in collector.identity.official_links if _CAREERS.search(url))
-    )
+    state = _restore_hiring(collector)
+    queue = deque(state[0])
     if not queue:
         raise CollectionError("official_careers_link_unavailable")
     visited: set[str] = set()
-    openings: dict[str, ResearchEvidence] = {}
-    structured = False
+    openings, structured = state[1:]
     limit = {"fast": 6, "thorough": 12, "deep": 24}[collector.limits.profile]
+    failed: list[str] = []
     while queue and len(visited) < limit:
         url = queue.popleft()
         if url in visited:
             continue
         visited.add(url)
-        board = _board(collector, url)
-        if board is not None:
-            structured = True
-            openings.update(board)
-            continue
-        capture, content = collector.fetcher.fetch(url)
-        page = _careers_page(collector, capture, content)
-        collector.support.extend(page.evidence)
-        collector.links.update(page.links)
-        queue.extend(
-            link for link in page.links if link not in visited and _CAREERS.search(link)
-        )
-        for row in _structured_jobs(content):
-            identifier = row.get("url") or row.get("identifier")
-            if isinstance(identifier, dict):
-                identifier = identifier.get("value")
-            if not isinstance(identifier, str):
-                continue
-            item = evidence(
-                capture, orjson.dumps(row).decode()[:3000], "jsonld:JobPosting"
-            )
-            collector.support.append(item)
-            openings[identifier] = item
-        collector._save_progress()
+        try:
+            board = _board(collector, url)
+            if board is not None:
+                structured = True
+                openings.update(board)
+            else:
+                queue.extend(_hiring_page(collector, url, openings))
+        except CollectionError as error:
+            failed.append(url)
+            collector.reasons.append(str(error))
+            logger.error("Official hiring page unavailable: %s", str(error))  # noqa: TRY400
+            if isinstance(error, BudgetExceeded):
+                break
+        _checkpoint_hiring(collector, list(queue) + failed, openings, structured)
+    remaining = list(dict.fromkeys((*queue, *failed)))
+    _checkpoint_hiring(collector, remaining, openings, structured)
     if structured and collector.support:
-        collector.metric("advertised_openings", len(openings), collector.support[-1])
+        collector.observations[:] = [
+            row
+            for row in collector.observations
+            if row.metric_id != "advertised_openings"
+        ]
+        collector.metric(
+            "advertised_openings",
+            None if remaining else len(openings),
+            collector.support[-1],
+        )
+        identifiers = tuple(dict.fromkeys(row.evidence_id for row in openings.values()))
+        if identifiers:
+            collector.observations[-1] = collector.observations[-1].model_copy(
+                update={"evidence_ids": identifiers}
+            )
     else:
         collector.reasons.append("careers_page_without_structured_opening_count")
-    if queue:
+    if remaining:
         collector.reasons.append("hiring_board_limit")
+
+
+def _restore_hiring(
+    collector: "Collector",
+) -> tuple[list[str], dict[str, ResearchEvidence], bool]:
+    """Restore official URLs and supported opening IDs from the durable cursor."""
+    if not collector.cursor:
+        return (
+            sorted(
+                url for url in collector.identity.official_links if _CAREERS.search(url)
+            ),
+            {},
+            False,
+        )
+    value = orjson.loads(collector.cursor)
+    if not isinstance(value, dict):
+        raise CollectionError("invalid_hiring_checkpoint")
+    queue, openings = value.get("queue"), value.get("openings")
+    if (
+        not isinstance(queue, list)
+        or not all(isinstance(url, str) for url in queue)
+        or not isinstance(openings, dict)
+    ):
+        raise CollectionError("invalid_hiring_checkpoint")
+    evidence_by_id = {item.evidence_id: item for item in collector.support}
+    restored = {
+        key: evidence_by_id[identifier]
+        for key, identifier in openings.items()
+        if isinstance(key, str)
+        and isinstance(identifier, str)
+        and identifier in evidence_by_id
+    }
+    return queue, restored, value.get("structured") is True
+
+
+def _checkpoint_hiring(
+    collector: "Collector",
+    queue: list[str],
+    openings: dict[str, ResearchEvidence],
+    structured: bool,
+) -> None:
+    """Persist remaining official URLs and deduplicated opening evidence after work."""
+    collector.cursor = (
+        orjson.dumps(
+            {
+                "queue": queue,
+                "openings": {key: item.evidence_id for key, item in openings.items()},
+                "structured": structured,
+            }
+        ).decode()
+        if queue
+        else None
+    )
+    collector._save_progress()
+
+
+def _hiring_page(
+    collector: "Collector", url: str, openings: dict[str, ResearchEvidence]
+) -> list[str]:
+    """Collect one careers wrapper, explicit job claims and linked official boards."""
+    capture, content = collector.fetcher.fetch(url)
+    page = _careers_page(collector, capture, content)
+    collector.support.extend(page.evidence)
+    collector.links.update(page.links)
+    for row in _structured_jobs(content):
+        identifier = row.get("url") or row.get("identifier")
+        if isinstance(identifier, dict):
+            identifier = identifier.get("value")
+        if not isinstance(identifier, str):
+            continue
+        item = evidence(capture, orjson.dumps(row).decode()[:3000], "jsonld:JobPosting")
+        collector.support.append(item)
+        openings[identifier] = item
+    return [link for link in page.links if _CAREERS.search(link)]

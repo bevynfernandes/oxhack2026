@@ -737,7 +737,7 @@ export interface components {
             browser_available: boolean;
             /**
              * Capture Bytes
-             * @default 33554432
+             * @default 67108864
              */
             capture_bytes: number;
             /** Collection Enabled */
@@ -766,7 +766,7 @@ export interface components {
             queued_jobs: number;
             /**
              * Request Budget
-             * @default 120
+             * @default 240
              */
             request_budget: number;
             /**
@@ -1495,6 +1495,8 @@ export interface components {
              * @enum {string}
              */
             profile?: "fast" | "thorough" | "deep";
+            /** Source Report Id */
+            source_report_id?: string | null;
         };
         /**
          * CrawlTarget

@@ -97,3 +97,13 @@ disables it. `GEMINI_MODEL` changes the model only by explicit configuration.
 To re-map existing reports without fetching sources, enable
 `SIGNALSHIFT_RESEARCH_MAPPING_ENABLED=1` and keep collection disabled. The same
 single-process lease, writable artifact root and durable report rules apply.
+
+
+Research defaults to the Thorough profile (up to ten minutes); Fast and Deep are
+explicit UI choices. Preserve writable captures, source checkpoints and mapping
+cache together in the research volume. Continue, Refresh and Re-map create new
+reports. Restart the container after updating its image and set
+`SIGNALSHIFT_RUNTIME_REVISION` to the deployed commit. Capabilities expose revision,
+process start time, resolved profiles and interpretation mode without contacting
+providers. Local browser pages and model turns are bounded independently; missing
+credentials, rate limits and unverified identifiers remain report limitations.

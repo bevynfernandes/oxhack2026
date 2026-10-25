@@ -1,5 +1,6 @@
 import ResearchTools from "./ResearchTools";
 import { evidenceSummary } from "./summary";
+import { CitedResearchAnalysis } from "./ResearchWorkflow";
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
 import { CashFlowResearch } from "./CashFlowResearch";
 import {
@@ -109,6 +110,7 @@ type Measurement = {
   reason: string | null;
   evidence: string[];
   fresh: boolean;
+  retained?: boolean;
 };
 
 /** Keep keyboard focus inside the open evidence drawer. */
@@ -187,7 +189,10 @@ export default function CompanyDossier({
     ? `/companies/${encodeURIComponent(profile.publication.assessment.publication_id)}/${encodeURIComponent(company.company_id)}`
     : null;
   const researchPath = standalone
-    ? "/research/identities/" + standalone.identity.identity_id
+    ? "/research/identities/" +
+      standalone.identity.identity_id +
+      "?profile=" +
+      (standalone.settings?.profile ?? "thorough")
     : "/research/new?" +
       new URLSearchParams({
         domain: companyDomain(company.website_url) ?? "",
@@ -235,6 +240,14 @@ export default function CompanyDossier({
         evidence: row.evidence_ids,
         fresh: true,
       });
+    const retainedCaptures = new Set(
+      standalone?.sources.flatMap(
+        (source) => source.details?.retained_capture_ids ?? [],
+      ),
+    );
+    const captureByEvidence = new Map(
+      standalone?.evidence.map((row) => [row.evidence_id, row.capture_id]),
+    );
     for (const row of standalone?.observations ?? [])
       rows.push({
         id: row.observation_id,
@@ -254,6 +267,11 @@ export default function CompanyDossier({
         reason: row.missing_reason ?? null,
         evidence: row.evidence_ids,
         fresh: row.origin === "fresh",
+        retained:
+          row.evidence_ids.length > 0 &&
+          row.evidence_ids.every((id) =>
+            retainedCaptures.has(captureByEvidence.get(id) ?? ""),
+          ),
       });
     return new Map(rows.map((row) => [row.id, row]));
   }, [profile, report, standalone]);
@@ -350,8 +368,12 @@ export default function CompanyDossier({
               <dd>
                 <strong>{row.value}</strong>
                 <small>
-                  {row.fresh ? "Fresh collection" : "Saved context"} ·{" "}
-                  {row.unit}
+                  {row.retained
+                    ? "Retained collection"
+                    : row.fresh
+                      ? "Fresh collection"
+                      : "Saved context"}{" "}
+                  · {row.unit}
                 </small>
                 <small>{row.period}</small>
                 <small>
@@ -476,6 +498,7 @@ export default function CompanyDossier({
           </MotionButton>
         </div>
       </header>
+      {standalone && <CitedResearchAnalysis report={standalone} />}
       {(synthetic || partial || (report && !outlook?.forecasts)) && (
         <div className="dossier-banners">
           <SyntheticNotice synthetic={synthetic} />

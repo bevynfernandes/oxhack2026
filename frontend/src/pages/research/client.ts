@@ -1,4 +1,4 @@
-import { api, ApiError, unwrap } from "../../api/client";
+import { api, ApiError, unwrap, type DTO } from "../../api/client";
 
 /** Load one immutable report using the shared safe error handling. */
 export async function fetchResearchReport(reportId: string) {
@@ -70,19 +70,25 @@ export async function previewCompany(domain: string) {
     await api.POST("/api/v2/research-identities", { body: { domain } }),
   );
 }
-export async function confirmIdentity(identityId: string) {
+export async function confirmIdentity(
+  identityId: string,
+  profile: DTO<"ResearchSettings">["profile"] = "thorough",
+) {
   return researchResult(
     await api.POST("/api/v2/research-jobs", {
-      body: { identity_id: identityId, identity_confirmed: true },
+      body: { identity_id: identityId, identity_confirmed: true, profile },
     }),
   );
 }
 
 /** Explicitly interpret retained captures without fetching company sources again. */
-export async function createMappingJob(reportId: string) {
+export async function createMappingJob(
+  reportId: string,
+  cachePolicy: "reuse" | "bypass" = "reuse",
+) {
   return researchResult(
     await api.POST("/api/v2/research-mapping-jobs", {
-      body: { source_report_id: reportId },
+      body: { source_report_id: reportId, cache_policy: cachePolicy },
     }),
   );
 }
@@ -92,6 +98,20 @@ export async function fetchMappingJob(jobId: string) {
   return researchResult(
     await api.GET("/api/v2/research-mapping-jobs/{job_id}", {
       params: { path: { job_id: jobId } },
+    }),
+  );
+}
+
+/** Explicitly resume checkpoints without replacing the previous immutable report. */
+export async function continueResearch(
+  jobId: string,
+  profile: DTO<"ResearchSettings">["profile"],
+  reportId?: string,
+) {
+  return researchResult(
+    await api.POST("/api/v2/research-jobs/{job_id}/continue", {
+      params: { path: { job_id: jobId } },
+      body: { profile, ...(reportId ? { source_report_id: reportId } : {}) },
     }),
   );
 }

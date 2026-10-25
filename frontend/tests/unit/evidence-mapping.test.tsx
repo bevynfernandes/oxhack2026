@@ -1,3 +1,4 @@
+import { CitedResearchAnalysis } from "../../src/pages/research/ResearchWorkflow";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { MemoryRouter } from "react-router-dom";
@@ -159,9 +160,58 @@ it("re-maps only after an explicit click and preserves the current report", asyn
   fireEvent.click(button);
   await waitFor(() => expect(read).toHaveBeenCalledWith("remapping"));
   expect(create).toHaveBeenCalledOnce();
-  expect(create).toHaveBeenCalledWith("original");
+  expect(create).toHaveBeenCalledWith("original", "reuse");
   expect(
     await screen.findByRole("link", { name: "Open newly mapped report" }),
   ).toHaveAttribute("href", "/research/v2/reports/new-report");
   expect(source.report_id).toBe("original");
+});
+
+it("keeps Gemini findings next to their original attributed quotations", async () => {
+  vi.spyOn(client, "fetchCapabilities").mockResolvedValue({
+    collection_enabled: false,
+  } as Awaited<ReturnType<typeof client.fetchCapabilities>>);
+  render(
+    <QueryClientProvider
+      client={
+        new QueryClient({ defaultOptions: { queries: { retry: false } } })
+      }
+    >
+      <MemoryRouter>
+        <CitedResearchAnalysis
+          report={{
+            ...source,
+            mapping: {
+              ...source.mapping!,
+              analysis: {
+                state: "completed",
+                method: "gemini",
+                reason_codes: [],
+                statements: [
+                  {
+                    text: "The company reports a customer revenue increase of 40 percent.",
+                    kind: "finding",
+                    group_id: "adoption_retention",
+                    mapping_ids: ["mapping"],
+                  },
+                ],
+              },
+            },
+          }}
+        />
+      </MemoryRouter>
+    </QueryClientProvider>,
+  );
+  fireEvent.click(
+    screen.getByRole("button", { name: /Gemini analysis and citations/ }),
+  );
+  expect(
+    screen.getByText("Our customer grew revenue by 40 percent."),
+  ).toBeVisible();
+  expect(
+    screen.getByRole("link", {
+      name: "Read supporting source (opens new tab)",
+    }),
+  ).toHaveAttribute("href", "https://example.com/about");
+  expect(screen.getByText(/Customer in quoted context/)).toBeVisible();
 });

@@ -2,7 +2,8 @@
 
 V2 adds explicitly confirmed domain identities and independent public collectors.
 V1 routes, saved publications and immutable reports retain their existing meaning.
-No frontend flows or model training are included in this backend change.
+The frontend supports domain confirmation, bounded collection, cited findings and
+explicit continuation. This workflow does not train prediction models.
 
 ## Run locally
 
@@ -11,8 +12,9 @@ uv sync --locked --all-extras --group docs
 uv run --no-sync playwright install --with-deps chromium
 export SIGNALSHIFT_RESEARCH_ROOT="$PWD/tests/outputs/local-research"
 export SIGNALSHIFT_RESEARCH_ENABLED=1
-# Optional: render up to three sparse JavaScript pages per job.
+# Optional: render sparse JavaScript pages within the selected profile.
 export SIGNALSHIFT_RESEARCH_BROWSER=1
+export SIGNALSHIFT_RUNTIME_REVISION="$(git rev-parse --short HEAD)"
 uv run --no-sync uvicorn oxhack2026.api.company_runtime:create_company_app --factory
 ```
 
@@ -54,7 +56,12 @@ POST requests after an ambiguous response. Explicit user refresh is a new write.
 ## Collection and interpretation
 
 Company pages yield first-party statements and dated events. The crawler visits at
-most twenty relevant pages, depth two, with sitemap and linked feed discovery.
+most the selected profile's company-page allowance, at depth three, with sitemap
+and linked feed discovery. Official ordinary HTML paths are eligible regardless of
+language; family ranking balances commercial, company, updates, docs and careers.
+Linked docs, developers, careers, jobs, blog, newsroom and changelog subdomains
+are included within the same confirmed domain and collection limits.
+Login, account, search and asset paths are excluded.
 Financial prose stays an attributed claim with its excerpt and extraction location;
 it is not converted into fabricated numbers. All claims, including disagreements,
 remain visible. Missing revenue, retention, cash/burn and competitor coverage are
@@ -71,7 +78,7 @@ npm observations use two adjacent thirty-day windows of the latest available dai
 data, with the collection time separate from the measurement period. HN retains
 matching dated records even when totals are non-exhaustive, with separate retrieved
 and nullable complete-window counts. GDELT articles remain coverage candidates;
-domain matching is explicit and bounded accessible article collection stops at six.
+domain matching is explicit and accessible article collection uses the profile limit.
 
 Registry collection requires a local reviewed mapping file selected through
 `SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS`. Each row contains `domain`, `jurisdiction`,
@@ -89,8 +96,8 @@ There are two active and eight queued discovery/research tasks, eight global net
 operations and at least one second between host requests. GitHub uses a shared
 rolling hourly budget of 60 unauthenticated or 5,000 authenticated requests and
 honors HTTP backoff. Discovery has a 45-second budget. Each research job has a
-five-minute deadline, 120 HTTP requests, 32 MiB of captured bodies and 4 MiB per
-response. Provider page/account limits produce explicit partial reasons.
+profile-specific deadline, request budget and captured-byte budget shown below,
+with 4 MiB per ordinary response (verified SEC company facts allow 16 MiB). Provider page/account limits produce explicit partial reasons.
 
 HTTP connects directly to a validated public IP with TLS hostname verification;
 redirects revalidate destinations and cross-host redirects discard credentials.
@@ -224,15 +231,20 @@ The limits are ceilings, not assertions that all public information was searched
 queues remaining durable work from a terminal useful job. It never rewrites that
 job or report. A job without a usable checkpoint requires Refresh instead.
 `POST /api/v2/research-mapping-jobs` accepts `cache_policy: reuse | bypass`;
-reuse is the default. Later collector and interpreter changes consume these
-contracts; older stored values omit the optional checkpoint/configuration fields.
+reuse is the default. Continuation can additionally name `source_report_id` to
+resume a later re-mapped report belonging to that exact job. Reports from other
+jobs or identities are rejected. Older stored values omit optional checkpoint and
+configuration fields and retain their original bytes.
 
 ### Source collection coverage
 
 The website frontier records visited and outstanding URLs, samples page families,
-and follows official documentation/careers links. Linked GitHub organisations can
+and follows linked public company subdomains. Linked GitHub organisations can
 supply public repositories; package manifests require reciprocal npm repository
-metadata. Hiring follows embedded public boards and deduplicates posting IDs.
+metadata. Explicit npm/pnpm/yarn/bun installation commands retain the quoted command
+as discovery evidence; ownership requires the separate verification above.
+Scoped Organization JSON-LD `sameAs` links retain
+their extraction location; an unrelated Organization's accounts are excluded. Hiring follows embedded public boards and deduplicates posting IDs.
 HN subdivides non-exhaustive time windows within its profile and stores unfinished
 pagination for continuation. News distinguishes matched articles and unverified
 candidates instead of marking every response partial. Public text PDFs are bounded
@@ -249,12 +261,102 @@ before spending their remaining model budget on new work. This permits an explic
 continuation to advance beyond an earlier interpretation limit. Gemini reviews
 important rule-mapped evidence as well as unclassified text, then submits cited
 findings. Local validation rejects unsupported quotes, subjects, citations,
-quantities and forecasts. The final model request is reserved for synthesis.
+quantities and forecasts. Extraction reserves one provider request, input capacity
+and 30% of remaining interpretation time (up to 120 seconds) for synthesis.
+Each Live turn has at most 90 seconds. A submitted but unfinished turn is retained
+with an explicit interruption reason.
 
 `mapping.statistics` separates processed/deferred evidence, accepted/rejected
 proposals, cached batches and actual provider requests. Unreported provider usage
 is null. `mapping.analysis` distinguishes unavailable synthesis from completed
 findings. Rule-only mode never presents deterministic output as Gemini analysis.
 Live connections reuse bounded turns, rotate on schema/context changes, discard
-audio and thoughts, and wait for explicit IDLE. Failed chunks do not become
-successful cache entries; model calls honour shared quotas and job deadlines.
+audio and thoughts, and wait for explicit IDLE. Validated nonempty submissions
+from interrupted turns can be replayed with their original interruption reasons.
+Invalid or empty failed chunks do not become successful cache entries. Model
+calls honour shared quotas and job deadlines.
+
+
+### Frontend actions and retained evidence
+
+The confirmation screen offers Fast, Thorough and Deep, defaulting to Thorough.
+Source progress shows execution separately from scope/coverage and supplies a
+human-readable issue and next action. Claims and unavailable observations do not
+inflate the count of measurements. Gemini accounting reports actual provider
+requests, cache hits, accepted/rejected proposals, deferred evidence and nullable
+provider-reported token usage. Rule-only and historical reports cannot imply that
+Gemini ran.
+
+Installation commands and npm links are discovery candidates, including possible
+third-party dependencies. Download observations require an exact registry package
+name and either a reciprocal company homepage or the matching package manifest
+in an officially linked repository. Name similarity does not establish ownership.
+Continuation revalidates older npm observations lacking this association check;
+their original report bytes and captures remain unchanged.
+
+Completed reports expose findings with original quotations, subjects, attribution,
+public source links and collection dates. Continue spends another explicit budget
+on retained frontier/cursors and deferred interpretation; completed captures stay
+available with their original dates. Refresh requires identity confirmation and
+collects new sources. Re-map reads retained captures only, with an explicit cache
+reuse/bypass choice. Every action creates a new immutable report, and failed reads
+or writes never silently resubmit research.
+Jobs that failed without producing a report offer identity confirmation for a new
+attempt; only useful completed/partial jobs expose continuation.
+
+The browser shares a twenty-second page deadline and twenty-request cap with its
+controlled network requests, so callbacks cannot outlive the page budget. Failed rendering
+retains successful static HTML and an explicit limitation. Source-level GitHub,
+npm and hiring checkpoints preserve completed resource evidence for continuation.
+The website phase uses at most 42% of total job time and GitHub discovery at most
+10%; collection as a whole uses at most 70%, leaving interpretation time.
+Website collection uses at most 60% of the shared HTTP and capture budgets,
+preserving capacity for external providers.
+
+After pulling implementation changes, restart the API worker. Check
+`process_started_at`, `runtime_revision` and `mapping.mode` in capabilities before
+expecting new behavior; fetching Git changes does not reload an existing process.
+Only enable one worker process per research root. Credentials remain backend-only;
+provider availability does not promise a successful live request.
+
+### Real-source acceptance, 25 October 2026
+
+The local acceptance runs used public network responses and actual Gemini calls,
+without substituting fixtures. All four domains were researched as standalone
+identities without saved publications. Raw captures, hashed model submissions,
+source checkpoints and immutable reports remain under ignored `tests/outputs/`.
+
+| Domain/action | Immutable report | Captures | Actual model requests |
+| --- | --- | ---: | ---: |
+| Qdrant | `7d8f4a0df76949bda53b997f3a9e86cb` | 131 | 6 |
+| PostHog | `9c120885e09944dfa151f0a78f612683` | 75 | 4 |
+| Linear | `3bac22e2a1c340578a3743639519d03d` | 87 | 4 |
+| ElevenLabs initial | `dfa888321200475191bb5bf3ed3f21e0` | 243 | 5 |
+| ElevenLabs Continue | `6be01d45eab9439c8918a8e6341e329a` | 300 | 2 |
+| ElevenLabs Refresh | `47df5e44d62f40f58298402c73c927fd` | 65 | 3 |
+| ElevenLabs uncached Re-map | `55353d7fc87c4f0fb72d4e56944d8078` | 243 | 3 |
+
+The initial broad runs exposed interpretation deadline starvation. Subsequent
+integration changes reserve synthesis capacity and external collection budgets.
+The final ElevenLabs re-map produced seven cited statements, including explicit
+gaps, and zero cached batches. Refresh and Continue retained useful fresh results
+but their synthesis requests were unavailable. These are recorded limitations,
+not successful generations. Continue replayed three cached batches while making
+two actual provider requests. The original report SHA-256 remained
+`da09c57d755decb328e6f0de3e57db2ead9dad848f838882b3b05bd79f3abb5f`.
+
+`research-final-artifact-audit.json` verifies report/capture integrity, newer
+refresh timestamps, unchanged retained captures, no collection during re-map,
+standalone identity coverage and current validation of all published statements.
+The underlying summaries are `research-complete-live-20261025/acceptance-summary.json`
+and `research-complete-elevenlabs-20261025/workflow-acceptance-summary.json`.
+
+Real restrictions remain visible: GitHub returned HTTP 403 on some requests,
+GDELT returned HTTP 429, and bounded website/HN/hiring collection retained pending
+work. An attempted reviewed Cloudflare SEC mapping received HTTP 403 before
+verification; `research-sec-live-20261025/source-result.json` retains that denied
+capture and publishes no registry claims. Companies House had no configured key;
+profile, filing and identity-mismatch behavior is covered by mocked tests rather
+than represented as live acceptance. These runs establish useful collection and
+honest failure reporting, not unrestricted provider access or complete financial
+coverage for private startups.

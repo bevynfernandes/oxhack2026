@@ -40,6 +40,7 @@ from oxhack2026.api.research_v2_schemas import (
     SourceState,
 )
 from oxhack2026.models.dimension_serving import DimensionModelRegistry
+from oxhack2026.research.frontier import NPM_ASSOCIATION_VERIFIED, source_issue
 from oxhack2026.research.network import (
     CollectionError,
     FetchBudget,
@@ -62,6 +63,30 @@ _NAMES = {
     "sec": "SEC disclosures",
     "companies_house": "Companies House",
 }
+
+
+def _failed_checkpoint(
+    source: SourceState, reason: str, finished: datetime
+) -> SourceState:
+    """Fail unfinished execution coherently while retaining terminal checkpoints."""
+    if source.state not in {"pending", "running"}:
+        return source
+    return source.model_copy(
+        update={
+            "state": "failed",
+            "finished_at": finished,
+            "reason_codes": tuple(dict.fromkeys((*source.reason_codes, reason))),
+            "details": source.details.model_copy(
+                update={
+                    "execution": "failed",
+                    "coverage": "limited",
+                    "issues": (*source.details.issues, source_issue(reason)),
+                }
+            )
+            if source.details
+            else None,
+        }
+    )
 
 
 class QueueFull(Exception):
@@ -414,22 +439,17 @@ class V2Service:
             try:
                 self.executor.submit(self.run, job.job_id)
             except RuntimeError as error:
+                finished = datetime.now(UTC)
                 self.store.save_job(
                     job.model_copy(
                         update={
                             "state": "failed",
-                            "finished_at": datetime.now(UTC),
+                            "finished_at": finished,
                             "reason_codes": ("worker_unavailable",),
                             "sources": tuple(
-                                source.model_copy(
-                                    update={
-                                        "state": "failed",
-                                        "reason_codes": ("worker_unavailable",),
-                                        "finished_at": datetime.now(UTC),
-                                    }
+                                _failed_checkpoint(
+                                    source, "worker_unavailable", finished
                                 )
-                                if source.state in {"pending", "running"}
-                                else source
                                 for source in job.sources
                             ),
                         }
@@ -452,8 +472,30 @@ class V2Service:
             RepositoryUnavailable: Collection is disabled.
         """
         previous = self.store.job(job_id)
+        if request.source_report_id:
+            source_report = self.store.report(request.source_report_id)
+            if (
+                source_report.job_id != job_id
+                or source_report.identity.identity_id != previous.identity_id
+            ):
+                message = "Continuation report must belong to the selected research job"
+                raise ValueError(message)
+            previous = previous.model_copy(
+                update={
+                    "report_id": source_report.report_id,
+                    "sources": source_report.sources,
+                    "mapping": MappingProgress(
+                        state=source_report.mapping.state,
+                        finished_at=source_report.mapping.mapped_at,
+                        statistics=source_report.mapping.statistics,
+                    )
+                    if source_report.mapping
+                    else previous.mapping,
+                }
+            )
         pending = any(
-            source.details and (source.details.frontier or source.details.cursor)
+            source.state == "failed"
+            or (source.details and (source.details.frontier or source.details.cursor))
             for source in previous.sources
         )
         if previous.state not in {"completed", "partial"} or not previous.report_id:
@@ -489,7 +531,10 @@ class V2Service:
                 updates["details"] = details
                 if details.frontier or details.cursor:
                     updates.update(state="pending", started_at=None, finished_at=None)
-            if source.state in {"skipped", "failed"}:
+            if source.state in {"skipped", "failed"} or (
+                source.provider == "npm"
+                and NPM_ASSOCIATION_VERIFIED not in source.reason_codes
+            ):
                 updates.update(
                     state="pending", started_at=None, finished_at=None, reason_codes=()
                 )
@@ -733,7 +778,15 @@ class V2Service:
             if source.state != "pending":
                 return
             running = source.model_copy(
-                update={"state": "running", "started_at": datetime.now(UTC)}
+                update={
+                    "state": "running",
+                    "started_at": datetime.now(UTC),
+                    "details": source.details.model_copy(
+                        update={"execution": "running"}
+                    )
+                    if source.details
+                    else None,
+                }
             )
 
             def checkpoint(value: SourceState) -> None:
@@ -758,12 +811,17 @@ class V2Service:
             )
             fetcher = self._fetcher(settings)
             fetcher.shared_budget = shared
+            if settings and index == 0:
+                fetcher.max_requests = max(1, int(settings.requests * 0.6))
+                fetcher.max_bytes = max(1, int(settings.capture_bytes * 0.6))
             fetcher.deadline = min(
                 collection_deadline,
                 time.monotonic()
                 + (
                     settings.deadline_seconds * 0.42
                     if settings and index == 0
+                    else settings.deadline_seconds * 0.10
+                    if settings and index == 1
                     else 10_000
                 ),
             )
@@ -800,17 +858,9 @@ class V2Service:
             )
 
     def _interrupt(self, job: Job, reason: str) -> None:
+        finished = datetime.now(UTC)
         states = tuple(
-            source.model_copy(
-                update={
-                    "state": "failed",
-                    "finished_at": datetime.now(UTC),
-                    "reason_codes": (reason,),
-                }
-            )
-            if source.state in {"pending", "running"}
-            else source
-            for source in job.sources
+            _failed_checkpoint(source, reason, finished) for source in job.sources
         )
         job = job.model_copy(update={"sources": states, "reason_codes": (reason,)})
         self.store.save_job(job)
@@ -872,17 +922,9 @@ class V2Service:
                     "finished_at": finished,
                     "reason_codes": ("collection_disabled_during_recovery",),
                     "sources": tuple(
-                        source.model_copy(
-                            update={
-                                "state": "failed",
-                                "finished_at": finished,
-                                "reason_codes": (
-                                    "collection_disabled_during_recovery",
-                                ),
-                            }
+                        _failed_checkpoint(
+                            source, "collection_disabled_during_recovery", finished
                         )
-                        if source.state in {"pending", "running"}
-                        else source
                         for source in job.sources
                     ),
                 }

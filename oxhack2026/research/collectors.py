@@ -34,7 +34,12 @@ from oxhack2026.api.research_v2_schemas import (
 from oxhack2026.api.schemas import Window
 from oxhack2026.models.financial_inference import CashFlowResearchEstimate
 from oxhack2026.research.extraction import Page, company_links, evidence, parse_page
-from oxhack2026.research.frontier import crawl_family, source_issue
+from oxhack2026.research.frontier import (
+    NPM_ASSOCIATION_VERIFIED,
+    crawl_family,
+    official_host,
+    source_issue,
+)
 from oxhack2026.research.network import CollectionError, Fetcher, public_url
 
 logger = logging.getLogger(__name__)
@@ -68,6 +73,18 @@ def _package_repository_matches(metadata: object, name: str, api_url: str) -> bo
     return normalized == urlsplit(api_url).path.removeprefix("/repos/").casefold()
 
 
+def _package_homepage_matches(homepage: object, domain: str) -> bool:
+    """Verify a registry homepage points to the confirmed company's public host."""
+    if not isinstance(homepage, str):
+        return False
+    try:
+        host = (urlsplit(public_url(homepage)).hostname or "").removeprefix("www.")
+    except CollectionError:
+        logger.error("Invalid public package homepage metadata")  # noqa: TRY400
+        return False
+    return official_host(host, domain)
+
+
 @dataclass
 class Collector:
     """Accumulate successful records even if a later request fails.
@@ -96,19 +113,30 @@ class Collector:
     links: set[str] = field(default_factory=set)
     reasons: list[str] = field(default_factory=list)
     browser_pages: int = 0
+    execution_failed: bool = False
     cash_flow_research: CashFlowResearchEstimate | None = None
 
     def __post_init__(self) -> None:
         """Restore successful source records when continuing a durable checkpoint."""
         self.support.extend(self.source.evidence)
-        self.observations.extend(self.source.observations)
+        if (
+            self.source.provider != "npm"
+            or NPM_ASSOCIATION_VERIFIED in self.source.reason_codes
+        ):
+            self.observations.extend(self.source.observations)
         self.claims.extend(self.source.claims)
         self.events.extend(self.source.events)
         self.links.update(self.source.links)
         if self.source.details:
             self.frontier = self.source.details.frontier
             self.visited.update(self.source.details.visited)
-            self.accounts.extend(self.source.details.accounts)
+            self.accounts.extend(
+                account
+                for account in self.source.details.accounts
+                if account.kind != "npm"
+                or self.source.provider == "github"
+                or NPM_ASSOCIATION_VERIFIED in self.source.reason_codes
+            )
             self.cursor = self.source.details.cursor
         resumed_limits = {"website_page_limit"} if self.frontier else set()
         if self.cursor:
@@ -160,7 +188,11 @@ class Collector:
     ) -> SourceState:
         issues = tuple(source_issue(code) for code in dict.fromkeys(self.reasons))
         details = SourceDetails(
-            execution="completed" if state == "partial" else state,
+            execution="failed"
+            if self.execution_failed
+            else "completed"
+            if state == "partial"
+            else state,
             applicability="unknown" if state == "skipped" else "applicable",
             scope="planned_sample"
             if self.source.provider in {"website", "news", "hiring"}
@@ -255,8 +287,13 @@ class Collector:
         from oxhack2026.research.browser import render
 
         self.browser_pages += 1
-        capture, content = render(self.fetcher, capture.final_url)
-        return parse_page(capture, content)
+        try:
+            rendered, body = render(self.fetcher, capture.final_url)
+            return parse_page(rendered, body)
+        except CollectionError as error:
+            logger.error("Browser fallback failed: %s", str(error))  # noqa: TRY400
+            self.reasons.append(str(error))
+            return page
 
     def _official_page(self, target: CrawlTarget) -> tuple[Capture, Page] | None:
         try:
@@ -265,15 +302,16 @@ class Collector:
             destination = (urlsplit(capture.final_url).hostname or "").removeprefix(
                 "www."
             )
-            if destination not in {
-                domain,
-                f"docs.{domain}",
-                f"developers.{domain}",
-                f"careers.{domain}",
-            }:
+            if not official_host(destination, domain):
                 self.reasons.append("unconfirmed_redirect_destination")
                 return None
-            return capture, self._website_page(capture, content)
+            page = self._website_page(capture, content)
+            if page.evidence and page.evidence[0].capture_id != capture.capture_id:
+                capture = next(
+                    row
+                    for row in reversed(self.fetcher.captures)
+                    if row.capture_id == page.evidence[0].capture_id
+                )
         except CollectionError as error:
             from oxhack2026.research.network import BudgetExceeded
 
@@ -282,6 +320,8 @@ class Collector:
             logger.error("Website page unavailable: %s", str(error))  # noqa: TRY400
             self.reasons.append(str(error))
             return None
+        else:
+            return capture, page
 
     def _documentation_seeds(self) -> tuple[CrawlTarget, ...]:
         if self.frontier:
@@ -294,9 +334,26 @@ class Collector:
             )
         )
 
+    def _official_accounts(self, capture: Capture, page: Page) -> None:
+        """Retain repository links; npm candidates require independent verification."""
+        account_evidence = dict(page.account_evidence)
+        for link in page.links:
+            host = urlsplit(link).hostname
+            if host == "github.com":
+                item = account_evidence.get(link) or evidence(
+                    capture, link, "link:href"
+                )
+                if link not in account_evidence:
+                    self.support.append(item)
+                kind = (
+                    "github_repo"
+                    if len(urlsplit(link).path.strip("/").split("/")) >= 2
+                    else "github_org"
+                )
+                self._association(kind, link, item)
+
     def website(self) -> None:
-        """Crawl twenty relevant company pages at depth two plus linked
-        feeds/sitemap."""
+        """Crawl balanced official pages within the selected profile and checkpoints."""
         domain = self.identity.canonical_domain
         queue = deque(
             self.frontier
@@ -340,19 +397,7 @@ class Collector:
                 self.claims.extend(page.claims)
                 self.events.extend(page.events)
                 self.links.update(page.links)
-                for link in page.links:
-                    host = urlsplit(link).hostname
-                    if host in {"github.com", "npmjs.com", "www.npmjs.com"}:
-                        item = evidence(capture, link, "link:href")
-                        self.support.append(item)
-                        kind = (
-                            "npm"
-                            if host != "github.com"
-                            else "github_repo"
-                            if len(urlsplit(link).path.strip("/").split("/")) >= 2
-                            else "github_org"
-                        )
-                        self._association(kind, link, item)
+                self._official_accounts(capture, page)
                 if target.depth < 3:
                     queued = {item.url for item in queue}
                     queue.extend(
@@ -440,6 +485,22 @@ class Collector:
                 "Repository package manifest unavailable: %s", type(error).__name__
             )
 
+    def _resource_queue(self, resources: list[str]) -> list[str]:
+        """Restore a provider's retained resource queue without guessing accounts."""
+        if not self.cursor:
+            return resources
+        value = orjson.loads(self.cursor)
+        if not isinstance(value, list) or not all(
+            isinstance(row, str) for row in value
+        ):
+            raise CollectionError("invalid_provider_checkpoint")
+        return value
+
+    def _checkpoint_resources(self, remaining: list[str]) -> None:
+        """Persist unprocessed resources beside successful provider evidence."""
+        self.cursor = orjson.dumps(remaining).decode() if remaining else None
+        self._save_progress()
+
     def github(self) -> None:
         """Read metadata and stable releases only for repositories linked by
         official pages."""
@@ -466,48 +527,62 @@ class Collector:
         )
         token = os.environ.get("GITHUB_TOKEN", "")
         headers = {"Authorization": f"Bearer {token}"} if token else None
-        discovered = self._organization_repositories(organizations, headers)
-        repositories = list(dict.fromkeys((*repositories, *discovered)))
+        discovered = (
+            []
+            if self.cursor
+            else self._organization_repositories(organizations, headers)
+        )
+        repositories = self._resource_queue(
+            list(dict.fromkeys((*repositories, *discovered)))
+        )
         if not repositories:
             raise CollectionError("unverified_repository_mapping")
         repository_limit = {"fast": 2, "thorough": 6, "deep": 12}[self.limits.profile]
+        remaining = list(repositories)
+        self._checkpoint_resources(remaining)
         for repository in repositories[:repository_limit]:
-            base = f"https://api.github.com/repos/{repository}"
-            value, item = self.json(base, headers)
-            if not isinstance(value, dict):
-                raise CollectionError("invalid_github_response")
-            for key, metric_id in (
-                ("stargazers_count", "github_stars"),
-                ("open_issues_count", "github_open_issues"),
-            ):
-                count = value.get(key)
-                if isinstance(count, int):
-                    self.metric(metric_id, count, item)
-            self.links.add(f"https://github.com/{repository}")
-            self._association("github_repo", f"https://github.com/{repository}", item)
-            self._repository_package(base, headers)
-            pushed = value.get("pushed_at")
-            if isinstance(pushed, str):
-                self.events.append(
-                    Event(
-                        event_id=uuid4().hex,
-                        kind="repository_push",
-                        title=repository,
-                        url=f"https://github.com/{repository}",
-                        published_at=pushed,
-                        evidence_ids=(item.evidence_id,),
-                    )
-                )
-            releases, release_evidence = self.json(
-                f"{base}/releases?per_page=20", headers
-            )
-            if not isinstance(releases, list):
-                raise CollectionError("invalid_github_releases")
-            if len(releases) == 20:
-                self.reasons.append("github_release_page_limit")
-            self._releases(repository, releases, release_evidence)
+            self._github_repository(repository, headers)
+            remaining.remove(repository)
+            self._checkpoint_resources(remaining)
         if len(repositories) > repository_limit:
             self.reasons.append("github_repository_limit")
+
+    def _github_repository(
+        self, repository: str, headers: dict[str, str] | None
+    ) -> None:
+        """Collect one verified repository's metadata, package and stable releases."""
+        base = f"https://api.github.com/repos/{repository}"
+        value, item = self.json(base, headers)
+        if not isinstance(value, dict):
+            raise CollectionError("invalid_github_response")
+        for key, metric_id in (
+            ("stargazers_count", "github_stars"),
+            ("open_issues_count", "github_open_issues"),
+        ):
+            count = value.get(key)
+            if isinstance(count, int):
+                self.metric(metric_id, count, item)
+        self.links.add(f"https://github.com/{repository}")
+        self._association("github_repo", f"https://github.com/{repository}", item)
+        self._repository_package(base, headers)
+        pushed = value.get("pushed_at")
+        if isinstance(pushed, str):
+            self.events.append(
+                Event(
+                    event_id=uuid4().hex,
+                    kind="repository_push",
+                    title=repository,
+                    url=f"https://github.com/{repository}",
+                    published_at=pushed,
+                    evidence_ids=(item.evidence_id,),
+                )
+            )
+        releases, release_evidence = self.json(f"{base}/releases?per_page=20", headers)
+        if not isinstance(releases, list):
+            raise CollectionError("invalid_github_releases")
+        if len(releases) == 20:
+            self.reasons.append("github_release_page_limit")
+        self._releases(repository, releases, release_evidence)
 
     def _releases(
         self, repository: str, releases: list[object], item: ResearchEvidence
@@ -557,58 +632,114 @@ class Collector:
                 and urlsplit(link).path.startswith("/package/")
             }
         )
+        packages = self._resource_queue(packages)
         if not packages:
             raise CollectionError("unverified_package_mapping")
+        limit = {"fast": 2, "thorough": 6, "deep": 12}[self.limits.profile]
+        remaining = list(packages)
+        self._checkpoint_resources(remaining)
+        verified = 0
+        for package in packages[:limit]:
+            if self._verified_package(package):
+                self._npm_package(package)
+                self.reasons.append(NPM_ASSOCIATION_VERIFIED)
+                verified += 1
+            else:
+                self.reasons.append("unverified_package_ownership")
+            remaining.remove(package)
+            self._checkpoint_resources(remaining)
+        if not verified:
+            raise CollectionError("unverified_package_mapping")
+        if len(packages) > {"fast": 2, "thorough": 6, "deep": 12}[self.limits.profile]:
+            self.reasons.append("npm_package_limit")
+
+    def _verified_package(self, package: str) -> bool:
+        """Require a reciprocal company homepage or verified repository manifest."""
+        metadata, registry = self.json(
+            f"https://registry.npmjs.org/{quote(package, safe='')}/latest"
+        )
+        if not isinstance(metadata, dict) or metadata.get("name") != package:
+            return False
+        if _package_homepage_matches(
+            metadata.get("homepage"), self.identity.canonical_domain
+        ):
+            self._association(
+                "npm", f"https://www.npmjs.com/package/{package}", registry
+            )
+            return True
+        for link in self.identity.official_links:
+            parsed = urlsplit(link)
+            if parsed.hostname != "github.com" or not re.fullmatch(
+                r"/[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/?", parsed.path
+            ):
+                continue
+            base = f"https://api.github.com/repos/{parsed.path.strip('/')}"
+            if not _package_repository_matches(metadata, package, base):
+                continue
+            token = os.environ.get("GITHUB_TOKEN", "")
+            manifest, _ = self.json(
+                f"{base}/contents/package.json",
+                {"Authorization": f"Bearer {token}"} if token else None,
+            )
+            if not isinstance(manifest, dict) or not isinstance(
+                manifest.get("content"), str
+            ):
+                continue
+            payload = orjson.loads(base64.b64decode(manifest["content"]))
+            if (
+                isinstance(payload, dict)
+                and payload.get("name") == package
+                and not payload.get("private")
+            ):
+                self._association(
+                    "npm", f"https://www.npmjs.com/package/{package}", registry
+                )
+                return True
+        return False
+
+    def _npm_package(self, package: str) -> None:
+        """Retain adjacent complete windows for an independently verified package."""
         today = datetime.now(UTC).date()
         start, end = today - timedelta(days=65), today - timedelta(days=1)
-        for package in packages[
-            : {"fast": 2, "thorough": 6, "deep": 12}[self.limits.profile]
-        ]:
-            data, item = self.json(
-                f"https://api.npmjs.org/downloads/range/{start}:{end}/"
-                f"{quote(package, safe='')}"
-            )
-            if not isinstance(data, dict) or not isinstance(
-                data.get("downloads"), list
-            ):
-                raise CollectionError("invalid_npm_response")
-            daily = self._daily_downloads(data["downloads"], start, end)
-            latest = max(daily) if daily else end
-            days = [latest - timedelta(days=index) for index in range(59, -1, -1)]
-            for offset, label in ((0, "previous"), (30, "latest")):
-                window_days = days[offset : offset + 30]
-                complete = all(day in daily for day in window_days)
-                if not complete:
-                    self.reasons.append("incomplete_npm_daily_window")
-                self.observations.append(
-                    Observation(
-                        observation_id=uuid4().hex,
-                        metric_id=f"npm_downloads_{label}_30d",
-                        definition=(
-                            f"Daily npm downloads for {package}; "
-                            "package adoption proxy, not users."
+        data, item = self.json(
+            f"https://api.npmjs.org/downloads/range/{start}:{end}/"
+            f"{quote(package, safe='')}"
+        )
+        if not isinstance(data, dict) or not isinstance(data.get("downloads"), list):
+            raise CollectionError("invalid_npm_response")
+        daily = self._daily_downloads(data["downloads"], start, end)
+        latest = max(daily) if daily else end
+        days = [latest - timedelta(days=index) for index in range(59, -1, -1)]
+        for offset, label in ((0, "previous"), (30, "latest")):
+            window_days = days[offset : offset + 30]
+            complete = all(day in daily for day in window_days)
+            if not complete:
+                self.reasons.append("incomplete_npm_daily_window")
+            self.observations.append(
+                Observation(
+                    observation_id=uuid4().hex,
+                    metric_id=f"npm_downloads_{label}_30d",
+                    definition=(
+                        f"Daily npm downloads for {package}; "
+                        "package adoption proxy, not users."
+                    ),
+                    unit="downloads",
+                    value=sum(daily[day] for day in window_days) if complete else None,
+                    window=Window(
+                        start=datetime.combine(
+                            window_days[0], datetime.min.time(), UTC
                         ),
-                        unit="downloads",
-                        value=sum(daily[day] for day in window_days)
-                        if complete
-                        else None,
-                        window=Window(
-                            start=datetime.combine(
-                                window_days[0], datetime.min.time(), UTC
-                            ),
-                            end=datetime.combine(
-                                window_days[-1] + timedelta(days=1),
-                                datetime.min.time(),
-                                UTC,
-                            ),
+                        end=datetime.combine(
+                            window_days[-1] + timedelta(days=1),
+                            datetime.min.time(),
+                            UTC,
                         ),
-                        collected_at=item.collected_at,
-                        evidence_ids=(item.evidence_id,),
-                        missing_reason=None if complete else "incomplete_daily_window",
-                    )
+                    ),
+                    collected_at=item.collected_at,
+                    evidence_ids=(item.evidence_id,),
+                    missing_reason=None if complete else "incomplete_daily_window",
                 )
-        if len(packages) > 2:
-            self.reasons.append("npm_package_limit")
+            )
 
     def _hn_title_evidence(
         self, title: str, index: int, fallback: ResearchEvidence
@@ -632,8 +763,7 @@ class Collector:
         collect_hiring(self)
 
     def news(self) -> None:
-        """Discover GDELT candidates and retrieve six accessible articles for
-        matching."""
+        """Discover news candidates within the profile and retain company matching."""
         query = urlencode(
             {
                 "query": f'"{self.identity.canonical_domain}"',
@@ -673,7 +803,7 @@ class Collector:
             except CollectionError as error:
                 logger.error("News article collection failed: %s", str(error))  # noqa: TRY400
                 self.reasons.append(str(error))
-        if len(articles) > 6:
+        if len(articles) > self.limits.article_pages:
             self.reasons.append("news_article_limit")
 
     def registry(self) -> None:
@@ -686,6 +816,7 @@ class Collector:
     def collect(self) -> SourceState:
         """Run one adapter, retaining successful captures and records on
         independent failure."""
+        self.execution_failed = False
         beginning = len(self.fetcher.captures)
         state: Literal["completed", "partial", "failed", "skipped"] = "completed"
         try:
@@ -712,6 +843,7 @@ class Collector:
                 if reason.startswith(("unverified_", "missing_", "official_careers"))
                 else "failed"
             )
+        self.execution_failed = state == "failed"
         if (
             any(source_issue(code).severity != "info" for code in self.reasons)
             and state == "completed"

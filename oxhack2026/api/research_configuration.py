@@ -106,3 +106,4 @@ class ContinueRequest(DTO):
     """Explicitly spend one selected profile's budget on remaining work."""
 
     profile: ResearchProfile = Field(default_factory=lambda: "thorough")
+    source_report_id: Identifier | None = None
