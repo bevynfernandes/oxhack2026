@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { rememberResearch } from "./library";
 import {
   MotionState,
   MotionDisclosure,
@@ -182,6 +184,7 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
   );
 }
 function StandaloneJobPage() {
+  const [historyError, setHistoryError] = useState(false);
   const { jobId = "" } = useParams();
   const query = useQuery({
     queryKey: ["research-v2-job", jobId],
@@ -202,13 +205,52 @@ function StandaloneJobPage() {
   const identity = useQuery({
     queryKey: ["research-identity", job?.identity_id],
     queryFn: () => fetchIdentity(job!.identity_id),
-    enabled: Boolean(job && ["queued", "running"].includes(job.state)),
+    enabled: Boolean(job),
     retry: false,
   });
+  useEffect(() => {
+    if (!job || !identity.data) return;
+    const record = {
+      name: identity.data.company_name,
+      domain: identity.data.canonical_domain,
+      asOf: null,
+    };
+    try {
+      rememberResearch({ ...record, path: "/research/v2/jobs/" + job.job_id });
+      if (job.report_id)
+        rememberResearch({
+          ...record,
+          path: "/research/v2/reports/" + job.report_id,
+        });
+    } catch {
+      setHistoryError(true);
+    }
+  }, [
+    job?.job_id,
+    job?.report_id,
+    identity.data?.company_name,
+    identity.data?.canonical_domain,
+  ]);
   return (
     <article className="research-start">
-      <Link to="/">Companies</Link>
+      <Link to="/explore">Your research</Link>
       <h1>Research status</h1>
+      {historyError && (
+        <p role="status">
+          Browser history could not be saved. Keep this page URL to return to
+          this job.
+        </p>
+      )}
+      {identity.data && (
+        <p>
+          <strong>{identity.data.company_name}</strong> ·{" "}
+          {identity.data.canonical_domain}
+        </p>
+      )}
+      <p>
+        This creates an evidence report, not a validated success prediction. You
+        can return to this job from Your research in this browser.
+      </p>
       <QueryState
         pending={query.isPending}
         error={query.error}

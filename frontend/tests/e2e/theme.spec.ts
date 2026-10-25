@@ -179,6 +179,14 @@ test("theme can roll back to the preserved light styles and respects forced colo
     document.documentElement.classList.remove("theme-techno-classical"),
   );
   expect(await canvas()).toBe("rgb(247, 249, 252)");
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.getByLabel("Search companies").scrollIntoViewIfNeeded();
+  await expect(page.getByLabel("Search companies")).toBeInViewport();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
   expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.evaluate(() =>
     document.documentElement.classList.add("theme-techno-classical"),

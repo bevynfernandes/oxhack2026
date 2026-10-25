@@ -1497,3 +1497,140 @@
     display: inline-flex;
   }
 }
+
+/* Continuing research uses the existing palette and shared motion primitives. */
+.research-library {
+  margin-block: 20px;
+}
+.research-library-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+}
+.research-library-controls > label:first-child {
+  flex: 1 1 220px;
+}
+.research-library-list {
+  list-style: none;
+  padding: 0;
+}
+.research-library-list > li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-block: 16px;
+  border-top: 1px solid var(--theme-line, #cbd5e1);
+}
+.research-library-list > li > div {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.research-library-list small {
+  display: block;
+  margin-block: 6px;
+}
+.research-note {
+  white-space: pre-wrap;
+}
+.research-tools-dialog {
+  width: min(760px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 24px;
+  border: 1px solid var(--theme-control-line, #8a5a35);
+  border-radius: 16px;
+  background: var(--theme-canvas, white);
+  color: var(--theme-text, #14141a);
+}
+.research-tools-dialog > header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+.research-tools-dialog h2 {
+  margin-top: 0;
+}
+.research-tools-dialog form {
+  display: grid;
+  gap: 16px;
+}
+.research-tools-dialog textarea {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  font: inherit;
+  color: var(--theme-text, #14141a);
+  background: var(--theme-surface, white);
+  border: 1px solid var(--theme-control-line, #8a5a35);
+  border-radius: 8px;
+  resize: vertical;
+}
+.research-tools-dialog label {
+  display: grid;
+  gap: 8px;
+}
+.research-tools-dialog .identity-confirm {
+  display: flex;
+}
+.research-decision-summary > div {
+  padding-block: 12px;
+  border-top: 1px solid var(--theme-line, #cbd5e1);
+}
+.research-decision-summary dt {
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.research-decision-summary dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.research-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  gap: 16px;
+}
+.research-comparison article {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.research-comparison dt {
+  font-weight: 700;
+}
+.research-comparison dd {
+  margin: 8px 0 20px;
+}
+.nav-short-label {
+  display: none;
+}
+/* Decorative theme assets never become document content when the theme is disabled. */
+html:not(.theme-techno-classical) :is(.home-pattern-region, .home-space-scene) {
+  display: none;
+}
+html:not(.theme-techno-classical) .home-motion-surface {
+  min-width: 0;
+}
+@media (max-width: 800px) {
+  .nav-wide-label {
+    display: none;
+  }
+  .nav-short-label {
+    display: inline;
+  }
+  .theme-techno-classical .site-header nav a:nth-child(2) {
+    display: inline-flex;
+  }
+  .research-library-list > li {
+    flex-wrap: wrap;
+    align-items: start;
+  }
+  .research-library-list > li > div {
+    flex-basis: 65%;
+  }
+  .research-tools-dialog {
+    padding: 16px;
+  }
+}

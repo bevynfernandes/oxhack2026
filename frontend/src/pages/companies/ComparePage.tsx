@@ -1,5 +1,6 @@
 import { MotionDisclosure, MotionLink as Link } from "../../motion";
 import { useQueries } from "@tanstack/react-query";
+import ResearchComparison from "../research/ResearchComparison";
 import { useSearchParams } from "react-router-dom";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
@@ -14,6 +15,14 @@ import {
 
 /** Compare two or three exact profiles using the same source snapshot and definitions. */
 export default function ComparePage() {
+  const [params] = useSearchParams();
+  return params.has("record") ? (
+    <ResearchComparison />
+  ) : (
+    <PublishedComparison />
+  );
+}
+function PublishedComparison() {
   const [params] = useSearchParams();
   const snapshot = params.get("snapshot") ?? "";
   const ids = params.getAll("company");
