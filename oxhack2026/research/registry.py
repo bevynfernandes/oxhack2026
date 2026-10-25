@@ -23,6 +23,10 @@ from oxhack2026.features.sec_financials import (
 )
 from oxhack2026.models.financial_inference import estimate_annual_cash_flow
 from oxhack2026.research.network import CollectionError
+from oxhack2026.research.sec_identity import (
+    sec_filing_candidates,
+    sec_issuer_website_quote,
+)
 
 if TYPE_CHECKING:
     from oxhack2026.research.collectors import Collector
@@ -47,7 +51,7 @@ def registry_mapping_path() -> Path:
 
 
 class RegistryMapping(DTO):
-    """Operator-reviewed association with a public supporting URL and jurisdiction."""
+    """Configured or reciprocally evidenced association with an exact registry ID."""
 
     domain: str
     jurisdiction: str
@@ -271,8 +275,88 @@ def _mapping_support(
     return evidence(capture, excerpt, location)
 
 
+def _sec_linked_candidates(collector: "Collector") -> tuple[tuple[str, str], ...]:
+    from oxhack2026.research.extraction import parse_page
+
+    domain = collector.identity.canonical_domain
+    links = set(collector.identity.official_links)
+    candidates = sec_filing_candidates(links)
+    visited: set[str] = set()
+    for _ in range(3):
+        if candidates:
+            break
+        investor_pages = sorted(
+            (
+                link
+                for link in links - visited
+                if (urlsplit(link).hostname or "")
+                in {f"{prefix}.{domain}" for prefix in ("ir", "investor", "investors")}
+            ),
+            key=lambda link: (
+                not re.search(r"sec-filing|annual|financial", urlsplit(link).path),
+                link,
+            ),
+        )
+        if not investor_pages:
+            break
+        link = investor_pages[0]
+        visited.add(link)
+        capture, content = collector.fetcher.fetch(link)
+        if urlsplit(capture.final_url).hostname != urlsplit(link).hostname:
+            raise CollectionError("sec_investor_page_unconfirmed_redirect")
+        page = parse_page(capture, content)
+        collector.support.extend(page.evidence[:1])
+        links.update(page.links)
+        candidates = sec_filing_candidates(links)
+    return candidates
+
+
+def _discover_sec_mapping(
+    collector: "Collector",
+) -> tuple[RegistryMapping, ResearchEvidence]:
+    from oxhack2026.research.extraction import evidence
+
+    headers = _mapping_support_headers("sec", "https://www.sec.gov/")
+    if headers is None:
+        raise CollectionError("missing_sec_user_agent")
+    domain = collector.identity.canonical_domain
+    candidates = _sec_linked_candidates(collector)
+    if len({cik for cik, _ in candidates}) != 1:
+        raise CollectionError("unverified_or_ambiguous_registry_mapping")
+    verified: list[tuple[RegistryMapping, ResearchEvidence]] = []
+    for cik, link in candidates[:2]:
+        capture, content = collector.fetcher.fetch(link, headers)
+        if capture.final_url != link:
+            raise CollectionError("sec_identity_filing_unconfirmed_redirect")
+        quote = sec_issuer_website_quote(content, cik, domain)
+        if quote is None:
+            continue
+        text = content.decode(errors="replace")
+        position = text.index(quote)
+        verified.append(
+            (
+                RegistryMapping(
+                    domain=domain,
+                    jurisdiction="US",
+                    reviewed=False,
+                    cik=cik,
+                    evidence_url=link,
+                ),
+                evidence(
+                    capture,
+                    text[max(0, position - 400) : position + len(quote) + 200],
+                    f"sec_reciprocal_issuer_website:character:{position}",
+                ),
+            )
+        )
+    if not verified:
+        raise CollectionError("sec_reciprocal_issuer_website_not_established")
+    collector.reasons.append("sec_identity_verified_by_reciprocal_official_links")
+    return verified[0]
+
+
 def collect_registry(collector: "Collector") -> None:
-    """Fetch registry facts for exact reviewed mappings; missing keys remain explicit.
+    """Fetch facts for reviewed or reciprocally verified SEC issuer mappings.
 
     Raises:
         CollectionError: Missing mapping, credentials, public verification or payload.
@@ -294,10 +378,13 @@ def collect_registry(collector: "Collector") -> None:
     matches = [
         row for row in matches if (row.cik if provider == "sec" else row.company_number)
     ]
-    if len(matches) != 1:
+    if not matches and provider == "sec":
+        mapping, item = _discover_sec_mapping(collector)
+    elif len(matches) != 1:
         raise CollectionError("unverified_or_ambiguous_registry_mapping")
-    mapping = matches[0]
-    item = _mapping_support(collector, mapping)
+    else:
+        mapping = matches[0]
+        item = _mapping_support(collector, mapping)
     collector.support.append(item)
     if provider == "sec":
         user_agent = os.environ.get("SEC_USER_AGENT", "")

@@ -624,6 +624,12 @@ export default function CompanyDossier({
       <section className="dossier-pillars" aria-label="Fundamental drivers">
         {groups.map((group, index) => {
           const row = sections.get(group.id);
+          const component = modelSections.get(group.id);
+          const sdkScore =
+            group.id === "adoption_retention" &&
+            component?.eligibility === "eligible"
+              ? component.score
+              : null;
           const ids = row?.metric_observation_ids ?? [];
           const coverage = standalone?.mapping?.dimensions.find(
             (item) => item.group_id === group.id,
@@ -640,7 +646,9 @@ export default function CompanyDossier({
                   <span className="pillar-model">
                     {group.id === "financial_health" && cashFlowResearch
                       ? "Cash-flow component trained"
-                      : "Outcome model untrained"}
+                      : sdkScore != null
+                        ? "SDK component trained"
+                        : "Outcome model untrained"}
                   </span>
                 </div>
                 <h3>
@@ -722,9 +730,21 @@ export default function CompanyDossier({
                 )}
               </div>
               <div className="pillar-model-note">
-                <span className="micro-label">SPECIALIST OUTLOOK</span>
-                <p>Business prediction unavailable</p>
-                <small>Requires training on later company outcomes</small>
+                <span className="micro-label">
+                  {sdkScore != null
+                    ? "EXPERIMENTAL SDK FORECAST"
+                    : "SPECIALIST OUTLOOK"}
+                </span>
+                <p>
+                  {sdkScore != null
+                    ? `SDK demand index ${sdkScore.toFixed(1)} / 100`
+                    : "Business prediction unavailable"}
+                </p>
+                <small>
+                  {sdkScore != null
+                    ? "Trained download forecast; not customer retention or business success"
+                    : "Requires training on later company outcomes"}
+                </small>
               </div>
               <footer>
                 <span

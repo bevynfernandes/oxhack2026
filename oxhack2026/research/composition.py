@@ -7,7 +7,14 @@ from math import log, log1p
 from urllib.parse import unquote, urlsplit
 from uuid import uuid4
 
-from oxhack2026.api.research_v2_schemas import Claim, Identity, Job, Observation, Report
+from oxhack2026.api.research_v2_schemas import (
+    Claim,
+    Identity,
+    Job,
+    Observation,
+    Report,
+    ResearchEvidence,
+)
 from oxhack2026.models.dimension_serving import DimensionInputs, DimensionModelRegistry
 from oxhack2026.models.startup_outlook import (
     FORECAST_HORIZONS,
@@ -56,13 +63,9 @@ def _conflicting_claims(job: Job) -> tuple[Claim, ...]:
     )
 
 
-def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
-    rows = [
-        row
-        for source in job.sources
-        for row in source.observations
-        if row.metric_id in {"npm_downloads_latest_30d", "npm_downloads_previous_30d"}
-    ]
+def _adoption_features(
+    rows: list[Observation], evidence: dict[str, ResearchEvidence]
+) -> tuple[tuple[float, ...] | None, tuple[str, ...], str]:
     adoption: tuple[tuple[float, ...] | None, tuple[str, ...], str] = (
         None,
         (),
@@ -74,11 +77,6 @@ def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
             selected["npm_downloads_latest_30d"],
             selected["npm_downloads_previous_30d"],
         )
-        from datetime import timedelta
-
-        evidence = {
-            row.evidence_id: row for source in job.sources for row in source.evidence
-        }
         packages = []
         for row in (current, previous):
             names = set()
@@ -120,6 +118,41 @@ def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
                 (current.observation_id, previous.observation_id),
                 "experimental_sdk_proxy_only",
             )
+    return adoption
+
+
+def _dimension_inputs(job: Job, outlook: StartupOutlook) -> DimensionInputs:
+    evidence = {
+        row.evidence_id: row for source in job.sources for row in source.evidence
+    }
+    packages: dict[str, list[Observation]] = defaultdict(list)
+    for source in job.sources:
+        for row in source.observations:
+            if row.metric_id not in {
+                "npm_downloads_latest_30d",
+                "npm_downloads_previous_30d",
+            }:
+                continue
+            names = {
+                unquote(parsed.path.split("/", 4)[-1])
+                for key in row.evidence_ids
+                if (item := evidence.get(key)) is not None
+                and (parsed := urlsplit(item.url)).hostname == "api.npmjs.org"
+                and parsed.path.startswith("/downloads/range/")
+            }
+            if len(names) == 1:
+                packages[names.pop()].append(row)
+    candidates = [
+        candidate
+        for name in sorted(packages)
+        if (candidate := _adoption_features(packages[name], evidence))[0] is not None
+    ]
+    # A pre-origin size rule chooses one SDK; counts from separate packages never mix.
+    adoption = max(
+        candidates,
+        key=lambda candidate: candidate[0][0] if candidate[0] is not None else -1,
+        default=(None, (), "requires_complete_adjacent_npm_windows"),
+    )
     return DimensionInputs(
         outlook.company_id, outlook.source_snapshot_id, outlook.as_of, adoption
     )
