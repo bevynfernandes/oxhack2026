@@ -163,7 +163,7 @@ test("theme can roll back to the preserved light styles and respects forced colo
     page
       .locator("html")
       .evaluate((node) => getComputedStyle(node).backgroundColor);
-  expect(await canvas()).toBe("rgb(13, 13, 36)");
+  expect(await canvas()).toBe("rgb(255, 226, 199)");
   await page.evaluate(() =>
     document.documentElement.classList.remove("theme-techno-classical"),
   );
