@@ -62,12 +62,9 @@ it("composes rapid filter and comparison changes without restoring a cleared sea
   expect(search).toHaveValue("beta");
   act(() => {
     fireEvent.change(search, { target: { value: "" } });
-    fireEvent.change(
-      screen.getByRole("combobox", { name: "Stage" }),
-      {
-        target: { value: "unknown" },
-      },
-    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Stage" }), {
+      target: { value: "unknown" },
+    });
     fireEvent.change(screen.getByLabelText("Evidence coverage"), {
       target: { value: "gaps" },
     });
