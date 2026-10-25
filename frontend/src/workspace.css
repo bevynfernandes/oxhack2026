@@ -399,6 +399,16 @@ button.secondary:hover {
   font-size: 10px;
   line-height: 1.4;
 }
+.ai-forecast-card .stat-value {
+  flex-wrap: wrap;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+.ai-forecast-card p {
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
 .stat-icon {
   display: grid;
   place-items: center;

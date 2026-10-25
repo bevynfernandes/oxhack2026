@@ -13,6 +13,7 @@ export default defineConfig({
       ...servers[0],
       command: `../.venv/bin/uvicorn --app-dir .. oxhack2026.api.company_runtime:create_company_app --factory --host 127.0.0.1 --port ${apiPort}`,
       env: {
+        GEMINI_API_KEY: "",
         SIGNALSHIFT_COMPANY_ROOT: "",
         SIGNALSHIFT_COMPANY_PUBLICATIONS: "",
         SIGNALSHIFT_PRELOADED_COMPANIES: "1",

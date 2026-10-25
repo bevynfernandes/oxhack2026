@@ -1,4 +1,6 @@
 import ResearchTools from "./ResearchTools";
+import AIForecastCards from "./AIForecastCards";
+import { FORECAST_SOURCE, PRELOADED_FORECASTS } from "./preloadedForecasts";
 import DecisionBrief from "./DecisionBrief";
 import SignalCharts from "./SignalCharts";
 import { evidenceSummary } from "./summary";
@@ -161,6 +163,13 @@ export default function CompanyDossier({
   };
   const decisionLayout = !report;
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
+  const preparedForecasts =
+    profile &&
+    !report &&
+    !standalone &&
+    !profile.publication.source.synthetic &&
+    profile.publication.source.snapshot_id === FORECAST_SOURCE &&
+    PRELOADED_FORECASTS[profile.company.company_id];
   const dimensionModels = standalone
     ? standalone.dimension_models
     : profile?.dimension_models;
@@ -581,11 +590,22 @@ export default function CompanyDossier({
           )}
         </div>
       )}
+      {preparedForecasts && (
+        <header className="forecast-section-heading">
+          <div>
+            <span className="micro-label">THE FORWARD VIEW</span>
+            <h2>Three perspectives on what comes next</h2>
+          </div>
+          <p>AI outlook indices · 0–100 · Not success probabilities</p>
+        </header>
+      )}
       <section
-        className="dossier-summary"
+        className={`dossier-summary ${preparedForecasts ? "prepared-outlooks" : ""}`}
         aria-label="Outcome forecasts and evidence coverage"
       >
-        {outlook?.forecasts ? (
+        {preparedForecasts && profile ? (
+          <AIForecastCards profile={profile} />
+        ) : outlook?.forecasts ? (
           <>
             {outlook.forecasts.map((forecast, index) => (
               <section className="dossier-stat" key={forecast.outcome_id}>
