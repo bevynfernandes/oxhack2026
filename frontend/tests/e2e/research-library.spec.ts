@@ -43,7 +43,7 @@ for (const width of [1440, 375]) {
     await page.goto(report);
     await expect(trigger).toBeVisible();
     await page
-      .getByRole("link", { name: "Compare & explore", exact: true })
+      .getByRole("link", { name: "Research library", exact: true })
       .click();
     const library = page.getByRole("region", { name: "Your research" });
     await expect(library).toContainText("Verify paying customer retention");

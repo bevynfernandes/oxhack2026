@@ -3,25 +3,29 @@ import { MemoryRouter } from "react-router-dom";
 import { expect, it, vi } from "vitest";
 import App from "../../src/App";
 
-it("explains company outcomes without a repository, fixture or prediction request", () => {
+it("lists the product's current functions without requesting published data", () => {
   render(
-    <MemoryRouter initialEntries={["/methodology"]}>
+    <MemoryRouter initialEntries={["/about"]}>
       <App />
     </MemoryRouter>,
   );
 
   expect(
-    screen.getByRole("heading", { name: "How to read a company outlook" }),
+    screen.getByRole("heading", {
+      name: "Startup research with its evidence attached",
+    }),
   ).toBeVisible();
   for (const name of [
-    "Operating and growing · 24 months",
-    "Cash-flow self-sufficiency · 12 months",
-    "Financing or acquisition · 24 months",
+    "What you can do",
+    "Sources the research worker can check",
+    "What the Research library does",
+    "What the results currently mean",
+    "Secondary tools",
   ]) {
     expect(screen.getByRole("heading", { name })).toBeVisible();
   }
-  expect(screen.getByText(/not a claim that a validated/)).toBeVisible();
-  expect(screen.getByRole("link", { name: "Methodology" })).toHaveAttribute(
+  expect(screen.getByText(/not a success score/)).toBeVisible();
+  expect(screen.getByRole("link", { name: "About" })).toHaveAttribute(
     "aria-current",
     "page",
   );

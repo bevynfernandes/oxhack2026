@@ -401,21 +401,12 @@ dd {
   margin: 0.3rem 0;
   overflow-wrap: anywhere;
 }
-.methodology {
+.about-page {
   max-width: 850px;
 }
-.methodology > section {
+.about-page > section {
   border-top: 1px solid #dfe3e8;
   padding: 1.5rem 0 0.5rem;
-}
-.methodology-definitions > div {
-  margin: 1rem 0;
-}
-.methodology-definitions dt {
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: #20242c;
-  text-transform: none;
 }
 .receipt {
   border-top: 1px solid #dfe3e8;
