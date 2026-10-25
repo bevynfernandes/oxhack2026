@@ -75,6 +75,19 @@ For local public-filings collection, configure `SEC_USER_AGENT` with your app an
 contact in the ignored `.env`, then launch with `uv run --env-file .env ...`.
 The API reads explicit process settings; it does not load that file implicitly.
 
+## Two preloaded companies
+
+Qdrant and Weaviate now have a packaged, dated public-input bundle. Start the API
+with `uv run --frozen --no-sync uvicorn oxhack2026.api.company_runtime:create_company_app --factory`
+and open either saved company in the frontend. No search, credentials, collector
+or local dataset restore is required for these examples. Source-backed inputs fill
+all five evidence views; the existing SDK-demand and title-sentiment models run
+locally on those inputs. Private financial/customer values stay unknown, and
+unsupported business forecasts stay unavailable. See the
+[bundle sources and model limits](oxhack2026/catalog/bundled/preloaded_companies_v1/README.md).
+Set `SIGNALSHIFT_PRELOADED_COMPANIES=0` to disable the default, or select your own
+explicit company root/publications as before.
+
 ## Frontend and API
 
 ```bash

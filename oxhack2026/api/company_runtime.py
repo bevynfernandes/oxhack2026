@@ -21,6 +21,10 @@ from oxhack2026.storage.company_assessments import (
 )
 
 logger = logging.getLogger(__name__)
+PRELOADED_COMPANY_ROOT = (
+    Path(__file__).resolve().parents[1] / "catalog/bundled/preloaded_companies_v1"
+)
+PRELOADED_PUBLICATION_ID = "company-assessments-preloaded-20261025-v1"
 
 
 def _dimension_registry() -> DimensionModelRegistry | None:
@@ -44,8 +48,10 @@ def create_company_app() -> FastAPI:
     """Build a company application from explicit environment configuration.
 
     Reads SIGNALSHIFT_COMPANY_ROOT and comma-separated
-    SIGNALSHIFT_COMPANY_PUBLICATIONS. Missing/invalid configuration leaves data
-    and readiness unavailable. No import-time reads, source collection, training,
+    SIGNALSHIFT_COMPANY_PUBLICATIONS. With neither configured, the two dated real
+    preloaded companies are available unless SIGNALSHIFT_PRELOADED_COMPANIES=0.
+    Partial/invalid explicit configuration remains unavailable. No import-time
+    reads, source collection, training,
     latest-version selection or synthetic fallback occurs. An explicit dimension
     bundle (or the pinned local experimental bundle) is verified at creation;
     eligible company requests run portable SDK proxy inference independently of
@@ -62,6 +68,13 @@ def create_company_app() -> FastAPI:
     root = os.environ.get("SIGNALSHIFT_COMPANY_ROOT", "").strip()
     selection = os.environ.get("SIGNALSHIFT_COMPANY_PUBLICATIONS", "").strip()
     models = _dimension_registry()
+    if (
+        not root
+        and not selection
+        and os.environ.get("SIGNALSHIFT_PRELOADED_COMPANIES", "1") == "1"
+    ):
+        root = str(PRELOADED_COMPANY_ROOT)
+        selection = PRELOADED_PUBLICATION_ID
     if not root or not selection:
         if root or selection:
             logger.error("Company root and explicit publication selection are required")

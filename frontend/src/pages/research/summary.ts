@@ -89,6 +89,12 @@ export function evidenceSummary(
   const gaps = groups
     .filter((row) => row.data_status === "insufficient_data")
     .map((row) => row.group_id.replaceAll("_", " "));
+  if (!report && !legacy) {
+    for (const row of sourceProfile?.metrics ?? []) {
+      if (["missing", "conflicting", "restricted"].includes(row.state))
+        gaps.push(definitions.get(row.metric_id)?.label ?? row.metric_id);
+    }
+  }
   // A fresh report must never inherit a saved context's older model output.
   const models = report ? report.dimension_models : profile?.dimension_models;
   const experiments = (models?.dimensions ?? [])

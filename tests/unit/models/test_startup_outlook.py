@@ -80,7 +80,7 @@ def test_saved_company_policy_assigns_known_metrics_without_guessing() -> None:
 
     outlook = build_company_outlook(source, "alpha")
 
-    assert outlook.grouping_policy_version == "company-metric-groups-v2"
+    assert outlook.grouping_policy_version == "company-metric-groups-v3"
     adoption = _section(outlook, "adoption_retention")
     assert adoption.data_status == "available"
     assert adoption.usable_metric_observation_ids

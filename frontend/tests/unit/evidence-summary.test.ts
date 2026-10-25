@@ -83,3 +83,22 @@ it("preserves eligible model targets and zero scores while excluding unavailable
     }).experiments,
   ).toEqual([]);
 });
+
+it("keeps missing saved financial facts visible even when every dimension has context", () => {
+  const profile = structuredClone(report.inventory.saved_context);
+  profile.outlook = {
+    ...report.outlook,
+    specialists: report.outlook.specialists.map((row) => ({
+      ...row,
+      data_status: "available",
+    })),
+  };
+  const observation = profile.metrics[0];
+  observation.state = "missing";
+  observation.value = null;
+  const label = profile.definitions.find(
+    (row) => row.metric_id === observation.metric_id,
+  )!.label;
+
+  expect(evidenceSummary(profile).gaps).toContain(label);
+});
