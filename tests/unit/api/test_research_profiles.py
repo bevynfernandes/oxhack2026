@@ -152,6 +152,11 @@ def test_queued_continuation_failure_preserves_terminal_sources(
                     "state": state,
                     "finished_at": now if state != "pending" else None,
                     "reason_codes": ("retained_reason",) if state != "pending" else (),
+                    "details": SourceDetails(
+                        execution="pending", scope="planned_sample", coverage="unknown"
+                    )
+                    if state == "pending"
+                    else None,
                 }
             )
             for provider, state in zip(PROVIDERS, states, strict=True)
@@ -178,6 +183,10 @@ def test_queued_continuation_failure_preserves_terminal_sources(
     for source, retained in zip(result.sources, expected, strict=True):
         if retained.state in {"pending", "running"}:
             assert source.state == "failed"
+            if source.details:
+                assert source.details.execution == "failed"
+                assert source.details.coverage == "limited"
+                assert source.details.issues[-1].code == result.reason_codes[-1]
         else:
             assert source == retained
 

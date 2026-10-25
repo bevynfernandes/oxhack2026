@@ -40,6 +40,7 @@ from oxhack2026.api.research_v2_schemas import (
     SourceState,
 )
 from oxhack2026.models.dimension_serving import DimensionModelRegistry
+from oxhack2026.research.frontier import source_issue
 from oxhack2026.research.network import (
     CollectionError,
     FetchBudget,
@@ -62,6 +63,30 @@ _NAMES = {
     "sec": "SEC disclosures",
     "companies_house": "Companies House",
 }
+
+
+def _failed_checkpoint(
+    source: SourceState, reason: str, finished: datetime
+) -> SourceState:
+    """Fail unfinished execution coherently while retaining terminal checkpoints."""
+    if source.state not in {"pending", "running"}:
+        return source
+    return source.model_copy(
+        update={
+            "state": "failed",
+            "finished_at": finished,
+            "reason_codes": tuple(dict.fromkeys((*source.reason_codes, reason))),
+            "details": source.details.model_copy(
+                update={
+                    "execution": "failed",
+                    "coverage": "limited",
+                    "issues": (*source.details.issues, source_issue(reason)),
+                }
+            )
+            if source.details
+            else None,
+        }
+    )
 
 
 class QueueFull(Exception):
@@ -414,22 +439,17 @@ class V2Service:
             try:
                 self.executor.submit(self.run, job.job_id)
             except RuntimeError as error:
+                finished = datetime.now(UTC)
                 self.store.save_job(
                     job.model_copy(
                         update={
                             "state": "failed",
-                            "finished_at": datetime.now(UTC),
+                            "finished_at": finished,
                             "reason_codes": ("worker_unavailable",),
                             "sources": tuple(
-                                source.model_copy(
-                                    update={
-                                        "state": "failed",
-                                        "reason_codes": ("worker_unavailable",),
-                                        "finished_at": datetime.now(UTC),
-                                    }
+                                _failed_checkpoint(
+                                    source, "worker_unavailable", finished
                                 )
-                                if source.state in {"pending", "running"}
-                                else source
                                 for source in job.sources
                             ),
                         }
@@ -835,28 +855,9 @@ class V2Service:
             )
 
     def _interrupt(self, job: Job, reason: str) -> None:
-        from oxhack2026.research.frontier import source_issue
-
+        finished = datetime.now(UTC)
         states = tuple(
-            source.model_copy(
-                update={
-                    "state": "failed",
-                    "finished_at": datetime.now(UTC),
-                    "reason_codes": (*source.reason_codes, reason),
-                    "details": source.details.model_copy(
-                        update={
-                            "execution": "failed",
-                            "coverage": "limited",
-                            "issues": (*source.details.issues, source_issue(reason)),
-                        }
-                    )
-                    if source.details
-                    else None,
-                }
-            )
-            if source.state in {"pending", "running"}
-            else source
-            for source in job.sources
+            _failed_checkpoint(source, reason, finished) for source in job.sources
         )
         job = job.model_copy(update={"sources": states, "reason_codes": (reason,)})
         self.store.save_job(job)
@@ -918,17 +919,9 @@ class V2Service:
                     "finished_at": finished,
                     "reason_codes": ("collection_disabled_during_recovery",),
                     "sources": tuple(
-                        source.model_copy(
-                            update={
-                                "state": "failed",
-                                "finished_at": finished,
-                                "reason_codes": (
-                                    "collection_disabled_during_recovery",
-                                ),
-                            }
+                        _failed_checkpoint(
+                            source, "collection_disabled_during_recovery", finished
                         )
-                        if source.state in {"pending", "running"}
-                        else source
                         for source in job.sources
                     ),
                 }
