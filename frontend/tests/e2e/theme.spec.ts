@@ -163,7 +163,18 @@ test("theme can roll back to the preserved light styles and respects forced colo
     page
       .locator("html")
       .evaluate((node) => getComputedStyle(node).backgroundColor);
-  expect(await canvas()).toBe("rgb(245, 243, 237)");
+  expect(await canvas()).toBe("rgb(255, 226, 199)");
+  for (const selector of [
+    ".home-terminal-heading",
+    ".home-directory",
+    ".home-fundamentals",
+  ]) {
+    expect(
+      await page
+        .locator(selector)
+        .evaluate((node) => getComputedStyle(node).backgroundImage),
+    ).toContain("repeating-linear-gradient");
+  }
   await page.evaluate(() =>
     document.documentElement.classList.remove("theme-techno-classical"),
   );

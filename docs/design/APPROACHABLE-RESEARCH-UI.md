@@ -2,8 +2,8 @@
 
 - Audience: someone investigating one company, moving from identity to outlook,
   business dimensions and supporting evidence.
-- Direction: a warm editorial research desk. Ivory canvas, paper surfaces, dark
-  ink, restrained terracotta actions and the existing engraved illustration.
+- Direction: a warm editorial research desk. Peach surfaces, an orange-gradient home canvas, dark
+  ink, bright orange actions and the existing engraved illustration.
 - Hierarchy: make the search action unmistakable, distinguish saved dossiers
   from new research, and use quieter styling for supporting explanations.
 - Typography: retain locally bundled Barlow Condensed for editorial headings,
@@ -36,18 +36,18 @@
 
 | Role                         | Value                             |
 | ---------------------------- | --------------------------------- |
-| Canvas / surface / raised    | `#f5f3ed` / `#fffdf8` / `#eae8df` |
-| Text / secondary text        | `#252923` / `#62665c`             |
-| Rules / control boundaries   | `#d8d8cc` / `#7b7e70`             |
-| Link and focus accent        | `#943c24`                         |
-| Action / hover / action text | `#a94125` / `#89321c` / `#ffffff` |
-| Selected surface             | `#f5e4d9`                         |
+| Canvas / surface / raised    | `#ffe2c7` / `#fffaf5` / `#f2f2f7` |
+| Text / secondary text        | `#14141a` / `#6c5141`             |
+| Rules / control boundaries   | `#d6a67c` / `#8a5a35`             |
+| Link and focus accent        | `#7a3600`                         |
+| Action / hover / action text | `#ff8200` / `#e87200` / `#14141a` |
+| Selected surface             | `#ffd1a6`                         |
 | Control / panel radius       | `8px` / `16px`                    |
 | Spacing                      | `8px` / `16px` / `24px` / `32px`  |
 
 - Use `--theme-on-action` for text on filled primary actions; `--theme-text`
   belongs on paper/neutral surfaces. Contrast tests cover the actual pairs.
-- Retain labelled warning, error and positive-source colours. Terracotta does
+- Retain labelled warning, error and positive-source colours. Orange does
   not indicate company quality or a model prediction.
 - Main search controls and saved-dossier links have at least 44px target heights.
 - On narrow screens the decorative hero illustration is omitted, the form
@@ -110,3 +110,13 @@
 - Final screenshots and traces: `tests/outputs/ui-polish-integrated/`.
 - Local-backend captures: `tests/outputs/ui-polish/live/`.
 - Logs: `tests/outputs/ui-polish/integrated-{unit,browser,build,format}.log`.
+
+## Screenshot palette refinement
+
+- Match the supplied peach/orange reference on port 5174 using the original PR #86 colour tokens.
+- Add shared fine horizontal/vertical grid backgrounds to the three homepage panels.
+- Keep the current hierarchy, handlers, motion library and backend unchanged.
+- Primary orange buttons use dark text to preserve contrast. Grid textures are removed in forced-colour mode.
+- Revalidated the screenshot palette: 71 unit tests, 55 browser tests, generated types,
+  TypeScript, production build and formatting pass. Logs: `tests/outputs/ui-orange/`;
+  desktop/mobile captures: `tests/outputs/ui-orange-browser/`.
