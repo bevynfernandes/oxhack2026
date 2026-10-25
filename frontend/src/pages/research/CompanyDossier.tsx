@@ -1058,6 +1058,21 @@ export default function CompanyDossier({
                         </SourceLink>
                       </blockquote>
                     ))}
+                  {profile?.evidence
+                    .filter((item) =>
+                      dimensionModel.evidence_ids?.includes(item.evidence_id),
+                    )
+                    .map((item) => (
+                      <blockquote key={item.evidence_id}>
+                        <p>{item.assertion}</p>
+                        <small>Published {date(item.published_at)}</small>
+                        {item.url && (
+                          <SourceLink url={item.url}>
+                            Classified source title
+                          </SourceLink>
+                        )}
+                      </blockquote>
+                    ))}
                   <Reasons reasons={dimensionModel.reason_codes} />
                   <ul>
                     {dimensionModel.limitations.map((limitation) => (

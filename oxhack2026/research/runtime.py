@@ -68,10 +68,9 @@ def configure_research(
     )
     app.dependency_overrides[get_v2_service] = lambda: read_service
     # Legacy stored reports remain readable even when new collection is disabled.
-    if repository is not None:
-        legacy_sources = LocalCompanyStore(
-            Path(os.environ["SIGNALSHIFT_COMPANY_ROOT"]).expanduser()
-        )
+    legacy_root = os.environ.get("SIGNALSHIFT_COMPANY_ROOT", "").strip()
+    if repository is not None and legacy_root:
+        legacy_sources = LocalCompanyStore(Path(legacy_root).expanduser())
         legacy = ResearchService(
             repository,
             legacy_sources,
@@ -108,7 +107,7 @@ def configure_research(
                 )
                 _app.dependency_overrides[get_v2_service] = lambda: service
                 service.recover()
-                if repository is not None and collection_enabled:
+                if repository is not None and legacy_root and collection_enabled:
                     legacy_service = ResearchService(
                         repository,
                         legacy_sources,

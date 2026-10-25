@@ -17,6 +17,7 @@ def test_missing_or_invalid_configuration_never_loads_fixtures(
     monkeypatch: pytest.MonkeyPatch, root: str, publications: str
 ) -> None:
     """Unconfigured production is live but has no usable data or synthetic fallback."""
+    monkeypatch.setenv("SIGNALSHIFT_PRELOADED_COMPANIES", "0")
     monkeypatch.setenv("SIGNALSHIFT_COMPANY_ROOT", root)
     monkeypatch.setenv("SIGNALSHIFT_COMPANY_PUBLICATIONS", publications)
     with TestClient(create_company_app()) as client:

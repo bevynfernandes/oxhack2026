@@ -1,7 +1,12 @@
 # Local company runtime
 
-- Restore the verified company bundle using the [recovery runbook](../../docs/tasks/dev1/D1-O6-local-recovery.md).
-- Select exact assessment publication IDs. The application never guesses latest,
+- For the two packaged Qdrant/Weaviate examples, no restore is needed: leave both
+  company root/publication variables unset. The API selects the exact dated
+  [real input bundle](../../oxhack2026/catalog/bundled/preloaded_companies_v1/README.md).
+  Set `SIGNALSHIFT_PRELOADED_COMPANIES=0` to disable this default.
+- For a custom publication, restore its verified bundle using the
+  [recovery runbook](../../docs/tasks/dev1/D1-O6-local-recovery.md).
+- Custom stores select exact assessment publication IDs. The application never guesses latest,
   loads synthetic fallback data, collects sources or trains models.
 - Dev 3 owns the shared API factory and its readiness behavior. Missing
   configuration leaves company data unavailable; no fixture fallback is selected.

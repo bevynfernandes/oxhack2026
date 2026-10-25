@@ -107,11 +107,18 @@ jobs:
       - run: npm run test:e2e -- --fully-parallel --workers=1 --shard=${{ matrix.shard }}/2
         env:
           SIGNALSHIFT_TEST_RUN: ci-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}
+      - name: Verify packaged real company examples
+        if: ${{ matrix.shard == 1 }}
+        run: npx playwright test --config playwright.preloaded.config.ts --workers=1
+        env:
+          SIGNALSHIFT_TEST_RUN: ci-${{ github.run_id }}-${{ github.run_attempt }}-preloaded
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
           name: browser-results-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}
-          path: tests/outputs/ci-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}/
+          path: |
+            tests/outputs/ci-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}/
+            tests/outputs/ci-${{ github.run_id }}-${{ github.run_attempt }}-preloaded/
           retention-days: 14
 
   frontend:

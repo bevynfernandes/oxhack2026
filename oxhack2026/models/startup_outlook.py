@@ -41,6 +41,10 @@ _COMPANY_METRIC_GROUPS: dict[str, SpecialistGroupId] = {
     "sdk_releases_30d_v1": "team_execution",
     "revenue_12m_usd_v1": "financial_health",
     "operating_cashflow_12m_usd_v1": "financial_health",
+    "hn_retrieved_named_titles_v1": "attention_sentiment",
+    "public_vector_comparison_v1": "industry_competition",
+    "financing_disclosure_v1": "financial_health",
+    "public_leadership_disclosure_v1": "team_execution",
 }
 
 
@@ -314,5 +318,5 @@ def build_company_outlook(
         if key in definitions
     }
     return build_untrained_outlook(
-        snapshot, company_id, mapping, "company-metric-groups-v2"
+        snapshot, company_id, mapping, "company-metric-groups-v3"
     )

@@ -1,5 +1,6 @@
 """Digest-verified experimental dimension overlays for saved company sources."""
 
+import re
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from hashlib import sha256
@@ -18,6 +19,7 @@ from oxhack2026.models.public_dimensions import (
     EntitySentimentModel,
     NumericDimensionModel,
     dimension_percentile,
+    entity_context,
     predict_entity_sentiment,
     predict_numeric_dimension,
 )
@@ -220,6 +222,68 @@ class DimensionInputs:
     sentiment: tuple[tuple[str, str], ...] = ()
 
 
+def _saved_sentiment_inputs(
+    snapshot: CompanySourceSnapshot, company_id: str
+) -> tuple[tuple[str, str], ...]:
+    """Select verified sampled HN titles with exact company-name entity spans.
+
+    Args:
+        snapshot: Verified saved source, including the explicit title-sample metric.
+        company_id: Company whose titles are being evaluated.
+    Returns:
+        Deduplicated entity-marked contexts and supporting source IDs, or no inputs
+        for synthetic, missing, stale, unverified or inconsistent samples.
+    """
+    if snapshot.synthetic:
+        return ()
+    company = next(row for row in snapshot.companies if row.company_id == company_id)
+    definition = next(
+        (
+            row
+            for row in snapshot.definitions
+            if row.metric_id == "hn_retrieved_named_titles_v1"
+        ),
+        None,
+    )
+    observation = next(
+        (
+            row
+            for row in snapshot.metrics
+            if row.company_id == company_id
+            and row.metric_id == "hn_retrieved_named_titles_v1"
+        ),
+        None,
+    )
+    evidence = {row.evidence_id: row for row in snapshot.evidence}
+    if (
+        definition is None
+        or observation is None
+        or company_metric_state(observation, definition, evidence, snapshot.as_of)
+        != "observed"
+        or not isinstance(observation.value, IntegerValue)
+        or observation.value.value != len(observation.evidence_ids)
+    ):
+        return ()
+    pattern = re.compile(rf"(?<!\w){re.escape(company.display_name)}(?!\w)", re.I)
+    contexts: dict[str, tuple[str, str]] = {}
+    for key in observation.evidence_ids:
+        source = evidence[key]
+        parsed = urlsplit(source.url or "")
+        match = pattern.search(source.assertion)
+        if (
+            source.provider == "hn_algolia"
+            and source.kind == "platform_observed"
+            and parsed.hostname == "hn.algolia.com"
+            and re.fullmatch(r"/api/v1/items/[0-9]+", parsed.path)
+            and match is not None
+        ):
+            contexts.setdefault(
+                source.assertion.casefold(),
+                (entity_context(source.assertion, match.start(), match.end()), key),
+            )
+    return tuple(contexts.values())[:30]
+
+
 @dataclass(frozen=True)
 class DimensionModelRegistry:
     """Verified portable models loaded once by the local API runtime.
@@ -296,7 +360,13 @@ class DimensionModelRegistry:
             else _adoption_inputs(snapshot, company_id)
         )
         return self.evaluate_inputs(
-            DimensionInputs(company_id, snapshot.snapshot_id, snapshot.as_of, adoption)
+            DimensionInputs(
+                company_id,
+                snapshot.snapshot_id,
+                snapshot.as_of,
+                adoption,
+                _saved_sentiment_inputs(snapshot, company_id),
+            )
         )
 
     def evaluate_inputs(self, inputs: "DimensionInputs") -> CompanyDimensionModels:
