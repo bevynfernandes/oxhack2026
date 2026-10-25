@@ -110,6 +110,29 @@ class Collector:
             self.visited.update(self.source.details.visited)
             self.accounts.extend(self.source.details.accounts)
             self.cursor = self.source.details.cursor
+        resumed_limits = {"website_page_limit"} if self.frontier else set()
+        if self.cursor:
+            resumed_limits.update(
+                {
+                    "hn_non_exhaustive_or_truncated",
+                    "github_repository_limit",
+                    "npm_package_limit",
+                    "hiring_board_limit",
+                }
+            )
+        if self.frontier or self.cursor:
+            resumed_limits.update(
+                {
+                    "collection_deadline",
+                    "request_limit",
+                    "capture_size_limit",
+                }
+            )
+        self.reasons.extend(
+            reason
+            for reason in self.source.reason_codes
+            if reason not in resumed_limits
+        )
 
     @property
     def limits(self) -> ResearchSettings:

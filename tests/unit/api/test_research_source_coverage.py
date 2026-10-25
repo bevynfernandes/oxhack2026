@@ -188,3 +188,158 @@ def test_scanned_and_invalid_pdf_are_explicit() -> None:
         pdf_markup(stream.getvalue())
     with pytest.raises(CollectionError, match="invalid_public_pdf"):
         pdf_markup(b"not a PDF")
+
+
+def test_continuation_retains_unresolved_page_limitations(tmp_path: Path) -> None:
+    """Finishing unseen pages cannot declare an unrendered homepage complete."""
+    from oxhack2026.api.research_configuration import CrawlTarget, SourceDetails
+
+    transport = httpx.MockTransport(
+        lambda _: httpx.Response(
+            200,
+            text="<main>"
+            + "Our platform offers public software for teams. " * 5
+            + "</main>",
+        )
+    )
+    resumed = collector(tmp_path, "website", (), transport)
+    resumed.source = resumed.source.model_copy(
+        update={
+            "state": "running",
+            "reason_codes": (
+                "website_page_limit",
+                "browser_required_unavailable_or_budget",
+                "website_frontier_limit",
+            ),
+            "details": SourceDetails(
+                execution="pending",
+                scope="planned_sample",
+                coverage="limited",
+                frontier=(CrawlTarget(url="https://example.com/about", depth=1),),
+                visited=("https://example.com/",),
+            ),
+        }
+    )
+    resumed.__post_init__()
+    result = resumed.collect()
+    assert result.details and not result.details.frontier
+    assert "website_page_limit" not in result.reason_codes
+    assert "browser_required_unavailable_or_budget" in result.reason_codes
+    assert "website_frontier_limit" in result.reason_codes
+    assert result.state == "partial"
+    assert result.details.coverage == "limited"
+
+
+def test_continuation_discovers_github_then_npm(tmp_path: Path) -> None:
+    """Continued official discovery reconsiders skipped dependent collectors."""
+    from concurrent.futures import Executor
+    from datetime import timedelta
+    from unittest.mock import Mock
+
+    from oxhack2026.api.research_configuration import ContinueRequest
+    from oxhack2026.api.research_v2_schemas import JobRequest
+    from oxhack2026.research.v2_service import V2Service
+    from oxhack2026.research.v2_store import V2Store
+
+    requests: list[str] = []
+
+    def respond(request: httpx.Request) -> httpx.Response:
+        requests.append(str(request.url))
+        path = request.url.path
+        if request.url.host == "example.com":
+            link = (
+                '<a href="https://github.com/example/sdk">SDK</a>'
+                if path == "/docs"
+                else '<a href="/docs">Documentation</a>'
+            )
+            return httpx.Response(
+                200,
+                text="<main>"
+                + "Our platform offers public software for teams. " * 5
+                + link
+                + "</main>",
+            )
+        if path.endswith("package.json"):
+            data: object = {
+                "content": base64.b64encode(
+                    orjson.dumps({"name": "@example/sdk"})
+                ).decode()
+            }
+        elif path.endswith("/latest"):
+            data = {
+                "name": "@example/sdk",
+                "repository": {"url": "git+https://github.com/example/sdk.git"},
+            }
+        elif path.endswith("/releases"):
+            data = []
+        elif request.url.host == "api.npmjs.org":
+            end = datetime.now(UTC).date() - timedelta(days=1)
+            data = {
+                "downloads": [
+                    {"day": (end - timedelta(days=i)).isoformat(), "downloads": 1}
+                    for i in range(65)
+                ]
+            }
+        else:
+            data = {"stargazers_count": 5, "open_issues_count": 2}
+        return httpx.Response(200, json=data)
+
+    transport = httpx.MockTransport(respond)
+    initial = collector(tmp_path, "website", (), transport)
+    initial.settings = profile_settings("fast").model_copy(update={"company_pages": 1})
+    website = initial.collect()
+    assert website.details and website.details.frontier
+    store = V2Store(tmp_path)
+    identity = initial.identity
+    store.save_identity(identity.model_copy(update={"state": "queued"}))
+    store.save_identity(identity)
+    service = V2Service(
+        store,
+        Mock(spec=Executor),
+        transport=transport,
+        quotas=Quotas(interval=0),
+        mapping_enabled=False,
+    )
+    queued = service.create(
+        JobRequest(identity_id=identity.identity_id, identity_confirmed=True)
+    )
+    prior = queued.model_copy(
+        update={
+            "state": "running",
+            "started_at": datetime.now(UTC),
+            "sources": tuple(
+                website
+                if s.provider == "website"
+                else s.model_copy(
+                    update={
+                        "state": "skipped"
+                        if s.provider in {"github", "npm", "hiring"}
+                        else "completed",
+                        "finished_at": datetime.now(UTC),
+                        "reason_codes": ("unverified_repository_mapping",)
+                        if s.provider == "github"
+                        else ("unverified_package_mapping",)
+                        if s.provider == "npm"
+                        else (),
+                    }
+                )
+                for s in queued.sources
+            ),
+        }
+    )
+    store.save_job(prior)
+    service._finish(prior, identity)
+    finished = store.job(prior.job_id)
+    assert finished.report_id
+    original = store.report(finished.report_id).model_dump_json()
+    continued = service.continue_job(prior.job_id, ContinueRequest(profile="fast"))
+    service.run(continued.job_id)
+    result = store.job(continued.job_id)
+    github = next(s for s in result.sources if s.provider == "github")
+    npm = next(s for s in result.sources if s.provider == "npm")
+    assert github.state == "completed"
+    assert npm.state == "completed"
+    assert [row.value for row in npm.observations] == [30, 30]
+    assert any("api.github.com/repos/example/sdk" in url for url in requests)
+    assert any("api.npmjs.org/downloads/range/" in url for url in requests)
+    assert store.report(finished.report_id).model_dump_json() == original

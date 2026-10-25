@@ -489,6 +489,12 @@ class V2Service:
                 updates["details"] = details
                 if details.frontier or details.cursor:
                     updates.update(state="pending", started_at=None, finished_at=None)
+            if source.state in {"skipped", "failed"}:
+                updates.update(
+                    state="pending", started_at=None, finished_at=None, reason_codes=()
+                )
+            if updates.get("state") == "pending" and details:
+                updates["details"] = details.model_copy(update={"execution": "pending"})
             states.append(source.model_copy(update=updates))
         return tuple(states)
 

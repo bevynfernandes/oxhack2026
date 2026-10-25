@@ -97,7 +97,7 @@ def test_continuation_keeps_prior_sources(tmp_path: Path) -> None:
     )
     states = V2Service(V2Store(tmp_path))._resume_sources(job)
     assert states[0].state == "pending"
-    assert states[0].details == details
+    assert states[0].details == details.model_copy(update={"execution": "pending"})
     assert states[1] == job.sources[1]
     assert job.sources[0].state == "partial"
 
