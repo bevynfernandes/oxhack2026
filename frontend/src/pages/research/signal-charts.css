@@ -1,0 +1,79 @@
+.signal-charts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  min-width: 0;
+}
+.signal-chart {
+  min-width: 0;
+  padding: 24px;
+  background-color: var(--theme-panel-surface);
+  background-image: var(--theme-panel-grid);
+  border: 1px solid var(--theme-control-line);
+  border-radius: var(--theme-radius-panel);
+}
+.signal-chart h2 {
+  font: 600 clamp(26px, 3vw, 34px)/1.15 var(--theme-display);
+  margin: 8px 0 12px;
+}
+.signal-chart p,
+.signal-chart small {
+  color: var(--theme-muted);
+}
+.signal-chart p {
+  line-height: 1.6;
+}
+.signal-chart-bars {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0;
+}
+.signal-chart-bars > li {
+  margin: 0 0 18px;
+}
+.signal-chart-label,
+.signal-chart-scale {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  font-size: 13px;
+}
+.signal-chart-label > span {
+  font-family: var(--theme-mono);
+}
+.signal-chart-track {
+  height: 12px;
+  margin: 8px 0;
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-control-line);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.signal-chart-fill {
+  height: 100%;
+  background: var(--theme-accent);
+}
+.signal-chart-estimate {
+  background: transparent;
+  border: 2px dashed var(--theme-accent);
+  box-sizing: border-box;
+}
+.signal-chart-note {
+  font-size: 12px;
+}
+.signal-chart small {
+  font-size: 11px;
+}
+.signal-chart .dossier-inline-action {
+  margin-top: 12px;
+  min-height: 44px;
+}
+@media (max-width: 760px) {
+  .signal-charts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .signal-chart {
+    padding: 20px;
+  }
+}
