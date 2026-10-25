@@ -52,9 +52,11 @@ export function ProfilePicker({
 export function InterpretationSummary({
   statistics,
   mode,
+  analysis,
 }: {
   statistics?: DTO<"InterpretationStatistics"> | null;
   mode?: string;
+  analysis?: DTO<"ResearchAnalysis"> | null;
 }) {
   if (!statistics)
     return (
@@ -81,16 +83,19 @@ export function InterpretationSummary({
           <p>
             {statistics.stage === "finished" &&
             statistics.failed_batches > 0 &&
-            statistics.processed === 0
+            statistics.processed === 0 &&
+            !analysis?.statements.length
               ? "Interpretation unavailable"
-              : statistics.stage === "finished" && statistics.deferred > 0
-                ? "Partial interpretation"
+              : statistics.stage === "finished"
+                ? statistics.deferred || statistics.failed_batches
+                  ? "Processing ended with incomplete extraction"
+                  : "Processing completed"
                 : statistics.stage.replaceAll("_", " ")}{" "}
             · {statistics.model}
           </p>
           <p>
-            {statistics.processed} of {statistics.candidates} evidence blocks
-            reviewed · {statistics.deferred} deferred
+            Extraction: {statistics.processed} of {statistics.candidates}{" "}
+            evidence blocks reviewed by Gemini · {statistics.deferred} deferred
           </p>
           <p>
             {statistics.provider_requests} new provider requests ·{" "}
@@ -98,9 +103,16 @@ export function InterpretationSummary({
             {statistics.failed_batches} failed batches
           </p>
           <p>
-            {statistics.accepted_proposals} supported proposals ·{" "}
-            {statistics.rejected_proposals} rejected proposals
+            {statistics.accepted_proposals} supported extraction proposals ·{" "}
+            {statistics.rejected_proposals} rejected extraction proposals
           </p>
+          {analysis && (
+            <p>
+              Synthesis: {analysis.state} · {analysis.statements.length}{" "}
+              validated statements. Synthesis can use rule-extracted evidence
+              even when Gemini extraction fails.
+            </p>
+          )}
           <small>
             Provider-reported tokens:{" "}
             {statistics.input_tokens == null
@@ -232,6 +244,7 @@ export function CitedResearchAnalysis({
         <InterpretationSummary
           statistics={mapping?.statistics}
           mode={mapping?.mode}
+          analysis={analysis}
         />
         {analysis?.statements.map((statement, index) => (
           <section key={index}>
@@ -284,8 +297,9 @@ export function CitedResearchAnalysis({
         )}
         {analysis && <Reasons reasons={analysis.reason_codes} />}
         <p>
-          Missing financials, retention and competitor evidence remain gaps. No
-          numerical growth, survival or financial forecast is inferred.
+          Findings cover only their cited evidence; other measurements may
+          remain unavailable. No numerical growth, survival or financial
+          forecast is inferred.
         </p>
       </MotionDisclosure>
       {report.derived_from_report_id && (

@@ -76,12 +76,11 @@ it("reacts to local saves and filters without changing report data", () => {
     screen.getAllByRole("checkbox", { name: /Compare research for/ })[1],
   );
   expect(
-    screen.getByRole("link", { name: "Compare research (2)" }),
+    screen.getByRole("link", { name: "Compare 2 startups" }),
   ).toHaveAttribute("href", expect.stringContaining("/compare?record="));
-  fireEvent.change(
-    screen.getByRole("searchbox", { name: "Find in your research" }),
-    { target: { value: "missing" } },
-  );
+  fireEvent.change(screen.getByRole("searchbox", { name: "Find a startup" }), {
+    target: { value: "missing" },
+  });
   expect(screen.getByRole("status")).toHaveTextContent("No research matches");
 });
 it("keeps reading usable when browser storage is unavailable and fails writes explicitly", () => {
@@ -112,7 +111,7 @@ it("saves and restores local search filters after remount without starting resea
   const first = mount();
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "One" } });
   fireEvent.click(screen.getByLabelText("Watchlist only"));
-  fireEvent.click(screen.getByRole("button", { name: "Save this search" }));
+  fireEvent.click(screen.getByRole("button", { name: "Save filter" }));
   first.unmount();
   mount();
   fireEvent.click(
@@ -125,5 +124,5 @@ it("saves and restores local search filters after remount without starting resea
       name: "Remove saved search One from watchlist",
     }),
   );
-  expect(screen.queryByText("Saved searches in this browser")).toBeNull();
+  expect(screen.queryByText("Saved filters in this browser")).toBeNull();
 });

@@ -137,6 +137,34 @@ def source_issue(code: str) -> SourceIssue:
             "Some retrieved articles could not be matched to the company.",
             "Unverified candidates are excluded from company findings.",
         ),
+        "google_search_page_limit": (
+            "Search discovered more candidate pages than this run could collect.",
+            "Continue research to collect the retained candidate pages.",
+        ),
+        "google_search_unmatched_candidate": (
+            "A Search candidate could not be matched to the confirmed company.",
+            "The captured page is retained but excluded from company findings.",
+        ),
+        "google_search_missing_grounding": (
+            "The model returned no verifiable Search grounding metadata.",
+            "Refresh to retry discovery; other sources remain available.",
+        ),
+        "gemini_provider_unavailable": (
+            "The model provider failed or exceeded the request deadline.",
+            "Refresh or retry after the provider recovers.",
+        ),
+        "gemini_invalid_request": (
+            "The provider rejected this model configuration or response schema.",
+            "Review the backend model adapter before retrying.",
+        ),
+        "gemini_authentication_failed": (
+            "The provider rejected the configured credentials or model access.",
+            "Configure an authorized API key on the backend.",
+        ),
+        "gemini_rate_limited": (
+            "The model provider rate-limited the request.",
+            "Wait for provider quota to reset before retrying.",
+        ),
     }
     info = (
         code.endswith("_validated")
@@ -145,6 +173,7 @@ def source_issue(code: str) -> SourceIssue:
         in {
             "news_no_articles",
             "no_public_openings",
+            "google_search_no_candidates",
         }
     )
     if code.startswith("missing_"):

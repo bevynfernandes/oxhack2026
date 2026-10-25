@@ -8,8 +8,9 @@ import socket
 import ssl
 import threading
 import time
+from collections.abc import Iterator
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import closing
+from contextlib import closing, contextmanager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from urllib.parse import urljoin, urlsplit, urlunsplit
@@ -23,6 +24,27 @@ from oxhack2026.storage.artifacts import FileArtifactStore
 logger = logging.getLogger(__name__)
 _DNS_EXECUTOR = ThreadPoolExecutor(max_workers=8, thread_name_prefix="research-dns")
 _DNS_SLOTS = threading.BoundedSemaphore(8)
+NETWORK_SLOTS = threading.BoundedSemaphore(8)
+
+
+@contextmanager
+def network_operation(deadline: float) -> Iterator[None]:
+    """Reserve one shared network operation until the absolute deadline.
+
+    Args:
+        deadline: Monotonic absolute request deadline.
+    Yields:
+        Control while one of the eight process-wide network slots is held.
+    Raises:
+        BudgetExceeded: No slot was available within the remaining time.
+    """
+    remaining = deadline - time.monotonic()
+    if remaining <= 0 or not NETWORK_SLOTS.acquire(timeout=remaining):
+        raise BudgetExceeded("network_deadline")
+    try:
+        yield
+    finally:
+        NETWORK_SLOTS.release()
 
 
 class CollectionError(Exception):
@@ -227,9 +249,7 @@ class Quotas:
 
     interval: float = 1.0
     _lock: threading.Lock = field(default_factory=threading.Lock)
-    _slots: threading.BoundedSemaphore = field(
-        default_factory=lambda: threading.BoundedSemaphore(8)
-    )
+    _slots: threading.BoundedSemaphore = field(default_factory=lambda: NETWORK_SLOTS)
     _next: dict[str, float] = field(default_factory=dict)
     _github_requests: list[float] = field(default_factory=list)
 

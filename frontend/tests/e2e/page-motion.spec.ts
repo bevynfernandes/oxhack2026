@@ -26,7 +26,7 @@ test("route navigation springs the page while retaining a single accessible main
   const samples = await page.evaluate(async () => {
     const link = Array.from(
       document.querySelectorAll<HTMLAnchorElement>("nav a"),
-    ).find((link) => link.textContent === "Methodology")!;
+    ).find((link) => link.textContent === "About")!;
     link.click();
     const values: number[] = [];
     for (let i = 0; i < 24; i++) {
@@ -40,7 +40,7 @@ test("route navigation springs the page while retaining a single accessible main
     return values;
   });
   expect(samples.some((value) => value > 1)).toBe(true);
-  await expect(page).toHaveURL(/\/methodology$/);
+  await expect(page).toHaveURL(/\/about$/);
   await expect(page.getByRole("main")).toHaveCount(1);
   await expect(page.getByRole("main")).toBeFocused();
   await settled(page);
@@ -48,7 +48,7 @@ test("route navigation springs the page while retaining a single accessible main
     header,
   );
   expect((await auditAccessibility(page)).violations).toEqual([]);
-  await page.screenshot({ path: info.outputPath("page-methodology.png") });
+  await page.screenshot({ path: info.outputPath("page-about.png") });
 });
 
 test("rapid navigation and browser back/forward settle on the current route", async ({
@@ -56,12 +56,9 @@ test("rapid navigation and browser back/forward settle on the current route", as
 }) => {
   await page.goto("/");
   const main = await page.locator("main").elementHandle();
+  await page.getByRole("link", { name: "About", exact: true }).first().click();
   await page
-    .getByRole("link", { name: "Methodology", exact: true })
-    .first()
-    .click();
-  await page
-    .getByRole("link", { name: "Compare & explore", exact: true })
+    .getByRole("link", { name: "Research library", exact: true })
     .click();
   await page.getByRole("link", { name: "Companies", exact: true }).click();
   await expect(page).toHaveURL(/\/$/);
@@ -107,10 +104,7 @@ test("reduced motion remains immediate during route changes and a live preferenc
   page,
 }) => {
   await page.goto("/");
-  await page
-    .getByRole("link", { name: "Methodology", exact: true })
-    .first()
-    .click();
+  await page.getByRole("link", { name: "About", exact: true }).first().click();
   await page.emulateMedia({ reducedMotion: "reduce" });
   await settled(page);
   await page.getByRole("link", { name: "Companies", exact: true }).click();

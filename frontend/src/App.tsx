@@ -4,13 +4,13 @@ import {
   MotionIndicator,
   MotionNavLink as NavLink,
 } from "./motion";
-import { Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Icon from "./components/WorkspaceIcon";
 import BatchPicker from "./pages/rankings/BatchPicker";
 import BatchPage from "./pages/rankings/BatchPage";
 import EvaluationPage from "./pages/evaluation/EvaluationPage";
 import DataHealthPage from "./pages/data-health/DataHealthPage";
-import MethodologyPage from "./pages/methodology/MethodologyPage";
+import AboutPage from "./pages/about/AboutPage";
 import CompanyHomePage from "./pages/companies/CompanyHomePage";
 import CompanyListPage from "./pages/companies/CompanyListPage";
 import CompanyProfilePage from "./pages/companies/CompanyProfilePage";
@@ -32,11 +32,15 @@ export default function App() {
         Skip to content
       </a>
       <header className="site-header">
-        <NavLink to="/" className="brand">
+        <NavLink
+          to="/"
+          className="brand"
+          aria-label="SignalShift Research home"
+        >
           <span className="brand-symbol">
             <Icon name="activity" />
           </span>
-          <strong>SignalShift</strong>
+          <strong>SignalShift</strong>{" "}
           <span className="terminal-tag">RESEARCH</span>
         </NavLink>
         <div className="terminal-breadcrumb">
@@ -49,19 +53,17 @@ export default function App() {
                 <>Companies{isActive && <MotionIndicator />}</>
               )}
             </NavLink>
-            <NavLink to="/explore" aria-label="Compare & explore">
+            <NavLink to="/explore" aria-label="Research library">
               {({ isActive }) => (
                 <>
-                  <span className="nav-wide-label">Compare & explore</span>
-                  <span className="nav-short-label">Compare</span>
+                  <span className="nav-wide-label">Research library</span>
+                  <span className="nav-short-label">Library</span>
                   {isActive && <MotionIndicator />}
                 </>
               )}
             </NavLink>
-            <NavLink to="/methodology">
-              {({ isActive }) => (
-                <>Methodology{isActive && <MotionIndicator />}</>
-              )}
+            <NavLink to="/about">
+              {({ isActive }) => <>About{isActive && <MotionIndicator />}</>}
             </NavLink>
           </MotionSelection>
         </nav>
@@ -108,7 +110,11 @@ export default function App() {
             element={<EvaluationPage />}
           />
           <Route path="/data-health" element={<DataHealthPage />} />
-          <Route path="/methodology" element={<MethodologyPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route
+            path="/methodology"
+            element={<Navigate to="/about" replace />}
+          />
           <Route
             path="*"
             element={

@@ -18,10 +18,9 @@ it("renders three backend horizons and five drivers without numerical outlook", 
     screen.getByRole("heading", { name: "Overall outlook unavailable" }),
   ).toBeVisible();
   expect(screen.getAllByText("24 months")).toHaveLength(2);
-  expect(screen.queryByText("12 months")).toBeNull();
-  expect(
-    screen.getByRole("heading", { name: "Overall outlook" }),
-  ).toBeVisible();
+  expect(screen.getAllByText("12 months")).toHaveLength(1);
+  for (const name of ["Growth outlook", "Survival outlook", "Financial health"])
+    expect(screen.getByRole("heading", { name })).toBeVisible();
   expect(screen.getAllByRole("button", { name: /^Inspect / })).toHaveLength(5);
   expect(screen.getByText(/Partial source results/)).toBeVisible();
   expect(screen.queryByText(/\d+%/)).toBeNull();
@@ -91,8 +90,10 @@ it("does not present proxy experiments as trained business outcome models", () =
   expect(
     screen.getByText(/not customer retention or business success/),
   ).toBeVisible();
-  expect(screen.getAllByText("Prediction unavailable")).toHaveLength(2);
-  expect(screen.getByText("Combined score unavailable")).toBeVisible();
+  expect(screen.getAllByText("Prediction unavailable")).toHaveLength(3);
+  expect(
+    screen.getByRole("heading", { name: "Financial health" }),
+  ).toBeVisible();
   expect(screen.getByText(/outcome models pending/)).toBeVisible();
 });
 it.each([

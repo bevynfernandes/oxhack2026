@@ -11,7 +11,7 @@ test("company research searches, inspects sources and compares the same publishe
   page.on("request", (request) => requests.push(request.url()));
   await page.goto("/explore");
   await expect(
-    page.getByRole("heading", { name: "Companies", exact: true }),
+    page.getByRole("heading", { name: "Research library", exact: true }),
   ).toBeVisible();
   await page.getByLabel("Assessment snapshot").selectOption(snapshot);
   await expect(

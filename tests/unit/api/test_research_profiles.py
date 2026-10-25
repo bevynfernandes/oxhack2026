@@ -138,6 +138,7 @@ def test_queued_continuation_failure_preserves_terminal_sources(
         "completed",
         "skipped",
         "completed",
+        "completed",
     )
     previous = Job(
         job_id="continuation",

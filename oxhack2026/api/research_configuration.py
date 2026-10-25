@@ -5,6 +5,7 @@ from typing import Literal
 from pydantic import Field
 
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL
+from oxhack2026.explanations.defaults import DEFAULT_MODEL
 
 ResearchProfile = Literal["fast", "thorough", "deep"]
 
@@ -22,7 +23,13 @@ class ResearchSettings(DTO):
     model_requests: int = Field(default=12, ge=1, le=24)
     input_reservation: int = Field(default=180_000, ge=1)
     mapping_mode: Literal["rules", "rules_gemini"] = "rules_gemini"
-    model: str = "gemini-3.8-live-extended-thinking"
+    model: str = DEFAULT_MODEL
+    thinking_level: Literal["minimal", "high"] | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
+    google_search_enabled: bool | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
 
 
 def profile_settings(profile: ResearchProfile) -> ResearchSettings:

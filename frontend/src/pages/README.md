@@ -6,7 +6,8 @@ Company outlook is the primary workflow in `PLAN.md`:
   inspection and evidence mapping for saved-company and standalone research.
 - `companies/`: explicit publication selection, searchable/filterable company
   table, three-outcome profiles, source inspection and up-to-three comparison.
-- `methodology/`: outcome meanings, evidence states and probability release rules.
+- `about/`: current research capabilities, source coverage, comparison scope and
+  the limits of the available evidence and models.
 
 The retained traction workflow uses separate routes and API contracts:
 
