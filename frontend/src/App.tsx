@@ -40,7 +40,7 @@ export default function App() {
           <span className="terminal-tag">RESEARCH</span>
         </NavLink>
         <div className="terminal-breadcrumb">
-          Company intelligence <span>/</span> Startup outlook
+          Company intelligence <span>/</span> Evidence research
         </div>
         <nav aria-label="Main navigation">
           <MotionSelection>
@@ -49,9 +49,13 @@ export default function App() {
                 <>Companies{isActive && <MotionIndicator />}</>
               )}
             </NavLink>
-            <NavLink to="/explore">
+            <NavLink to="/explore" aria-label="Compare & explore">
               {({ isActive }) => (
-                <>Compare & explore{isActive && <MotionIndicator />}</>
+                <>
+                  <span className="nav-wide-label">Compare & explore</span>
+                  <span className="nav-short-label">Compare</span>
+                  {isActive && <MotionIndicator />}
+                </>
               )}
             </NavLink>
             <NavLink to="/methodology">

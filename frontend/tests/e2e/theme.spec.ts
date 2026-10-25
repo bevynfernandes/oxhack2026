@@ -163,11 +163,39 @@ test("theme can roll back to the preserved light styles and respects forced colo
     page
       .locator("html")
       .evaluate((node) => getComputedStyle(node).backgroundColor);
-  expect(await canvas()).toBe("rgb(13, 13, 36)");
+  expect(await canvas()).toBe("rgb(255, 226, 199)");
+  for (const selector of [
+    ".home-terminal-heading",
+    ".home-directory",
+    ".home-fundamentals",
+  ]) {
+    expect(
+      await page
+        .locator(selector)
+        .evaluate((node) => getComputedStyle(node).backgroundImage),
+    ).toContain("repeating-linear-gradient");
+  }
   await page.evaluate(() =>
     document.documentElement.classList.remove("theme-techno-classical"),
   );
   expect(await canvas()).toBe("rgb(247, 249, 252)");
+  await page.setViewportSize({ width: 375, height: 812 });
+  await expect(page.locator(".home-space-scene")).toBeHidden();
+  for (const region of await page.locator(".home-pattern-region").all()) {
+    await expect(region).toBeHidden();
+  }
+  expect(
+    await page
+      .locator("main")
+      .evaluate((node) => node.scrollWidth <= node.clientWidth),
+  ).toBe(true);
+  await page.getByLabel("Search companies").scrollIntoViewIfNeeded();
+  await expect(page.getByLabel("Search companies")).toBeInViewport();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
   expect((await auditAccessibility(page)).violations).toEqual([]);
   await page.evaluate(() =>
     document.documentElement.classList.add("theme-techno-classical"),
@@ -182,3 +210,56 @@ test("theme can roll back to the preserved light styles and respects forced colo
   ).toBe("none");
   await page.screenshot({ path: info.outputPath("forced-colours.png") });
 });
+
+for (const viewport of [
+  { width: 320, height: 740 },
+  { width: 768, height: 1024 },
+  { width: 1024, height: 768 },
+]) {
+  test(`research entry keeps readable controls and reachable actions at ${viewport.width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize(viewport);
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/");
+    const search = page.getByLabel("Search companies");
+    await expect(search).toHaveAccessibleDescription(
+      "Enter a name or website. You’ll confirm the company before research begins.",
+    );
+    await expect(
+      page.getByRole("heading", { name: "Saved research" }),
+    ).toBeVisible();
+    for (const control of [
+      search,
+      page.getByRole("button", { name: "Research company", exact: true }),
+      page.getByRole("link", { name: "Open dossier for Synthetic alpha" }),
+    ]) {
+      const bounds = await control.boundingBox();
+      expect(bounds!.height).toBeGreaterThanOrEqual(44);
+      expect(bounds!.width).toBeGreaterThanOrEqual(44);
+    }
+    await search.fill("alpha");
+    const open = page.getByRole("link", {
+      name: "Open dossier for Synthetic alpha",
+    });
+    await open.scrollIntoViewIfNeeded();
+    await expect(open).toBeInViewport();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+    await page.screenshot({
+      path: info.outputPath(`entry-${viewport.width}.png`),
+      fullPage: true,
+    });
+    await open.focus();
+    await page.keyboard.press("Enter");
+    await expect(
+      page.getByRole("button", {
+        name: "Expand dimension: Adoption & Retention",
+      }),
+    ).toBeVisible();
+  });
+}

@@ -13,6 +13,14 @@ The dependency is pinned; updates must run motion lifecycle and browser tests.
   restores focus after close. Escape and navigation cleanup share this lifecycle.
 - `MotionSelection` groups related active controls. Render `MotionIndicator`
   inside the active control only; it moves between selected controls in that group.
+- `MotionSurface` gives a grouped interactive region restrained hover and
+  focus-within lift using the shared spatial spring. Reduced motion stays still.
+- `MotionAmbient` owns the homepage's slow decorative drift and orbit. It never
+  contains data or controls and stops immediately when reduced motion is enabled.
+- `MotionSpinnerRing` rotates only while work is active, with live reduced-motion
+  support. `CompanySpinner` places the website favicon inside the stationary core;
+  failed icons fall back to favicon discovery, then a monogram. It does not add a
+  live region or represent a percentage. Unmount it when work finishes or fails.
 - `MotionState stateKey={status}` preserves its child DOM and live region. Keys
   represent actual state changes, never poll timestamps or response object identity.
 

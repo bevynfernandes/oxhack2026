@@ -1,5 +1,10 @@
 # Techno-Classical Retrofuturist theme
 
+This document records the original dark theme and its validation. The current
+warm palette, rounded surfaces and research-entry hierarchy are described in
+[Approachable research UI](APPROACHABLE-RESEARCH-UI.md). The shared motion and
+behavioural boundaries below still apply.
+
 ## Intent and boundaries
 
 SignalShift is a research instrument: editorial hierarchy and etched geometry

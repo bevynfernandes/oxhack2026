@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import type { DTO } from "../../api/client";
 import { date, Reasons, SourceLink } from "../../components/Common";
+import CompanySpinner from "../../components/CompanySpinner";
 import {
   MotionButton,
   MotionDisclosure,
@@ -65,7 +66,17 @@ export function MappingControls({ report }: { report: Report }) {
         disabled={active || !capabilities.data?.mapping?.enabled}
         onClick={() => create.mutate()}
       >
-        {active ? "Mapping evidence…" : "Re-map captured evidence"}
+        {active ? (
+          <span className="loading-label">
+            <CompanySpinner
+              size="small"
+              website={report.identity.canonical_domain}
+            />
+            Mapping evidence…
+          </span>
+        ) : (
+          "Re-map captured evidence"
+        )}
       </MotionButton>
       <small>
         Uses retained sources and creates a new report. To collect newer

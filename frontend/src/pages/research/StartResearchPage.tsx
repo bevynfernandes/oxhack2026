@@ -10,6 +10,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api } from "../../api/client";
 import { QueryState, Reasons, SourceLink } from "../../components/Common";
+import CompanySpinner from "../../components/CompanySpinner";
 import { companyDomain } from "../companies/identity";
 import { useCompany } from "../companies/shared";
 import {
@@ -92,9 +93,14 @@ function SavedResearchPage() {
               type="submit"
               disabled={!confirmed || !domain || start.isPending}
             >
-              {start.isPending
-                ? "Submitting research…"
-                : "Confirm and start research"}
+              {start.isPending ? (
+                <span className="loading-label">
+                  <CompanySpinner size="small" website={domain} />
+                  Submitting research…
+                </span>
+              ) : (
+                "Confirm and start research"
+              )}
             </MotionButton>
             <Link
               to={
@@ -235,7 +241,14 @@ function DomainResearchPage() {
           <MotionButton
             disabled={!domain.trim() || !enabled || discovery.isPending}
           >
-            {discovery.isPending ? "Requesting preview…" : "Preview company"}
+            {discovery.isPending ? (
+              <span className="loading-label">
+                <CompanySpinner size="small" website={domain} />
+                Requesting preview…
+              </span>
+            ) : (
+              "Preview company"
+            )}
           </MotionButton>
           {discovery.error && (
             <MotionState stateKey={discovery.error.message}>
@@ -255,7 +268,14 @@ function DomainResearchPage() {
           {preview && (
             <section className="panel">
               <MotionState stateKey={preview.state}>
-                <p role="status">
+                <p role="status" className="loading-label">
+                  {["queued", "running"].includes(preview.state) && (
+                    <CompanySpinner
+                      website={
+                        preview.canonical_domain || preview.requested_domain
+                      }
+                    />
+                  )}
                   {preview.state === "ready"
                     ? "Identity preview ready"
                     : preview.state === "failed"
@@ -320,9 +340,17 @@ function DomainResearchPage() {
                   <MotionButton
                     disabled={!confirmed || !enabled || start.isPending}
                   >
-                    {start.isPending
-                      ? "Submitting research…"
-                      : "Confirm and start research"}
+                    {start.isPending ? (
+                      <span className="loading-label">
+                        <CompanySpinner
+                          size="small"
+                          website={preview.canonical_domain}
+                        />
+                        Submitting research…
+                      </span>
+                    ) : (
+                      "Confirm and start research"
+                    )}
                   </MotionButton>
                   {start.error && (
                     <MotionState stateKey={start.error.message}>

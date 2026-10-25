@@ -1,3 +1,5 @@
+import ResearchTools from "./ResearchTools";
+import { evidenceSummary } from "./summary";
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
 import { CashFlowResearch } from "./CashFlowResearch";
 import {
@@ -789,6 +791,10 @@ export default function CompanyDossier({
         })}
       </section>
       <div className="dossier-ledger">
+        <ResearchTools
+          path={location.pathname}
+          summary={evidenceSummary(profile, standalone, report)}
+        />
         <div>
           <Icon name="shield" />
           <strong>EVIDENCE LEDGER</strong>
