@@ -77,3 +77,8 @@
     padding: 20px;
   }
 }
+
+/* Keep the last evidence controls clear of the shell footer after chart reflow. */
+.company-dossier:has(> .signal-charts) .dossier-ledger {
+  scroll-margin-block: 16px;
+}
