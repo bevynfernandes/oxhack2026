@@ -18,6 +18,11 @@ from oxhack2026.api.evidence_mapping_schemas import (
     MappingCapability,
     MappingProgress,
 )
+from oxhack2026.api.research_configuration import (
+    ResearchProfile,
+    ResearchSettings,
+    SourceDetails,
+)
 from oxhack2026.api.research_schemas import Domain, JobState, ResearchRequest
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime, Window
 from oxhack2026.models.dimension_serving import CompanyDimensionModels
@@ -168,6 +173,7 @@ class JobRequest(DTO):
 
     identity_id: Identifier
     identity_confirmed: Literal[True]
+    profile: ResearchProfile = Field(default_factory=lambda: "thorough")
 
     @model_validator(mode="before")
     @classmethod
@@ -185,6 +191,7 @@ class SourceState(DTO):
     state: Literal[
         "pending", "running", "completed", "partial", "failed", "skipped"
     ] = "pending"
+    details: SourceDetails | None = Field(default=None, exclude_if=lambda v: v is None)
     reason_codes: tuple[str, ...] = ()
     started_at: UTCDateTime | None = None
     finished_at: UTCDateTime | None = None
@@ -254,6 +261,12 @@ class Event(DTO):
 class Job(DTO):
     """Durable multi-source work; complete collector checkpoints survive recovery."""
 
+    settings: ResearchSettings | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    derived_from_report_id: Identifier | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
     schema_version: Literal["research-job-v2"] = "research-job-v2"
     job_id: Identifier
     identity_id: Identifier
@@ -297,6 +310,12 @@ class Job(DTO):
 class Report(DTO):
     """Immutable standalone report with raw artifact lineage and null forecasts."""
 
+    settings: ResearchSettings | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
+    derived_from_report_id: Identifier | None = Field(
+        default=None, exclude_if=lambda v: v is None
+    )
     schema_version: Literal["research-report-v2"] = "research-report-v2"
     report_id: Identifier
     job_id: Identifier
@@ -415,7 +434,10 @@ class Capabilities(DTO):
     active_jobs: int = 2
     queued_jobs: int = 8
     network_operations: int = 8
-    deadline_seconds: int = 300
+    profiles: tuple[ResearchSettings, ...] = Field(default_factory=tuple)
+    process_started_at: UTCDateTime | None = None
+    runtime_revision: str | None = None
+    deadline_seconds: int = 600
     request_budget: int = 120
     response_bytes: int = 4194304
     capture_bytes: int = 33554432

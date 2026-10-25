@@ -1,6 +1,48 @@
 {
   "components": {
     "schemas": {
+      "AccountAssociation": {
+        "additionalProperties": false,
+        "description": "A verified official-page association, never a fuzzy-name attachment.",
+        "properties": {
+          "discovered_on": {
+            "maxLength": 2048,
+            "title": "Discovered On",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "github_org",
+              "github_repo",
+              "npm",
+              "hiring",
+              "registry"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "resource": {
+            "title": "Resource",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "resource",
+          "evidence_ids",
+          "discovered_on"
+        ],
+        "title": "AccountAssociation",
+        "type": "object"
+      },
       "ArtifactReference": {
         "additionalProperties": false,
         "description": "Hashed artifact relative to a configured bundle root, never a signed URL.",
@@ -276,7 +318,7 @@
             "type": "boolean"
           },
           "deadline_seconds": {
-            "default": 300,
+            "default": 600,
             "title": "Deadline Seconds",
             "type": "integer"
           },
@@ -294,6 +336,25 @@
             "default": 8,
             "title": "Network Operations",
             "type": "integer"
+          },
+          "process_started_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Process Started At"
+          },
+          "profiles": {
+            "items": {
+              "$ref": "#/components/schemas/ResearchSettings"
+            },
+            "title": "Profiles",
+            "type": "array"
           },
           "providers": {
             "items": {
@@ -316,6 +377,17 @@
             "default": 4194304,
             "title": "Response Bytes",
             "type": "integer"
+          },
+          "runtime_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Runtime Revision"
           },
           "schema_version": {
             "const": "research-capabilities-v2",
@@ -1829,6 +1901,46 @@
         "title": "CompanySummary",
         "type": "object"
       },
+      "ContinueRequest": {
+        "additionalProperties": false,
+        "description": "Explicitly spend one selected profile's budget on remaining work.",
+        "properties": {
+          "profile": {
+            "enum": [
+              "fast",
+              "thorough",
+              "deep"
+            ],
+            "title": "Profile",
+            "type": "string"
+          }
+        },
+        "title": "ContinueRequest",
+        "type": "object"
+      },
+      "CrawlTarget": {
+        "additionalProperties": false,
+        "description": "A public page left to collect at a bounded discovery depth.",
+        "properties": {
+          "depth": {
+            "default": 0,
+            "maximum": 4.0,
+            "minimum": 0.0,
+            "title": "Depth",
+            "type": "integer"
+          },
+          "url": {
+            "maxLength": 2048,
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "title": "CrawlTarget",
+        "type": "object"
+      },
       "Cutoff": {
         "additionalProperties": false,
         "description": "An explicitly published, selectable forecast batch.",
@@ -3211,6 +3323,18 @@
         "additionalProperties": false,
         "description": "Durable multi-source work; complete collector checkpoints survive recovery.",
         "properties": {
+          "derived_from_report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Derived From Report Id"
+          },
           "finished_at": {
             "anyOf": [
               {
@@ -3274,6 +3398,16 @@
             "title": "Schema Version",
             "type": "string"
           },
+          "settings": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResearchSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "sources": {
             "items": {
               "$ref": "#/components/schemas/SourceState"
@@ -3327,6 +3461,15 @@
           "identity_id": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
             "title": "Identity Id",
+            "type": "string"
+          },
+          "profile": {
+            "enum": [
+              "fast",
+              "thorough",
+              "deep"
+            ],
+            "title": "Profile",
             "type": "string"
           }
         },
@@ -3754,6 +3897,14 @@
         "additionalProperties": false,
         "description": "Durable re-mapping work sharing the research worker capacity.",
         "properties": {
+          "cache_policy": {
+            "enum": [
+              "reuse",
+              "bypass"
+            ],
+            "title": "Cache Policy",
+            "type": "string"
+          },
           "job_id": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
             "title": "Job Id",
@@ -3785,6 +3936,16 @@
             "title": "Schema Version",
             "type": "string"
           },
+          "settings": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResearchSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "source_report_id": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
             "title": "Source Report Id",
@@ -3803,6 +3964,14 @@
         "additionalProperties": false,
         "description": "Explicitly request a new interpretation of retained source evidence.",
         "properties": {
+          "cache_policy": {
+            "enum": [
+              "reuse",
+              "bypass"
+            ],
+            "title": "Cache Policy",
+            "type": "string"
+          },
           "source_report_id": {
             "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
             "title": "Source Report Id",
@@ -4734,6 +4903,18 @@
             "title": "Claims",
             "type": "array"
           },
+          "derived_from_report_id": {
+            "anyOf": [
+              {
+                "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Derived From Report Id"
+          },
           "dimension_models": {
             "anyOf": [
               {
@@ -4808,6 +4989,16 @@
             "default": "research-report-v2",
             "title": "Schema Version",
             "type": "string"
+          },
+          "settings": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ResearchSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "sources": {
             "items": {
@@ -5173,6 +5364,87 @@
         "title": "ResearchRequest",
         "type": "object"
       },
+      "ResearchSettings": {
+        "additionalProperties": false,
+        "description": "Resolved immutable limits and interpreter configuration for one job.",
+        "properties": {
+          "article_pages": {
+            "default": 12,
+            "minimum": 1.0,
+            "title": "Article Pages",
+            "type": "integer"
+          },
+          "browser_pages": {
+            "default": 6,
+            "minimum": 0.0,
+            "title": "Browser Pages",
+            "type": "integer"
+          },
+          "capture_bytes": {
+            "default": 67108864,
+            "minimum": 1.0,
+            "title": "Capture Bytes",
+            "type": "integer"
+          },
+          "company_pages": {
+            "default": 60,
+            "minimum": 1.0,
+            "title": "Company Pages",
+            "type": "integer"
+          },
+          "deadline_seconds": {
+            "default": 600,
+            "minimum": 1.0,
+            "title": "Deadline Seconds",
+            "type": "integer"
+          },
+          "input_reservation": {
+            "default": 180000,
+            "minimum": 1.0,
+            "title": "Input Reservation",
+            "type": "integer"
+          },
+          "mapping_mode": {
+            "default": "rules_gemini",
+            "enum": [
+              "rules",
+              "rules_gemini"
+            ],
+            "title": "Mapping Mode",
+            "type": "string"
+          },
+          "model": {
+            "default": "gemini-3.8-live-extended-thinking",
+            "title": "Model",
+            "type": "string"
+          },
+          "model_requests": {
+            "default": 12,
+            "maximum": 24.0,
+            "minimum": 1.0,
+            "title": "Model Requests",
+            "type": "integer"
+          },
+          "profile": {
+            "default": "thorough",
+            "enum": [
+              "fast",
+              "thorough",
+              "deep"
+            ],
+            "title": "Profile",
+            "type": "string"
+          },
+          "requests": {
+            "default": 240,
+            "minimum": 1.0,
+            "title": "Requests",
+            "type": "integer"
+          }
+        },
+        "title": "ResearchSettings",
+        "type": "object"
+      },
       "ResearchSourceState": {
         "additionalProperties": false,
         "description": "Actual bounded provider state, independent of model/data readiness.",
@@ -5390,6 +5662,124 @@
         "title": "Score",
         "type": "object"
       },
+      "SourceDetails": {
+        "additionalProperties": false,
+        "description": "Execution and coverage are independent; continuation retains actual work.",
+        "properties": {
+          "accounts": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/AccountAssociation"
+            },
+            "title": "Accounts",
+            "type": "array"
+          },
+          "applicability": {
+            "default": "unknown",
+            "enum": [
+              "applicable",
+              "unknown",
+              "not_applicable"
+            ],
+            "title": "Applicability",
+            "type": "string"
+          },
+          "collected": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Collected",
+            "type": "integer"
+          },
+          "coverage": {
+            "enum": [
+              "complete",
+              "limited",
+              "unknown",
+              "not_applicable"
+            ],
+            "title": "Coverage",
+            "type": "string"
+          },
+          "cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cursor"
+          },
+          "execution": {
+            "enum": [
+              "pending",
+              "running",
+              "completed",
+              "failed",
+              "skipped"
+            ],
+            "title": "Execution",
+            "type": "string"
+          },
+          "frontier": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/CrawlTarget"
+            },
+            "title": "Frontier",
+            "type": "array"
+          },
+          "issues": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/SourceIssue"
+            },
+            "title": "Issues",
+            "type": "array"
+          },
+          "outstanding": {
+            "default": 0,
+            "minimum": 0.0,
+            "title": "Outstanding",
+            "type": "integer"
+          },
+          "retained_capture_ids": {
+            "default": [],
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "title": "Retained Capture Ids",
+            "type": "array"
+          },
+          "scope": {
+            "enum": [
+              "planned_sample",
+              "provider_window",
+              "verified_entity"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "visited": {
+            "default": [],
+            "items": {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            "title": "Visited",
+            "type": "array"
+          }
+        },
+        "required": [
+          "execution",
+          "scope",
+          "coverage"
+        ],
+        "title": "SourceDetails",
+        "type": "object"
+      },
       "SourceHealth": {
         "additionalProperties": false,
         "description": "Public source coverage; diagnostics contain no internal error strings.",
@@ -5452,6 +5842,47 @@
         "title": "SourceHealth",
         "type": "object"
       },
+      "SourceIssue": {
+        "additionalProperties": false,
+        "description": "An actionable source explanation; information alone is not a failure.",
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "remedy": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Remedy"
+          },
+          "severity": {
+            "enum": [
+              "info",
+              "warning",
+              "error"
+            ],
+            "title": "Severity",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "message"
+        ],
+        "title": "SourceIssue",
+        "type": "object"
+      },
       "SourceState": {
         "additionalProperties": false,
         "description": "One collector checkpoint, including skipped and interrupted work.",
@@ -5481,6 +5912,16 @@
             },
             "title": "Claims",
             "type": "array"
+          },
+          "details": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SourceDetails"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "events": {
             "default": [],
@@ -7319,6 +7760,57 @@
           }
         },
         "summary": "Job"
+      }
+    },
+    "/api/v2/research-jobs/{job_id}/continue": {
+      "post": {
+        "description": "Explicitly queue remaining checkpointed work as a new immutable report.",
+        "operationId": "research_v2_continue",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContinueRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Continue Research"
       }
     },
     "/api/v2/research-mapping-jobs": {

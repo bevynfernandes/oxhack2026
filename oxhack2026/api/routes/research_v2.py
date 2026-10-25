@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from oxhack2026.api.evidence_mapping_schemas import MappingJob, MappingJobRequest
 from oxhack2026.api.repository import RepositoryUnavailable
+from oxhack2026.api.research_configuration import ContinueRequest
 from oxhack2026.api.research_v2_schemas import (
     PROVIDERS,
     Capabilities,
@@ -158,3 +159,17 @@ def mapping_job(
 ) -> MappingJob:
     """Read durable interpretation progress without enqueueing or vendor access."""
     return _call(lambda: _read(lambda: _service(service).store.mapping_job(job_id)))
+
+
+@router.post(
+    "/research-jobs/{job_id}/continue",
+    status_code=202,
+    operation_id="research_v2_continue",
+)
+def continue_research(
+    job_id: Identifier,
+    request: ContinueRequest,
+    service: V2Service | None = _dependency,
+) -> Job:
+    """Explicitly queue remaining checkpointed work as a new immutable report."""
+    return _call(lambda: _service(service).continue_job(job_id, request))

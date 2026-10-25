@@ -122,6 +122,8 @@ class V2Store:
                     job.state not in _TRANSITIONS[previous.state]
                     or job.identity_id != previous.identity_id
                     or job.requested_at != previous.requested_at
+                    or job.settings != previous.settings
+                    or job.derived_from_report_id != previous.derived_from_report_id
                     or (previous.started_at and job.started_at != previous.started_at)
                     or any(
                         old.state in {"completed", "partial", "failed", "skipped"}

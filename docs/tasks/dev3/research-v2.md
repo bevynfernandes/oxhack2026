@@ -206,3 +206,23 @@ Google documents the [Live model protocol](https://ai.google.dev/gemini-api/docs
 and [project-specific quotas](https://ai.google.dev/gemini-api/docs/rate-limits).
 A configured key/model is not proof of a successful provider generation; live
 acceptance must record actual results separately from mocked regression tests.
+
+## Research profiles and explicit continuation
+
+V2 job creation accepts `profile: fast | thorough | deep` (default `thorough`).
+The worker snapshots the effective configuration on each job. Capabilities expose
+all three profiles, process start time and an optional `SIGNALSHIFT_RUNTIME_REVISION`.
+The limits are ceilings, not assertions that all public information was searched.
+
+| Profile | Total seconds | Company pages | Article pages | Browser pages | Requests | Capture MiB | Model requests |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Fast | 300 | 20 | 6 | 3 | 120 | 32 | 6 |
+| Thorough | 600 | 60 | 12 | 6 | 240 | 64 | 12 |
+| Deep | 1200 | 120 | 24 | 12 | 480 | 128 | 24 |
+
+`POST /api/v2/research-jobs/{job_id}/continue` accepts a profile and explicitly
+queues remaining durable work from a terminal useful job. It never rewrites that
+job or report. A job without a usable checkpoint requires Refresh instead.
+`POST /api/v2/research-mapping-jobs` accepts `cache_policy: reuse | bypass`;
+reuse is the default. Later collector and interpreter changes consume these
+contracts; older stored values omit the optional checkpoint/configuration fields.
