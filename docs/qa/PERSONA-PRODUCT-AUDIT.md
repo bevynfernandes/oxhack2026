@@ -44,7 +44,7 @@
 | --- | --- | --- |
 | Founder | PostHog domain discovery, explicit identity confirmation, progress, completed partial report, mobile evidence, JSON export, refresh and reopening from history | Can inspect public claims and missing records; cannot obtain validated growth/survival predictions |
 | Angel investor | ElevenLabs name lookup → source-backed candidate → identity → completed report; SDK measurements, experimental proxy explanation, notes and watchlist | SDK downloads are not customers or recurring revenue; coverage is not predictive confidence |
-| VC analyst | Qdrant/Weaviate published-cohort comparison; fresh ElevenLabs versus saved Qdrant comparison, desktop and mobile; exact report/source navigation | Different dates/definitions are retained; no artificial common cohort, ranked winner or inferred peer suitability |
+| VC analyst | Qdrant/Weaviate published-cohort comparison; fresh ElevenLabs versus saved Qdrant comparison, then two fresh Qdrant/ElevenLabs reports from the watchlist, desktop and mobile; exact report/source navigation | Different dates/definitions are retained; no artificial common cohort, ranked winner or inferred peer suitability |
 | Accelerator | Qdrant name research → confirmation → live partial report; mobile Financial Health drawer, missing-data explanation, applicant notes and watchlist | Missing public financial/customer data cannot be used as evidence that the applicant will fail |
 | Strategy analyst | PostHog refresh with keyboard confirmation, a new immutable report, old report still accessible, dated browser-local notes/watchlist | Manual review dates only; no background monitoring, scheduled refresh or notifications |
 | Journalist | Qdrant original-source navigation; PostHog export; ElevenLabs measurement definitions, dates, source limitations, identity and mapping provenance | Attributed company claims, demonstrations and experimental estimates require independent verification |
@@ -100,7 +100,7 @@ All captures were produced through Playwright MCP and remain in ignored `tests/o
 - Before: `before-founder-progress.png`, `before-investor-name-search.png`, `before-vc-comparison.png`, `before-mobile-comparison.png`.
 - Failure retained: `founder-live-worker-failure.png`.
 - Live reports: `founder-live-report-mobile.png`, `after-name-research-desktop.png`, `angel-completed-320px-reduced-motion.png`.
-- Continuing workflow: `accelerator-watchlist-mobile.png`, `vc-mixed-comparison-desktop.png`, `vc-mixed-comparison-mobile.png`.
+- Continuing workflow: `accelerator-watchlist-mobile.png`, `vc-mixed-comparison-desktop.png`, `vc-mixed-comparison-mobile.png`, `vc-two-fresh-reports-mobile.png`.
 - Evidence: `journalist-live-provenance-desktop.png`, `accelerator-live-financial-evidence-mobile.png`.
 - Fault tests: `controlled-directory-service-error.png`, `controlled-empty-directory.png`.
 
@@ -145,3 +145,9 @@ The review diff against the integrated #90 UI base includes earlier #88 refineme
 - `frontend/tests/unit/research-library.test.tsx`
 - `frontend/tests/unit/theme.test.ts`
 - `docs/qa/PERSONA-PRODUCT-AUDIT.md`
+
+## Delivery
+
+- PR #90 merged into the integrated UI branch.
+- PR #93 contains the persona fixes and carries forward #88 refinements; review #93 as the integrated successor rather than merging the conflicting #88 independently.
+- Working preview: `http://localhost:5174/`. Use **Compare & explore → Your research**, or **Decision summary & notes** on any dossier.
