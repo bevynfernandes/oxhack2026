@@ -19,6 +19,7 @@ def evidence_chunks(
     candidates: list[tuple[EvidenceDocument, DocumentBlock]],
     company: str,
     live: bool,
+    max_blocks: int = 24,
 ) -> list[EvidenceChunk]:
     """Build stable bounded chunks and interleave documents without mixing them.
 
@@ -26,9 +27,15 @@ def evidence_chunks(
         candidates: Prioritized public evidence; duplicate boilerplate is removed.
         company: Confirmed company name, used as data rather than an instruction.
         live: Compact classification submissions for the configured Live model.
+        max_blocks: Maximum sentences per request, between one and 24.
     Returns:
         Deterministic page chunks, preserving cache keys when more pages arrive.
+    Raises:
+        ValueError: The requested sentence count is outside the supported range.
     """
+    if not 1 <= max_blocks <= 24:
+        message = "max_blocks must be between one and 24"
+        raise ValueError(message)
     documents: dict[str, list[tuple[EvidenceDocument, DocumentBlock]]] = {}
     seen: set[str] = set()
     for document, block in candidates:
@@ -44,7 +51,7 @@ def evidence_chunks(
         size = 0
         for row in rows:
             required = len(row[1].text[:1200].encode()) + 900
-            if group and (len(group) >= 24 or size + required > 16_000):
+            if group and (len(group) >= max_blocks or size + required > 16_000):
                 chunks.append(_chunk(group, company, live))
                 group, size = [], 0
             group.append(row)

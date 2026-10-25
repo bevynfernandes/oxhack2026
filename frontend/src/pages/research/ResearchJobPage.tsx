@@ -9,7 +9,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useParams, useLocation } from "react-router-dom";
 import { api, type DTO } from "../../api/client";
-import { date, QueryState, Reasons } from "../../components/Common";
+import { date, QueryState, Reasons, SourceLink } from "../../components/Common";
 import CompanySpinner from "../../components/CompanySpinner";
 import { fetchIdentity, researchResult } from "./client";
 
@@ -169,6 +169,9 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
           {source.finished_at && (
             <small>Finished {date(source.finished_at)}</small>
           )}
+          {source.discovery && (
+            <SearchDiscoveryDetails discovery={source.discovery} />
+          )}
           {(source.evidence.length > 0 || source.observations.length > 0) && (
             <MotionDisclosure
               summary={
@@ -203,6 +206,59 @@ export function SourceProgress({ sources }: { sources: DTO<"SourceState">[] }) {
     </ul>
   );
 }
+
+/** Keep provider discovery distinct from independently captured source evidence. */
+function SearchDiscoveryDetails({
+  discovery,
+}: {
+  discovery: DTO<"SearchDiscovery">;
+}) {
+  return (
+    <MotionDisclosure
+      summary={`Search discovery · ${discovery.candidates.length} candidates`}
+    >
+      <p>
+        Collected {date(discovery.collected_at)} · {discovery.model} ·{" "}
+        {discovery.requests} provider requests
+      </p>
+      <p>Only captured pages matched to the company can support findings.</p>
+      {discovery.queries.length > 0 && (
+        <>
+          <h4>Search queries</h4>
+          <ul>
+            {discovery.queries.map((query) => (
+              <li key={query}>{query}</li>
+            ))}
+          </ul>
+        </>
+      )}
+      <ul>
+        {discovery.candidates.map((candidate) => (
+          <li key={candidate.url}>
+            <SourceLink url={candidate.final_url ?? candidate.url}>
+              {candidate.title || candidate.final_url || candidate.url}
+            </SourceLink>
+            <p>
+              {candidate.state.replaceAll("_", " ")}
+              {candidate.reason &&
+                ` · ${candidate.reason.replaceAll("_", " ")}`}
+            </p>
+          </li>
+        ))}
+      </ul>
+      {discovery.search_suggestions && (
+        <iframe
+          title="Google Search suggestions"
+          srcDoc={discovery.search_suggestions}
+          sandbox="allow-popups allow-popups-to-escape-sandbox"
+          referrerPolicy="no-referrer"
+          style={{ width: "100%", height: "10rem", border: 0 }}
+        />
+      )}
+    </MotionDisclosure>
+  );
+}
+
 function StandaloneJobPage() {
   const [historyError, setHistoryError] = useState(false);
   const { jobId = "" } = useParams();

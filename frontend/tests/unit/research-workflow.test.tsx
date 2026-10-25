@@ -31,7 +31,9 @@ const statistics: DTO<"InterpretationStatistics"> = {
 it("labels cached work separately from new calls and unknown usage", () => {
   render(<InterpretationSummary statistics={statistics} />);
   expect(
-    screen.getByText(/120 of 200 evidence blocks reviewed · 80 deferred/),
+    screen.getByText(
+      /120 of 200 evidence blocks reviewed by Gemini · 80 deferred/,
+    ),
   ).toBeVisible();
   expect(
     screen.getByText(
@@ -130,3 +132,36 @@ it.each([false, true])(
     );
   },
 );
+
+it("distinguishes failed extraction from successful cited synthesis", () => {
+  render(
+    <InterpretationSummary
+      statistics={{
+        ...statistics,
+        processed: 0,
+        deferred: 200,
+        accepted_proposals: 0,
+      }}
+      analysis={{
+        state: "partial",
+        method: "gemini",
+        statements: [
+          {
+            text: "Company reports revenue over $50 million a year.",
+            group_id: "financial_health",
+            kind: "finding",
+            mapping_ids: ["revenue"],
+          },
+        ],
+        reason_codes: ["analysis_unsupported_statement"],
+      }}
+    />,
+  );
+  expect(
+    screen.getByText(/Processing ended with incomplete extraction/),
+  ).toBeVisible();
+  expect(
+    screen.getByText(/Synthesis: partial · 1 validated statements/),
+  ).toBeVisible();
+  expect(screen.getByText(/0 supported extraction proposals/)).toBeVisible();
+});

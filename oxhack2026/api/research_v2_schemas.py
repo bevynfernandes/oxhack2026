@@ -23,6 +23,7 @@ from oxhack2026.api.research_configuration import (
     ResearchSettings,
     SourceDetails,
 )
+from oxhack2026.api.research_discovery import SearchDiscovery
 from oxhack2026.api.research_schemas import Domain, JobState, ResearchRequest
 from oxhack2026.api.schemas import DTO, Identifier, PublicURL, UTCDateTime, Window
 from oxhack2026.models.dimension_serving import CompanyDimensionModels
@@ -49,7 +50,15 @@ def _event_url(value: str) -> str:
 EventURL = Annotated[str, Field(max_length=2048), AfterValidator(_event_url)]
 
 Provider = Literal[
-    "website", "github", "npm", "hiring", "hn", "news", "sec", "companies_house"
+    "website",
+    "github",
+    "npm",
+    "hiring",
+    "hn",
+    "news",
+    "sec",
+    "companies_house",
+    "google_search",
 ]
 PROVIDERS: tuple[Provider, ...] = (
     "website",
@@ -60,7 +69,9 @@ PROVIDERS: tuple[Provider, ...] = (
     "news",
     "sec",
     "companies_house",
+    "google_search",
 )
+LEGACY_PROVIDERS = PROVIDERS[:-1]
 
 
 class DiscoveryRequest(DTO):
@@ -189,6 +200,9 @@ class SourceState(DTO):
     """One collector checkpoint, including skipped and interrupted work."""
 
     provider: Provider
+    discovery: SearchDiscovery | None = Field(
+        default=None, exclude_if=lambda value: value is None
+    )
     name: str
     state: Literal[
         "pending", "running", "completed", "partial", "failed", "skipped"
@@ -292,7 +306,10 @@ class Job(DTO):
         if (self.state in {"completed", "partial"}) != (self.report_id is not None):
             message = "Useful terminal results require a report"
             raise ValueError(message)
-        if tuple(source.provider for source in self.sources) != PROVIDERS:
+        if tuple(source.provider for source in self.sources) not in {
+            PROVIDERS,
+            LEGACY_PROVIDERS,
+        }:
             message = "Every collector must have exactly one ordered state"
             raise ValueError(message)
         if self.state == "running" and self.started_at is None:

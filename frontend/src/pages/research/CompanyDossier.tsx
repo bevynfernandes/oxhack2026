@@ -526,46 +526,27 @@ export default function CompanyDossier({
       >
         {outlook?.forecasts ? (
           <>
-            {outlook.forecasts
-              .filter((forecast) => forecast.outcome_id !== "financial_health")
-              .map((forecast, index) => (
-                <section className="dossier-stat" key={forecast.outcome_id}>
-                  <div>
-                    <h3>{forecastNames[forecast.outcome_id]}</h3>
-                    <div className="stat-value">
-                      —{" "}
-                      <span className="horizon-tag">
-                        {forecast.horizon_months} months
-                      </span>
-                    </div>
-                    <p>Prediction unavailable</p>
+            {outlook.forecasts.map((forecast, index) => (
+              <section className="dossier-stat" key={forecast.outcome_id}>
+                <div>
+                  <h3>{forecastNames[forecast.outcome_id]}</h3>
+                  <div className="stat-value">
+                    —{" "}
+                    <span className="horizon-tag">
+                      {forecast.horizon_months} months
+                    </span>
                   </div>
-                  <span className="stat-icon">
-                    <Icon
-                      name={
-                        index === 0
-                          ? "chart"
-                          : index === 1
-                            ? "shield"
-                            : "finance"
-                      }
-                    />
-                  </span>
-                </section>
-              ))}
-            <section className="dossier-stat">
-              <div>
-                <h3>Overall outlook</h3>
-                <div className="stat-value">—</div>
-                <p>Combined score unavailable</p>
-                <small className="stat-explanation">
-                  Needs all five dimension scores
-                </small>
-              </div>
-              <span className="stat-icon">
-                <Icon name="chart" />
-              </span>
-            </section>
+                  <p>Prediction unavailable</p>
+                </div>
+                <span className="stat-icon">
+                  <Icon
+                    name={
+                      index === 0 ? "chart" : index === 1 ? "shield" : "finance"
+                    }
+                  />
+                </span>
+              </section>
+            ))}
           </>
         ) : (
           (profile?.assessment.outcomes ?? []).map((outcome) => (

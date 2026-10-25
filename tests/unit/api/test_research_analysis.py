@@ -193,3 +193,57 @@ def test_analysis_preserves_subject_bounds_and_attribution(
         [record().model_copy(update=changes)],
     )
     assert not result.statements
+
+
+@pytest.mark.parametrize(
+    "updates,text,kind",
+    [
+        ({"metric_eligible": True}, "Revenue measurements are missing.", "gap"),
+        ({"metric_eligible": True}, "Revenue measurements are unavailable.", "finding"),
+        ({"qualifier": "exact"}, "Revenue measurements are missing.", "gap"),
+        ({"record_type": "event"}, "Revenue measurements are missing.", "gap"),
+        ({}, "Revenue and retention measurements are missing.", "gap"),
+    ],
+)
+def test_analysis_rejects_contradictory_or_unrelated_gaps(
+    updates: dict[str, object], text: str, kind: str
+) -> None:
+    """Absent numbers in the prompt never establish that measured data is missing."""
+    source = record().model_copy(update={"exact_decimal": None, **updates})
+    response = orjson.dumps(
+        {
+            "proposals": [
+                {
+                    "text": text,
+                    "kind": kind,
+                    "group_id": "financial_health",
+                    "mapping_ids": [source.mapping_id],
+                }
+            ]
+        }
+    ).decode()
+
+    result = validate_analysis(response, [source])
+
+    assert result.state == "unavailable"
+    assert not result.statements
+    assert "analysis_unsupported_statement" in result.reason_codes
+
+
+def test_analysis_allows_specific_unmeasured_gap() -> None:
+    """Missing normalized revenue can coexist with company-reported revenue claims."""
+    source = record().model_copy(update={"exact_decimal": None})
+    response = orjson.dumps(
+        {
+            "proposals": [
+                {
+                    "text": "Platform revenue measurements are missing.",
+                    "kind": "gap",
+                    "group_id": "financial_health",
+                    "mapping_ids": [source.mapping_id],
+                }
+            ]
+        }
+    ).decode()
+
+    assert validate_analysis(response, [source]).state == "completed"

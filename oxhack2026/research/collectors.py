@@ -22,6 +22,7 @@ from oxhack2026.api.research_configuration import (
     SourceDetails,
     profile_settings,
 )
+from oxhack2026.api.research_discovery import SearchDiscovery
 from oxhack2026.api.research_v2_schemas import (
     Capture,
     Claim,
@@ -115,10 +116,14 @@ class Collector:
     browser_pages: int = 0
     execution_failed: bool = False
     cash_flow_research: CashFlowResearchEstimate | None = None
+    discovery: SearchDiscovery | None = None
+    run_id: str | None = None
+    known_urls: frozenset[str] = frozenset()
 
     def __post_init__(self) -> None:
         """Restore successful source records when continuing a durable checkpoint."""
         self.support.extend(self.source.evidence)
+        self.discovery = self.source.discovery
         if (
             self.source.provider != "npm"
             or NPM_ASSOCIATION_VERIFIED in self.source.reason_codes
@@ -138,7 +143,11 @@ class Collector:
                 or NPM_ASSOCIATION_VERIFIED in self.source.reason_codes
             )
             self.cursor = self.source.details.cursor
-        resumed_limits = {"website_page_limit"} if self.frontier else set()
+        resumed_limits = (
+            {"website_page_limit", "google_search_page_limit"}
+            if self.frontier
+            else set()
+        )
         if self.cursor:
             resumed_limits.update(
                 {
@@ -195,7 +204,7 @@ class Collector:
             else state,
             applicability="unknown" if state == "skipped" else "applicable",
             scope="planned_sample"
-            if self.source.provider in {"website", "news", "hiring"}
+            if self.source.provider in {"website", "news", "hiring", "google_search"}
             else "provider_window",
             coverage="limited"
             if any(i.severity != "info" for i in issues)
@@ -231,6 +240,7 @@ class Collector:
                 "events": tuple(self.events),
                 "links": tuple(sorted(self.links)),
                 "cash_flow_research": self.cash_flow_research,
+                "discovery": self.discovery,
             }
         )
 
@@ -812,6 +822,12 @@ class Collector:
         from oxhack2026.research.registry import collect_registry
 
         collect_registry(self)
+
+    def google_search(self) -> None:
+        """Discover public pages separately from captured-evidence interpretation."""
+        from oxhack2026.research.search import collect_search
+
+        collect_search(self)
 
     def collect(self) -> SourceState:
         """Run one adapter, retaining successful captures and records on

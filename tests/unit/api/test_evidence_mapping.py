@@ -314,6 +314,7 @@ def test_gemini_quote_validation_and_cache_replay(
 
 def test_remapping_new_report_preserves_source_dates_and_old_bytes(
     tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Remapping uses artifacts, coalesces active work and preserves old bytes."""
     report = source_report(
@@ -330,7 +331,20 @@ def test_remapping_new_report_preserves_source_dates_and_old_bytes(
     request = MappingJobRequest(source_report_id=report.report_id)
     job = service.create_mapping(request)
     assert service.create_mapping(request).job_id == job.job_id
+    original_map = MappingEngine.map
+    deadlines: list[float] = []
+
+    def map_with_deadline(
+        engine: MappingEngine, source: Report, source_report_id: str | None = None
+    ) -> Report:
+        assert engine.deadline is not None
+        deadlines.append(engine.deadline - time.monotonic())
+        return original_map(engine, source, source_report_id)
+
+    monkeypatch.setattr(MappingEngine, "map", map_with_deadline)
     service.run_mapping(job.job_id)
+    assert job.settings
+    assert job.settings.deadline_seconds - 5 < deadlines[0]
     finished = store.mapping_job(job.job_id)
     assert finished.progress.state == "completed"
     assert finished.report_id and finished.report_id != report.report_id
@@ -783,3 +797,166 @@ def test_valid_interrupted_submissions_remain_auditable_cache_entries(
     assert repeated.mapping.statistics.provider_requests == 0
     assert "gemini_live_background_incomplete" in repeated.mapping.reason_codes
     client.generate.assert_not_called()
+
+
+def test_failed_batch_does_not_abandon_other_documents(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A transient failed chunk leaves later chunks and synthesis available."""
+    from pydantic import BaseModel
+
+    from oxhack2026.api.research_configuration import ResearchSettings
+
+    report = source_report(
+        tmp_path,
+        "<main>"
+        + "".join(
+            f"<p>Our product supports workflow number {index} for teams.</p>"
+            for index in range(40)
+        )
+        + "</main>",
+    ).model_copy(update={"settings": ResearchSettings()})
+    interpreter = GeminiInterpreter(time.monotonic() + 120)
+    calls = 0
+
+    def generate(prompt: str, schema: type[BaseModel] | None = None) -> str:
+        nonlocal calls
+        calls += 1
+        interpreter.attempts += 1
+        if calls <= 2:
+            raise MappingUnavailable("gemini_provider_internal_error")
+        return '{"proposals":[]}'
+
+    monkeypatch.setattr(interpreter, "generate", generate)
+    monkeypatch.setattr(time, "sleep", lambda duration: None)
+
+    mapped = MappingEngine(tmp_path, interpreter=interpreter).map(report)
+
+    assert mapped.mapping and mapped.mapping.statistics
+    statistics = mapped.mapping.statistics
+    assert statistics.failed_batches == 1
+    assert statistics.processed > 0
+    assert statistics.deferred > 0
+    assert statistics.batches > 0
+    assert calls >= 4
+    assert "gemini_provider_internal_error" in mapped.mapping.reason_codes
+
+
+def test_native_extraction_is_small_and_preserves_synthesis_thinking(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Extraction uses small low-latency requests; synthesis retains HIGH thinking."""
+    from pydantic import BaseModel
+
+    from oxhack2026.api.research_configuration import ResearchSettings
+
+    report = source_report(
+        tmp_path,
+        "<main>"
+        + "".join(
+            f"<p>Our product supports workflow number {index} for teams.</p>"
+            for index in range(20)
+        )
+        + "</main>",
+    ).model_copy(update={"settings": ResearchSettings()})
+    interpreter = GeminiInterpreter(time.monotonic() + 150)
+    sizes: list[int] = []
+    levels: list[str] = []
+
+    def generate(prompt: str, schema: type[BaseModel] | None = None) -> str:
+        levels.append(interpreter.thinking_level)
+        interpreter.attempts += 1
+        if schema is None:
+            sizes.append(len(orjson.loads(prompt.split("SOURCE DATA:\n")[1])))
+        return '{"proposals":[]}'
+
+    monkeypatch.setattr(interpreter, "generate", generate)
+
+    mapped = MappingEngine(tmp_path, interpreter=interpreter).map(report)
+
+    assert sizes and max(sizes) <= 6
+    assert levels[:-1] == ["minimal"] * len(sizes)
+    assert levels[-1] == "high"
+    assert interpreter.thinking_level == "high"
+    assert mapped.mapping and mapped.mapping.statistics
+    assert mapped.mapping.statistics.processed == 20
+
+
+def test_fast_mapping_reserves_time_without_starving_extraction(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A 90-second fast mapping allocation still permits an extraction request."""
+    from pydantic import BaseModel
+
+    from oxhack2026.api.research_configuration import profile_settings
+
+    report = source_report(
+        tmp_path,
+        "<main><p>Our product supports creative professionals worldwide.</p></main>",
+    ).model_copy(update={"settings": profile_settings("fast")})
+    interpreter = GeminiInterpreter(time.monotonic() + 90)
+    schemas: list[type[BaseModel] | None] = []
+
+    def generate(prompt: str, schema: type[BaseModel] | None = None) -> str:
+        schemas.append(schema)
+        interpreter.attempts += 1
+        return '{"proposals":[]}'
+
+    monkeypatch.setattr(interpreter, "generate", generate)
+
+    MappingEngine(tmp_path, interpreter=interpreter).map(report)
+
+    assert schemas[0] is None
+    assert schemas[-1] is not None
+    assert len(schemas) == 2
+
+
+def test_structured_values_reach_synthesis_without_becoming_gaps(
+    tmp_path: Path,
+) -> None:
+    """Measured zero and nonzero platform counts retain their exact numeric context."""
+    from oxhack2026.research.analysis import analysis_prompt, validate_analysis
+
+    report = source_report(tmp_path, "<main><p>We provide useful software.</p></main>")
+    source = report.evidence[0]
+    observations = tuple(
+        Observation(
+            observation_id=f"stars-{index}",
+            metric_id="github_stars",
+            definition="Public repository stars",
+            unit="count",
+            value=value,
+            collected_at=source.collected_at,
+            evidence_ids=(source.evidence_id,),
+        )
+        for index, value in enumerate((0.0, 40420.0))
+    )
+    github = report.sources[1].model_copy(
+        update={"observations": observations, "evidence": (source,)}
+    )
+    report = report.model_copy(
+        update={
+            "observations": observations,
+            "sources": (report.sources[0], github, *report.sources[2:]),
+        }
+    )
+
+    records, _ = MappingEngine(tmp_path)._structured(report)
+    payload = analysis_prompt(records)
+
+    assert [row.exact_decimal for row in records] == ["0.0", "40420.0"]
+    assert all(row.metric_eligible for row in records)
+    assert '"metric_eligible":true' in payload
+    response = orjson.dumps(
+        {
+            "proposals": [
+                {
+                    "text": "The public GitHub repository has 40,420 stars.",
+                    "group_id": "attention_sentiment",
+                    "kind": "finding",
+                    "mapping_ids": [records[1].mapping_id],
+                }
+            ]
+        }
+    ).decode()
+    assert validate_analysis(response, records).state == "completed"

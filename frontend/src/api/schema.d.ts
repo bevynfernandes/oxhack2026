@@ -2726,7 +2726,7 @@ export interface components {
              * Provider
              * @enum {string}
              */
-            provider: "website" | "github" | "npm" | "hiring" | "hn" | "news" | "sec" | "companies_house";
+            provider: "website" | "github" | "npm" | "hiring" | "hn" | "news" | "sec" | "companies_house" | "google_search";
             /** Reason */
             reason?: string | null;
         };
@@ -3073,6 +3073,8 @@ export interface components {
              * @default 600
              */
             deadline_seconds: number;
+            /** Google Search Enabled */
+            google_search_enabled?: boolean | null;
             /**
              * Input Reservation
              * @default 180000
@@ -3086,7 +3088,7 @@ export interface components {
             mapping_mode: "rules" | "rules_gemini";
             /**
              * Model
-             * @default gemini-3.8-live-extended-thinking
+             * @default gemma-4-31b-it
              */
             model: string;
             /**
@@ -3105,6 +3107,8 @@ export interface components {
              * @default 240
              */
             requests: number;
+            /** Thinking Level */
+            thinking_level?: ("minimal" | "high") | null;
         };
         /**
          * ResearchSourceState
@@ -3186,6 +3190,75 @@ export interface components {
             reason: string | null;
             /** Value */
             value: number | null;
+        };
+        /**
+         * SearchCandidate
+         * @description A discovery link; only matched captured pages can support findings.
+         */
+        SearchCandidate: {
+            /** Capture Id */
+            capture_id?: string | null;
+            /** Final Url */
+            final_url?: string | null;
+            /** Reason */
+            reason?: string | null;
+            /**
+             * State
+             * @default pending
+             * @enum {string}
+             */
+            state: "pending" | "matched" | "unmatched" | "blocked" | "already_collected";
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+            /** Url */
+            url: string;
+        };
+        /**
+         * SearchDiscovery
+         * @description Provider metadata, distinct from evidence extracted from original pages.
+         */
+        SearchDiscovery: {
+            artifact?: components["schemas"]["ArtifactReference"] | null;
+            /**
+             * Candidates
+             * @default []
+             */
+            candidates: components["schemas"]["SearchCandidate"][];
+            /**
+             * Collected At
+             * Format: date-time
+             */
+            collected_at: string;
+            /** Input Tokens */
+            input_tokens?: number | null;
+            /** Model */
+            model: string;
+            /** Model Version */
+            model_version?: string | null;
+            /** Output Tokens */
+            output_tokens?: number | null;
+            /**
+             * Queries
+             * @default []
+             */
+            queries: string[];
+            /**
+             * Requests
+             * @default 0
+             */
+            requests: number;
+            /**
+             * Reserved Input
+             * @default 0
+             */
+            reserved_input: number;
+            /** Run Id */
+            run_id: string;
+            /** Search Suggestions */
+            search_suggestions?: string | null;
         };
         /**
          * SourceDetails
@@ -3307,6 +3380,7 @@ export interface components {
              */
             claims: components["schemas"]["Claim"][];
             details?: components["schemas"]["SourceDetails"] | null;
+            discovery?: components["schemas"]["SearchDiscovery"] | null;
             /**
              * Events
              * @default []
@@ -3335,7 +3409,7 @@ export interface components {
              * Provider
              * @enum {string}
              */
-            provider: "website" | "github" | "npm" | "hiring" | "hn" | "news" | "sec" | "companies_house";
+            provider: "website" | "github" | "npm" | "hiring" | "hn" | "news" | "sec" | "companies_house" | "google_search";
             /**
              * Reason Codes
              * @default []

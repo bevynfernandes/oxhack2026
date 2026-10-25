@@ -154,48 +154,78 @@ experimental dimension models and does not create outcome probabilities. Existin
 company model payloads remain attached. Unknown definitions, rejected model
 proposals and bounded interpretation coverage have explicit reasons.
 
-Install the `research` and `explanations` extras for interpretation. Evidence
-mapping defaults to `SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini`, combining
-deterministic rules with `gemini-3.8-live-extended-thinking` through Google's Live
-API. Provider and background-completion failures remain explicit limitations
-and preserve supported rule-based results. Set
-`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` explicitly to make no model requests.
-The adapter enables audio output and transcription, discards audio immediately,
-and receives data through an asynchronous, local-only evidence submission function.
-It waits for explicit `IDLE` rather than stopping on `turnComplete`.
-Structured output is not supported by this Live model; every submitted proposal
-is instead strictly validated locally against the same evidence schema.
-An explicit `GEMINI_MODEL=gemma-4-31b-it` selects native structured text calls.
-`GEMINI_MODEL` overrides the model explicitly; errors never select another model.
-The private repository contains a shared backend default in
-`oxhack2026/explanations/internal-gemini.env`, as requested by the repository owner.
-A process `GEMINI_API_KEY` overrides it; an explicitly empty value disables it.
-The key is excluded from public API DTOs, captured prompts, logs and frontend
-configuration. Other provider credentials remain local environment configuration.
+Install the `research` and `explanations` extras for interpretation. New jobs
+use `gemma-4-31b-it` through the native text API and
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules_gemini`. Set `GEMINI_API_KEY` in the
+worker environment; an explicitly empty value disables the existing credential
+fallback. `GEMINI_MODEL` selects an explicit alternative. Credentials never enter
+public DTOs, prompts, logs or frontend configuration. Use
+`SIGNALSHIFT_RESEARCH_MAPPING_MODE=rules` to disable all model requests, including
+Search discovery. No Gemini CLI installation or audio configuration is required.
 
-Each mapping run has a two-minute deadline, at most six bounded requests, a
-conservative sixty-thousand input-token reservation and two simultaneous model
-operations. Live interpretation consolidates up to 24 candidate sentences into
-one size-bounded session so asynchronous background reasoning shares that budget.
-Candidates are selected round-robin across captured pages, retaining each page's
-priority order, so a long pricing page cannot consume the whole request.
-Short request-local handles select exact retained document blocks; model output
-never supplies quote text or capture locations. Additional candidates remain an
-explicit coverage limitation. A connection loss after a received submission
-preserves it with an interrupted-background reason, rather than discarding it.
-Retained pricing language and monetary/free prices are checked independently of
-the model's subject label in both rules and Gemini validation. Price-only quotes
-cannot establish company revenue, ARR, funding, cash or profitability. Explicit
-source financial assertions remain eligible even when the quote also discusses
-subscription prices; monetary normalization and metric eligibility stay separate.
-`SIGNALSHIFT_GEMINI_RPM` and `SIGNALSHIFT_GEMINI_TPM` configure the
-shared process quota (defaults ten requests and sixty thousand reserved tokens per
-minute). These are application limits, not claims about Google's project quota.
-The mapper caches exact prompt/model responses as hashed artifacts, independently
-validates concepts, subjects and contiguous quotes and checkpoints each batch.
-Unavailability or malformed responses preserve deterministic results as partial.
-No browsing, external tool execution or external source instructions reach the
-interpreter as trusted instructions.
+Gemma uses MINIMAL thinking for bounded extraction and HIGH for cited synthesis.
+Extraction batches contain at most six sentences. Compact classifications select
+retained source sentences; the backend reconstructs exact
+quotes and quantities. The API schema uses compatible objects, arrays, enums and
+required fields; strict local validation enforces lengths, counts, subjects,
+financial qualifiers, dates and citation support. A generated classification
+never establishes independent truth. Pricing cannot establish company revenue,
+ARR, funding, cash or profitability.
+
+Extraction streams have an absolute 45-second request deadline; synthesis and
+Search allow 90 seconds. These limits are bounded by the job's
+remaining deadline, and a 128 KiB public-response limit. Partial JSON, truncated
+streams and access refusals are rejected. Private thinking content is discarded.
+Extraction and Search allow 2,048 output tokens; synthesis allows 8,192,
+included in conservative quota
+reservations. Synthesis receives up to 90 seconds and two available request slots
+before additional extraction spends its budget. Transient failures receive one
+bounded retry; configuration and authentication errors fail without retries.
+Failed extraction batches do not prevent subsequent batches from running within
+the remaining budget. Unprocessed candidates remain explicit gaps. Status codes
+distinguish provider errors, overload, connection failures and request timeouts;
+provider error messages are not exposed. Fast/Thorough/Deep limits include
+both collection and interpretation; the mapper uses at most the profile's
+interpretation allocation and remaining overall time.
+
+Re-interpreting retained evidence uses the full selected job deadline because no
+website collection is required. The synthesis time reserve is capped at 40% of
+remaining mapping time so a Fast run still has time to extract evidence.
+Structured counts and supported financial measurements retain their exact values
+and units in synthesis context. Gap validation rejects missingness claims about
+collected values or events, and rejects unrelated concepts added to a cited gap.
+
+`SIGNALSHIFT_GEMINI_RPM` and `SIGNALSHIFT_GEMINI_TPM` set process-wide model quotas
+(defaults ten requests and sixty thousand reserved tokens per minute). Native
+model requests also share the eight network-operation slots, at most two model
+operations and one request per second to the model host. Actual requests and
+reported usage are recorded; missing usage is not presented as zero. Cache keys
+include prompt, model, thinking level, response schema and parser/prompt policy.
+Malformed and interrupted responses cannot become reusable successful results.
+
+### Google Search discovery
+
+New collection jobs include a separately checkpointed Google Search source.
+`SIGNALSHIFT_RESEARCH_GOOGLE_SEARCH=0` disables it. Discovery makes one native
+request with minimal thinking and the Search tool, separately from structured
+extraction. Discovery shares model/profile budgets with interpretation. Provider
+Search queries may exceed one query per generation; retained metadata records
+what the provider actually reports.
+
+Grounding metadata supplies candidate URLs, queries and provider attribution.
+At most six candidates are fetched per run through the protected HTTPS fetcher,
+within shared request, capture and deadline limits. Exact official hosts or
+independent pages referencing the confirmed domain can match; unrelated pages
+remain retained candidates and cannot support findings. Search prose and snippets
+are never metric evidence. Original captured pages supply quotes and publication
+dates. Provider metadata is retained as a hashed discovery artifact, separately
+from source captures. Provider suggestions render in an isolated sandboxed frame.
+
+Pending candidates survive continuation without repeating completed discovery or
+page requests. Legacy eight-source jobs remain readable alongside new nine-source
+jobs, and existing report bytes are never rewritten. Search failures preserve
+successful sources and expose their actual reason. Search availability in
+capabilities describes configuration, not a live provider health check.
 
 `POST /api/v2/research-mapping-jobs` with `{"source_report_id":"..."}` explicitly
 queues interpretation of retained captures. Poll
@@ -208,8 +238,7 @@ collection. Capabilities expose mapping mode, local credential/SDK configuration
 and worker availability without contacting Google. Stored reads need neither
 worker nor credentials. Restart recovery preserves completed cached batches.
 
-Google documents the [Live model protocol](https://ai.google.dev/gemini-api/docs/models/gemini-3.8-live-extended-thinking),
-[Gemma text API](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api)
+Google documents the [Gemma text API](https://ai.google.dev/gemma/docs/core/gemma_on_gemini_api)
 and [project-specific quotas](https://ai.google.dev/gemini-api/docs/rate-limits).
 A configured key/model is not proof of a successful provider generation; live
 acceptance must record actual results separately from mocked regression tests.

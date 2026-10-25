@@ -180,12 +180,17 @@ def supported_quantities(text: str, records: list[MappedRecord]) -> bool:
         support.extend(quoted)
         if not quoted and record.exact_decimal is not None:
             context = record.numerical_context
+            metric = _metric(record.concept.replace("_", " "), 0, 0)
             support.append(
                 _Quantity(
                     Decimal(record.exact_decimal),
                     context.currency or "" if context else "",
-                    context.unit if context and context.unit != "count" else "",
-                    _metric(record.concept.replace("_", " "), 0, 0),
+                    context.unit
+                    if context and context.unit != "count"
+                    else metric
+                    if context and metric in {"star", "download", "opening"}
+                    else "",
+                    metric,
                     "",
                     tuple(
                         date.isoformat()
