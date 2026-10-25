@@ -33,8 +33,16 @@ from oxhack2026.explanations.gemini import (
 )
 from oxhack2026.research.composition import compose
 from oxhack2026.research.documents import extract_document, normalize_text, page_family
-from oxhack2026.research.evidence_mapping import MappingEngine, mapping_mode
-from oxhack2026.research.mapping_policy import classify, metric_eligible
+from oxhack2026.research.evidence_mapping import (
+    MappingEngine,
+    _live_candidates,
+    mapping_mode,
+)
+from oxhack2026.research.mapping_policy import (
+    classify,
+    metric_eligible,
+    price_only_financial_claim,
+)
 from oxhack2026.research.v2_service import V2Service
 from oxhack2026.research.v2_store import V2Store
 from oxhack2026.storage.artifacts import FileArtifactStore
@@ -370,6 +378,7 @@ def test_capabilities_do_not_import_collection_or_interpretation(
     assert capability.mode == "rules_gemini"
     assert capability.enabled is False
     assert capability.gemini_available is False
+    assert capability.deadline_seconds == 120
 
 
 def test_unknown_configuration_and_page_families(
@@ -432,7 +441,7 @@ def test_compact_classification_uses_backend_quotes(
                     "subject": "company",
                 },
                 {
-                    "block_id": document.blocks[0].block_id,
+                    "block_id": "b0",
                     "concept": "product",
                     "subject": "company",
                 },
@@ -445,6 +454,182 @@ def test_compact_classification_uses_backend_quotes(
     assert len(claims) == 1
     assert claims[0].quotes[0].exact == document.blocks[0].text
     assert claims[0].group_id == "industry_competition"
+
+
+@pytest.mark.parametrize("available", [False, True])
+def test_live_batches_share_one_session_and_retain_coverage_limits(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, available: bool
+) -> None:
+    """Amortize Live background reasoning without silently dropping candidates."""
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules_gemini")
+    report = source_report(
+        tmp_path,
+        "<main>"
+        + "".join(
+            f"<p>Example serves creative professionals in region {index}.</p>"
+            for index in range(30)
+        )
+        + "</main>",
+    )
+    client = Mock(spec=GeminiInterpreter)
+    client.model = "gemini-test-live"
+    client.reason_codes = []
+    client.model_version = None
+    client.input_tokens = client.output_tokens = client.attempts = 0
+    client.generate.return_value = '{"proposals":[]}'
+    if not available:
+        client.generate.side_effect = MappingUnavailable(
+            "gemini_live_provider_unavailable"
+        )
+    checkpoint = Mock()
+
+    mapped = MappingEngine(tmp_path, checkpoint, client).map(report)
+
+    client.generate.assert_called_once()
+    prompt = client.generate.call_args.args[0]
+    blocks = orjson.loads(prompt.split("SOURCE DATA:\n", 1)[1])
+    assert 12 < len(blocks) <= 24
+    assert [block["block_id"] for block in blocks] == [
+        f"b{index}" for index in range(len(blocks))
+    ]
+    assert mapped.mapping
+    assert "gemini_candidate_budget" in mapped.mapping.reason_codes
+    assert checkpoint.call_args.args[0].completed_batches == int(available)
+
+
+def test_live_candidates_preserve_document_diversity(tmp_path: Path) -> None:
+    """A large pricing page must leave space for other captured sources."""
+    report = source_report(
+        tmp_path,
+        "<main><p>Example serves creative professionals worldwide.</p></main>",
+    )
+    document = extract_document(
+        report.captures[0],
+        FileArtifactStore(tmp_path).read(report.captures[0].artifact),
+    )
+    assert document
+    other = document.model_copy(update={"capture_id": "other"})
+    first = (document, document.blocks[0])
+    second = (other, other.blocks[0])
+
+    selected = _live_candidates([first] * 30 + [second], 4)
+
+    assert selected == [first, second, first, first]
+    assert _live_candidates([first], 0) == []
+
+
+@pytest.mark.parametrize("subject", ["company", "product"])
+@pytest.mark.parametrize(
+    "quote",
+    [
+        "$6 per month, first month $1.",
+        "Our plans start at $6 per month.",
+        "Our subscription costs USD 72 annually.",
+        "Our Revenue plan costs USD 6 per month.",
+        "We raised our subscription price to USD 12 per month.",
+        "Notre abonnement coûte EUR 6 par mois.",
+    ],
+)
+@pytest.mark.parametrize(
+    "concept", ["revenue", "arr", "funding", "profitability", "cash"]
+)
+def test_product_prices_cannot_become_financial_claims(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    concept: str,
+    quote: str,
+    subject: str,
+) -> None:
+    """Reject retained prices independently of Gemini's asserted financial subject."""
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules_gemini")
+    report = source_report(tmp_path, f"<main><p>{quote}</p></main>")
+    client = Mock(spec=GeminiInterpreter)
+    client.model = "gemini-test-live"
+    client.reason_codes = []
+    client.model_version = None
+    client.input_tokens = client.output_tokens = client.attempts = 0
+    client.generate.return_value = orjson.dumps(
+        {"proposals": [{"block_id": "b0", "concept": concept, "subject": subject}]}
+    ).decode()
+
+    mapped = MappingEngine(tmp_path, interpreter=client).map(report)
+
+    assert mapped.mapping
+    assert not any(
+        row.record_type == "claim" and row.group_id == "financial_health"
+        for row in mapped.mapping.records
+    )
+    assert any(
+        row.reason == "gemini_price_not_financial_performance"
+        for row in mapped.mapping.dispositions
+    )
+
+
+@pytest.mark.parametrize(
+    ("quote", "price_only"),
+    [
+        ("Our plans start at $6 per month.", True),
+        ("Our subscription costs 6 EUR per month.", True),
+        ("Our plans are free for everyone.", True),
+        ("Our Revenue plan costs USD 6 per month.", True),
+        ("We raised our subscription price to USD 12 per month.", True),
+        ("Our revenue was USD 12 million per month.", False),
+        ("Our ARR reached USD 12 million, with plans from USD 6 per month.", False),
+        ("We raised USD 12 million, with plans from USD 6 per month.", False),
+        ("Our subscriptions generated USD 12 million in revenue.", False),
+        ("We are profitable, with plans from USD 6 per month.", False),
+        ("Our cash balance was USD 12 million, with plans from USD 6.", False),
+        ("Notre chiffre d'affaires était EUR 12 millions par mois.", False),
+        ("Unser Umsatz betrug EUR 12 Millionen pro Monat.", False),
+    ],
+)
+def test_price_evidence_requires_a_source_financial_assertion(
+    quote: str, price_only: bool
+) -> None:
+    """Pricing vocabulary cannot override explicit source-supported financial facts."""
+    assert price_only_financial_claim(quote) is price_only
+
+
+@pytest.mark.parametrize(
+    ("concept", "quote"),
+    [
+        ("revenue", "Our revenue was USD 12 million per month."),
+        ("arr", "Our ARR reached USD 12 million, with plans from USD 6 per month."),
+        ("funding", "We raised USD 12 million, with plans from USD 6 per month."),
+        ("profitability", "We are profitable, with plans from USD 6 per month."),
+        ("cash", "Our cash balance was USD 12 million, with plans from USD 6."),
+    ],
+)
+def test_financial_positive_controls_survive_gemini_validation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    concept: str,
+    quote: str,
+) -> None:
+    """Verify the proposal path preserves actual financial assertions and anchors."""
+    monkeypatch.setenv("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules_gemini")
+    monkeypatch.setattr(
+        "oxhack2026.research.evidence_mapping.classify", lambda text: None
+    )
+    report = source_report(tmp_path, f"<main><p>{quote}</p></main>")
+    client = Mock(spec=GeminiInterpreter)
+    client.model = "gemini-test-live"
+    client.reason_codes = []
+    client.model_version = None
+    client.input_tokens = client.output_tokens = client.attempts = 0
+    client.generate.return_value = orjson.dumps(
+        {"proposals": [{"block_id": "b0", "concept": concept, "subject": "company"}]}
+    ).decode()
+
+    mapped = MappingEngine(tmp_path, interpreter=client).map(report)
+
+    assert mapped.mapping
+    claims = [row for row in mapped.mapping.records if row.method == "gemini"]
+    assert len(claims) == 1
+    assert claims[0].concept == concept
+    assert claims[0].subject == "company"
+    assert claims[0].quotes[0].exact == quote
+    assert claims[0].group_id == "financial_health"
 
 
 def test_mapping_only_recovery_never_enqueues_collection(tmp_path: Path) -> None:

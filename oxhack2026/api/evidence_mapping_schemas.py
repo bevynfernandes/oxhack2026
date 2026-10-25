@@ -14,6 +14,7 @@ MappingState = Literal[
     "pending", "running", "completed", "partial", "failed", "skipped"
 ]
 SubjectKind = Literal["company", "product", "customer", "third_party", "unresolved"]
+MAPPING_DEADLINE_SECONDS = 120
 
 
 class QuoteAnchor(DTO):
@@ -246,4 +247,4 @@ class MappingCapability(DTO):
     mode: Literal["rules", "rules_gemini"]
     gemini_available: bool
     reason: str | None = None
-    deadline_seconds: int = 60
+    deadline_seconds: int = MAPPING_DEADLINE_SECONDS

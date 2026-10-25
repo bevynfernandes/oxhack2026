@@ -6,6 +6,7 @@ from unittest.mock import Mock
 
 import orjson
 import pytest
+from websockets.exceptions import ConnectionClosedError
 
 from oxhack2026.explanations import gemini_live
 from oxhack2026.explanations.config import DEFAULT_MODEL
@@ -203,3 +204,50 @@ def test_live_preserves_submission_if_background_times_out(
     )
     assert result.response == '{"proposals":[]}'
     assert result.reason_code == "gemini_live_background_incomplete"
+
+
+@pytest.mark.parametrize("submitted", [False, True])
+def test_live_connection_loss_retains_only_received_submissions(
+    monkeypatch: pytest.MonkeyPatch, submitted: bool
+) -> None:
+    """A transport failure must preserve received results and expose partiality."""
+    frames: list[dict[str, object]] = [{"setupComplete": {}}]
+    if submitted:
+        frames.append(
+            {
+                "toolCall": {
+                    "functionCalls": [
+                        {
+                            "id": "call",
+                            "name": "submit_evidence",
+                            "args": {"proposals": []},
+                        }
+                    ]
+                }
+            }
+        )
+    socket = FakeSocket(frames)
+    calls = 0
+    original = socket.recv
+
+    async def receive() -> bytes:
+        nonlocal calls
+        calls += 1
+        if calls > len(frames):
+            raise ConnectionClosedError(None, None)
+        return await original()
+
+    monkeypatch.setattr(socket, "recv", receive)
+    monkeypatch.setattr(gemini_live, "connect", Mock(return_value=socket))
+    request = gemini_live.generate_live(
+        "test-key", DEFAULT_MODEL, "source blocks", proposal_schema(), 2
+    )
+    if not submitted:
+        with pytest.raises(ConnectionClosedError):
+            asyncio.run(request)
+        return
+
+    result = asyncio.run(request)
+
+    assert result.response == '{"proposals":[]}'
+    assert result.reason_code == "gemini_live_background_interrupted"
