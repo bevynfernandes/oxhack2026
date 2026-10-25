@@ -92,12 +92,22 @@ no investment grades or fabricated scores.
 
 ## Implementation acceptance
 
-- Preserve name/domain search and exact identity confirmation. Current research
-  supports known saved companies only; unknown companies remain an explicit gap.
+- Preserve name/domain search, saved-company selection and explicit identity
+  confirmation for standalone domain research. Unsupported discovery remains an
+  explicit gap; never fabricate a domain or silently confirm a company.
 - Separate saved analysis from new research. Show actual queued/running/partial/
   completed/failed and actionable 503/409/error states; no guessed percentages.
-- Render backend forecast order/horizons and five specialist groups, with null
-  predictions readable and target/model readiness explicit. No browser scoring.
+- API compatibility: preserve all three `outlook.forecasts` fields in backend
+  order, including the Financial Health 12-month field and its null prediction.
+  Validate the existing horizons and readiness states without changing saved
+  report bytes or inserting fields into legacy reports.
+- UI summary: render Growth (24 months), Survival (24 months) and Overall outlook.
+  Overall is not the API's Financial Health forecast under a different label;
+  it remains unavailable until the five required dimensions and aggregation gate
+  are satisfied. Do not assign it an invented horizon or compute a browser score.
+- UI drivers: render all five specialist groups in their shared order, including
+  Financial Health. Keep any experimental fiscal-year cash-flow estimate within
+  that dimension, labelled separately from validated outcome predictions.
 - Resolve metric/evidence references from the report inventory. Retain values,
   units, windows, stale/missing/restricted states and original measurement dates.
   Funding is not cash/runway; downloads are not customers/retention; exact-domain
@@ -105,15 +115,22 @@ no investment grades or fabricated scores.
 - Show actual supported signals/risks when supplied; otherwise explain the gap.
   No invented narrative, inferred ARR, verified badges or bubble/success labels.
 - Keep saved v1 URLs, exact old outcome names and legacy research reports usable.
-- Verify a real partial report, five groups, all three null forecast lanes, mobile
-  layout/zoom, dialog keyboard focus/Escape/tabs, reduced motion and source links.
-  Test the normal empty/error paths and verify generated types/build/format.
+- Verify API/serialization compatibility for all three null forecast fields.
+  Separately browser-test a real partial report with the Growth / Survival /
+  Overall summary and all five drivers, including the Financial Health drawer.
+  Check mobile layout/zoom, dialog keyboard focus/Escape/tabs, reduced motion,
+  source links and normal empty/error paths; verify generated types/build/format.
 
 The existing private Qdrant replay shared in #46 predates forecast metadata; use
-it for legacy compatibility. New report tests exercise the approved three lanes.
+it for legacy compatibility. New report contract tests retain the three API
+forecast lanes; UI tests assert the revised summary and driver hierarchy above.
 Any new live run must retain its actual capture and cannot rewrite that replay.
 
-## Verification
+## Historical verification (2026-10-24 dossier implementation)
+
+The results below describe the earlier dossier implementation, not acceptance of
+the revised #79 summary. The updated implementation acceptance above governs
+that integration.
 
 Full Python checks, Ruff, mypy, strict docs, generated types, frontend build,
 formatting and 23 frontend unit tests pass. Browser acceptance: 21 fixture tests
