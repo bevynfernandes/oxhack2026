@@ -13,11 +13,13 @@ import { expressiveTokens, springPreset } from "../../src/motion/tokens";
 import {
   MotionProvider,
   MotionButton,
+  MotionAmbient,
   MotionLink,
   MotionNavLink,
   MotionDisclosure,
   MotionDialog,
   MotionState,
+  MotionSurface,
   type MotionDialogHandle,
 } from "../../src/motion";
 
@@ -79,6 +81,36 @@ it("preserves button refs, submission type, handlers and disabled behaviour", ()
   expect(ref.current).toHaveAttribute("type", "submit");
   fireEvent.click(ref.current!);
   expect(click).not.toHaveBeenCalled();
+});
+
+it("preserves surface events and stays still with reduced motion", () => {
+  const enter = vi.fn();
+  render(
+    <MotionProvider reducedMotion>
+      <MotionSurface onPointerEnter={enter} data-testid="surface">
+        <button>Action</button>
+      </MotionSurface>
+    </MotionProvider>,
+  );
+  const surface = screen.getByTestId("surface");
+  fireEvent.pointerEnter(surface, { pointerType: "mouse" });
+  expect(enter).toHaveBeenCalledOnce();
+  expect(surface).toHaveAttribute("data-motion-surface");
+  expect(surface.style.transform).not.toContain("-3px");
+});
+
+it("keeps ambient decoration hidden and stationary with reduced motion", () => {
+  render(
+    <MotionProvider reducedMotion>
+      <MotionAmbient mode="orbit" data-testid="ambient">
+        Decoration
+      </MotionAmbient>
+    </MotionProvider>,
+  );
+  const ambient = screen.getByTestId("ambient");
+  expect(ambient).toHaveAttribute("aria-hidden", "true");
+  expect(ambient).toHaveAttribute("data-motion-ambient", "orbit");
+  expect(ambient.style.transform).not.toContain("rotate(360deg)");
 });
 
 it("preserves router links and navigation attributes", () => {

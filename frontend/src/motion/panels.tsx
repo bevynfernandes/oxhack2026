@@ -10,6 +10,57 @@ import {
 import { animate, LayoutGroup, m, useMotionValue } from "motion/react";
 import { MotionButton } from "./controls";
 import { useMotionPreference, useMotionTransition } from "./provider";
+import { motionGeometry } from "./tokens";
+
+/** Give grouped interactive content shared spring feedback without changing its semantics. */
+export function MotionSurface({
+  children,
+  onPointerEnter,
+  onPointerLeave,
+  onFocusCapture,
+  onBlurCapture,
+  ...props
+}: Omit<
+  ComponentPropsWithoutRef<"div">,
+  "onDrag" | "onDragStart" | "onDragEnd" | "onAnimationStart"
+> & { children: ReactNode }) {
+  const [hovered, setHovered] = useState(false);
+  const [focused, setFocused] = useState(false);
+  const reduced = useMotionPreference();
+  const transition = useMotionTransition("defaultSpatial");
+  const active = !reduced && (hovered || focused);
+  return (
+    <m.div
+      {...props}
+      data-motion-surface=""
+      initial={false}
+      animate={{
+        y: active ? motionGeometry.surfaceLift : 0,
+        scale: active ? motionGeometry.surfaceScale : 1,
+      }}
+      transition={transition}
+      onPointerEnter={(event) => {
+        if (event.pointerType !== "touch") setHovered(true);
+        onPointerEnter?.(event);
+      }}
+      onPointerLeave={(event) => {
+        setHovered(false);
+        onPointerLeave?.(event);
+      }}
+      onFocusCapture={(event) => {
+        setFocused(true);
+        onFocusCapture?.(event);
+      }}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget))
+          setFocused(false);
+        onBlurCapture?.(event);
+      }}
+    >
+      {children}
+    </m.div>
+  );
+}
 
 /** Group indicator identities without adding a layout wrapper. */
 export function MotionSelection({ children }: { children: ReactNode }) {

@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 520" fill="none">
-<defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><path d="M0 0V5" stroke="#f2f0e9" stroke-width=".6" opacity=".35"/></pattern></defs>
-<g stroke="#f2f0e9" stroke-width=".7">
+<defs><pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(30)"><path d="M0 0V5" stroke="#ffffff" stroke-width=".6" opacity=".6"/></pattern></defs>
+<g stroke="#14141a" stroke-width=".7">
 <path opacity=".38" d="M451.0 242.0L505.0 242.0"/>
 <path opacity=".38" d="M466.6 255.5L494.5 257.4"/>
 <path opacity=".38" d="M465.2 269.0L493.0 272.7"/>
@@ -114,12 +114,12 @@
 <ellipse cx="260" cy="315" rx="127.6" ry="19.3" opacity=".65"/>
 <ellipse cx="260" cy="352" rx="97.5" ry="13.4" opacity=".65"/>
 <path d="M260 79V405" stroke-width="3"/>
-<ellipse cx="260" cy="242" rx="196" ry="48" stroke-width="9" stroke="#0d0d24"/>
+<ellipse cx="260" cy="242" rx="196" ry="48" stroke-width="9" stroke="#ffe2c7"/>
 <ellipse cx="260" cy="242" rx="196" ry="44" stroke-width="1.5"/>
 <ellipse cx="260" cy="242" rx="196" ry="52"/>
 </g>
 <path d="M95 187C68 357 190 422 260 422S451 357 425 187M101 188C76 350 191 415 260 415S443 350 419 188" stroke-width="1.4"/>
 <path d="M244 421V443L224 461H296L276 443V421M228 462L216 471H304L292 462M218 472L203 484H317L302 472M203 484V490H317V484" fill="url(#hatch)"/>
 <path d="M160 499H360M188 505H332M260 13V42M31 242H60M460 242H489" opacity=".5"/>
-<circle cx="260" cy="242" r="5" fill="#f2f0e9"/>
+<circle cx="260" cy="242" r="5" fill="#ffffff"/>
 </g></svg>

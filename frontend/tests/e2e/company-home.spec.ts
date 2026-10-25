@@ -98,7 +98,9 @@ test("directory pagination and footer remain reachable on a small mobile screen"
     page.getByRole("link", { name: /Open dossier for/ }),
   ).toHaveCount(2);
   await expect(page.getByText("Page 1 of 2")).toBeVisible();
-  const footer = page.getByRole("link", { name: "Research a new domain" });
+  const footer = page.getByRole("link", {
+    name: "Browse publications & compare companies",
+  });
   await footer.scrollIntoViewIfNeeded();
   await expect(footer).toBeInViewport();
   expect(

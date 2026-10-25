@@ -1,4 +1,5 @@
 export { MotionProvider } from "./provider";
+export { MotionAmbient } from "./ambient";
 export {
   MotionButton,
   MotionLink,
@@ -11,6 +12,7 @@ export {
   MotionIndicator,
   MotionSelection,
   MotionState,
+  MotionSurface,
 } from "./panels";
 export { MotionDialog, type MotionDialogHandle } from "./dialog";
 
