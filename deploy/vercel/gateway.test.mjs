@@ -68,6 +68,7 @@ test("Vercel proxy preserves parameters and status without exposing credentials"
   t.mock.method(globalThis, "fetch", async (url, options) => {
     assert.equal(url, "https://api.example.com/api/v2/company-search?q=qdrant");
     assert.equal(options.headers["x-phronesis-gateway-key"], key);
+    assert.equal(options.headers["accept-encoding"], "gzip");
     assert.equal(options.headers.cookie, undefined);
     return Response.json({ companies: [] }, { status: 200 });
   });

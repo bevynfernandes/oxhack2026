@@ -35,6 +35,7 @@ export default {
         method: request.method,
         headers: {
           "content-type": "application/json",
+          "accept-encoding": "gzip",
           "x-phronesis-gateway-key": key,
         },
         body,
