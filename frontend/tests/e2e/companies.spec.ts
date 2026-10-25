@@ -173,3 +173,64 @@ test("company tables and comparison remain usable on narrow screens with a three
   });
   expect((await auditAccessibility(page)).violations).toEqual([]);
 });
+
+for (const width of [1440, 390]) {
+  test(`saved company examples share the decision brief at ${width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto(`/companies/${snapshot}/alpha`);
+    await expect(
+      page.getByRole("heading", { name: "What the evidence tells us" }),
+    ).toBeVisible();
+    await expect(page.locator(".company-dossier")).toHaveClass(
+      /decision-dossier/,
+    );
+    await expect(
+      page
+        .locator(".dossier-banners")
+        .getByText("Synthetic test data.", { exact: true }),
+    ).toBeVisible();
+    await expect(page.getByText("24 months")).toHaveCount(2);
+    await expect(
+      page.getByRole("button", { name: "Continue research", exact: true }),
+    ).toHaveCount(0);
+    await page
+      .getByRole("button", { name: "Inspect supporting evidence", exact: true })
+      .click();
+    const drawer = page.getByRole("dialog");
+    await expect(
+      drawer.getByRole("heading", { name: "All published measurements" }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(drawer).not.toBeVisible();
+    await expect(
+      page.getByRole("button", {
+        name: "Inspect supporting evidence",
+        exact: true,
+      }),
+    ).toBeFocused();
+    await page
+      .getByRole("button", { name: "Saved assessment", exact: true })
+      .click();
+    await expect(
+      page.getByRole("heading", { name: "Cash-flow self-sufficiency" }),
+    ).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(drawer).not.toBeVisible();
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+    await page.screenshot({
+      path: info.outputPath("saved-decision.png"),
+      fullPage: true,
+    });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+  });
+}

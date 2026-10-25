@@ -158,6 +158,7 @@ export default function CompanyDossier({
     segment: "Standalone research",
     business_model: null,
   };
+  const decisionLayout = !report;
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
   const dimensionModels =
     standalone?.dimension_models ?? profile?.dimension_models;
@@ -444,7 +445,7 @@ export default function CompanyDossier({
   };
   return (
     <article
-      className={`company-dossier ${standalone ? "decision-dossier" : ""}`}
+      className={`company-dossier ${decisionLayout ? "decision-dossier" : ""}`}
       aria-label="Company research dossier"
     >
       <header className="dossier-company">
@@ -453,7 +454,7 @@ export default function CompanyDossier({
             {company.display_name.slice(0, 1)}
           </div>
           <div>
-            {standalone && (
+            {decisionLayout && (
               <span className="micro-label">
                 COMPANY RESEARCH / DECISION WORKSPACE
               </span>
@@ -482,7 +483,7 @@ export default function CompanyDossier({
           </strong>
           <small>Source-backed · as of {date(cutoff ?? null)}</small>
         </div>
-        {!standalone && (
+        {!decisionLayout && (
           <div className="dossier-outlook">
             <span className="outlook-mark" aria-hidden="true">
               —
@@ -509,9 +510,13 @@ export default function CompanyDossier({
           </MotionButton>
         </div>
       </header>
-      {standalone && (
+      {decisionLayout && (
         <DecisionBrief
           report={standalone}
+          models={dimensionModels}
+          usableIds={outlook?.specialists.flatMap(
+            (row) => row.usable_metric_observation_ids,
+          )}
           summary={evidenceSummary(profile, standalone, report)}
           onEvidence={() => open({ kind: "sources", index: 1 })}
         />
@@ -573,7 +578,7 @@ export default function CompanyDossier({
             <section className="dossier-stat">
               <div>
                 <h3>
-                  {standalone
+                  {decisionLayout
                     ? "Overall outlook unavailable"
                     : "Overall outlook"}
                 </h3>
@@ -646,7 +651,7 @@ export default function CompanyDossier({
           BUSINESS FUNDAMENTALS <span>(5 DIMENSIONS)</span>
         </h2>
         <p>
-          {standalone
+          {decisionLayout
             ? "Open a dimension for its evidence and limitations"
             : "Select a pillar to inspect measurements and model readiness"}
         </p>
@@ -709,7 +714,7 @@ export default function CompanyDossier({
               <header>
                 <div className="pillar-top">
                   <span>DIMENSION 0{index + 1}</span>
-                  {!standalone && (
+                  {!decisionLayout && (
                     <span className="pillar-model">
                       {group.id === "financial_health" && cashFlowResearch
                         ? "Cash-flow component trained"
@@ -733,7 +738,7 @@ export default function CompanyDossier({
                     <Icon name="arrow" />
                   </MotionButton>
                 </h3>
-                {!standalone && (
+                {!decisionLayout && (
                   <p className="pillar-description">{group.description}</p>
                 )}
               </header>
@@ -801,7 +806,7 @@ export default function CompanyDossier({
                   </small>
                 )}
               </div>
-              {!standalone && (
+              {!decisionLayout && (
                 <div className="pillar-model-note">
                   <span className="micro-label">
                     {sentimentScore != null

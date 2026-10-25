@@ -294,3 +294,9 @@
   font-size: 12px;
   line-height: 1.5;
 }
+
+.theme-techno-classical .decision-dossier .saved-assessment-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

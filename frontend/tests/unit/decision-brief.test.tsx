@@ -4,7 +4,7 @@ import type { ComponentProps } from "react";
 import DecisionBrief from "../../src/pages/research/DecisionBrief";
 import type { EvidenceSummary } from "../../src/pages/research/summary";
 
-type Report = ComponentProps<typeof DecisionBrief>["report"];
+type Report = NonNullable<ComponentProps<typeof DecisionBrief>["report"]>;
 const report = {
   outlook: {
     specialists: [
@@ -140,5 +140,22 @@ it("withholds ineligible experimental scores", () => {
   expect(screen.queryByText(/99/)).toBeNull();
   expect(
     screen.getByRole("heading", { name: "Before making a decision" }),
+  ).toBeVisible();
+});
+
+it("uses a saved publication's measurements without claiming fresh interpretation", () => {
+  render(
+    <DecisionBrief
+      summary={summary}
+      usableIds={["usable"]}
+      models={report.dimension_models}
+      onEvidence={vi.fn()}
+    />,
+  );
+  expect(screen.getByText("Retrieved story links, not users.")).toBeVisible();
+  expect(screen.getByText("Evidence review")).toBeVisible();
+  expect(screen.queryByText("Interpretation unavailable")).toBeNull();
+  expect(
+    screen.getByRole("heading", { name: "Title sentiment" }),
   ).toBeVisible();
 });

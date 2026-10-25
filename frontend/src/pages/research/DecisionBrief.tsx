@@ -8,36 +8,33 @@ export default function DecisionBrief({
   report,
   summary,
   onEvidence,
+  usableIds,
+  models,
 }: {
-  report: Awaited<ReturnType<typeof fetchStandaloneReport>>;
+  report?: Awaited<ReturnType<typeof fetchStandaloneReport>>;
+  usableIds?: string[];
+  models?: Awaited<
+    ReturnType<typeof fetchStandaloneReport>
+  >["dimension_models"];
   summary: EvidenceSummary;
   onEvidence: () => void;
 }) {
-  const analysis = report.mapping?.analysis;
+  const analysis = report?.mapping?.analysis;
   const finding = analysis?.statements.find((row) => row.kind === "finding");
   const findingRecords =
-    report.mapping?.records.filter((row) =>
+    report?.mapping?.records.filter((row) =>
       finding?.mapping_ids.includes(row.mapping_id),
     ) ?? [];
-  const findingSource = report.evidence.find((row) =>
+  const findingSource = report?.evidence.find((row) =>
     findingRecords.some((record) =>
       record.evidence_ids.includes(row.evidence_id),
     ),
   );
   const conflict = analysis?.statements.find((row) => row.kind === "conflict");
-  const gaps = report.outlook.specialists
-    .filter((row) => row.data_status === "insufficient_data")
-    .map(
-      (row) =>
-        ({
-          adoption_retention: "Adoption & retention",
-          attention_sentiment: "Attention & sentiment",
-          financial_health: "Financial health",
-          industry_competition: "Industry & competition",
-          team_execution: "Team & execution",
-        })[row.group_id],
-    );
-  const eligibleModels = report.dimension_models?.dimensions.filter(
+  const gaps = summary.gaps.map((group) => group.replaceAll("_", " "));
+  const eligibleModels = (
+    models ?? report?.dimension_models
+  )?.dimensions.filter(
     (row) => row.eligibility === "eligible" && row.score != null,
   );
   const experiment =
@@ -45,9 +42,11 @@ export default function DecisionBrief({
     eligibleModels?.find((row) => row.group_id === "attention_sentiment");
   const isSentiment = experiment?.group_id === "attention_sentiment";
   const usable = new Set(
-    report.outlook.specialists.flatMap(
-      (row) => row.usable_metric_observation_ids,
-    ),
+    usableIds ??
+      report?.outlook.specialists.flatMap(
+        (row) => row.usable_metric_observation_ids,
+      ) ??
+      [],
   );
   const signal = summary.measurements.find(
     (row) => usable.has(row.id) && row.value !== "Unavailable",
@@ -62,7 +61,7 @@ export default function DecisionBrief({
         <span className="decision-status">
           {analysis?.state === "unavailable"
             ? "Interpretation unavailable"
-            : report.mapping?.state === "partial"
+            : report?.mapping?.state === "partial"
               ? "Partial analysis"
               : "Evidence review"}
         </span>
