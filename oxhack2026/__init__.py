@@ -1,1 +1,1 @@
-"""SignalShift package scaffold; product capabilities are not implemented."""
+"""SignalShift company research, evidence assessments and forecasting."""

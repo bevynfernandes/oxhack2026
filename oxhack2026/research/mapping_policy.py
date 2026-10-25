@@ -106,6 +106,36 @@ SEC_FINANCIAL_METRICS = frozenset(
         "sec_cash_and_equivalents_usd",
     }
 )
+_CURRENCY = r"(?:[$€£¥₹₩]|\b(?:USD|EUR|GBP|CAD|AUD|JPY|CHF|CNY)\b)"
+_AMOUNT = r"-?\d[\d.,\u00a0\u202f ]*(?:million|billion|thousand|millions|m|bn|k)?"
+_MONEY = rf"(?:{_CURRENCY}\s*{_AMOUNT}|{_AMOUNT}\s*{_CURRENCY})"
+_PRICE_CONTEXT = re.compile(
+    r"\b(?:plans?|prices?|pricing|subscriptions?|billed|billing|costs?|charges?|"
+    r"abonnements?|forfaits?|tarifs?|prix|preise?|abos?|tarifas?|suscripciones?)\b|"
+    r"\b(?:per|par|pro|a|each)\s+(?:month|year|seat|user|minute|mois|monat)\b|"
+    r"/\s*(?:mo|month|yr|year|seat|user|minute)\b",
+    re.IGNORECASE,
+)
+_FINANCIAL_TERMS = (
+    "(?:"
+    + "|".join(rule.pattern for rule in CONCEPTS if rule.group == "financial_health")
+    + r")\w*"
+)
+_FINANCIAL_CONNECTORS = (
+    r"(?:(?:is|are|was|were|has|have|had|reached|reported|grew|rose|fell|"
+    r"increased|decreased|totaled|totalled|of|at|to|about|approximately|over|"
+    r"under|more|less|than|least|most|est|était|atteint|de|plus|environ|"
+    r"betrug|von|etwa|fue|es|alcanzó)\s+){0,8}"
+)
+_FINANCIAL_ASSERTION = re.compile(
+    rf"{_FINANCIAL_TERMS}\s*[:=]?\s*{_FINANCIAL_CONNECTORS}{_MONEY}|"
+    rf"{_MONEY}\s+(?:in|of|de)\s+{_FINANCIAL_TERMS}|"
+    r"\b(?:is|are|was|were|became|remains?)\s+(?:now\s+)?"
+    r"(?:profitable|cash[- ]flow positive)\b",
+    re.IGNORECASE,
+)
+_MONETARY_VALUE = re.compile(_MONEY, re.IGNORECASE)
+_FREE_PRICE = re.compile(r"\b(?:free|gratis|gratuit|kostenlos|gratuito)\b", re.I)
 METRIC_GROUPS: dict[str, SpecialistGroupId] = {
     "npm_downloads_latest_30d": "adoption_retention",
     "npm_downloads_previous_30d": "adoption_retention",
@@ -146,7 +176,32 @@ def classify(text: str) -> ConceptRule | None:
         re.IGNORECASE,
     ):
         return None
-    return next((rule for rule, pattern in _PATTERNS if pattern.search(text)), None)
+    rule = next((rule for rule, pattern in _PATTERNS if pattern.search(text)), None)
+    if rule and rule.group == "financial_health" and price_only_financial_claim(text):
+        return None
+    return rule
+
+
+def price_only_financial_claim(text: str) -> bool:
+    """Identify source prices that do not assert actual financial performance.
+
+    Args:
+        text: Retained source quote, independent of any model-provided subject.
+    Returns:
+        Whether pricing language and a monetary/free price lack a supported
+        financial assertion. Currency symbols identify a quoted price without
+        guessing a normalized currency. Mixed quotes retain explicit financial
+        statements; ambiguous financial interpretations remain unmapped.
+    """
+    monetary = _MONETARY_VALUE.search(text)
+    price = _PRICE_CONTEXT.search(text) or _MONETARY_VALUE.fullmatch(
+        text.strip().rstrip(".")
+    )
+    return bool(
+        price
+        and (monetary or _FREE_PRICE.search(text))
+        and not _FINANCIAL_ASSERTION.search(text)
+    )
 
 
 def metric_eligible(row: Observation, as_of: datetime) -> tuple[bool, str]:

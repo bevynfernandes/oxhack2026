@@ -166,9 +166,22 @@ A process `GEMINI_API_KEY` overrides it; an explicitly empty value disables it.
 The key is excluded from public API DTOs, captured prompts, logs and frontend
 configuration. Other provider credentials remain local environment configuration.
 
-Each mapping run has a sixty-second deadline, at most six bounded requests, a
+Each mapping run has a two-minute deadline, at most six bounded requests, a
 conservative sixty-thousand input-token reservation and two simultaneous model
-operations. `SIGNALSHIFT_GEMINI_RPM` and `SIGNALSHIFT_GEMINI_TPM` configure the
+operations. Live interpretation consolidates up to 24 candidate sentences into
+one size-bounded session so asynchronous background reasoning shares that budget.
+Candidates are selected round-robin across captured pages, retaining each page's
+priority order, so a long pricing page cannot consume the whole request.
+Short request-local handles select exact retained document blocks; model output
+never supplies quote text or capture locations. Additional candidates remain an
+explicit coverage limitation. A connection loss after a received submission
+preserves it with an interrupted-background reason, rather than discarding it.
+Retained pricing language and monetary/free prices are checked independently of
+the model's subject label in both rules and Gemini validation. Price-only quotes
+cannot establish company revenue, ARR, funding, cash or profitability. Explicit
+source financial assertions remain eligible even when the quote also discusses
+subscription prices; monetary normalization and metric eligibility stay separate.
+`SIGNALSHIFT_GEMINI_RPM` and `SIGNALSHIFT_GEMINI_TPM` configure the
 shared process quota (defaults ten requests and sixty thousand reserved tokens per
 minute). These are application limits, not claims about Google's project quota.
 The mapper caches exact prompt/model responses as hashed artifacts, independently

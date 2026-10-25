@@ -34,7 +34,7 @@ docs-test: ## Build documentation with warnings treated as errors.
 frontend-install: ## Install locked frontend dependencies.
 	npm --prefix frontend ci
 
-frontend-check: ## Type-check and build the frontend template.
+frontend-check: ## Check API types and build the frontend.
 	npm --prefix frontend run build
 
 help: ## List development targets.

@@ -2226,7 +2226,7 @@ export interface components {
         MappingCapability: {
             /**
              * Deadline Seconds
-             * @default 60
+             * @default 120
              */
             deadline_seconds: number;
             /** Enabled */

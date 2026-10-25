@@ -1,1 +1,1 @@
-"""Batch command template; no executable entry point is registered."""
+"""Administrative data collection, publication and model commands."""

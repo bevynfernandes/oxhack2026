@@ -3653,7 +3653,7 @@
         "description": "Local configuration only; no vendor probe is performed.",
         "properties": {
           "deadline_seconds": {
-            "default": 60,
+            "default": 120,
             "title": "Deadline Seconds",
             "type": "integer"
           },

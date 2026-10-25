@@ -3,6 +3,7 @@
 import logging
 import re
 import time
+from collections import deque
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -15,6 +16,7 @@ import orjson
 from pydantic import ValidationError
 
 from oxhack2026.api.evidence_mapping_schemas import (
+    MAPPING_DEADLINE_SECONDS,
     DimensionCoverage,
     MappedRecord,
     MappingBundle,
@@ -26,6 +28,7 @@ from oxhack2026.api.evidence_mapping_schemas import (
 from oxhack2026.api.research_v2_schemas import Capture, Claim, Report, ResearchEvidence
 from oxhack2026.explanations.config import mapping_mode as mapping_mode
 from oxhack2026.explanations.gemini import (
+    LIVE_BATCH_LIMIT,
     BlockClassification,
     CachedInterpretation,
     EvidenceProposal,
@@ -53,6 +56,7 @@ from oxhack2026.research.mapping_policy import (
     METRIC_PROVIDERS,
     classify,
     metric_eligible,
+    price_only_financial_claim,
 )
 from oxhack2026.research.numerical_claims import normalize_quantity
 from oxhack2026.storage.artifacts import FileArtifactStore
@@ -214,7 +218,7 @@ class MappingEngine:
             ValueError: Captured artifacts are corrupt or configuration is invalid.
         """
         started = datetime.now(UTC)
-        deadline = time.monotonic() + 58
+        deadline = time.monotonic() + MAPPING_DEADLINE_SECONDS - 2
         mode = mapping_mode()
         self._artifacts = []
         self._reasons = []
@@ -577,30 +581,43 @@ class MappingEngine:
             )
         )
         batches: list[list[tuple[EvidenceDocument, DocumentBlock]]] = []
+        live = "-live" in interpreter.model
+        candidate_limit = LIVE_BATCH_LIMIT if live else 120
+        batch_bytes = 24_000 if live else 6500
+        batch_limit = 1 if live else 6
+        selected = (
+            _live_candidates(candidates, candidate_limit)
+            if live
+            else candidates[:candidate_limit]
+        )
         size = 0
-        for candidate in candidates[:120]:
+        for candidate in selected:
             required = len(candidate[1].text[:1200].encode()) + 900
-            if not batches or size + required > 6500:
+            if not batches or size + required > batch_bytes:
                 batches.append([])
                 size = 0
             batches[-1].append(candidate)
             size += required
-        for batch_number, batch in enumerate(batches[:6]):
-            lookup = {block.block_id: (document, block) for document, block in batch}
+        completed_batches = 0
+        for batch in batches[:batch_limit]:
+            lookup = {
+                f"b{index}" if live else block.block_id: (document, block)
+                for index, (document, block) in enumerate(batch)
+            }
             blocks = [
                 {
-                    "block_id": block.block_id,
+                    "block_id": block_id,
                     "text": block.text[:1200],
                     "heading": block.heading[:300],
                     "title": document.title[:300],
                     "language": document.language,
                 }
-                for document, block in batch
+                for block_id, (document, block) in lookup.items()
             ]
             prompt = proposal_prompt(
                 report.identity.company_name,
                 blocks,
-                compact="-live" in interpreter.model,
+                compact=live,
             )
             try:
                 response = self._response(prompt, interpreter)
@@ -637,8 +654,9 @@ class MappingEngine:
                     )
                     continue
                 self._proposal(report, proposal, lookup, work)
-            self._progress(started, batch_number + 1)
-        if len(candidates) > 120 or len(batches) > 6:
+            completed_batches += 1
+            self._progress(started, completed_batches)
+        if len(candidates) > candidate_limit or len(batches) > batch_limit:
             self._reasons.append("gemini_candidate_budget")
 
     def _response(self, prompt: str, interpreter: GeminiInterpreter) -> str:
@@ -710,6 +728,19 @@ class MappingEngine:
             subject = rule_subject
         if block.role == "quotation":
             subject = "customer" if rule_subject == "customer" else "unresolved"
+        financial = CONCEPT_LOOKUP[proposal.concept].group == "financial_health"
+        price_only = financial and price_only_financial_claim(proposal.exact_quote)
+        if price_only or (subject == "product" and financial):
+            work.dispositions.append(
+                MappingDisposition(
+                    candidate_id=block.block_id,
+                    state="rejected",
+                    reason="gemini_price_not_financial_performance"
+                    if price_only
+                    else "gemini_subject_concept_mismatch",
+                )
+            )
+            return
         selected = block.model_copy(
             update={
                 "text": proposal.exact_quote,
@@ -735,6 +766,30 @@ def _claim_key(mapped: MappedRecord, text: str) -> str:
         mapped.concept,
         text.casefold(),
     )
+
+
+def _live_candidates(
+    candidates: list[tuple[EvidenceDocument, DocumentBlock]], limit: int
+) -> list[tuple[EvidenceDocument, DocumentBlock]]:
+    """Select source blocks round-robin so one long page cannot fill the request.
+
+    Args:
+        candidates: Prioritized, source-anchored candidate blocks.
+        limit: Maximum number of blocks to select.
+    Returns:
+        Bounded candidates retaining priority within each captured document.
+    """
+    by_capture: dict[str, deque[tuple[EvidenceDocument, DocumentBlock]]] = {}
+    for document, block in candidates:
+        by_capture.setdefault(document.capture_id, deque()).append((document, block))
+    queues = deque(by_capture.values())
+    selected: list[tuple[EvidenceDocument, DocumentBlock]] = []
+    while queues and len(selected) < limit:
+        queue = queues.popleft()
+        selected.append(queue.popleft())
+        if queue:
+            queues.append(queue)
+    return selected
 
 
 def _proposal_values(response: str) -> list[object]:

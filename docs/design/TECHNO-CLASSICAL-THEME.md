@@ -69,7 +69,6 @@ revision changes hierarchy, spacing and composition as well.
 - `armillary.svg` is an original 6.67 KB geometric engraving with meridians, orbital
   rings and a pedestal. `grain.svg` is a 331-byte static texture tile. Both are
   decorative CSS backgrounds, excluded from forced-colour mode, with no animation.
-- Keep the earlier `observatory.svg` asset for the retained first-pass design.
   No Hermes branding, artwork, font binaries or source code is copied.
 - Evidence, tables and forms retain opaque surfaces for readable contrast.
 
@@ -141,7 +140,6 @@ accessible description and disabled animation remain unchanged.
 | `frontend/src/theme/assets/grain.svg`                        | Original 331-byte static texture tile.                                                                                                        |
 | `frontend/src/theme/assets/OFL.txt`                          | Font licence retained with the asset.                                                                                                         |
 | `frontend/src/theme/assets/NOTICE.md`                        | Asset provenance and attribution.                                                                                                             |
-| `frontend/src/theme/assets/observatory.svg`                  | Original 755-byte decorative line engraving.                                                                                                  |
 | `frontend/src/components/HistoryChart.tsx`                   | Read shared colour tokens for chart presentation; preserve the light fallback, values, gaps and disabled animation.                           |
 | `frontend/src/pages/research/CompanyDossier.tsx`             | Label/focus scrollable measurements; attach styling classes to existing events/timestamps.                                                    |
 | `frontend/src/pages/tool-detail/ToolDetail.tsx`              | Label/focus the existing scrollable history table.                                                                                            |

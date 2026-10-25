@@ -1,1 +1,1 @@
-"""Verified tool identities and effective-dated mapping templates."""
+"""Verified identities and effective-dated source mappings."""
