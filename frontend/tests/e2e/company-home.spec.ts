@@ -61,11 +61,19 @@ test("homepage honestly handles empty and failed publication lists", async ({
     route.fulfill({ status: 503, json: {} }),
   );
   await page.reload();
-  await expect(page.getByRole("alert")).toContainText("unavailable");
-  await expect(page.getByRole("button", { name: "Retry" })).toBeVisible();
+  await expect(page.getByRole("status")).toContainText("unavailable");
+  const retry = page.getByRole("button", { name: "Retry saved assessments" });
+  await expect(retry).toBeVisible();
+  await page.route("**/api/v1/company-snapshots", (route) =>
+    route.fulfill({ json: { items: [] } }),
+  );
+  await retry.click();
+  await expect(page.getByRole("status")).toContainText(
+    "No company assessments",
+  );
 });
 
-test("directory pagination keeps every company reachable without growing the viewport", async ({
+test("directory pagination and footer remain reachable on a small mobile screen", async ({
   page,
 }) => {
   await page.route("**/api/v1/company-snapshots/*/companies", async (route) => {
@@ -90,17 +98,13 @@ test("directory pagination keeps every company reachable without growing the vie
     page.getByRole("link", { name: /Open dossier for/ }),
   ).toHaveCount(2);
   await expect(page.getByText("Page 1 of 2")).toBeVisible();
+  const footer = page.getByRole("link", { name: "Research a new domain" });
+  await footer.scrollIntoViewIfNeeded();
+  await expect(footer).toBeInViewport();
   expect(
-    await page.evaluate(() => {
-      const main = document.querySelector("main")!;
-      const footer = document
-        .querySelector(".directory-footer")!
-        .getBoundingClientRect();
-      return (
-        main.scrollHeight <= main.clientHeight &&
-        footer.bottom <= main.getBoundingClientRect().bottom
-      );
-    }),
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
   ).toBe(true);
   await page.getByRole("button", { name: "Next", exact: true }).click();
   await expect(

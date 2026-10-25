@@ -1,13 +1,26 @@
 # SignalShift: startup outlook
 
-Approved UI alignment (2026-10-24): **Startup Outlook → Growth (24 months),
-Survival (24 months), Financial Health (12 months) → five fundamental driver
+Current owner direction (2026-10-25): **Startup Outlook → Growth (24 months),
+Survival (24 months), Overall dimension index → five fundamental driver
 groups → sources and limitations**. See the
 [current decision and API boundary](docs/tasks/dev2/prediction-workspace-alignment.md)
 and [canonical design reference](design/prediction-workspace/README.md).
 Ivan retains the frontend assignment. This supersedes the older page hierarchy
 below; saved v1 outcomes keep their exact meanings. Numerical predictions remain
 unavailable pending label/data review and validated local models.
+
+This supersedes the previous top-level Financial Health card. Financial Health
+remains a business dimension; existing financial forecast payloads retain their
+original target and horizon. Overall is an index of the five separate dimensions,
+not a survival probability. Missing dimensions do not silently become zero or
+receive redistributed weights. Research estimates may extrapolate beyond training
+populations only with their target, assumptions and limitations visible; do not
+describe those estimates as validated startup forecasts.
+
+Gemini interpretation is optional (`rules_gemini`); deterministic mapping (`rules`)
+is the default after retained live provider failures. The owner's instruction
+allows dropping Gemini if unreliable. Keep the latest bounded Live implementation
+available for opt-in evaluation, with independent source-quote validation.
 
 Latest direction: [startup prediction plan #46](https://github.com/bevynfernandes/oxhack2026/issues/46)
 and its [data-readiness and delivery plan](docs/tasks/dev2/startup-prediction-reset.md)
@@ -78,7 +91,8 @@ label-evaluation dates. Future labels live outside assessment/features payloads.
 Assessment statuses are `evidence_only`, `validated_probability`, `unavailable`.
 An evidence-only explanation describes facts and gaps; it must not assert an
 unvalidated likelihood. Show an outcome probability only when the published
-Dev 2 evaluation gate permits it. There is no arbitrary overall 0-100 score.
+Dev 2 evaluation gate permits it. The Overall 0-100 dimension index follows the
+current owner direction above and requires five separately supported scores.
 
 Visual direction: neutral surfaces, readable system typography, one restrained
 accent, compact navigation, tables and divided rows. Reduce oversized headlines,

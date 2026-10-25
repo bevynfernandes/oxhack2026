@@ -22,6 +22,7 @@ from oxhack2026.api.research_v2_schemas import (
     SourceState,
 )
 from oxhack2026.api.schemas import Window
+from oxhack2026.models.financial_inference import CashFlowResearchEstimate
 from oxhack2026.research.documents import page_family
 from oxhack2026.research.extraction import Page, company_links, evidence, parse_page
 from oxhack2026.research.network import CollectionError, Fetcher, public_url
@@ -67,6 +68,7 @@ class Collector:
     links: set[str] = field(default_factory=set)
     reasons: list[str] = field(default_factory=list)
     browser_pages: int = 0
+    cash_flow_research: CashFlowResearchEstimate | None = None
 
     def json(
         self, url: str, headers: dict[str, str] | None = None
@@ -565,5 +567,6 @@ class Collector:
                 "claims": tuple(self.claims),
                 "events": tuple(self.events),
                 "links": tuple(sorted(self.links)),
+                "cash_flow_research": self.cash_flow_research,
             }
         )

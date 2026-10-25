@@ -1,0 +1,277 @@
+{
+  "cutoff": "2026-09-30",
+  "parser": "oxhack2026.features.sec_financials.sec_annual_financials",
+  "selection": "Five source-access stress tests; not a prevalence or model-evaluation cohort",
+  "facts_source": "https://data.sec.gov/api/xbrl/companyfacts/CIK{cik}.json",
+  "metadata_sha256": "f2e3c041cb8eb2cb4b251e11eae25f61b5e18fab0bef34544b912611c0fd219e",
+  "panel_sha256": "e7d5a745226b05925194c39926ca8cc971f29bd59935f39e715086d9b20036de",
+  "rows": 747,
+  "issuers": [
+    {
+      "cik": "0000878079",
+      "source_sha256": "3aca1f44f4e80e20a35bac74db748a3d767512d3bd454b7ccb366e34a0ffe72e",
+      "annual_filings": 21,
+      "status_counts": [
+        {
+          "status": "missing",
+          "len": 147
+        },
+        {
+          "status": "observed",
+          "len": 42
+        }
+      ],
+      "metric_coverage": [
+        {
+          "metric": "assets",
+          "observed_filings": 6
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "observed_filings": 6
+        },
+        {
+          "metric": "current_assets",
+          "observed_filings": 6
+        },
+        {
+          "metric": "current_liabilities",
+          "observed_filings": 6
+        },
+        {
+          "metric": "gross_profit",
+          "observed_filings": 0
+        },
+        {
+          "metric": "liabilities",
+          "observed_filings": 6
+        },
+        {
+          "metric": "net_income",
+          "observed_filings": 6
+        },
+        {
+          "metric": "operating_cash_flow",
+          "observed_filings": 0
+        },
+        {
+          "metric": "revenue",
+          "observed_filings": 6
+        }
+      ]
+    },
+    {
+      "cik": "0000880460",
+      "source_sha256": "500cee15e3698904dd0a9f7def52a801d4715a6eb986b8f24a60bceea94f00df",
+      "annual_filings": 21,
+      "status_counts": [
+        {
+          "status": "missing",
+          "len": 136
+        },
+        {
+          "status": "observed",
+          "len": 53
+        }
+      ],
+      "metric_coverage": [
+        {
+          "metric": "assets",
+          "observed_filings": 6
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "observed_filings": 6
+        },
+        {
+          "metric": "current_assets",
+          "observed_filings": 6
+        },
+        {
+          "metric": "current_liabilities",
+          "observed_filings": 6
+        },
+        {
+          "metric": "gross_profit",
+          "observed_filings": 6
+        },
+        {
+          "metric": "liabilities",
+          "observed_filings": 6
+        },
+        {
+          "metric": "net_income",
+          "observed_filings": 6
+        },
+        {
+          "metric": "operating_cash_flow",
+          "observed_filings": 6
+        },
+        {
+          "metric": "revenue",
+          "observed_filings": 5
+        }
+      ]
+    },
+    {
+      "cik": "0001108524",
+      "source_sha256": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
+      "annual_filings": 22,
+      "status_counts": [
+        {
+          "status": "missing",
+          "len": 46
+        },
+        {
+          "status": "observed",
+          "len": 152
+        }
+      ],
+      "metric_coverage": [
+        {
+          "metric": "assets",
+          "observed_filings": 17
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "observed_filings": 17
+        },
+        {
+          "metric": "current_assets",
+          "observed_filings": 17
+        },
+        {
+          "metric": "current_liabilities",
+          "observed_filings": 17
+        },
+        {
+          "metric": "gross_profit",
+          "observed_filings": 17
+        },
+        {
+          "metric": "liabilities",
+          "observed_filings": 17
+        },
+        {
+          "metric": "net_income",
+          "observed_filings": 17
+        },
+        {
+          "metric": "operating_cash_flow",
+          "observed_filings": 17
+        },
+        {
+          "metric": "revenue",
+          "observed_filings": 16
+        }
+      ]
+    },
+    {
+      "cik": "0001159154",
+      "source_sha256": "bf97cdb10899b412607715402f6d1d95f9179f72b187e0f244a6b7ee59280eb5",
+      "annual_filings": 12,
+      "status_counts": [
+        {
+          "status": "missing",
+          "len": 71
+        },
+        {
+          "status": "observed",
+          "len": 37
+        }
+      ],
+      "metric_coverage": [
+        {
+          "metric": "assets",
+          "observed_filings": 5
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "observed_filings": 5
+        },
+        {
+          "metric": "current_assets",
+          "observed_filings": 5
+        },
+        {
+          "metric": "current_liabilities",
+          "observed_filings": 5
+        },
+        {
+          "metric": "gross_profit",
+          "observed_filings": 0
+        },
+        {
+          "metric": "liabilities",
+          "observed_filings": 5
+        },
+        {
+          "metric": "net_income",
+          "observed_filings": 5
+        },
+        {
+          "metric": "operating_cash_flow",
+          "observed_filings": 2
+        },
+        {
+          "metric": "revenue",
+          "observed_filings": 5
+        }
+      ]
+    },
+    {
+      "cik": "0001477333",
+      "source_sha256": "04cc636210456fc5163996c546c38dd049e53b5f9ce59b8f824f1725b06afe11",
+      "annual_filings": 7,
+      "status_counts": [
+        {
+          "status": "observed",
+          "len": 63
+        }
+      ],
+      "metric_coverage": [
+        {
+          "metric": "assets",
+          "observed_filings": 7
+        },
+        {
+          "metric": "cash_and_equivalents",
+          "observed_filings": 7
+        },
+        {
+          "metric": "current_assets",
+          "observed_filings": 7
+        },
+        {
+          "metric": "current_liabilities",
+          "observed_filings": 7
+        },
+        {
+          "metric": "gross_profit",
+          "observed_filings": 7
+        },
+        {
+          "metric": "liabilities",
+          "observed_filings": 7
+        },
+        {
+          "metric": "net_income",
+          "observed_filings": 7
+        },
+        {
+          "metric": "operating_cash_flow",
+          "observed_filings": 7
+        },
+        {
+          "metric": "revenue",
+          "observed_filings": 7
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Metadata and companyfacts are later snapshots, not contemporaneous vintages.",
+    "Only original accession-matched annual USD consolidated US-GAAP facts are eligible.",
+    "No custom taxonomy fallback, currency conversion, runway inference or outcome model."
+  ]
+}

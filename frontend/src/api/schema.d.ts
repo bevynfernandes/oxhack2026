@@ -324,6 +324,34 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/company-search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search Companies
+         * @description Find candidate websites by name or URL; no research job starts here.
+         *
+         *     Args:
+         *         request: Bounded name or URL query.
+         *         service: Configured source-safe research service.
+         *     Returns:
+         *         Source-linked candidate domains and explicit discovery limitations.
+         *     Raises:
+         *         HTTPException: Input is invalid or the configured service is unavailable.
+         */
+        post: operations["research_v2_company_search"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/research-capabilities": {
         parameters: {
             query?: never;
@@ -728,6 +756,76 @@ export interface components {
             status_code: number;
             /** Url */
             url: string;
+        };
+        /**
+         * CashFlowResearchEstimate
+         * @description Evidenced experimental component, separate from approved business forecasts.
+         *
+         *     Attributes:
+         *         status: Explicit research-estimate status, never validated private inference.
+         *         issuer_id: Independently verified SEC issuer CIK.
+         *         accession_number: Original annual report supplying the financial features.
+         *         filing_date: Publication date of that annual report.
+         *         period_end: Fiscal reporting period end; not a prediction-origin timestamp.
+         *         as_of: UTC collection/inference cutoff.
+         *         target: Versioned next-fiscal-year positive operating cash flow component.
+         *         probability: Experimental conditional probability, not a five-lane score.
+         *         architecture: Actual locally fitted classifier used for this output.
+         *         model_sha256: Exact bundled fitted parameter bytes used for inference.
+         *         evaluation_sha256: Exact frozen evaluation linked by the trained parameters.
+         *         evidence_ids: Supporting mapping, submissions and financial-fact captures.
+         *         limitations: Conditional follow-up, cohort transfer and horizon boundaries.
+         *     Raises:
+         *         ValueError: Dates contradict the source availability cutoff.
+         */
+        CashFlowResearchEstimate: {
+            /** Accession Number */
+            accession_number: string;
+            /**
+             * Architecture
+             * @default regularized_logistic_regression_c_0.1
+             * @constant
+             */
+            architecture: "regularized_logistic_regression_c_0.1";
+            /**
+             * As Of
+             * Format: date-time
+             */
+            as_of: string;
+            /** Evaluation Sha256 */
+            evaluation_sha256: string;
+            /** Evidence Ids */
+            evidence_ids: string[];
+            /**
+             * Filing Date
+             * Format: date
+             */
+            filing_date: string;
+            /** Issuer Id */
+            issuer_id: string;
+            /** Limitations */
+            limitations: string[];
+            /** Model Sha256 */
+            model_sha256: string;
+            /**
+             * Period End
+             * Format: date
+             */
+            period_end: string;
+            /** Probability */
+            probability: number;
+            /**
+             * Status
+             * @default research_estimate
+             * @constant
+             */
+            status: "research_estimate";
+            /**
+             * Target
+             * @default positive_operating_cash_flow_1fy
+             * @constant
+             */
+            target: "positive_operating_cash_flow_1fy";
         };
         /**
          * Catalog
@@ -1161,6 +1259,66 @@ export interface components {
             valid_from: string;
             /** Valid To */
             valid_to: string | null;
+        };
+        /**
+         * CompanySearchCandidate
+         * @description A possible website, never proof of legal identity or company ownership.
+         *
+         *     Attributes:
+         *         name: Source result title or supplied domain.
+         *         domain: Normalized public candidate hostname.
+         *         website: HTTPS homepage used by the existing identity-preview workflow.
+         *         source: User-supplied URL or a candidate from a published domain directory.
+         */
+        CompanySearchCandidate: {
+            /** Domain */
+            domain: string;
+            /** Name */
+            name: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "input" | "public_directory";
+            /** Website */
+            website: string;
+        };
+        /**
+         * CompanySearchRequest
+         * @description Company name or URL query; discovery candidates still require confirmation.
+         *
+         *     Attributes:
+         *         query: Bounded user input, searched locally when it is a company name.
+         */
+        CompanySearchRequest: {
+            /** Query */
+            query: string;
+        };
+        /**
+         * CompanySearchResult
+         * @description Bounded discovery results, including provider failures and ambiguity.
+         *
+         *     Attributes:
+         *         query: The original trimmed user query.
+         *         candidates: Possible websites; the user chooses before identity preview.
+         *         reason_codes: Source limitations and required confirmation.
+         *         source_url: Public directory documentation, when a snapshot was searched.
+         *         source_attribution: Publisher and license for the directory snapshot.
+         */
+        CompanySearchResult: {
+            /** Candidates */
+            candidates: components["schemas"]["CompanySearchCandidate"][];
+            /** Query */
+            query: string;
+            /**
+             * Reason Codes
+             * @default []
+             */
+            reason_codes: string[];
+            /** Source Attribution */
+            source_attribution?: string | null;
+            /** Source Url */
+            source_url?: string | null;
         };
         /**
          * CompanySnapshotMetadata
@@ -2784,6 +2942,7 @@ export interface components {
              * @default []
              */
             captures: components["schemas"]["Capture"][];
+            cash_flow_research?: components["schemas"]["CashFlowResearchEstimate"] | null;
             /**
              * Claims
              * @default []
@@ -3936,6 +4095,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    research_v2_company_search: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompanySearchRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CompanySearchResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

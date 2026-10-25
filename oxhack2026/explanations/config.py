@@ -23,8 +23,14 @@ def gemini_api_key() -> str:
 
 
 def mapping_mode() -> Literal["rules", "rules_gemini"]:
-    """Default to Gemini interpretation; reject unsupported explicit settings."""
-    mode = os.environ.get("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules_gemini")
+    """Use deterministic mapping unless optional Gemini is explicitly enabled.
+
+    Returns:
+        The configured mapping mode, defaulting to rules after failed live audits.
+    Raises:
+        ValueError: The explicit setting is unsupported.
+    """
+    mode = os.environ.get("SIGNALSHIFT_RESEARCH_MAPPING_MODE", "rules")
     if mode not in {"rules", "rules_gemini"}:
         message = "Unsupported research mapping mode"
         raise ValueError(message)

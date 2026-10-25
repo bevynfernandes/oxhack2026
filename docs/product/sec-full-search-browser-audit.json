@@ -1,0 +1,22 @@
+{
+  "started": "2026-10-25T00:40:59.523Z",
+  "finished": "2026-10-25T00:41:31.546Z",
+  "status": "passed",
+  "errors": [],
+  "writes": [
+    "/api/v2/company-search",
+    "/api/v2/research-identities",
+    "/api/v2/research-jobs"
+  ],
+  "identityUrl": "http://127.0.0.1:4316/research/identities/521bc2ab9c624736a0f6eafa9706f7cf",
+  "jobUrl": "http://127.0.0.1:4316/research/v2/jobs/7cf22e72ac3f41a8bf13d06bf0772593",
+  "reportUrl": "http://127.0.0.1:4316/research/v2/reports/d82de792a93a4dc9ac0c1d3b85af8462",
+  "mobileOverflow": false,
+  "scope": "Actual primary search to identity confirmation, live collection and SEC cash-flow component report; desktop and 390px mobile.",
+  "assertions": [
+    "No research job before identity confirmation",
+    "Four untrained dimensions remain explicit",
+    "Financial component model trained and 95.3% estimate visible",
+    "Growth, survival and complete Overall remain unavailable"
+  ]
+}

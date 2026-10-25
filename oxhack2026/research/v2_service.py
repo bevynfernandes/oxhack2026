@@ -22,6 +22,7 @@ from oxhack2026.api.repository import RepositoryUnavailable
 from oxhack2026.api.research_v2_schemas import (
     PROVIDERS,
     Capabilities,
+    CompanySearchResult,
     DiscoveryRequest,
     Identity,
     Job,
@@ -86,6 +87,8 @@ class V2Service:
 
     def capabilities(self) -> Capabilities:
         """Read configuration and local executable presence without vendor requests."""
+        from oxhack2026.research.registry import registry_mapping_path
+
         browser = False
         if (
             os.environ.get("SIGNALSHIFT_RESEARCH_BROWSER") == "1"
@@ -99,7 +102,7 @@ class V2Service:
                 provider=provider,
                 available=provider not in {"sec", "companies_house"}
                 or bool(
-                    os.environ.get("SIGNALSHIFT_RESEARCH_REGISTRY_MAPPINGS")
+                    registry_mapping_path().is_file()
                     and os.environ.get(
                         "SEC_USER_AGENT"
                         if provider == "sec"
@@ -163,6 +166,23 @@ class V2Service:
         )
         if active >= 10:
             raise QueueFull
+
+    def search(self, query: str) -> CompanySearchResult:
+        """Retrieve bounded name/domain candidates before identity confirmation.
+
+        Args:
+            query: User-supplied company name or HTTPS URL.
+        Returns:
+            Source-backed candidate websites or an actionable unavailable state.
+        Raises:
+            RepositoryUnavailable: Research collection is disabled.
+            ValueError: The name or URL is invalid.
+        """
+        from oxhack2026.research.company_search import company_search
+
+        if self.executor is None or not self.collection_enabled:
+            raise RepositoryUnavailable
+        return company_search(query)
 
     def discover(self, request: DiscoveryRequest) -> Identity:
         """Queue bounded discovery; invalid URLs fail before any network access.

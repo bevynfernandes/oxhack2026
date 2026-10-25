@@ -18,6 +18,8 @@ uv run --frozen --no-sync uvicorn oxhack2026.api.company_runtime:create_company_
 
 Use a separate environment for development/model tests. API configuration reads
 only explicit environment variables; it does not implicitly load `.env` files.
+For a local research process with settings in `.env`, use
+`uv run --env-file .env --frozen --no-sync uvicorn ...` to load them explicitly.
 The API dependency profile excludes model-training libraries. Mount the publication
 root read-only for an API worker; use a separate writer for refresh and recovery.
 

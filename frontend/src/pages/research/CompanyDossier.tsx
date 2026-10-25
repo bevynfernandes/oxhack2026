@@ -1,4 +1,5 @@
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
+import { CashFlowResearch } from "./CashFlowResearch";
 import {
   MotionSelection,
   MotionIndicator,
@@ -155,6 +156,9 @@ export default function CompanyDossier({
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
   const dimensionModels =
     standalone?.dimension_models ?? profile?.dimension_models;
+  const cashFlowResearch = standalone?.sources.find(
+    (source) => source.provider === "sec",
+  )?.cash_flow_research;
   const modelSections = useMemo(
     () =>
       new Map(dimensionModels?.dimensions.map((row) => [row.group_id, row])),
@@ -292,6 +296,8 @@ export default function CompanyDossier({
       row.reason_codes.includes("provider_results_truncated"),
     );
   const currentGroup = groups[panel.index];
+  const isCashFlowDriver =
+    currentGroup.id === "financial_health" && !!cashFlowResearch;
   const section =
     panel.kind === "driver" ? sections.get(currentGroup.id) : undefined;
   const dimensionModel =
@@ -443,7 +449,7 @@ export default function CompanyDossier({
             <h2>Overall outlook unavailable</h2>
             <small>
               {dimensionModels
-                ? "Experimental dimensions available · outcome models pending"
+                ? "Auxiliary proxy experiments available · outcome models pending"
                 : "Outcome models not trained"}
             </small>
           </div>
@@ -484,42 +490,65 @@ export default function CompanyDossier({
         className="dossier-summary"
         aria-label="Outcome forecasts and evidence coverage"
       >
-        {outlook?.forecasts
-          ? outlook.forecasts.map((forecast, index) => (
-              <section className="dossier-stat" key={forecast.outcome_id}>
-                <div>
-                  <h3>{forecastNames[forecast.outcome_id]}</h3>
-                  <div className="stat-value">
-                    —{" "}
-                    <span className="horizon-tag">
-                      {forecast.horizon_months} months
-                    </span>
+        {outlook?.forecasts ? (
+          <>
+            {outlook.forecasts
+              .filter((forecast) => forecast.outcome_id !== "financial_health")
+              .map((forecast, index) => (
+                <section className="dossier-stat" key={forecast.outcome_id}>
+                  <div>
+                    <h3>{forecastNames[forecast.outcome_id]}</h3>
+                    <div className="stat-value">
+                      —{" "}
+                      <span className="horizon-tag">
+                        {forecast.horizon_months} months
+                      </span>
+                    </div>
+                    <p>Prediction unavailable</p>
                   </div>
-                  <p>Prediction unavailable</p>
+                  <span className="stat-icon">
+                    <Icon
+                      name={
+                        index === 0
+                          ? "chart"
+                          : index === 1
+                            ? "shield"
+                            : "finance"
+                      }
+                    />
+                  </span>
+                </section>
+              ))}
+            <section className="dossier-stat">
+              <div>
+                <h3>Overall outlook</h3>
+                <div className="stat-value">—</div>
+                <p>Combined score unavailable</p>
+                <small className="stat-explanation">
+                  Needs all five dimension scores
+                </small>
+              </div>
+              <span className="stat-icon">
+                <Icon name="chart" />
+              </span>
+            </section>
+          </>
+        ) : (
+          (profile?.assessment.outcomes ?? []).map((outcome) => (
+            <section className="dossier-stat" key={outcome.outcome_id}>
+              <div>
+                <h3>{outcomeNames[outcome.outcome_id]}</h3>
+                <div className="stat-value">
+                  — <span className="horizon-tag">Saved assessment</span>
                 </div>
-                <span className="stat-icon">
-                  <Icon
-                    name={
-                      index === 0 ? "chart" : index === 1 ? "shield" : "finance"
-                    }
-                  />
-                </span>
-              </section>
-            ))
-          : (profile?.assessment.outcomes ?? []).map((outcome) => (
-              <section className="dossier-stat" key={outcome.outcome_id}>
-                <div>
-                  <h3>{outcomeNames[outcome.outcome_id]}</h3>
-                  <div className="stat-value">
-                    — <span className="horizon-tag">Saved assessment</span>
-                  </div>
-                  <p>Original outcome · inspect assessment</p>
-                </div>
-                <span className="stat-icon">
-                  <Icon name="chart" />
-                </span>
-              </section>
-            ))}
+                <p>Original outcome · inspect assessment</p>
+              </div>
+              <span className="stat-icon">
+                <Icon name="chart" />
+              </span>
+            </section>
+          ))
+        )}
         <section className="dossier-stat">
           <div>
             <h3>
@@ -561,8 +590,7 @@ export default function CompanyDossier({
         </h2>
         <p>Select a pillar to inspect measurements and model readiness</p>
         <span className="model-label">
-          <Icon name="shield" /> Local models ·{" "}
-          {dimensionModels ? "trained, experimental" : "not connected"}
+          <Icon name="shield" /> Business outcome models · not trained
         </span>
       </div>
       <div
@@ -596,7 +624,6 @@ export default function CompanyDossier({
       <section className="dossier-pillars" aria-label="Fundamental drivers">
         {groups.map((group, index) => {
           const row = sections.get(group.id);
-          const model = modelSections.get(group.id);
           const ids = row?.metric_observation_ids ?? [];
           const coverage = standalone?.mapping?.dimensions.find(
             (item) => item.group_id === group.id,
@@ -611,7 +638,9 @@ export default function CompanyDossier({
                 <div className="pillar-top">
                   <span>DIMENSION 0{index + 1}</span>
                   <span className="pillar-model">
-                    {model ? "Trained · experimental" : "Not connected"}
+                    {group.id === "financial_health" && cashFlowResearch
+                      ? "Cash-flow component trained"
+                      : "Outcome model untrained"}
                   </span>
                 </div>
                 <h3>
@@ -694,22 +723,8 @@ export default function CompanyDossier({
               </div>
               <div className="pillar-model-note">
                 <span className="micro-label">SPECIALIST OUTLOOK</span>
-                <p>
-                  {model?.score != null
-                    ? `SDK demand index: ${model.score.toFixed(1)} / 100`
-                    : "Dimension inference unavailable"}
-                </p>
-                <small>
-                  {model
-                    ? model.eligibility === "unreliable"
-                      ? "Withheld: unreliable validation"
-                      : model.eligibility === "not_applicable"
-                        ? "Outside training population"
-                        : model.eligibility === "eligible"
-                          ? "Experimental proxy, not success probability"
-                          : "Company inputs unavailable"
-                    : "No model bundle connected"}
-                </small>
+                <p>Business prediction unavailable</p>
+                <small>Requires training on later company outcomes</small>
               </div>
               <footer>
                 <span
@@ -847,24 +862,33 @@ export default function CompanyDossier({
                 <Icon name={currentGroup.icon} />
                 <div>
                   <strong>
-                    {dimensionModel?.score != null
-                      ? `Experimental SDK demand index: ${dimensionModel.score.toFixed(1)} / 100`
-                      : "Dimension inference unavailable"}
+                    {isCashFlowDriver
+                      ? "Cash-flow component model trained"
+                      : "Business outcome model not trained"}
                   </strong>
                   <p>
                     Data:{" "}
                     {section ? dataNames[section.data_status] : "Not published"}{" "}
-                    · Model:{" "}
-                    {dimensionModel ? "trained, experimental" : "not connected"}
+                    ·{" "}
+                    {isCashFlowDriver
+                      ? "Experimental annual cash-flow model"
+                      : "Model: no trained company-outcome model"}
                   </p>
                 </div>
               </div>
               <p>{currentGroup.description}</p>
               {dimensionModel && (
                 <>
-                  <h3>Experimental model</h3>
+                  <h3>Auxiliary proxy experiment</h3>
                   <p>{dimensionModel.architecture}</p>
                   <p>Target: {dimensionModel.target}</p>
+                  {dimensionModel.score != null && (
+                    <p>
+                      SDK demand percentile: {dimensionModel.score.toFixed(1)} /
+                      100. This experiment was not trained on business successes
+                      or failures and does not score this business.
+                    </p>
+                  )}
                   <p>
                     Inputs from source {dimensionModels?.source_snapshot_id} as
                     of {date(dimensionModels?.as_of ?? null)}. The index is a
@@ -883,11 +907,14 @@ export default function CompanyDossier({
                 reasons={
                   section?.reason_codes.filter(
                     (reason) =>
-                      !dimensionModel || reason !== "model_not_trained",
+                      (!isCashFlowDriver ||
+                        reason !== "sec_annual_financial_component_only") &&
+                      ((!dimensionModel && !isCashFlowDriver) ||
+                        reason !== "model_not_trained"),
                   ) ?? ["no_published_group_mapping", "model_not_trained"]
                 }
               />
-              {standalone && !standalone.mapping && (
+              {standalone && !standalone.mapping && !isCashFlowDriver && (
                 <p>
                   This report has no published dimension evidence mapping.{" "}
                   <MotionButton
@@ -897,6 +924,12 @@ export default function CompanyDossier({
                     Browse fresh measurements
                   </MotionButton>
                 </p>
+              )}
+              {standalone && currentGroup.id === "financial_health" && (
+                <CashFlowResearch
+                  sources={standalone.sources}
+                  evidence={standalone.evidence}
+                />
               )}
               <h3>Observed evidence</h3>
               {renderMeasurements(
@@ -1084,6 +1117,7 @@ export default function CompanyDossier({
 function FreshResearchEvidence({ report }: { report: StandaloneReport }) {
   return (
     <>
+      <CashFlowResearch sources={report.sources} evidence={report.evidence} />
       <h3>Fresh source coverage</h3>
       <SourceProgress sources={report.sources} />
       <h3>Attributed claims</h3>

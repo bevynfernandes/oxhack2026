@@ -1,0 +1,13 @@
+{
+  "source": "https://downloads.majestic.com/majestic_million.csv",
+  "publisher": "Majestic Million",
+  "license": "https://creativecommons.org/licenses/by/3.0/",
+  "documentation": "https://majestic.com/reports/majestic-million",
+  "source_file_modified_at": "2026-10-24T23:03:02.856947+00:00",
+  "built_at": "2026-10-24T23:05:06.116496+00:00",
+  "source_sha256": "66918a08c03771c0f84ba5bef6288b053e81f3b1d961769b2e7fe249ad1e247c",
+  "artifact_sha256": "7dc9827e51ab0a729f1dd8fadec7bf677ad213f983a0a21d85eed34afa9512f6",
+  "rows": 999742,
+  "transformation": "Domain, GlobalRank only; lowercase; lexical index",
+  "purpose": "Unverified website candidates only, never model inputs"
+}

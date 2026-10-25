@@ -1,0 +1,133 @@
+{
+  "schema_version": "sec-financial-component-v1",
+  "component": "revenue_growth_2fy",
+  "status": "research_models_trained",
+  "eligible_for_serving": false,
+  "provenance": {
+    "plan_sha256": "d1ab1d19843509cb389c74869f9b3243b0076f64554ece94ad8ac5caaaab73e5",
+    "cohort_sha256": "21f92ecac40b5055298a212831f0775a4b13ad2207e24e689100e6fffb7b7495",
+    "acquisition_sha256": "d954f7bd52f7f975086f2b0d41c31b4daa7015235bcdeeef05de40a2419ab0b1",
+    "metadata_sha256": "f2e3c041cb8eb2cb4b251e11eae25f61b5e18fab0bef34544b912611c0fd219e",
+    "observations_sha256": "46f5a32f2eb265c64d4a0a63f79bcfb055c6ab34fd8e43fb913ee8282c282fb9",
+    "implementation_commit": "bb5fca3"
+  },
+  "features": [
+    "log_revenue",
+    "log_assets",
+    "operating_cash_flow_margin",
+    "net_income_margin",
+    "gross_margin",
+    "liabilities_to_assets",
+    "cash_to_assets",
+    "current_ratio",
+    "report_lag_days"
+  ],
+  "coverage": [
+    {
+      "partition": "excluded",
+      "origins": 3757,
+      "issuers": 286,
+      "censored_origins": 2975
+    },
+    {
+      "partition": "test",
+      "origins": 59,
+      "issuers": 29,
+      "censored_origins": 24
+    },
+    {
+      "partition": "train",
+      "origins": 614,
+      "issuers": 181,
+      "censored_origins": 400
+    },
+    {
+      "partition": "validation",
+      "origins": 32,
+      "issuers": 17,
+      "censored_origins": 14
+    }
+  ],
+  "counts": {
+    "train": {
+      "rows": 214,
+      "issuers": 76,
+      "positive_rows": 89
+    },
+    "validation": {
+      "rows": 18,
+      "issuers": 11,
+      "positive_rows": 2
+    },
+    "test": {
+      "rows": 35,
+      "issuers": 19,
+      "positive_rows": 16
+    }
+  },
+  "training_prevalence": 0.4158878504672897,
+  "selected_model": "training_prevalence",
+  "validation": {
+    "training_prevalence": {
+      "roc_auc": 0.5,
+      "average_precision": 0.1111111111111111,
+      "brier": 0.19165429295134945,
+      "log_loss": 0.5754042074495681
+    },
+    "logistic_c_0.1": {
+      "roc_auc": 0.25,
+      "average_precision": 0.1111111111111111,
+      "brier": 0.23964953691910823,
+      "log_loss": 0.6831376821058376
+    },
+    "logistic_c_1": {
+      "roc_auc": 0.21875,
+      "average_precision": 0.10555555555555556,
+      "brier": 0.26172117894693847,
+      "log_loss": 0.7628999402443096
+    },
+    "decision_tree_depth_3": {
+      "roc_auc": 0.40625,
+      "average_precision": 0.15555555555555556,
+      "brier": 0.2114043704856376,
+      "log_loss": 0.6353656011924123
+    },
+    "histogram_gradient_boosting": {
+      "roc_auc": 0.46875,
+      "average_precision": 0.14835164835164835,
+      "brier": 0.26074485088830646,
+      "log_loss": 0.7338440103035608
+    }
+  },
+  "test": {
+    "roc_auc": 0.5,
+    "average_precision": 0.45714285714285713,
+    "brier": 0.24986524088192352,
+    "log_loss": 0.6929433600373385
+  },
+  "test_prevalence_baseline": {
+    "roc_auc": 0.5,
+    "average_precision": 0.45714285714285713,
+    "brier": 0.24986524088192352,
+    "log_loss": 0.6929433600373385
+  },
+  "test_log_loss_improvement_95pct_issuer_bootstrap": [
+    0.0,
+    0.0
+  ],
+  "statistical_gate_passed": false,
+  "model_artifact_sha256": {
+    "logistic_c_0.1": "dbd7eb55e90682f0cf8cc31114463b32ac65f65f82d7268858b9a06b85514372",
+    "logistic_c_1": "2ed3d7f793eb0f9e575fe7962f77492c7e1ca03d3ec4300d4514e744a89398ef",
+    "decision_tree_depth_3": "dbc3a893f7fd7cff86e405514dfc9fffc40fe988e3c08003c15747fdc6ba36ce",
+    "histogram_gradient_boosting": "074cdea69c2b82bd3e26b37a3aa86404ce649226e6cc98c4b0fd94a63b716b73"
+  },
+  "limitations": [
+    "Historical US reporting issuers; not representative private startups.",
+    "Targets require observed follow-up reports; attrition is not failure.",
+    "Fiscal-year endpoints differ from exact calendar horizons from filing.",
+    "Retrospective SEC snapshots can contain corrected source metadata.",
+    "Issuer separation is not a completed corporate-family or scope audit.",
+    "No operating-survival, paid-retention or complete resilience labels."
+  ]
+}

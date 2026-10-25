@@ -393,6 +393,12 @@ button.secondary:hover {
   font-size: 10px;
   color: #586b82;
 }
+.stat-explanation {
+  display: block;
+  margin-top: 3px;
+  font-size: 10px;
+  line-height: 1.4;
+}
 .stat-icon {
   display: grid;
   place-items: center;
@@ -953,6 +959,17 @@ button.secondary:hover {
   gap: 13px;
   border-color: #edf1f6;
 }
+.home-directory .company-results.company-candidates li {
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+.company-candidates strong {
+  overflow-wrap: anywhere;
+}
+@media (max-width: 640px) {
+  .home-directory .company-results.company-candidates li {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 .home-directory .company-monogram {
   width: 40px;
   height: 40px;
@@ -1270,6 +1287,9 @@ button.secondary:hover {
   .dossier-stat p {
     font-size: 8px;
     margin-top: 3px;
+  }
+  .stat-explanation {
+    font-size: 9px;
   }
   .stat-unit {
     font-size: 9px;
@@ -1629,6 +1649,11 @@ button.secondary:hover {
 .evidence-mapping-controls {
   display: grid;
   gap: 10px;
+  margin-block: 16px;
+  overflow-wrap: anywhere;
+}
+
+.cash-flow-research {
   margin-block: 16px;
   overflow-wrap: anywhere;
 }

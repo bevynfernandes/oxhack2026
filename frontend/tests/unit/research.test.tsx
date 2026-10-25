@@ -18,7 +18,10 @@ it("renders three backend horizons and five drivers without numerical outlook", 
     screen.getByRole("heading", { name: "Overall outlook unavailable" }),
   ).toBeVisible();
   expect(screen.getAllByText("24 months")).toHaveLength(2);
-  expect(screen.getByText("12 months")).toBeVisible();
+  expect(screen.queryByText("12 months")).toBeNull();
+  expect(
+    screen.getByRole("heading", { name: "Overall outlook" }),
+  ).toBeVisible();
   expect(screen.getAllByRole("button", { name: /^Inspect / })).toHaveLength(5);
   expect(screen.getByText(/Partial source results/)).toBeVisible();
   expect(screen.queryByText(/\d+%/)).toBeNull();
@@ -39,7 +42,7 @@ it("does not add forecasts when opening an older immutable report", () => {
     screen.getByRole("link", { name: "View original saved analysis" }),
   ).toHaveAttribute("href", "/companies/synthetic-assessments-v1/alpha");
 });
-it("shows attached trained dimensions separately from unavailable company forecasts", () => {
+it("does not present proxy experiments as trained business outcome models", () => {
   const groups: DTO<"SpecialistOutlook">["group_id"][] = [
     "adoption_retention",
     "attention_sentiment",
@@ -82,10 +85,10 @@ it("shows attached trained dimensions separately from unavailable company foreca
       <ResearchWorkspace report={attached} />
     </MemoryRouter>,
   );
-  expect(screen.getAllByText("Trained · experimental")).toHaveLength(5);
-  expect(screen.getByText("SDK demand index: 34.8 / 100")).toBeVisible();
-  expect(screen.queryByText("Untrained")).toBeNull();
-  expect(screen.getAllByText("Prediction unavailable")).toHaveLength(3);
+  expect(screen.getAllByText("Outcome model untrained")).toHaveLength(5);
+  expect(screen.queryByText("SDK demand index: 34.8 / 100")).toBeNull();
+  expect(screen.getAllByText("Prediction unavailable")).toHaveLength(2);
+  expect(screen.getByText("Combined score unavailable")).toBeVisible();
   expect(screen.getByText(/outcome models pending/)).toBeVisible();
 });
 it.each([

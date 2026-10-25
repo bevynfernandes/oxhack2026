@@ -401,6 +401,101 @@
         "title": "Capture",
         "type": "object"
       },
+      "CashFlowResearchEstimate": {
+        "additionalProperties": false,
+        "description": "Evidenced experimental component, separate from approved business forecasts.\n\nAttributes:\n    status: Explicit research-estimate status, never validated private inference.\n    issuer_id: Independently verified SEC issuer CIK.\n    accession_number: Original annual report supplying the financial features.\n    filing_date: Publication date of that annual report.\n    period_end: Fiscal reporting period end; not a prediction-origin timestamp.\n    as_of: UTC collection/inference cutoff.\n    target: Versioned next-fiscal-year positive operating cash flow component.\n    probability: Experimental conditional probability, not a five-lane score.\n    architecture: Actual locally fitted classifier used for this output.\n    model_sha256: Exact bundled fitted parameter bytes used for inference.\n    evaluation_sha256: Exact frozen evaluation linked by the trained parameters.\n    evidence_ids: Supporting mapping, submissions and financial-fact captures.\n    limitations: Conditional follow-up, cohort transfer and horizon boundaries.\nRaises:\n    ValueError: Dates contradict the source availability cutoff.",
+        "properties": {
+          "accession_number": {
+            "pattern": "^[0-9]{10}-[0-9]{2}-[0-9]{6}$",
+            "title": "Accession Number",
+            "type": "string"
+          },
+          "architecture": {
+            "const": "regularized_logistic_regression_c_0.1",
+            "default": "regularized_logistic_regression_c_0.1",
+            "title": "Architecture",
+            "type": "string"
+          },
+          "as_of": {
+            "format": "date-time",
+            "title": "As Of",
+            "type": "string"
+          },
+          "evaluation_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Evaluation Sha256",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9_.-]{0,127}$",
+              "type": "string"
+            },
+            "minItems": 3,
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "filing_date": {
+            "format": "date",
+            "title": "Filing Date",
+            "type": "string"
+          },
+          "issuer_id": {
+            "pattern": "^[0-9]{10}$",
+            "title": "Issuer Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_sha256": {
+            "pattern": "^[a-f0-9]{64}$",
+            "title": "Model Sha256",
+            "type": "string"
+          },
+          "period_end": {
+            "format": "date",
+            "title": "Period End",
+            "type": "string"
+          },
+          "probability": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Probability",
+            "type": "number"
+          },
+          "status": {
+            "const": "research_estimate",
+            "default": "research_estimate",
+            "title": "Status",
+            "type": "string"
+          },
+          "target": {
+            "const": "positive_operating_cash_flow_1fy",
+            "default": "positive_operating_cash_flow_1fy",
+            "title": "Target",
+            "type": "string"
+          }
+        },
+        "required": [
+          "issuer_id",
+          "accession_number",
+          "filing_date",
+          "period_end",
+          "as_of",
+          "probability",
+          "model_sha256",
+          "evaluation_sha256",
+          "evidence_ids",
+          "limitations"
+        ],
+        "title": "CashFlowResearchEstimate",
+        "type": "object"
+      },
       "Catalog": {
         "additionalProperties": false,
         "description": "Versioned catalogue; batch reads use the batch's frozen mapping.",
@@ -1373,6 +1468,118 @@
           "evidence_ids"
         ],
         "title": "CompanyRelationship",
+        "type": "object"
+      },
+      "CompanySearchCandidate": {
+        "additionalProperties": false,
+        "description": "A possible website, never proof of legal identity or company ownership.\n\nAttributes:\n    name: Source result title or supplied domain.\n    domain: Normalized public candidate hostname.\n    website: HTTPS homepage used by the existing identity-preview workflow.\n    source: User-supplied URL or a candidate from a published domain directory.",
+        "properties": {
+          "domain": {
+            "maxLength": 253,
+            "minLength": 4,
+            "pattern": "^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\\.)+[a-z]{2,63}$",
+            "title": "Domain",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 300,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "input",
+              "public_directory"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "website": {
+            "maxLength": 2048,
+            "title": "Website",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "domain",
+          "website",
+          "source"
+        ],
+        "title": "CompanySearchCandidate",
+        "type": "object"
+      },
+      "CompanySearchRequest": {
+        "additionalProperties": false,
+        "description": "Company name or URL query; discovery candidates still require confirmation.\n\nAttributes:\n    query: Bounded user input, searched locally when it is a company name.",
+        "properties": {
+          "query": {
+            "maxLength": 200,
+            "minLength": 2,
+            "title": "Query",
+            "type": "string"
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "title": "CompanySearchRequest",
+        "type": "object"
+      },
+      "CompanySearchResult": {
+        "additionalProperties": false,
+        "description": "Bounded discovery results, including provider failures and ambiguity.\n\nAttributes:\n    query: The original trimmed user query.\n    candidates: Possible websites; the user chooses before identity preview.\n    reason_codes: Source limitations and required confirmation.\n    source_url: Public directory documentation, when a snapshot was searched.\n    source_attribution: Publisher and license for the directory snapshot.",
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/CompanySearchCandidate"
+            },
+            "maxItems": 5,
+            "title": "Candidates",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "reason_codes": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Reason Codes",
+            "type": "array"
+          },
+          "source_attribution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Attribution"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          }
+        },
+        "required": [
+          "query",
+          "candidates"
+        ],
+        "title": "CompanySearchResult",
         "type": "object"
       },
       "CompanySnapshotMetadata": {
@@ -5230,6 +5437,16 @@
             "title": "Captures",
             "type": "array"
           },
+          "cash_flow_research": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CashFlowResearchEstimate"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "claims": {
             "default": [],
             "items": {
@@ -6857,6 +7074,45 @@
           }
         },
         "summary": "History"
+      }
+    },
+    "/api/v2/company-search": {
+      "post": {
+        "description": "Find candidate websites by name or URL; no research job starts here.\n\nArgs:\n    request: Bounded name or URL query.\n    service: Configured source-safe research service.\nReturns:\n    Source-linked candidate domains and explicit discovery limitations.\nRaises:\n    HTTPException: Input is invalid or the configured service is unavailable.",
+        "operationId": "research_v2_company_search",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompanySearchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompanySearchResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Companies"
       }
     },
     "/api/v2/research-capabilities": {

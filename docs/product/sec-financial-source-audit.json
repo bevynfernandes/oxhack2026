@@ -1,0 +1,88 @@
+{
+  "retrieved_at": "2026-10-24T23:51:40.730322+00:00",
+  "contact_configured_locally": true,
+  "official_source_probes": [
+    {
+      "name": "cloudflare-submissions-contact",
+      "status": 200,
+      "bytes": 158248,
+      "sha256": "492c18698423081e5357cf03ab9768c21853540f5900764a32503bfd788c7ffd",
+      "content_type": "application/json",
+      "content_range": null,
+      "url": "https://data.sec.gov/submissions/CIK0001477333.json"
+    },
+    {
+      "name": "sec-fsds-2018q1-contact",
+      "status": 206,
+      "bytes": 1024,
+      "sha256": "cf0248e3de197ae76e4afc66ab963e8669d8e394a7ef6602a2161007693b2afa",
+      "content_type": "application/octet-stream",
+      "content_range": "bytes 0-1023/93176693",
+      "url": "https://www.sec.gov/files/dera/data/financial-statement-data-sets/2018q1.zip"
+    }
+  ],
+  "financial_pilot": [
+    {
+      "cik": "0001477333",
+      "status": 200,
+      "bytes": 1667262,
+      "complete": true,
+      "sha256": "04cc636210456fc5163996c546c38dd049e53b5f9ce59b8f824f1725b06afe11",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001477333.json"
+    },
+    {
+      "cik": "0001108524",
+      "status": 200,
+      "bytes": 4729214,
+      "complete": true,
+      "sha256": "c36bddafd22061dfe573fa22199074d882196f6667cf641eb30c8cec5a340ae5",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001108524.json"
+    },
+    {
+      "cik": "0000878079",
+      "status": 200,
+      "bytes": 1132084,
+      "complete": true,
+      "sha256": "3aca1f44f4e80e20a35bac74db748a3d767512d3bd454b7ccb366e34a0ffe72e",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000878079.json"
+    },
+    {
+      "cik": "0001159154",
+      "status": 200,
+      "bytes": 1022228,
+      "complete": true,
+      "sha256": "bf97cdb10899b412607715402f6d1d95f9179f72b187e0f244a6b7ee59280eb5",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001159154.json"
+    },
+    {
+      "cik": "0000880460",
+      "status": 200,
+      "bytes": 848871,
+      "complete": true,
+      "sha256": "500cee15e3698904dd0a9f7def52a801d4715a6eb986b8f24a60bceea94f00df",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0000880460.json"
+    }
+  ],
+  "production_fetcher": [
+    {
+      "cik": "0001477333",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001477333.json",
+      "bytes": 1667262,
+      "standard_financial_concepts": 338
+    },
+    {
+      "cik": "0001108524",
+      "url": "https://data.sec.gov/api/xbrl/companyfacts/CIK0001108524.json",
+      "bytes": 4729214,
+      "standard_financial_concepts": 691
+    }
+  ],
+  "company_domain_coverage": {
+    "entities": 986914,
+    "nonempty_websites": 0,
+    "nonempty_investor_websites": 0,
+    "source_sha256": "abb4a68da2cecb114cf008141d8a458ca41b40792680b0dc56707f3c3e93430e",
+    "decision": "Assess actual official website coverage before using this snapshot for domain-to-CIK discovery; do not infer a legal entity from a matching company name."
+  },
+  "decision": "Use original accession-specific financial facts for the next company-model experiment; do not train on future restatements. Legal identity must be verified independently of name similarity."
+}

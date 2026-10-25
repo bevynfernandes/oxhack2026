@@ -1,0 +1,152 @@
+{
+  "audited_at": "2026-10-24T22:54:40.605841+00:00",
+  "deployment_decision": "No startup-success/survival probability or complete five-dimension business score from these data.",
+  "public_datasets": [
+    {
+      "decision": "reject_as_fixed_horizon_outcome_training",
+      "has_closure_date": false,
+      "has_exit_date": false,
+      "name": "66,368-company Crunchbase-derived flat file",
+      "reason": "Current status and lifetime funding totals do not establish pre-origin features and dated outcomes.",
+      "rows": 66368
+    },
+    {
+      "commit": "13b7bce45f0f5da544303a17fa1c6235a9cbb619",
+      "companies": 3566,
+      "decision": "adjudication_leads_only",
+      "name": "Startup Lifecycle Project v1.0.0",
+      "reason": "Current YC status is not a dated outcome; website death proxy can lag shutdown announcements by 20 months; limited independently documented closure sample."
+    },
+    {
+      "company_status_counts": [
+        {
+          "len": 1134,
+          "status": "ipo"
+        },
+        {
+          "len": 2584,
+          "status": "closed"
+        },
+        {
+          "len": 183441,
+          "status": "operating"
+        },
+        {
+          "len": 9394,
+          "status": "acquired"
+        }
+      ],
+      "decision": "reconstructed_research_only_not_training_ready",
+      "name": "Crunchbase 2013 Snapshot (Kaggle justinas/startup-investments)",
+      "reason": "Retrospective values lack verified original availability; frozen temporal/family-separated development sample has only one training closure and four training exits. Do not alter splits to manufacture successful fitting."
+    }
+  ],
+  "reconstructed_panel": {
+    "counts": [
+      {
+        "companies": 442,
+        "families": 58,
+        "partition": "excluded_family_overlap",
+        "recorded_closure_24m": 1,
+        "recorded_exit_24m": 178
+      },
+      {
+        "companies": 4664,
+        "families": 4497,
+        "partition": "excluded_time_gap",
+        "recorded_closure_24m": 151,
+        "recorded_exit_24m": 214
+      },
+      {
+        "companies": 2150,
+        "families": 2138,
+        "partition": "test",
+        "recorded_closure_24m": 107,
+        "recorded_exit_24m": 77
+      },
+      {
+        "companies": 328,
+        "families": 323,
+        "partition": "train",
+        "recorded_closure_24m": 1,
+        "recorded_exit_24m": 4
+      },
+      {
+        "companies": 1325,
+        "families": 1296,
+        "partition": "validation",
+        "recorded_closure_24m": 39,
+        "recorded_exit_24m": 65
+      }
+    ],
+    "feature_names": [
+      "age_years",
+      "log_early_funding_usd",
+      "early_round_count",
+      "unknown_amount_fraction",
+      "days_since_last_round"
+    ],
+    "origin": "12 months after first recorded funding",
+    "panel_sha256": "6e6c22cf7e9ce9bff37d09f4f8ce1b1397ff2816abe3b8ddedaf1565036dc927",
+    "split": "train origins 2000-2005; validation 2008; test 2011; cross-partition acquisition families excluded"
+  },
+  "status": "business_prediction_training_data_not_ready",
+  "no_replacement_startup_growth_survival_models_fitted": true,
+  "bankruptcy_research_experiment": {
+    "fitted_estimators": 8,
+    "selected": "histogram_gradient_boosting",
+    "evaluation": "docs/product/disclosure-bankruptcy-evaluation.json",
+    "eligible_for_serving": false,
+    "target": "Recorded next-calendar-year Chapter 7/11 filing in selected ECL reporting firms",
+    "reason": "Complete SEC history repaired measured input mismatches. Four follow-up candidates were fitted with a later 2018-2021 test; selected boosting ROC AUC 0.603 and validation Brier gate failed. This remains a narrow public-issuer experiment, not five startup dimensions or Growth/Survival.",
+    "latest_evaluation": "docs/product/disclosure-bankruptcy-full-history-evaluation.json",
+    "latest_statistical_gate_passed": false
+  },
+  "extrapolation_preference": "User permits doing as much as available public sources support and extrapolating. Clearly identify estimates, assumptions, transfer limits and uncertainty; do not invent missing company facts or misstate validation.",
+  "financial_component_experiment": {
+    "fitted_estimators": 8,
+    "cohort_selected": 320,
+    "official_responses": 290,
+    "cash_flow": {
+      "target": "Positive next-fiscal-year operating cash flow, conditional on observed original follow-up",
+      "selected_model": "logistic_c_0.1",
+      "statistical_gate_passed": true,
+      "test_issuers": 25,
+      "test_rows": 49,
+      "roc_auc": 0.8693877551020408,
+      "evaluation": "docs/product/sec-cash-flow-evaluation.json"
+    },
+    "revenue_growth": {
+      "target": "Recognized annual revenue growth of at least 10% over two fiscal years, conditional on observed follow-up",
+      "selected_model": "training_prevalence",
+      "statistical_gate_passed": false,
+      "evaluation": "docs/product/sec-revenue-growth-evaluation.json"
+    },
+    "eligible_for_serving": false,
+    "remaining_release_checks": [
+      "Broader independent numeric and corporate-family/scope review",
+      "Expand verified domain-to-legal-entity mappings beyond the one reviewed identity",
+      "Population transfer and sparse follow-up limits"
+    ],
+    "does_not_supply": [
+      "Paid retention",
+      "Operating survival",
+      "Five business dimensions",
+      "Complete overall index"
+    ],
+    "portable_weights": "oxhack2026/models/bundled/financial_components_v1/positive_operating_cash_flow_1fy.model.json",
+    "portable_parity": {
+      "rows": 4462,
+      "max_absolute_probability_error": 2.220446049250313e-16,
+      "audit": "docs/product/sec-cash-flow-portable-parity.json"
+    },
+    "experimental_report_integration": {
+      "status": "verified_for_reviewed_cloudflare_identity",
+      "financial_observations": 9,
+      "audit": "docs/product/sec-live-cash-flow-report-audit.json",
+      "browser_audit": "docs/product/sec-cash-flow-browser-audit.json",
+      "numeric_review": "docs/product/sec-original-filing-numeric-review.json",
+      "default_identity_catalog": "oxhack2026/research/bundled/reviewed-registry-mappings.json"
+    }
+  }
+}

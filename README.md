@@ -47,8 +47,34 @@ and the earlier [source research](docs/tasks/dev2/public-model-research-20261024
 `compare-public`, and dated company-outcome experiments. The API loads a packaged, digest-verified baseline bundle and attaches
 experimental model status to saved profiles and new research reports. Complete
 matched npm windows receive an SDK-demand index; unsupported inputs abstain. The
-three company-outcome cards remain unavailable, and execution inference is
+Growth and Survival forecasts and the combined Overall index remain unavailable,
+and execution inference is
 withheld because its held-out benchmark is unreliable.
+
+A separate [dated bankruptcy experiment](docs/product/disclosure-bankruptcy-experiment.md)
+has fitted eight scikit-learn classifiers across an initial study and a follow-up
+using complete SEC history. The later holdout gave ROC AUC 0.603 on 689 issuers
+with 14 positive cases and failed the frozen validation-loss gate. This research
+model is not served; independent label/population review is also outstanding. It does
+not replace the requested five business dimensions or private-startup forecasts.
+See [FINAL_DEMO.md](FINAL_DEMO.md) for verified demo claims and remaining work.
+
+A newer annual-financial experiment fitted eight classifiers on a fixed historical
+320-issuer cohort, with 290 official SEC responses. Regularized logistic regression
+for next-fiscal-year positive operating cash flow passed its statistical gate
+(ROC AUC 0.869 on 49 rows from 25 test issuers). Revenue-growth candidates lost to
+prevalence. The selected cash-flow weights are packaged as portable JSON and
+match the fitted pipeline on all 4,462 panel rows. A reviewed SEC identity with
+recent usable financials can now show dated original financial facts and an
+explicitly experimental cash-flow estimate in the report. The packaged identity
+catalog currently covers Cloudflare; other domains require reviewed mappings.
+This component does not complete the five business dimensions or private-company
+forecasts. See the [evaluation](docs/product/sec-cash-flow-evaluation.json) and
+[real report audit](docs/product/sec-live-cash-flow-report-audit.json).
+
+For local public-filings collection, configure `SEC_USER_AGENT` with your app and
+contact in the ignored `.env`, then launch with `uv run --env-file .env ...`.
+The API reads explicit process settings; it does not load that file implicitly.
 
 ## Frontend and API
 
@@ -101,6 +127,12 @@ outputs out of version control.
 
 Standalone startup research is available through the additive v2 backend. See the
 [local worker setup, API sequence and evidence semantics](docs/tasks/dev3/research-v2.md).
+The main company search accepts names and HTTPS websites. Name candidates come
+from a bundled, attributed public domain directory and require identity preview;
+names absent from the directory need an exact website. See
+[current source/model limits](docs/product/free-source-decisions.md) and
+[demo evidence and remaining work](FINAL_DEMO.md). Deterministic evidence mapping
+is the default; Gemini interpretation is optional.
 It requires an explicit writable research root and opt-in collection worker; saved
 company publications are optional. The existing frontend needs the corresponding
 v2 domain-confirmation and multi-source presentation work before exposing this flow.

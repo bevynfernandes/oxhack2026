@@ -25,7 +25,10 @@ data = [
     "polars>=1,<2",
     "pydantic>=2.12,<3",
 ]
-models = ["catboost>=1.2,<2", "numpy>=2,<3", "scikit-learn>=1.6,<2"]
+models = [
+    "catboost>=1.2,<2", "joblib>=1.4,<2", "numpy>=2,<3",
+    "scikit-learn>=1.6,<2", "threadpoolctl>=3,<4",
+]
 explanations = [
     "google-genai>=1,<2",
     "python-dotenv>=1,<2",
@@ -38,6 +41,7 @@ research = [
     "lxml>=6,<7",
     "playwright>=1.55,<2",
     "trafilatura>=2.0,<3",
+    "tld>=0.13,<1",
 ]
 
 [dependency-groups]

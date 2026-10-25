@@ -1,0 +1,11 @@
+{
+  "report_id": "3558851a874b4be3a59527e92c170259",
+  "errors": [],
+  "supporting_links": 4,
+  "a11y": [],
+  "mobile": {
+    "fits": true,
+    "viewportFits": true
+  },
+  "status": "passed"
+}

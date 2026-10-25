@@ -10,6 +10,8 @@ from oxhack2026.api.repository import RepositoryUnavailable
 from oxhack2026.api.research_v2_schemas import (
     PROVIDERS,
     Capabilities,
+    CompanySearchRequest,
+    CompanySearchResult,
     DiscoveryRequest,
     Identity,
     Job,
@@ -94,6 +96,23 @@ def discover(
     """Queue bounded identity discovery; collection requires a subsequent
     confirmation."""
     return _call(lambda: _service(service).discover(request))
+
+
+@router.post("/company-search", operation_id="research_v2_company_search")
+def search_companies(
+    request: CompanySearchRequest, service: V2Service | None = _dependency
+) -> CompanySearchResult:
+    """Find candidate websites by name or URL; no research job starts here.
+
+    Args:
+        request: Bounded name or URL query.
+        service: Configured source-safe research service.
+    Returns:
+        Source-linked candidate domains and explicit discovery limitations.
+    Raises:
+        HTTPException: Input is invalid or the configured service is unavailable.
+    """
+    return _call(lambda: _service(service).search(request.query))
 
 
 @router.get("/research-identities/{identity_id}", operation_id="research_v2_identity")
