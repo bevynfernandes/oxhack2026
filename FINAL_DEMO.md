@@ -95,7 +95,13 @@ The local SEC contact is in the ignored `.env`; `uv run --env-file .env` loads i
 without committing it or putting it in the command text. A five-issuer official
 SEC financial-data pilot succeeded, including historical bankrupt issuers.
 The production Fetcher also retained real Cloudflare and Salesforce financial
-responses. Extraction and financial-model training from these facts remain next.
+responses. The shared annual financial parser now reconstructs nine measures
+from original accessions: 747 metric rows across 83 annual filings in the five
+pilot issuers. Missing and conflicting values remain explicit; this includes
+pre-XBRL reports and unsupported custom concepts. See the
+[extraction audit](docs/product/sec-annual-financial-pilot-audit.json).
+These five source-access stress tests are not a training or evaluation cohort;
+financial-model fitting remains next.
 
 Do not demonstrate an SDK-download percentile as a business success score. Do not
 claim universal private-company financial data, validated probabilities, or a
