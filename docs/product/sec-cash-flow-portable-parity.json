@@ -1,0 +1,27 @@
+{
+  "model_sha256": "b0c276ed3db52019056b49896fed6f5a634ecea53dfd562e04d1601aeb441767",
+  "evaluation_sha256": "73ec4483e6c69a72ef8249eab882ec6e2d8dcd646916c13069412198fa84237f",
+  "matched_pipeline_rows": 4462,
+  "max_absolute_probability_error": 2.220446049250313e-16,
+  "pilot_inference": [
+    {
+      "cik": "0001477333",
+      "accession": "0001477333-26-000016",
+      "original_filing_date": "2026-02-26",
+      "period_end": "2025-12-31",
+      "experimental_conditional_probability": 0.953026860907715,
+      "domain_mapping_verified": false,
+      "production_report_served": false
+    },
+    {
+      "cik": "0001108524",
+      "accession": "0001108524-26-000060",
+      "original_filing_date": "2026-03-02",
+      "period_end": "2026-01-31",
+      "experimental_conditional_probability": 0.9948679466481345,
+      "domain_mapping_verified": false,
+      "production_report_served": false
+    }
+  ],
+  "eligible_for_serving": false
+}

@@ -110,6 +110,11 @@ component, conditional on observed follow-up; it is not survival or unrestricted
 runway. The two-fiscal-year revenue-growth candidates lost to the prevalence
 baseline and were rejected. See the [cash-flow evaluation](docs/product/sec-cash-flow-evaluation.json)
 and [growth evaluation](docs/product/sec-revenue-growth-evaluation.json).
+The cash-flow model's fitted JSON weights are bundled in
+`oxhack2026/models/bundled/financial_components_v1`; portable local inference
+matches the original pipeline across all 4,462 panel rows with maximum absolute
+probability difference 2.22e-16. This proves weight/transform parity, not complete
+production identity mapping or approval to score private companies.
 
 Do not demonstrate an SDK-download percentile as a business success score. Do not
 claim universal private-company financial data, validated probabilities, or a

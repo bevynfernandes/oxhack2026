@@ -125,7 +125,7 @@
     "eligible_for_serving": false,
     "remaining_release_checks": [
       "Independent numeric and corporate-family/scope review",
-      "Live feature and portable-weight parity",
+      "Verified live legal-entity mapping and report integration",
       "Population transfer and sparse follow-up limits"
     ],
     "does_not_supply": [
@@ -133,6 +133,12 @@
       "Operating survival",
       "Five business dimensions",
       "Complete overall index"
-    ]
+    ],
+    "portable_weights": "oxhack2026/models/bundled/financial_components_v1/positive_operating_cash_flow_1fy.model.json",
+    "portable_parity": {
+      "rows": 4462,
+      "max_absolute_probability_error": 2.220446049250313e-16,
+      "audit": "docs/product/sec-cash-flow-portable-parity.json"
+    }
   }
 }
