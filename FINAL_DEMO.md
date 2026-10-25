@@ -14,6 +14,20 @@ This file records verified claims and remaining work. It is not a completion sig
 
 ## Claims currently supported
 
+- ElevenLabs now follows its linked official SDK documentation before collecting
+  npm inputs. A fresh run on the normal `localhost:5173` / API `8000` setup passed
+  in 61 seconds and displayed **SDK component trained** with an experimental
+  **SDK-demand index of 31.3/100**. The fitted Ridge model consumed one package's
+  complete adjacent 30-day windows; multiple packages are evaluated separately,
+  selecting the largest eligible current SDK rather than adding their counts.
+  This forecasts technical demand, not customers, retention or startup success.
+  Provider 403/429 responses remain explicit, and the fresh report rendered with
+  no browser errors or mobile horizontal overflow. Local report:
+  `/research/v2/reports/f8a93102a81a4d5e8746921de3c84bce`.
+  See `docs/product/elevenlabs-sdk-browser-audit.json` and
+  `docs/product/elevenlabs-sdk-model-audit.json`. Earlier immutable reports keep
+  their earlier missing-input results; use **Refresh research** for a fresh run.
+
 - The backend retains source artifacts, hashes and attributable evidence.
 - Main includes Gemini-assisted source mapping with independent quote validation.
   A real Qdrant mapping audit was partial; provider failures do not justify invented

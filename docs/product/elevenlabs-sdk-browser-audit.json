@@ -1,0 +1,10 @@
+{
+  "started": "2026-10-25T01:03:02.195Z",
+  "errors": [],
+  "identityUrl": "http://127.0.0.1:5173/research/identities/72951b61d0214b52b4890640f2689589",
+  "jobUrl": "http://127.0.0.1:5173/research/v2/jobs/5e3bd42d9c64461aac01caedca6cb5a0",
+  "reportUrl": "http://127.0.0.1:5173/research/v2/reports/f8a93102a81a4d5e8746921de3c84bce",
+  "mobileOverflow": false,
+  "status": "passed",
+  "finished": "2026-10-25T01:04:03.159Z"
+}
