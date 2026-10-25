@@ -1,4 +1,9 @@
 import { useState } from "react";
+import {
+  loadSavedSearches,
+  storeSavedSearches,
+  type SavedSearch,
+} from "./savedSearches";
 import { MotionButton, MotionInput, MotionLink as Link } from "../../motion";
 import { date } from "../../components/Common";
 import { forgetResearch, useResearchLibrary } from "./library";
@@ -11,6 +16,18 @@ export default function ResearchLibrary() {
   const [selection, setSelection] = useState<string[]>([]);
   const [limit, setLimit] = useState(6);
   const [error, setError] = useState("");
+  const [savedSearches, setSavedSearches] = useState(loadSavedSearches);
+  function saveFilters(next: SavedSearch[]) {
+    try {
+      storeSavedSearches(next);
+      setSavedSearches(next);
+      setError("");
+    } catch {
+      setError(
+        "Browser storage is unavailable. This search could not be saved or removed.",
+      );
+    }
+  }
   const rows = entries.filter(
     (row) =>
       (!watchOnly || row.watched) &&
@@ -43,6 +60,7 @@ export default function ResearchLibrary() {
           Find in your research
           <MotionInput
             type="search"
+            maxLength={200}
             value={query}
             onChange={(event) => {
               setQuery(event.target.value);
@@ -64,6 +82,54 @@ export default function ResearchLibrary() {
           </Link>
         ) : (
           <span>Select two or three dossiers to compare evidence.</span>
+        )}
+      </div>
+      <div className="research-saved-searches">
+        <MotionButton
+          className="secondary"
+          disabled={!query.trim() && !watchOnly}
+          onClick={() =>
+            saveFilters([
+              { query: query.trim(), watched: watchOnly },
+              ...savedSearches.filter(
+                (row) =>
+                  row.query !== query.trim() || row.watched !== watchOnly,
+              ),
+            ])
+          }
+        >
+          Save this search
+        </MotionButton>
+        {savedSearches.length > 0 && (
+          <>
+            <h3>Saved searches in this browser</h3>
+            <ul>
+              {savedSearches.map((row, index) => (
+                <li key={JSON.stringify(row)}>
+                  <MotionButton
+                    className="secondary"
+                    onClick={() => {
+                      setQuery(row.query);
+                      setWatchOnly(row.watched);
+                      setLimit(6);
+                    }}
+                  >
+                    Use search: {row.query || "All research"}
+                    {row.watched ? " · Watchlist" : ""}
+                  </MotionButton>
+                  <MotionButton
+                    className="secondary"
+                    aria-label={`Remove saved search ${row.query || "All research"}${row.watched ? " from watchlist" : ""}`}
+                    onClick={() =>
+                      saveFilters(savedSearches.filter((_, i) => i !== index))
+                    }
+                  >
+                    Remove search
+                  </MotionButton>
+                </li>
+              ))}
+            </ul>
+          </>
         )}
       </div>
       {error && <p role="alert">{error}</p>}

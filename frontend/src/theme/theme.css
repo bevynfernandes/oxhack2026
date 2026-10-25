@@ -1634,3 +1634,22 @@ html:not(.theme-techno-classical) .home-motion-surface {
     padding: 16px;
   }
 }
+
+.research-saved-searches {
+  margin-block: 16px;
+}
+.research-saved-searches ul {
+  list-style: none;
+  padding: 0;
+}
+.research-saved-searches li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-block: 8px;
+}
+.research-saved-searches button {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}

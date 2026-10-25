@@ -100,3 +100,30 @@ it("keeps reading usable when browser storage is unavailable and fails writes ex
   get.mockRestore();
   set.mockRestore();
 });
+
+it("saves and restores local search filters after remount without starting research", () => {
+  rememberResearch(record);
+  const mount = () =>
+    render(
+      <MemoryRouter>
+        <ResearchLibrary />
+      </MemoryRouter>,
+    );
+  const first = mount();
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "One" } });
+  fireEvent.click(screen.getByLabelText("Watchlist only"));
+  fireEvent.click(screen.getByRole("button", { name: "Save this search" }));
+  first.unmount();
+  mount();
+  fireEvent.click(
+    screen.getByRole("button", { name: "Use search: One · Watchlist" }),
+  );
+  expect(screen.getByRole("searchbox")).toHaveValue("One");
+  expect(screen.getByLabelText("Watchlist only")).toBeChecked();
+  fireEvent.click(
+    screen.getByRole("button", {
+      name: "Remove saved search One from watchlist",
+    }),
+  );
+  expect(screen.queryByText("Saved searches in this browser")).toBeNull();
+});

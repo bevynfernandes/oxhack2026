@@ -51,6 +51,15 @@ for (const width of [1440, 375]) {
     await expect(
       library.getByRole("checkbox", { name: /Compare research for/ }),
     ).toHaveCount(1);
+    await library.getByRole("searchbox").fill("Synthetic");
+    await library.getByRole("button", { name: "Save this search" }).click();
+    await page.reload();
+    await library
+      .getByRole("button", { name: "Use search: Synthetic · Watchlist" })
+      .click();
+    await expect(library.getByLabel("Watchlist only")).toBeChecked();
+    await expect(library.getByRole("searchbox")).toHaveValue("Synthetic");
+    await library.getByRole("searchbox").fill("");
     await library.getByLabel("Watchlist only").uncheck();
     const checks = library.getByRole("checkbox", {
       name: /Compare research for/,

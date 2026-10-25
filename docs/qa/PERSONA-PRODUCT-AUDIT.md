@@ -58,7 +58,7 @@
 ## Problems resolved
 
 - Revised the homepage promise to dated evidence research with validated predictions explicitly unavailable.
-- Added **Your research** to Compare & explore: visited immutable reports, saved dossiers, jobs, local search, watchlist filtering, notes and manual review dates.
+- Added **Your research** to Compare & explore: visited immutable reports, saved dossiers, jobs, local search, saved-search filters, watchlist filtering, notes and manual review dates.
 - Added a decision-summary dialog explaining definitions, coverage versus confidence, a usable observed signal, unestablished business risk, missing evidence, source freshness and comparison caveats. It deliberately does not invent the strongest predictor or largest business risk.
 - Added evidence comparison for two or three exact fresh/legacy/published records. Retained observation definitions, units, periods, collection dates and report limitations; preserved the original same-publication comparison.
 - Restored comparison navigation on narrow screens; retained native link behaviour, modal focus and the shared Material motion primitives.
@@ -81,17 +81,18 @@
 
 ## Validation
 
-- Frontend unit suite: **95 passed** (15 files).
+- Frontend unit suite: **96 passed** (15 files).
 - Full Chromium suite: **64 passed**, including generated fixture workflows, mobile layouts, automated accessibility, error states, shared motion, rapid reversal, disabled controls, polling, keyboard focus and immutable report export.
 - After the final summary/history correction and merge reconciliation, reran the affected report/library browser coverage: **13 passed**; see `browser-summary-regression.log`.
+- Saved-search follow-up: text/watchlist filters persist across reloads; MCP mobile check and desktop/mobile browser regressions pass without submitting research. Final full-suite log: `browser-saved-search.log`.
 - Generated TypeScript contract check, TypeScript typecheck, Prettier check, production build and `git diff --check`: passed.
-- #90 independently: **86 unit tests and 54 browser tests passed**, production build and formatting passed before merge.
+- #90 independently: **86 unit tests and 54 browser tests passed**, production build and formatting passed before merge; GitHub checks subsequently all passed.
 - Playwright MCP live checks: desktop 1440×900; mobile 375×812; narrow/zoom-equivalent 320×740; keyboard activation, Escape/focus restoration, tab Home/End, live reduced-motion preference, source navigation, downloads, history persistence after browser restart and horizontal overflow.
-- Live axe WCAG 2 A/AA and 2.1 AA checks: no violations on the completed 320px ElevenLabs report and its evidence drawer. Automated accessibility is not a full assistive-technology audit.
+- Live axe WCAG 2 A/AA and 2.1 AA checks: no violations on the completed 320px ElevenLabs report its evidence drawer and the mobile research library. Automated accessibility is not a full assistive-technology audit.
 - Controlled MCP fault injection: saved-directory 503, retry/recovery and empty publication list. These were labelled controlled tests and were not substituted for successful live collection.
 - A short local Vite overlay occurred while reconciling merge-conflict markers; the affected interaction was rerun after resolution. No unresolved overlay remains.
 - No application animation engine changes, numeric-count animation, new runtime npm dependencies, backend edits or relaxed test assertions.
-- Production build retains the existing >500 kB chunk warning (main bundle approximately 594 kB / 182 kB gzip); build succeeds. No performance threshold is claimed by this audit.
+- Production build retains the existing >500 kB chunk warning (main bundle approximately 595 kB / 183 kB gzip); build succeeds. No performance threshold is claimed by this audit.
 
 ## Captures and evidence
 
@@ -100,7 +101,7 @@ All captures were produced through Playwright MCP and remain in ignored `tests/o
 - Before: `before-founder-progress.png`, `before-investor-name-search.png`, `before-vc-comparison.png`, `before-mobile-comparison.png`.
 - Failure retained: `founder-live-worker-failure.png`.
 - Live reports: `founder-live-report-mobile.png`, `after-name-research-desktop.png`, `angel-completed-320px-reduced-motion.png`.
-- Continuing workflow: `accelerator-watchlist-mobile.png`, `vc-mixed-comparison-desktop.png`, `vc-mixed-comparison-mobile.png`, `vc-two-fresh-reports-mobile.png`.
+- Continuing workflow: `accelerator-watchlist-mobile.png`, `saved-search-mobile.png`, `vc-mixed-comparison-desktop.png`, `vc-mixed-comparison-mobile.png`, `vc-two-fresh-reports-mobile.png`.
 - Evidence: `journalist-live-provenance-desktop.png`, `accelerator-live-financial-evidence-mobile.png`.
 - Fault tests: `controlled-directory-service-error.png`, `controlled-empty-directory.png`.
 
@@ -109,7 +110,7 @@ All captures were produced through Playwright MCP and remain in ignored `tests/o
 - Growth, Survival and Overall company outcomes remain unavailable: no validated outcome models/labels are provided. A frontend-only patch cannot make the original success/failure investment decision reliable.
 - Public-source collection is bounded. JavaScript-only content may be incomplete; GitHub/provider calls can fail; missing financial entity mappings prevent some financial collection. Missing evidence stays missing.
 - Actual paying-customer retention, audited private financials, calibrated confidence and a validated ranking of business risks/supporting signals are not available for the researched companies.
-- Watchlists, notes and history are **browser-local**. No account storage, cross-device sync, saved-search management, alerts or scheduled collection is implemented or implied. The existing API does not provide the account/notification/scheduler services required for a durable version of those features.
+- Watchlists, notes and history are **browser-local**. Saved searches retain browser-local text/watchlist filters. No account storage, cross-device sync, alerts or scheduled collection is implemented or implied. The existing API does not provide the account/notification/scheduler services required for a durable version of those features.
 - Review dates are visible manual reminders, not a scheduled task. Reports are retained as immutable versions; automatic longitudinal change analysis is not implemented.
 - Cross-report comparison is evidence comparison with dates and definitions. It does not turn unrelated records into a statistically comparable cohort.
 - Existing package-traction and technical data-health tools retain their own meanings and routes; they are not relabelled as company-success models.
@@ -135,6 +136,7 @@ The review diff against the integrated #90 UI base includes earlier #88 refineme
 - `frontend/src/pages/research/client.ts`
 - `frontend/src/pages/research/library.ts`
 - `frontend/src/pages/research/summary.ts`
+- `frontend/src/pages/research/savedSearches.ts`
 - `frontend/src/theme/theme.css`
 - `frontend/tests/e2e/company-home.spec.ts`
 - `frontend/tests/e2e/research-library.spec.ts`
