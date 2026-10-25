@@ -73,7 +73,7 @@ test("homepage honestly handles empty and failed publication lists", async ({
   );
 });
 
-test("directory pagination and footer remain reachable on a small mobile screen", async ({
+test("directory pagination remains reachable on a small mobile screen", async ({
   page,
 }) => {
   await page.route("**/api/v1/company-snapshots/*/companies", async (route) => {
@@ -98,11 +98,9 @@ test("directory pagination and footer remain reachable on a small mobile screen"
     page.getByRole("link", { name: /Open dossier for/ }),
   ).toHaveCount(2);
   await expect(page.getByText("Page 1 of 2")).toBeVisible();
-  const footer = page.getByRole("link", {
-    name: "Browse publications & compare companies",
-  });
-  await footer.scrollIntoViewIfNeeded();
-  await expect(footer).toBeInViewport();
+  const next = page.getByRole("button", { name: "Next", exact: true });
+  await next.scrollIntoViewIfNeeded();
+  await expect(next).toBeInViewport();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,
@@ -175,4 +173,70 @@ test("search covers every configured publication and dotted company names", asyn
   await expect(
     page.getByRole("link", { name: "Open dossier for Node.js" }),
   ).toHaveCount(0);
+});
+
+test("desktop homepage fits without footer clutter and keeps background motion visible", async ({
+  page,
+}, info) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await expect(
+    page.getByRole("link", { name: "Open dossier for Synthetic alpha" }),
+  ).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  await expect(page.locator(".directory-footer")).toHaveCount(0);
+  await expect(page.locator(".app-shell > footer")).toBeHidden();
+  for (const [width, height] of [
+    [1280, 720],
+    [1366, 768],
+    [1440, 900],
+    [1920, 1080],
+  ]) {
+    await page.setViewportSize({ width, height });
+    await expect
+      .poll(
+        () =>
+          page
+            .locator("main")
+            .evaluate((node) => node.scrollHeight <= node.clientHeight),
+        { message: `${width}x${height} homepage must fit` },
+      )
+      .toBe(true);
+    await expect(
+      page.getByRole("link", { name: "Open dossier for Synthetic beta" }),
+    ).toBeInViewport();
+    await page.screenshot({ path: info.outputPath(`home-fit-${width}.png`) });
+  }
+  const pattern = page.locator('[data-motion-ambient="drift"]');
+  expect(
+    await pattern.evaluate((node) => Number(getComputedStyle(node).opacity)),
+  ).toBeGreaterThanOrEqual(0.6);
+  expect(
+    await page
+      .locator(".home-pattern-region-left")
+      .evaluate((node) => getComputedStyle(node).position),
+  ).toBe("fixed");
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  const start = await pattern.evaluate(
+    (node) => getComputedStyle(node).transform,
+  );
+  await expect
+    .poll(() => pattern.evaluate((node) => getComputedStyle(node).transform))
+    .not.toBe(start);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect
+    .poll(() =>
+      pattern.evaluate(
+        (node) =>
+          new DOMMatrixReadOnly(getComputedStyle(node).transform).isIdentity,
+      ),
+    )
+    .toBe(true);
+  await page.setViewportSize({ width: 375, height: 667 });
+  await expect(
+    page
+      .getByRole("navigation", { name: "Main navigation" })
+      .getByRole("link", { name: "Compare & explore" }),
+  ).toBeVisible();
+  expect((await auditAccessibility(page)).violations).toEqual([]);
 });

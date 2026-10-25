@@ -10,7 +10,8 @@
   Plus Jakarta Sans for controls and reading, and JetBrains Mono for metadata.
   Supporting text must remain legible on phones; do not shrink a page to fit it.
 - Layout: shared spacing and radius tokens; aligned cards; readable paragraph
-  widths; the homepage scrolls rather than shrinking its text. The dossier keeps
+  widths; the default desktop homepage fits the viewport. Small and zoomed
+  layouts retain scrolling to keep controls reachable. The dossier keeps
   its existing compact overview and internal measurement scrolling. Tables keep
   their own scroll containers and preserve source ordering.
 - Motion: retain the existing Material 3 Expressive library without changes.
@@ -78,6 +79,8 @@
   confirmation help text and the saved-research heading; handlers unchanged.
 - `frontend/tests/unit/theme.test.ts`: check the new explicit action-text token
   against both primary action backgrounds using the existing AA threshold.
+- `frontend/tests/e2e/company-home.spec.ts`: desktop viewport fit, removed footer,
+  visible background motion, reduced-motion updates and mobile navigation checks.
 - `frontend/tests/e2e/theme.spec.ts`: updated canvas expectation and additional
   320px, 768px and 1024px target-size, keyboard, overflow and accessibility checks.
 - `docs/design/TECHNO-CLASSICAL-THEME.md`: link the historical foundation to the
@@ -88,7 +91,7 @@
 
 - Evidence panels retain their existing compact metadata and internal scrolling;
   the page-fit regression still covers laptops and phones down to 375 × 667.
-- The narrow-screen footer keeps its existing truncated qualification; complete
+- On other routes, the narrow-screen footer keeps its existing truncated qualification; complete
   explanations remain on the report and methodology pages.
 - The production build still reports the existing large JavaScript chunk warning.
   This refinement adds no package, chart animation or new animation engine.
@@ -120,3 +123,20 @@
 - Revalidated the screenshot palette: 71 unit tests, 55 browser tests, generated types,
   TypeScript, production build and formatting pass. Logs: `tests/outputs/ui-orange/`;
   desktop/mobile captures: `tests/outputs/ui-orange-browser/`.
+
+## Compact homepage and visible patterns
+
+- Remove the duplicate publications link and hide the bottom footer on the homepage.
+- Keep Compare & explore reachable in the main navigation, including phones.
+- Arrange the two saved-company cards side by side on desktop and tighten the
+  hero/fundamentals spacing so the default screen fits without page scrolling.
+- Cover the background with the existing animated patterns at visible opacity;
+  keep them non-interactive and preserve the existing reduced-motion behaviour.
+- Additional search results, smaller screens and zoom can still scroll rather
+  than hide content. Other routes retain their existing footer and layout.
+- Preserve the desktop header height across navigation so route changes do not
+  shift the application chrome.
+- Validation: 71 unit and 56 browser tests passed; generated types, TypeScript,
+  production build and formatting passed. Desktop fit verified at 1280×720,
+  1366×768, 1440×900 and 1920×1080. Logs: `tests/outputs/ui-home-fit/`;
+  final captures: `tests/outputs/ui-home-fit-final2/`.

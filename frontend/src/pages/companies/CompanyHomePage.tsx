@@ -329,9 +329,6 @@ export default function CompanyHomePage() {
                 )}
               </>
             )}
-            <div className="directory-footer">
-              <Link to="/explore">Browse publications & compare companies</Link>
-            </div>
           </section>
         </MotionSurface>
         <MotionSurface className="home-motion-surface home-motion-fundamentals">
