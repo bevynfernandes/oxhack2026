@@ -127,7 +127,7 @@ export default function CompanyHomePage() {
               <span>NAME / DOMAIN</span>
             </div>
             <form
-              className="terminal-search"
+              className="terminal-search company-research-form"
               onSubmit={(event) => {
                 event.preventDefault();
                 if (search.trim().length >= 2 && !searching)
@@ -159,9 +159,12 @@ export default function CompanyHomePage() {
                   {searching ? "Finding company…" : "Research company"}
                 </MotionButton>
               </div>
-              <p id="company-domain-search-help">
-                Search saved companies immediately or inspect a new company by
-                its name or exact website domain.
+              <p
+                id="company-domain-search-help"
+                className="company-search-help"
+              >
+                Enter a name or website. You’ll confirm the company before
+                research begins.
               </p>
             </form>
             {(lookup.error || preview.error) && (
@@ -241,6 +244,7 @@ export default function CompanyHomePage() {
             )}
             {rows && (
               <>
+                <h3 className="saved-research-heading">Saved research</h3>
                 <p className="directory-count" role="status">
                   {rows.length} {rows.length === 1 ? "company" : "companies"}{" "}
                   available across configured publications
