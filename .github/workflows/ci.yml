@@ -78,6 +78,10 @@ jobs:
 
   browser:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
     defaults:
       run:
         working-directory: frontend
@@ -100,14 +104,14 @@ jobs:
             uv.lock
       - run: uv sync --project .. --locked --no-dev --extra api --extra data
       - run: npx playwright install --with-deps --no-shell chromium
-      - run: npm run test:e2e
+      - run: npm run test:e2e -- --fully-parallel --workers=1 --shard=${{ matrix.shard }}/2
         env:
-          SIGNALSHIFT_TEST_RUN: ci-${{ github.run_id }}-${{ github.run_attempt }}
+          SIGNALSHIFT_TEST_RUN: ci-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}
       - uses: actions/upload-artifact@v4
         if: ${{ !cancelled() }}
         with:
-          name: browser-results-${{ github.run_id }}-${{ github.run_attempt }}
-          path: tests/outputs/
+          name: browser-results-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}
+          path: tests/outputs/ci-${{ github.run_id }}-${{ github.run_attempt }}-shard-${{ matrix.shard }}/
           retention-days: 14
 
   frontend:
