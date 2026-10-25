@@ -46,8 +46,11 @@ test("company homepage searches and opens a saved analysis with keyboard", async
   await analysis.focus();
   await page.keyboard.press("Enter");
   await expect(
-    page.getByRole("heading", { name: "Overall outlook unavailable" }),
+    page.getByRole("heading", { name: "What the evidence tells us" }),
   ).toBeVisible();
+  await expect(
+    page.getByText("Prediction unavailable", { exact: true }),
+  ).toHaveCount(3);
 });
 
 for (const status of [404, 500, 503]) {

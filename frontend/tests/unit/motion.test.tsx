@@ -175,6 +175,26 @@ it("closes immediately with reduced motion and restores the opener", () => {
   expect(opener).toHaveFocus();
 });
 
+it("does not steal focus when a native close event arrives after the user moves on", () => {
+  render(
+    <MotionProvider reducedMotion>
+      <DialogExample />
+      <button>Next action</button>
+    </MotionProvider>,
+  );
+  const opener = screen.getByText("Open");
+  opener.focus();
+  fireEvent.click(opener);
+  const dialog = screen.getByRole("dialog");
+  // Reproduce native close ordering: remove open, restore focus, queue event.
+  dialog.removeAttribute("open");
+  opener.focus();
+  const next = screen.getByText("Next action");
+  next.focus();
+  fireEvent(dialog, new Event("close"));
+  expect(next).toHaveFocus();
+});
+
 it("cancels an obsolete close when reopened and closes on unmount", async () => {
   const ref = createRef<MotionDialogHandle>();
   const view = render(

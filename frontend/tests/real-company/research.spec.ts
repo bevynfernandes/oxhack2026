@@ -84,7 +84,7 @@ test("live standalone domain preview, collection, evidence and immutable refresh
     const jobUrl = page.url();
     await page.getByRole("link", { name: "Open research report" }).click();
     await expect(
-      page.getByRole("heading", { name: "Overall outlook unavailable" }),
+      page.getByRole("heading", { name: "What the evidence tells us" }),
     ).toBeVisible();
     const reportUrl = page.url();
     const id = reportUrl.split("/").at(-1)!;
