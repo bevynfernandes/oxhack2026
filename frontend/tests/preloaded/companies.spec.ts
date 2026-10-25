@@ -108,7 +108,7 @@ for (const name of ["Qdrant", "Weaviate"]) {
 
 test("both packaged companies compare without collecting sources", async ({
   page,
-}) => {
+}, info) => {
   const choices = await (
     await page.request.get("/api/v1/company-snapshots")
   ).json();
@@ -126,4 +126,38 @@ test("both packaged companies compare without collecting sources", async ({
   await expect(
     page.getByRole("link", { name: "Weaviate", exact: true }),
   ).toBeVisible();
+  const table = page.getByRole("table");
+  await expect(table.locator("tr[data-metric-id]")).toHaveCount(11);
+  await expect(
+    table.getByRole("row", { name: /^Growth outlook/ }),
+  ).toContainText("76");
+  await expect(
+    table.getByRole("row", { name: /^Growth outlook/ }),
+  ).toContainText("72");
+  await expect(
+    table.getByRole("row", { name: /^SDK demand index/ }),
+  ).toContainText("34.8");
+  await expect(
+    table.getByRole("row", { name: /^SDK demand index/ }),
+  ).toContainText("34.2");
+  await expect(table.getByRole("cell", { name: /^Missing/ })).toHaveCount(6);
+  expect((await auditAccessibility(page)).violations).toEqual([]);
+  await page.screenshot({ path: info.outputPath("comparison-desktop.png") });
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({ path: info.outputPath("comparison-mobile.png") });
+  const records = new URLSearchParams();
+  records.append("record", `/companies/${snapshot}/qdrant`);
+  records.append("record", `/companies/${snapshot}/weaviate`);
+  await page.goto(`/compare?${records}`);
+  await expect(
+    page.getByRole("heading", { name: "Compare companies" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("table").locator("tr[data-metric-id]"),
+  ).toHaveCount(11);
 });

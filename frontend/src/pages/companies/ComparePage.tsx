@@ -1,6 +1,10 @@
 import { MotionDisclosure, MotionLink as Link } from "../../motion";
 import { useQueries } from "@tanstack/react-query";
 import ResearchComparison from "../research/ResearchComparison";
+import {
+  FORECAST_SOURCE,
+  PRELOADED_FORECASTS,
+} from "../research/preloadedForecasts";
 import { useSearchParams } from "react-router-dom";
 import { api, unwrap } from "../../api/client";
 import { date, QueryState } from "../../components/Common";
@@ -16,16 +20,36 @@ import {
 /** Compare two or three exact profiles using the same source snapshot and definitions. */
 export default function ComparePage() {
   const [params] = useSearchParams();
-  return params.has("record") ? (
+  const records = params.getAll("record");
+  const saved = records.map((path) =>
+    /^\/companies\/([^/]+)\/([^/]+)$/.exec(path),
+  );
+  const samePublication =
+    records.length >= 2 &&
+    saved.every((match) => match && match[1] === saved[0]?.[1]);
+  return params.has("record") && !samePublication ? (
     <ResearchComparison />
   ) : (
-    <PublishedComparison />
+    <PublishedComparison
+      selection={
+        samePublication
+          ? {
+              snapshot: saved[0]![1],
+              ids: saved.map((match) => match![2]),
+            }
+          : undefined
+      }
+    />
   );
 }
-function PublishedComparison() {
+function PublishedComparison({
+  selection,
+}: {
+  selection?: { snapshot: string; ids: string[] };
+}) {
   const [params] = useSearchParams();
-  const snapshot = params.get("snapshot") ?? "";
-  const ids = params.getAll("company");
+  const snapshot = selection?.snapshot ?? params.get("snapshot") ?? "";
+  const ids = selection?.ids ?? params.getAll("company");
   const valid =
     Boolean(snapshot) &&
     ids.length >= 2 &&
@@ -46,6 +70,18 @@ function PublishedComparison() {
     })),
   });
   const profiles = queries.flatMap((query) => (query.data ? [query.data] : []));
+  const definitions = [
+    ...new Map(
+      profiles.flatMap((profile) =>
+        profile.definitions.map((row) => [row.metric_id, row] as const),
+      ),
+    ).values(),
+  ];
+  const aiScores = profiles.map((profile) =>
+    profile.publication.source.snapshot_id === FORECAST_SOURCE
+      ? PRELOADED_FORECASTS[profile.company.company_id]
+      : undefined,
+  );
   const measurements = profiles.map(
     (profile) => new Map(profile.metrics.map((row) => [row.metric_id, row])),
   );
@@ -71,12 +107,19 @@ function PublishedComparison() {
   return (
     <>
       <Link to={`/explore?${params}`}>Change company selection</Link>
-      <header className="page-heading">
+      <header className="page-heading comparison-heading">
+        <span className="micro-label">SIDE BY SIDE / COMPANY INTELLIGENCE</span>
         <h1>Compare companies</h1>
         <p>
-          Read the same outcomes and metric definitions side by side. There is
-          no composite winner.
+          One view of every measurement, AI outlook and local model result.
+          Missing data stays visible; no composite winner is implied.
         </p>
+        {complete && (
+          <p className="comparison-count">
+            {profiles.length} companies · {definitions.length} source metrics ·
+            Same dated publication
+          </p>
+        )}
       </header>
       {!valid ? (
         <p role="alert">
@@ -93,15 +136,17 @@ function PublishedComparison() {
       )}
       {complete && (
         <>
-          <PublicationNotice publication={profiles[0].publication} />
+          <MotionDisclosure summary="Source snapshot & limitations">
+            <PublicationNotice publication={profiles[0].publication} />
+          </MotionDisclosure>
           {contextDiffers && (
-            <p className="notice">
+            <p className="notice comparison-context-note">
               Stage or business model differs or is unknown. Check each
               company's context before interpreting differences.
             </p>
           )}
           <div
-            className="table-scroll comparison-scroll"
+            className="table-scroll comparison-scroll complete-comparison"
             role="region"
             aria-label="Company comparison"
             tabIndex={0}
@@ -126,6 +171,113 @@ function PublishedComparison() {
                 </tr>
               </thead>
               <tbody>
+                {aiScores.some(Boolean) && (
+                  <>
+                    <tr className="comparison-group">
+                      <th colSpan={profiles.length + 1}>
+                        AI outlook indices{" "}
+                        <small>
+                          Prepared AI estimates / 100 · not calibrated
+                          probabilities
+                        </small>
+                      </th>
+                    </tr>
+                    {(
+                      [
+                        ["growth", "Growth outlook · 24 months"],
+                        ["survival", "Survival outlook · 24 months"],
+                        ["financial_health", "Financial health · 12 months"],
+                      ] as const
+                    ).map(([outcome, label]) => (
+                      <tr key={outcome}>
+                        <th scope="row">{label}</th>
+                        {profiles.map((profile, index) => {
+                          const card = aiScores[index]?.find(
+                            (row) => row.outcome === outcome,
+                          );
+                          return (
+                            <td key={profile.company.company_id}>
+                              {card ? (
+                                <>
+                                  <strong className="comparison-score">
+                                    {card.score}
+                                    <span> / 100</span>
+                                  </strong>
+                                  <p>{card.rationale}</p>
+                                  <small>{card.caveat}</small>
+                                </>
+                              ) : (
+                                "Not available"
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </>
+                )}
+                {profiles.some((profile) => profile.dimension_models) && (
+                  <>
+                    <tr className="comparison-group">
+                      <th colSpan={profiles.length + 1}>
+                        Local model results{" "}
+                        <small>
+                          Computed from source inputs · experimental proxies
+                        </small>
+                      </th>
+                    </tr>
+                    {(
+                      [
+                        ["adoption_retention", "SDK demand index"],
+                        ["attention_sentiment", "Title sentiment index"],
+                        ["financial_health", "Financial model"],
+                        ["industry_competition", "Competition model"],
+                        ["team_execution", "Execution model"],
+                      ] as const
+                    ).map(([group, label]) => (
+                      <tr key={group}>
+                        <th scope="row">{label}</th>
+                        {profiles.map((profile) => {
+                          const model =
+                            profile.dimension_models?.dimensions.find(
+                              (row) => row.group_id === group,
+                            );
+                          return (
+                            <td key={profile.company.company_id}>
+                              {model?.score != null ? (
+                                <strong className="comparison-score">
+                                  {model.score.toFixed(1)}
+                                  <span> / 100</span>
+                                </strong>
+                              ) : (
+                                <strong>Unavailable</strong>
+                              )}
+                              <small>
+                                {model?.eligibility.replaceAll("_", " ") ??
+                                  "Model not available"}
+                              </small>
+                              {model && (
+                                <MotionDisclosure summary="Model details">
+                                  <p>{model.target}</p>
+                                  <ul>
+                                    {model.limitations.map((limit) => (
+                                      <li key={limit}>{limit}</li>
+                                    ))}
+                                  </ul>
+                                </MotionDisclosure>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </>
+                )}
+                <tr className="comparison-group">
+                  <th colSpan={profiles.length + 1}>
+                    Company context & original assessments
+                  </th>
+                </tr>
                 <tr>
                   <th scope="row">Company context</th>
                   {profiles.map(({ company }) => (
@@ -169,8 +321,20 @@ function PublishedComparison() {
                     </td>
                   ))}
                 </tr>
-                {profiles[0].definitions.map((definition) => (
-                  <tr key={definition.metric_id}>
+                <tr className="comparison-group">
+                  <th colSpan={profiles.length + 1}>
+                    All source measurements{" "}
+                    <small>
+                      {definitions.length} metrics · includes missing and
+                      unavailable values
+                    </small>
+                  </th>
+                </tr>
+                {definitions.map((definition) => (
+                  <tr
+                    key={definition.metric_id}
+                    data-metric-id={definition.metric_id}
+                  >
                     <th scope="row">
                       {definition.label}
                       <small>
@@ -194,7 +358,9 @@ function PublishedComparison() {
                         <td key={profile.company.company_id}>
                           {metric ? (
                             <>
-                              {observationValue(metric)}
+                              <strong className="comparison-value">
+                                {observationValue(metric)}
+                              </strong>
                               {stale && (
                                 <strong className="stale-label">
                                   Stale at assessment date

@@ -82,10 +82,13 @@ for (const width of [1440, 375]) {
     await expect(
       page.getByText(/No validated success probabilities/),
     ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { name: /Measurements/ }),
+    ).toHaveCount(2);
     await page
-      .getByRole("button", { name: /Measurements/ })
+      .getByRole("heading", { name: /Measurements/ })
       .first()
-      .click();
+      .scrollIntoViewIfNeeded();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
