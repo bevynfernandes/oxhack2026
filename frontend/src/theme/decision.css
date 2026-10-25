@@ -1,0 +1,302 @@
+/* Fresh decision reports share the entry page's paper, grid and typography.
+   Legacy dossiers retain their compact viewport layout. */
+.theme-techno-classical .app-shell:has(.decision-dossier) {
+  background-color: #eea05a;
+  background-image:
+    url("./assets/grain.svg"),
+    radial-gradient(circle at 16% 18%, #ffd8b5 0, transparent 38%),
+    radial-gradient(circle at 82% 72%, #ff7900 0, transparent 42%);
+  background-size:
+    128px 128px,
+    cover,
+    cover;
+}
+.theme-techno-classical .app-shell:has(.decision-dossier) > main {
+  overflow: auto;
+  padding: 24px clamp(16px, 4vw, 64px) 40px;
+}
+.theme-techno-classical .decision-dossier {
+  height: auto;
+  min-height: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+  gap: 20px;
+}
+.theme-techno-classical .decision-dossier > * {
+  flex-shrink: 0;
+}
+.theme-techno-classical
+  .decision-dossier
+  :is(
+    .dossier-company,
+    .decision-brief,
+    .dossier-stat,
+    .pillar-card,
+    .decision-research-details
+  ) {
+  background-color: var(--theme-panel-surface);
+  background-image: var(--theme-panel-grid);
+  border: 1px solid var(--theme-control-line);
+  border-radius: var(--theme-radius-panel);
+}
+.theme-techno-classical .decision-dossier .dossier-company {
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  padding: 24px;
+  min-height: 150px;
+  gap: 24px;
+}
+.theme-techno-classical .decision-dossier .dossier-name h1 {
+  font-size: clamp(40px, 4vw, 60px);
+  line-height: 1.05;
+}
+.theme-techno-classical .decision-dossier .dossier-identity .micro-label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 10px;
+}
+.theme-techno-classical .decision-dossier .dossier-readiness {
+  padding-left: 24px;
+  border-left: 1px solid var(--theme-line);
+}
+.theme-techno-classical .decision-dossier .dossier-actions :is(a, button) {
+  min-height: 44px;
+}
+.decision-brief {
+  padding: 24px;
+  min-width: 0;
+}
+.decision-brief-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 20px;
+}
+.decision-brief h2 {
+  font: 600 clamp(28px, 3vw, 40px)/1.1 var(--theme-display);
+  margin: 8px 0 0;
+  text-wrap: balance;
+}
+.decision-status {
+  border: 1px solid var(--theme-control-line);
+  border-radius: 30px;
+  padding: 8px 12px;
+  font: 500 11px/1.5 var(--theme-mono);
+  color: var(--theme-accent);
+}
+.decision-brief-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 0.85fr;
+  border-top: 1px solid var(--theme-line);
+}
+.decision-brief-grid > section {
+  min-width: 0;
+  padding: 20px 24px 0;
+  border-left: 1px solid var(--theme-line);
+}
+.decision-brief-grid > section:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.decision-brief-grid > section:last-child {
+  padding-right: 0;
+}
+.decision-brief h3 {
+  font: 600 12px/1.5 var(--theme-mono);
+  color: var(--theme-muted);
+  margin: 0 0 12px;
+}
+.decision-brief p {
+  font-size: 14px;
+  line-height: 1.65;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.decision-brief small {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--theme-muted);
+}
+.decision-brief .decision-signal-value {
+  font: 600 40px/1.1 var(--theme-display);
+}
+.decision-signal-value span {
+  font: 500 12px/1.5 var(--theme-mono);
+}
+.theme-techno-classical .decision-brief .dossier-inline-action {
+  font-size: 12px;
+  min-height: 44px;
+  margin-top: 4px;
+}
+.theme-techno-classical .decision-dossier .dossier-summary {
+  gap: 12px;
+}
+.theme-techno-classical .decision-dossier .dossier-stat {
+  padding: 16px 20px;
+  min-height: 118px;
+}
+.theme-techno-classical .decision-dossier .dossier-section-label {
+  flex-wrap: wrap;
+  gap: 8px 16px;
+}
+.theme-techno-classical .decision-dossier .dossier-pillars {
+  flex: none;
+  min-height: 0;
+  gap: 12px;
+}
+.theme-techno-classical .decision-dossier .pillar-card {
+  padding: 20px 16px 12px;
+}
+.theme-techno-classical .decision-dossier .pillar-card h3 {
+  font-size: 26px;
+  min-height: 58px;
+}
+.theme-techno-classical .decision-dossier .pillar-measurements {
+  min-height: 90px;
+  overflow: visible;
+  flex: none;
+}
+.theme-techno-classical .decision-dossier .pillar-card footer {
+  margin-top: auto;
+  padding-top: 12px;
+}
+.theme-techno-classical .decision-dossier .pillar-card footer button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.theme-techno-classical .decision-dossier .decision-research-details {
+  margin: 0;
+}
+.theme-techno-classical .decision-dossier .research-analysis {
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  padding: 12px 20px;
+}
+.theme-techno-classical .decision-dossier .dossier-ledger {
+  flex-wrap: wrap;
+  min-height: 56px;
+  padding: 12px 0;
+  gap: 12px;
+}
+@media (max-width: 1100px) {
+  .theme-techno-classical .decision-dossier .dossier-company {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .theme-techno-classical .decision-dossier .dossier-readiness {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    border-left: 0;
+    border-top: 1px solid var(--theme-line);
+    padding: 12px 0 0;
+  }
+  .theme-techno-classical .decision-dossier .dossier-pillars {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 800px) {
+  .theme-techno-classical .app-shell:has(.decision-dossier) > main {
+    padding: 16px 12px 32px;
+  }
+  .theme-techno-classical .decision-dossier .dossier-company {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 20px;
+  }
+  .theme-techno-classical .decision-dossier .dossier-readiness {
+    grid-row: auto;
+  }
+  .theme-techno-classical .decision-dossier .dossier-actions {
+    grid-column: auto;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .decision-brief {
+    padding: 20px;
+  }
+  .decision-brief-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .decision-brief-grid > section,
+  .decision-brief-grid > section:first-child {
+    padding: 16px 0;
+    border-left: 0;
+    border-bottom: 1px solid var(--theme-line);
+  }
+  .decision-brief-grid > section:last-child {
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .theme-techno-classical .decision-dossier .dossier-pillars {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .theme-techno-classical .decision-dossier .pillar-card h3 {
+    min-height: 0;
+  }
+  .theme-techno-classical .decision-dossier .dossier-stat {
+    padding: 14px;
+  }
+}
+@media (forced-colors: active) {
+  .theme-techno-classical .app-shell:has(.decision-dossier),
+  .theme-techno-classical
+    .decision-dossier
+    :is(
+      .dossier-company,
+      .decision-brief,
+      .dossier-stat,
+      .pillar-card,
+      .decision-research-details
+    ) {
+    background-image: none;
+  }
+}
+
+/* Match the entry page's wrapped navigation; all destinations stay reachable. */
+@media (max-width: 800px) {
+  .theme-techno-classical .app-shell:has(.decision-dossier) {
+    grid-template-rows: auto minmax(0, 1fr) 30px;
+  }
+  .theme-techno-classical .app-shell:has(.decision-dossier) > .site-header {
+    flex-wrap: wrap;
+    padding-top: 10px;
+    gap: 4px;
+  }
+  .theme-techno-classical .app-shell:has(.decision-dossier) > .site-header nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .theme-techno-classical
+    .app-shell:has(.decision-dossier)
+    > .site-header
+    nav
+    a {
+    display: inline-flex;
+    padding-block: 16px;
+  }
+  .theme-techno-classical .decision-dossier .dossier-readiness {
+    display: block;
+  }
+}
+
+.theme-techno-classical
+  .decision-dossier
+  :is(
+    .pillar-measurements dt,
+    .pillar-measurements dd,
+    .more-metrics,
+    .pillar-status,
+    .pillar-card footer button
+  ) {
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.theme-techno-classical .decision-dossier .saved-assessment-action {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}

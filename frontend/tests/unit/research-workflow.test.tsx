@@ -133,6 +133,16 @@ it.each([false, true])(
   },
 );
 
+it("does not present a failed terminal interpretation as successful completion", () => {
+  render(
+    <InterpretationSummary
+      statistics={{ ...statistics, processed: 0, deferred: 200 }}
+    />,
+  );
+  expect(screen.getByText(/Interpretation unavailable/)).toBeVisible();
+  expect(screen.queryByText(/finished/)).toBeNull();
+});
+
 it("distinguishes failed extraction from successful cited synthesis", () => {
   render(
     <InterpretationSummary

@@ -1,4 +1,5 @@
 import ResearchTools from "./ResearchTools";
+import DecisionBrief from "./DecisionBrief";
 import { evidenceSummary } from "./summary";
 import { CitedResearchAnalysis } from "./ResearchWorkflow";
 import { MappingControls, MappedDimensionEvidence } from "./EvidenceMapping";
@@ -157,6 +158,7 @@ export default function CompanyDossier({
     segment: "Standalone research",
     business_model: null,
   };
+  const decisionLayout = !report;
   const outlook = standalone?.outlook ?? report?.outlook ?? profile?.outlook;
   const dimensionModels =
     standalone?.dimension_models ?? profile?.dimension_models;
@@ -442,13 +444,21 @@ export default function CompanyDossier({
     tabRefs.current[next]?.focus();
   };
   return (
-    <article className="company-dossier" aria-label="Company research dossier">
+    <article
+      className={`company-dossier ${decisionLayout ? "decision-dossier" : ""}`}
+      aria-label="Company research dossier"
+    >
       <header className="dossier-company">
         <div className="dossier-identity">
           <div className="dossier-monogram" aria-hidden="true">
             {company.display_name.slice(0, 1)}
           </div>
           <div>
+            {decisionLayout && (
+              <span className="micro-label">
+                COMPANY RESEARCH / DECISION WORKSPACE
+              </span>
+            )}
             <div className="dossier-name">
               <h1>{company.display_name}</h1>
               <span className="stage-tag">
@@ -473,20 +483,22 @@ export default function CompanyDossier({
           </strong>
           <small>Source-backed · as of {date(cutoff ?? null)}</small>
         </div>
-        <div className="dossier-outlook">
-          <span className="outlook-mark" aria-hidden="true">
-            —
-          </span>
-          <div>
-            <span className="micro-label">STARTUP OUTLOOK</span>
-            <h2>Overall outlook unavailable</h2>
-            <small>
-              {dimensionModels
-                ? "Auxiliary proxy experiments available · outcome models pending"
-                : "Outcome models not trained"}
-            </small>
+        {!decisionLayout && (
+          <div className="dossier-outlook">
+            <span className="outlook-mark" aria-hidden="true">
+              —
+            </span>
+            <div>
+              <span className="micro-label">STARTUP OUTLOOK</span>
+              <h2>Overall outlook unavailable</h2>
+              <small>
+                {dimensionModels
+                  ? "Auxiliary proxy experiments available · outcome models pending"
+                  : "Outcome models not trained"}
+              </small>
+            </div>
           </div>
-        </div>
+        )}
         <div className="dossier-actions">
           <Link className="button" to={researchPath}>
             {standalone ? "Refresh research" : "Research company"}{" "}
@@ -498,7 +510,17 @@ export default function CompanyDossier({
           </MotionButton>
         </div>
       </header>
-      {standalone && <CitedResearchAnalysis report={standalone} />}
+      {decisionLayout && (
+        <DecisionBrief
+          report={standalone}
+          models={dimensionModels}
+          usableIds={outlook?.specialists.flatMap(
+            (row) => row.usable_metric_observation_ids,
+          )}
+          summary={evidenceSummary(profile, standalone, report)}
+          onEvidence={() => open({ kind: "sources", index: 1 })}
+        />
+      )}
       {(synthetic || partial || (report && !outlook?.forecasts)) && (
         <div className="dossier-banners">
           <SyntheticNotice synthetic={synthetic} />
@@ -582,8 +604,10 @@ export default function CompanyDossier({
               </span>
             </div>
             <p>
-              {measurements.size} measurements ·{" "}
-              {standalone || report ? "Research report" : "Saved analysis"}
+              {standalone
+                ? `${usable} usable measurement${usable === 1 ? "" : "s"}`
+                : `${measurements.size} measurements`}{" "}
+              · {standalone || report ? "Research report" : "Saved analysis"}
             </p>
             {standalone && (
               <MotionButton
@@ -603,7 +627,11 @@ export default function CompanyDossier({
         <h2>
           BUSINESS FUNDAMENTALS <span>(5 DIMENSIONS)</span>
         </h2>
-        <p>Select a pillar to inspect measurements and model readiness</p>
+        <p>
+          {decisionLayout
+            ? "Open a dimension for its evidence and limitations"
+            : "Select a pillar to inspect measurements and model readiness"}
+        </p>
         <span className="model-label">
           <Icon name="shield" /> Business outcome models · not trained
         </span>
@@ -663,15 +691,17 @@ export default function CompanyDossier({
               <header>
                 <div className="pillar-top">
                   <span>DIMENSION 0{index + 1}</span>
-                  <span className="pillar-model">
-                    {group.id === "financial_health" && cashFlowResearch
-                      ? "Cash-flow component trained"
-                      : sdkScore != null
-                        ? "SDK component trained"
-                        : sentimentScore != null
-                          ? "Sentiment component trained"
-                          : "Outcome model untrained"}
-                  </span>
+                  {!decisionLayout && (
+                    <span className="pillar-model">
+                      {group.id === "financial_health" && cashFlowResearch
+                        ? "Cash-flow component trained"
+                        : sdkScore != null
+                          ? "SDK component trained"
+                          : sentimentScore != null
+                            ? "Sentiment component trained"
+                            : "Outcome model untrained"}
+                    </span>
+                  )}
                 </div>
                 <h3>
                   <MotionButton
@@ -685,7 +715,9 @@ export default function CompanyDossier({
                     <Icon name="arrow" />
                   </MotionButton>
                 </h3>
-                <p className="pillar-description">{group.description}</p>
+                {!decisionLayout && (
+                  <p className="pillar-description">{group.description}</p>
+                )}
               </header>
               <div
                 className="pillar-measurements"
@@ -751,29 +783,31 @@ export default function CompanyDossier({
                   </small>
                 )}
               </div>
-              <div className="pillar-model-note">
-                <span className="micro-label">
-                  {sentimentScore != null
-                    ? "EXPERIMENTAL TEXT SENTIMENT"
-                    : sdkScore != null
-                      ? "EXPERIMENTAL SDK FORECAST"
-                      : "SPECIALIST OUTLOOK"}
-                </span>
-                <p>
-                  {sentimentScore != null
-                    ? `Title sentiment index ${sentimentScore.toFixed(1)} / 100`
-                    : sdkScore != null
-                      ? `SDK demand index ${sdkScore.toFixed(1)} / 100`
-                      : "Business prediction unavailable"}
-                </p>
-                <small>
-                  {sentimentScore != null
-                    ? `${component?.sample_size} retrieved titles; unvalidated financial-news model transfer`
-                    : sdkScore != null
-                      ? "Trained download forecast; not customer retention or business success"
-                      : "Requires training on later company outcomes"}
-                </small>
-              </div>
+              {!decisionLayout && (
+                <div className="pillar-model-note">
+                  <span className="micro-label">
+                    {sentimentScore != null
+                      ? "EXPERIMENTAL TEXT SENTIMENT"
+                      : sdkScore != null
+                        ? "EXPERIMENTAL SDK FORECAST"
+                        : "SPECIALIST OUTLOOK"}
+                  </span>
+                  <p>
+                    {sentimentScore != null
+                      ? `Title sentiment index ${sentimentScore.toFixed(1)} / 100`
+                      : sdkScore != null
+                        ? `SDK demand index ${sdkScore.toFixed(1)} / 100`
+                        : "Business prediction unavailable"}
+                  </p>
+                  <small>
+                    {sentimentScore != null
+                      ? `${component?.sample_size} retrieved titles; unvalidated financial-news model transfer`
+                      : sdkScore != null
+                        ? "Trained download forecast; not customer retention or business success"
+                        : "Requires training on later company outcomes"}
+                  </small>
+                </div>
+              )}
               <footer>
                 <span
                   className={`pillar-status ${row?.data_status === "available" ? "available" : ""}`}
@@ -794,6 +828,14 @@ export default function CompanyDossier({
           );
         })}
       </section>
+      {standalone && (
+        <MotionDisclosure
+          className="decision-research-details"
+          summary="Research findings, citations & continuation"
+        >
+          <CitedResearchAnalysis report={standalone} />
+        </MotionDisclosure>
+      )}
       <div className="dossier-ledger">
         <ResearchTools
           path={location.pathname}
@@ -834,7 +876,16 @@ export default function CompanyDossier({
         ref={dialog}
         aria-labelledby="driver-dialog-title"
         onKeyDown={containFocus}
-        onClose={() => opener.current?.focus()}
+        onClose={(event) => {
+          // Native close can restore focus before this queued callback fires.
+          // Do not steal focus if the user has already moved to another control.
+          if (
+            document.activeElement === document.body ||
+            event.currentTarget.contains(document.activeElement)
+          ) {
+            opener.current?.focus();
+          }
+        }}
       >
         <header className="driver-dialog-header">
           <div>

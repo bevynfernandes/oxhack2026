@@ -11,6 +11,7 @@ import "./styles.css";
 import "./workspace.css";
 import "./motion/motion.css";
 import "./theme/theme.css";
+import "./theme/decision.css";
 
 const queryClient = createQueryClient();
 createRoot(document.getElementById("root")!).render(

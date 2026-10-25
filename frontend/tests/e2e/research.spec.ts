@@ -862,3 +862,88 @@ test("fully failed research offers identity confirmation without an invalid cont
   ).toBeDisabled();
   expect(continuationWrites).toBe(0);
 });
+
+for (const width of [1440, 390]) {
+  test(`decision brief prioritises evidence and keeps research controls accessible at ${width}px`, async ({
+    page,
+  }, info) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    let writes = 0;
+    await page.route("**/api/v2/research-capabilities", (route) =>
+      route.fulfill({ json: capabilities }),
+    );
+    await page.route("**/api/v2/research-reports/standalone-report", (route) =>
+      route.fulfill({
+        json: {
+          ...standaloneReport,
+          sources: sourceStates.map((source) =>
+            source.provider === "github"
+              ? { ...source, state: "failed" }
+              : source,
+          ),
+        },
+      }),
+    );
+    await page.route("**/api/v2/research-jobs/*/continue", (route) => {
+      writes++;
+      return route.fulfill({ status: 503, json: {} });
+    });
+    await page.goto("/research/v2/reports/standalone-report");
+    await expect(
+      page.getByRole("heading", { name: "What the evidence tells us" }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(
+        "No usable measurement yet. Collected claims alone do not establish traction.",
+      ),
+    ).toBeVisible();
+    await expect(
+      page.getByRole("button", { name: "Continue research", exact: true }),
+    ).toHaveCount(0);
+    await expect(page.getByText("24 months")).toHaveCount(2);
+    await page
+      .getByRole("button", { name: "Inspect supporting evidence", exact: true })
+      .click();
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(
+      page.getByRole("button", {
+        name: "Inspect supporting evidence",
+        exact: true,
+      }),
+    ).toBeFocused();
+    const details = page.getByRole("button", {
+      name: "Research findings, citations & continuation",
+      exact: true,
+    });
+    await details.focus();
+    await page.keyboard.press("Enter");
+    await expect(details).toHaveAttribute("aria-expanded", "true");
+    const continuation = page.getByRole("button", {
+      name: "Continue research",
+      exact: true,
+    });
+    await expect(continuation).toBeEnabled();
+    expect(writes).toBe(0);
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+    await continuation.click();
+    await expect(page.getByRole("alert")).toBeVisible();
+    expect(writes).toBe(1);
+    await details.click();
+    await expect(details).toHaveAttribute("aria-expanded", "false");
+    await page.screenshot({
+      path: info.outputPath("decision-brief.png"),
+      fullPage: true,
+    });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "200%";
+    });
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+    ).toBe(true);
+    expect((await auditAccessibility(page)).violations).toEqual([]);
+  });
+}

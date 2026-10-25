@@ -81,11 +81,16 @@ export function InterpretationSummary({
       ) : (
         <>
           <p>
-            {statistics.stage === "finished"
-              ? statistics.deferred || statistics.failed_batches
-                ? "Processing ended with incomplete extraction"
-                : "Processing completed"
-              : statistics.stage.replaceAll("_", " ")}{" "}
+            {statistics.stage === "finished" &&
+            statistics.failed_batches > 0 &&
+            statistics.processed === 0 &&
+            !analysis?.statements.length
+              ? "Interpretation unavailable"
+              : statistics.stage === "finished"
+                ? statistics.deferred || statistics.failed_batches
+                  ? "Processing ended with incomplete extraction"
+                  : "Processing completed"
+                : statistics.stage.replaceAll("_", " ")}{" "}
             · {statistics.model}
           </p>
           <p>

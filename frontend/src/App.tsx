@@ -40,7 +40,7 @@ export default function App() {
           <span className="brand-symbol">
             <Icon name="activity" />
           </span>
-          <strong>SignalShift</strong>
+          <strong>SignalShift</strong>{" "}
           <span className="terminal-tag">RESEARCH</span>
         </NavLink>
         <div className="terminal-breadcrumb">
