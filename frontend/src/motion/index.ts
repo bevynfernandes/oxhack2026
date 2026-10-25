@@ -13,6 +13,7 @@ export {
   MotionSelection,
   MotionState,
   MotionSurface,
+  MotionSpinnerRing,
 } from "./panels";
 export { MotionDialog, type MotionDialogHandle } from "./dialog";
 

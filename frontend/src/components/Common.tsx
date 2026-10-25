@@ -1,6 +1,7 @@
 import { MotionState, MotionButton, MotionDisclosure } from "../motion";
 import type { ReactNode } from "react";
 import type { DTO } from "../api/client";
+import CompanySpinner from "./CompanySpinner";
 
 export const count = (value: number | null | undefined): string =>
   value == null
@@ -69,7 +70,10 @@ export function QueryState({
   if (pending)
     return (
       <MotionState stateKey="pending">
-        <p role="status">Loading published data…</p>
+        <p role="status" className="loading-label">
+          <CompanySpinner size="small" />
+          Loading published data…
+        </p>
       </MotionState>
     );
   if (error)
