@@ -174,8 +174,11 @@ Short request-local handles select exact retained document blocks; model output
 never supplies quote text or capture locations. Additional candidates remain an
 explicit coverage limitation. A connection loss after a received submission
 preserves it with an interrupted-background reason, rather than discarding it.
-Product prices classified as financial performance are rejected independently of
-the model; they do not establish company revenue, ARR, funding or profitability.
+Retained pricing language and monetary/free prices are checked independently of
+the model's subject label in both rules and Gemini validation. Price-only quotes
+cannot establish company revenue, ARR, funding, cash or profitability. Explicit
+source financial assertions remain eligible even when the quote also discusses
+subscription prices; monetary normalization and metric eligibility stay separate.
 `SIGNALSHIFT_GEMINI_RPM` and `SIGNALSHIFT_GEMINI_TPM` configure the
 shared process quota (defaults ten requests and sixty thousand reserved tokens per
 minute). These are application limits, not claims about Google's project quota.

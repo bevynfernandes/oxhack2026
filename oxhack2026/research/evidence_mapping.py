@@ -56,6 +56,7 @@ from oxhack2026.research.mapping_policy import (
     METRIC_PROVIDERS,
     classify,
     metric_eligible,
+    price_only_financial_claim,
 )
 from oxhack2026.research.numerical_claims import normalize_quantity
 from oxhack2026.storage.artifacts import FileArtifactStore
@@ -723,15 +724,16 @@ class MappingEngine:
             subject = rule_subject
         if block.role == "quotation":
             subject = "customer" if rule_subject == "customer" else "unresolved"
-        if (
-            subject == "product"
-            and CONCEPT_LOOKUP[proposal.concept].group == "financial_health"
-        ):
+        financial = CONCEPT_LOOKUP[proposal.concept].group == "financial_health"
+        price_only = financial and price_only_financial_claim(proposal.exact_quote)
+        if price_only or (subject == "product" and financial):
             work.dispositions.append(
                 MappingDisposition(
                     candidate_id=block.block_id,
                     state="rejected",
-                    reason="gemini_subject_concept_mismatch",
+                    reason="gemini_price_not_financial_performance"
+                    if price_only
+                    else "gemini_subject_concept_mismatch",
                 )
             )
             return
