@@ -14,6 +14,20 @@ This file records verified claims and remaining work. It is not a completion sig
 
 ## Claims currently supported
 
+- The previously fitted FinEntity TF-IDF/logistic sentiment model now consumes
+  exact company-name spans in retained, exact-domain HN story titles. Its original
+  weights are unchanged; portable inference agrees with scikit-learn to floating
+  point precision. A fresh ElevenLabs HN probe retrieved four titles and only one
+  explicitly named ElevenLabs; that title produced **48.3/100 text valence**.
+  The report shows the one-title sample, exact quotation, canonical story link,
+  formula, source/model provenance and transfer warning. This is unvalidated
+  transfer from financial news, not representative public opinion or a business
+  forecast. Original held-out negative recall was only 1/11; do not demonstrate
+  this component as accurate risk screening. Missing entity spans abstain.
+  The source-replay report (fresh HN, retained other-source checkpoints) is
+  `/research/v2/reports/d8e831f150f7448880c0a2c635bb7562`. Desktop/mobile checks
+  passed; tracked sentiment audits under `docs/product` record the exact scope.
+
 - ElevenLabs now follows its linked official SDK documentation before collecting
   npm inputs. A fresh run on the normal `localhost:5173` / API `8000` setup passed
   in 61 seconds and displayed **SDK component trained** with an experimental

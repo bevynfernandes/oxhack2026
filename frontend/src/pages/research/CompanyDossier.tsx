@@ -164,6 +164,15 @@ export default function CompanyDossier({
       new Map(dimensionModels?.dimensions.map((row) => [row.group_id, row])),
     [dimensionModels],
   );
+  const eventSourceUrls = useMemo(
+    () =>
+      new Map(
+        standalone?.events.flatMap((event) =>
+          event.evidence_ids.map((id) => [id, event.url] as const),
+        ),
+      ),
+    [standalone?.events],
+  );
   const cutoff = outlook?.as_of ?? profile?.publication.source.as_of;
   const synthetic = profile?.publication.source.synthetic ?? false;
   const [mobileGroup, setMobileGroup] = useState(0);
@@ -940,7 +949,11 @@ export default function CompanyDossier({
                     .map((item) => (
                       <blockquote key={item.evidence_id}>
                         <p>{item.excerpt}</p>
-                        <SourceLink url={item.url}>
+                        <SourceLink
+                          url={
+                            eventSourceUrls.get(item.evidence_id) ?? item.url
+                          }
+                        >
                           Classified source title
                         </SourceLink>
                       </blockquote>
