@@ -92,6 +92,7 @@ def test_live_waits_for_idle_and_discards_audio(
         )
     )
     assert result.response == '{"proposals":[]}'
+    assert "/ws/google.ai.generativelanguage.v1alpha." in connector.call_args.args[0]
     assert (result.input_tokens, result.output_tokens) == (100, 30)
     setup = socket.sent[0]["setup"]
     assert isinstance(setup, dict)

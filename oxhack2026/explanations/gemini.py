@@ -76,6 +76,7 @@ class CachedInterpretation(BaseModel):
     model_version: str | None
     input_tokens: int
     output_tokens: int
+    reason_codes: tuple[str, ...] = ()
 
 
 @dataclass
@@ -108,6 +109,7 @@ class GeminiInterpreter:
 
         Args:
             prompt: Bounded public captured text and trusted extraction instructions.
+            schema: Optional submission contract, replacing block classifications.
         Returns:
             JSON response containing untrusted proposals.
         Raises:
@@ -154,7 +156,7 @@ class GeminiInterpreter:
                         contents=prompt,
                         config=types.GenerateContentConfig(
                             response_mime_type="application/json",
-                            response_schema=proposal_schema(),
+                            response_schema=proposal_schema(output=schema),
                             temperature=0,
                             max_output_tokens=2000,
                             thinking_config=(
@@ -220,7 +222,7 @@ class GeminiInterpreter:
 
         try:
             payload_schema = proposal_schema(compact=True, output=schema)
-            remaining = max(0.001, self.deadline - time.monotonic())
+            remaining = max(0.001, min(90, self.deadline - time.monotonic()))
             if self._runner and self._session:
                 result = self._runner.run(
                     self._session.generate(prompt, payload_schema, remaining)

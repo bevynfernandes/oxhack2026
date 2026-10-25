@@ -62,6 +62,7 @@ from oxhack2026.research.mapping_policy import (
     metric_eligible,
     price_only_financial_claim,
 )
+from oxhack2026.research.network import CollectionError
 from oxhack2026.research.numerical_claims import normalize_quantity
 from oxhack2026.storage.artifacts import FileArtifactStore
 from oxhack2026.storage.contracts import ArtifactReference
@@ -258,7 +259,19 @@ class MappingEngine:
             if time.monotonic() >= deadline:
                 self._reasons.append("mapping_deadline")
                 break
-            document = self._document(capture, content)
+            try:
+                document = self._document(capture, content)
+            except CollectionError as error:
+                logger.error("Captured document extraction failed: %s", str(error))  # noqa: TRY400
+                self._reasons.append(str(error))
+                work.dispositions.append(
+                    MappingDisposition(
+                        candidate_id=capture.capture_id,
+                        state="unmapped",
+                        reason=str(error),
+                    )
+                )
+                continue
             if document is None:
                 work.dispositions.append(
                     MappingDisposition(
@@ -342,7 +355,9 @@ class MappingEngine:
         try:
             analysis = None
             if self._extended:
-                self._interpret_extended(report, candidates, work, interpreter, started)
+                self._extract_with_reserve(
+                    report, candidates, work, interpreter, started
+                )
                 self._set_statistics(stage="synthesizing")
                 self._progress(
                     started, self._statistics.batches if self._statistics else 0
@@ -358,6 +373,31 @@ class MappingEngine:
             return analysis
         finally:
             interpreter.close_session()
+
+    def _extract_with_reserve(
+        self,
+        report: Report,
+        candidates: list[tuple[EvidenceDocument, DocumentBlock]],
+        work: MappingWork,
+        interpreter: GeminiInterpreter,
+        started: datetime,
+    ) -> None:
+        """Reserve time, one provider request and input capacity for cited synthesis."""
+        deadline, requests, input_budget = (
+            interpreter.deadline,
+            interpreter.max_requests,
+            interpreter.max_input,
+        )
+        remaining = max(0, deadline - time.monotonic())
+        interpreter.deadline -= min(120, remaining * 0.3)
+        interpreter.max_requests -= 1
+        interpreter.max_input -= min(32_000, int(input_budget * 0.4))
+        try:
+            self._interpret_extended(report, candidates, work, interpreter, started)
+        finally:
+            interpreter.deadline = deadline
+            interpreter.max_requests = requests
+            interpreter.max_input = input_budget
 
     def _interpreter(
         self, settings: ResearchSettings | None, deadline: float
@@ -481,11 +521,7 @@ class MappingEngine:
         key = _identifier(capture.capture_id, capture.artifact.sha256, PARSER_VERSION)
         path = self.root / "research-v2" / "mapping-documents" / f"{key}.json"
         with file_lock(path.with_suffix(".lock")):
-            if path.exists() and self.cache_policy == "reuse":
-                if self._statistics:
-                    self._set_statistics(
-                        cached_batches=self._statistics.cached_batches + 1
-                    )
+            if path.exists():
                 reference = ArtifactReference.model_validate_json(path.read_bytes())
                 cached = EvidenceDocument.model_validate_json(store.read(reference))
                 self._artifacts.append(reference)
@@ -719,7 +755,7 @@ class MappingEngine:
         )
         for chunk in chunks:
             if (
-                interpreter.attempts >= interpreter.max_requests - 1
+                interpreter.attempts >= interpreter.max_requests
                 or time.monotonic() >= interpreter.deadline
             ):
                 self._reasons.append("gemini_candidate_budget")
@@ -754,7 +790,7 @@ class MappingEngine:
                 if (
                     attempt
                     or not retryable
-                    or interpreter.attempts >= interpreter.max_requests - 1
+                    or interpreter.attempts >= interpreter.max_requests
                     or time.monotonic() + 2 >= interpreter.deadline
                 ):
                     raise
@@ -922,11 +958,17 @@ class MappingEngine:
                     store.read(reference)
                 )
                 interpreter.model_version = captured.model_version
+                interpreter.reason_codes.extend(
+                    code
+                    for code in captured.reason_codes
+                    if code not in interpreter.reason_codes
+                )
             else:
                 before_input, before_output = (
                     interpreter.input_tokens,
                     interpreter.output_tokens,
                 )
+                prior_reasons = len(interpreter.reason_codes)
                 response = (
                     interpreter.generate(prompt, schema)
                     if schema
@@ -939,6 +981,7 @@ class MappingEngine:
                     model_version=interpreter.model_version,
                     input_tokens=interpreter.input_tokens - before_input,
                     output_tokens=interpreter.output_tokens - before_output,
+                    reason_codes=tuple(interpreter.reason_codes[prior_reasons:]),
                 )
                 reference = store.write(
                     captured.model_dump_json().encode(), "application/json"
@@ -955,7 +998,14 @@ class MappingEngine:
                 ) as error:
                     self._artifacts.append(reference)
                     raise MappingUnavailable("gemini_invalid_output") from error
-                if not interpreter.reason_codes:
+                interruptions = {
+                    "gemini_live_background_incomplete",
+                    "gemini_live_background_interrupted",
+                }
+                if not captured.reason_codes or (
+                    set(captured.reason_codes) <= interruptions
+                    and orjson.loads(response).get("proposals")
+                ):
                     atomic_write(path, reference.model_dump_json().encode())
         self._artifacts.append(reference)
         return captured.response

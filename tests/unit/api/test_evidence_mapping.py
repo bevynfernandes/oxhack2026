@@ -714,3 +714,72 @@ def test_profiled_chunks_advance_with_cached_checkpoints(tmp_path: Path) -> None
     assert second.mapping.statistics.cached_batches > 1
     assert second.mapping.statistics.processed > processed
     assert second.mapping.statistics.provider_requests <= 6
+
+
+def test_document_cache_is_not_counted_as_a_gemini_batch(tmp_path: Path) -> None:
+    """Reusing deterministic document parsing cannot imply model interpretation."""
+    report = source_report(tmp_path, "<main><p>We serve 10 customers.</p></main>")
+    first = MappingEngine(tmp_path).map(report)
+    second = MappingEngine(tmp_path).map(report)
+    assert first.mapping and second.mapping
+    assert second.mapping.statistics and second.mapping.statistics.cached_batches == 0
+
+
+def test_unsupported_pdf_does_not_abort_other_evidence(tmp_path: Path) -> None:
+    """A retained malformed PDF becomes an explicit gap alongside usable HTML."""
+    from oxhack2026.storage.artifacts import FileArtifactStore
+
+    report = source_report(tmp_path, "<main><p>We serve 10 customers.</p></main>")
+    capture = report.captures[0].model_copy(
+        update={
+            "capture_id": "invalid-pdf",
+            "content_type": "application/pdf",
+            "artifact": FileArtifactStore(tmp_path).write(
+                b"not PDF", "application/octet-stream"
+            ),
+        }
+    )
+    report = report.model_copy(update={"captures": (*report.captures, capture)})
+    mapped = MappingEngine(tmp_path).map(report)
+    assert mapped.mapping and mapped.mapping.records
+    assert "invalid_public_pdf" in mapped.mapping.reason_codes
+
+
+def test_valid_interrupted_submissions_remain_auditable_cache_entries(
+    tmp_path: Path,
+) -> None:
+    """Useful returned proposals advance continuation while preserving interruption."""
+    from oxhack2026.api.research_configuration import profile_settings
+
+    report = source_report(
+        tmp_path, "<main><p>Our platform offers useful software for teams.</p></main>"
+    )
+    report = report.model_copy(update={"settings": profile_settings("fast")})
+    client = Mock(spec=GeminiInterpreter)
+    client.model = "test-live-model"
+    client.model_version = None
+    client.reason_codes = []
+    client.input_tokens = client.output_tokens = client.attempts = 0
+    client.deadline = time.monotonic() + 60
+
+    def generate(prompt: str, schema: object = None) -> str:
+        client.attempts += 1
+        if schema:
+            return '{"proposals":[]}'
+        client.reason_codes.append("gemini_live_background_incomplete")
+        return (
+            '{"proposals":[{"block_id":"b0","concept":"product_capability",'
+            '"subject":"company"}]}'
+        )
+
+    client.generate.side_effect = generate
+    MappingEngine(tmp_path, interpreter=client).map(report)
+    client.attempts = 0
+    client.generate.reset_mock()
+    client.reason_codes = []
+    repeated = MappingEngine(tmp_path, interpreter=client).map(report)
+    assert repeated.mapping and repeated.mapping.statistics
+    assert repeated.mapping.statistics.cached_batches == 2
+    assert repeated.mapping.statistics.provider_requests == 0
+    assert "gemini_live_background_incomplete" in repeated.mapping.reason_codes
+    client.generate.assert_not_called()

@@ -6,12 +6,21 @@ from unittest.mock import Mock
 import pytest
 from google import genai
 from google.genai import errors, types
+from pydantic import BaseModel
 
 from oxhack2026.explanations import config
-from oxhack2026.explanations.gemini import GeminiInterpreter, MappingUnavailable
+from oxhack2026.explanations.gemini import (
+    GeminiInterpreter,
+    MappingUnavailable,
+    proposal_schema,
+)
+from oxhack2026.research.analysis import AnalysisBatch
 
 
-def test_gemma_structured_text_and_usage(monkeypatch: pytest.MonkeyPatch) -> None:
+@pytest.mark.parametrize("schema", [None, AnalysisBatch])
+def test_gemma_structured_text_and_usage(
+    monkeypatch: pytest.MonkeyPatch, schema: type[BaseModel] | None
+) -> None:
     """An explicit Gemma override requests native structured text without audio."""
     monkeypatch.setenv("GEMINI_API_KEY", "test-key")
     monkeypatch.setenv("GEMINI_MODEL", "gemma-4-31b-it")
@@ -41,7 +50,7 @@ def test_gemma_structured_text_and_usage(monkeypatch: pytest.MonkeyPatch) -> Non
     monkeypatch.setattr(genai, "Client", constructor)
 
     interpreter = GeminiInterpreter(time.monotonic() + 5)
-    result = interpreter.generate("bounded public source data")
+    result = interpreter.generate("bounded public source data", schema)
 
     assert result == '{"proposals":[]}'
     assert interpreter.model == "gemma-4-31b-it"
@@ -50,7 +59,7 @@ def test_gemma_structured_text_and_usage(monkeypatch: pytest.MonkeyPatch) -> Non
     request = client.models.generate_content.call_args.kwargs
     assert request["model"] == "gemma-4-31b-it"
     assert request["config"].response_mime_type == "application/json"
-    assert request["config"].response_schema is not None
+    assert request["config"].response_schema == proposal_schema(output=schema)
     assert (
         request["config"].thinking_config.thinking_level == types.ThinkingLevel.MINIMAL
     )

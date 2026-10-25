@@ -10,6 +10,7 @@ from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from oxhack2026.api.evidence_mapping_schemas import MappedRecord
 from oxhack2026.api.research_analysis import AnalysisStatement, ResearchAnalysis
 from oxhack2026.explanations.gemini import MappingUnavailable
+from oxhack2026.research.analysis_quantities import supported_quantities
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ def analysis_prompt(records: list[MappedRecord]) -> str:
     selected = []
     counts: dict[str, int] = {}
     for row in records:
-        if counts.get(row.group_id, 0) >= 6:
+        if counts.get(row.group_id, 0) >= 3:
             continue
         counts[row.group_id] = counts.get(row.group_id, 0) + 1
         selected.append(
@@ -46,7 +47,7 @@ def analysis_prompt(records: list[MappedRecord]) -> str:
                 "published_on": row.published_on,
                 "exact_decimal": row.exact_decimal,
                 "resource": row.resource,
-                "quotes": [anchor.exact[:1000] for anchor in row.quotes[:2]],
+                "quotes": [anchor.exact[:400] for anchor in row.quotes[:2]],
                 "quantity": row.numerical_context.model_dump(mode="json")
                 if row.numerical_context
                 else None,
@@ -62,6 +63,46 @@ def analysis_prompt(records: list[MappedRecord]) -> str:
         "survival, growth or failure; do not produce scores. Do not introduce "
         "numbers, entities or comparisons absent from cited evidence.\n"
         + orjson.dumps(selected).decode()
+    )
+
+
+def _preserves_context(statement: AnalysisStatement, cited: list[MappedRecord]) -> bool:
+    """Reject subject transfers, stripped bounds and reversed financial negation."""
+    text = statement.text.casefold()
+    if statement.kind != "finding":
+        return True
+    if all(row.subject == "customer" for row in cited) and "customer" not in text:
+        return False
+    if all(
+        row.subject in {"third_party", "unresolved"} for row in cited
+    ) and not re.search(r"third.party|unresolved|uncertain|unverified|candidate", text):
+        return False
+    if re.search(r"\d", text):
+        if all(
+            row.attribution == "company_reported" for row in cited
+        ) and not re.search(
+            r"report|claim|according|stat(?:e|es|ed)|says|website|source|documentation|pricing",
+            text,
+        ):
+            return False
+        qualifiers = {row.qualifier for row in cited}
+        required = {
+            "lower_bound": r"at least|more than|over|greater than|lower bound",
+            "upper_bound": r"at most|less than|under|up to|upper bound",
+            "approximate": r"about|approximately|around|roughly|estimated",
+        }
+        if len(qualifiers) == 1:
+            pattern = required.get(next(iter(qualifiers)))
+            if pattern and not re.search(pattern, text):
+                return False
+    quotes = " ".join(anchor.exact.casefold() for row in cited for anchor in row.quotes)
+    negation = (
+        r"\b(?:not|never|no longer|hasn.t|haven.t)\s+(?:yet\s+)?"
+        r"(?:raised|profitable|achieved|reached|retained)\b"
+    )
+    return not (
+        re.search(negation, quotes)
+        and not re.search(r"\b(?:not|never|no longer|hasn.t|haven.t)\b", text)
     )
 
 
@@ -87,16 +128,14 @@ def validate_analysis(response: str, records: list[MappedRecord]) -> ResearchAna
         ):
             rejected += 1
             continue
-        support = " ".join(anchor.exact for row in cited for anchor in row.quotes)
-        support += " " + " ".join(row.exact_decimal or "" for row in cited)
-        numbers = re.findall(
-            r"[-+]?\d+(?:[,.]\d+)*|[%$€£¥]|\b(?:USD|EUR|GBP)\b", statement.text
-        )
-        if any(number not in support for number in numbers) or re.search(
+        if not supported_quantities(statement.text, cited) or re.search(
             r"\b(?:success score|probability|will (?:survive|fail|grow))\b",
             statement.text,
             re.I,
         ):
+            rejected += 1
+            continue
+        if not _preserves_context(statement, cited):
             rejected += 1
             continue
         accepted.append(statement)

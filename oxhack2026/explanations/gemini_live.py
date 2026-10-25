@@ -11,7 +11,7 @@ from websockets.exceptions import ConnectionClosed
 
 _ENDPOINT = (
     "wss://generativelanguage.googleapis.com/ws/"
-    "google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContent"
+    "google.ai.generativelanguage.v1alpha.GenerativeService.BidiGenerateContent"
 )
 
 
